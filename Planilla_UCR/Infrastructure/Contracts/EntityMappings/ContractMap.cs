@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Contracts.EntityMappings
 {
-    public class ContracttMap : IEntityTypeConfiguration<Contract>
+    public class ContractMap : IEntityTypeConfiguration<Contract>
     {
         public void Configure(EntityTypeBuilder<Contract> builder)
         {
@@ -23,17 +23,14 @@ namespace Infrastructure.Contracts.EntityMappings
             builder.HasKey(p => p.EmployeeEmail);
             builder.HasKey(p => p.ProjectEmail);
             builder.HasKey(p => p.ProjectName);
+            builder.HasKey(p => p.Date);
 
-            builder.Property(p => p.Project_Name)
-                   .IsRequired()
+            builder.Property(p => p.ProjectName)
                    .HasMaxLength(100);
 
             builder.Property(p => p.MountPerHour)
                  .IsRequired();
-
             builder.Property(p => p.TypeOfContract)
-                   .IsRequired();
-            builder.Property(p => p.Date)
                    .IsRequired();
             builder.Property(p => p.Duration)
                     .IsRequired();
