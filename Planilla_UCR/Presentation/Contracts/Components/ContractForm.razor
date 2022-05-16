@@ -9,14 +9,14 @@
 @using Application.Projects
 @using Domain.Projects.Entities
 
-@inject IPersonService PersonService
+@inject IContractService ContractService
 
 <div class="container">
-    <h1>Projects</h1>
+    <h1>Contracts</h1>
     <Loading IsLoading="_isLoading">
         @if (_isLoading)
         {
-            <h4 class="text-danger">There are no projects currently registered.</h4>
+            <h4 class="text-danger">There are no Contracts currently registered.</h4>
         }
         else
         {
@@ -46,10 +46,13 @@
 
     private bool _isLoading = true;
     private IEnumerable<ProjectDTO> _projects;
+    private bool _processing = false;
 
-    protected override async Task OnInitializedAsync()
+    async Task ProcessCreation()
     {
-        _projects = await ProjectService.GetAllProjectsAsync();
-        _isLoading = false;
+        _processing = true;
+        await ContractService.CreateContractAsync("myEmail@address.com", "projectEmail@address.com", "NameOfProject", 100, "Type1", "20200520", 5);
+        _processing = false;
     }
+
 }
