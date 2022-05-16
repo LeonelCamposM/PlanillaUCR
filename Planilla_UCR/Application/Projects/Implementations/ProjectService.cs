@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 
 namespace Application.Projects.Implementations
 {
-    internal class ProjectService : IProjectService
+    internal class ContractService : IProjectService
     {
         private readonly IProjectRepository _projectRepository;
 
-        public ProjectService(IProjectRepository projectRepository) 
+        public ContractService(IProjectRepository projectRepository) 
         {
             _projectRepository = projectRepository;
         }
