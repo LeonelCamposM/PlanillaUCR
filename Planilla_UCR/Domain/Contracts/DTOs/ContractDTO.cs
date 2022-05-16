@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Domain.Contract.DTOs
+namespace Domain.Contracts.DTOs
 {
-    public class ContractDTO
+    public class ContractsDTO
     {
         public String EmployeeEmail { get; }
         public String ProjectEmail { get; }
@@ -20,7 +20,7 @@ namespace Domain.Contract.DTOs
 
 
 
-        public ContractDTO(String employeeEmail, string projectEmail, string projectName, int mountPerHour, string typeOfContract, string date, int duration)
+        public ContractsDTO(String employeeEmail, string projectEmail, string projectName, int mountPerHour, string typeOfContract, string date, int duration)
         {
             EmployeeEmail = employeeEmail;
             ProjectEmail = projectEmail;

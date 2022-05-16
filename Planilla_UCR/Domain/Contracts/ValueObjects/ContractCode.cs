@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 
-namespace Domain.Contract.ValueObjects
+namespace Domain.Contracts.ValueObjects
 {
     class ContractCode
     {

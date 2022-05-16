@@ -1,5 +1,7 @@
 ﻿using Application.Projects;
 using Application.Projects.Implementations;
+using Application.Contracts;
+using Application.Contracts.Implementations;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;

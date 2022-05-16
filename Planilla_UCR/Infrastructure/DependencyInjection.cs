@@ -1,9 +1,9 @@
 ﻿using Domain.Core.Repositories;
 using Infrastructure.Projects;
 using Infrastructure.Projects.Repositories;
-using Domain.Contract.Repositories;
-using Infrastructure.Contract;
-using Infrastructure.Contract.Repositories;
+using Domain.Contracts.Repositories;
+using Infrastructure.Contracts;
+using Infrastructure.Contracts.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;

@@ -1,6 +1,8 @@
 ﻿using Domain.Core.Repositories;
 using Domain.Projects.DTOs;
 using Domain.Projects.Entities;
+using Domain.Projects.Repositories;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,11 +11,11 @@ using System.Threading.Tasks;
 
 namespace Application.Projects.Implementations
 {
-    internal class ContractService : IProjectService
+    internal class ProjectService : IProjectService
     {
         private readonly IProjectRepository _projectRepository;
 
-        public ContractService(IProjectRepository projectRepository) 
+        public ProjectService(IProjectRepository projectRepository)
         {
             _projectRepository = projectRepository;
         }

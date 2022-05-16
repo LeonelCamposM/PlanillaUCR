@@ -1,6 +1,7 @@
 ﻿using Domain.Core.Repositories;
-using Domain.Contract.DTOs;
-using Domain.Contract.Entities;
+using Domain.Contracts.DTOs;
+using Domain.Contracts.Entities;
+using Domain.Contracts.Repositories;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Infrastructure.Contract.Repositories
+namespace Infrastructure.Contracts.Repositories
 {
     internal class ContractRepository : IContractRepository
     {
@@ -23,7 +24,7 @@ namespace Infrastructure.Contract.Repositories
         public async Task CreateContractAsync(String employeeEmail, string projectEmail, string projectName, int mountPerHour, string typeOfContract, string date, int duration)
         {
             Contract c = new Contract(employeeEmail, projectEmail, projectName, mountPerHour, typeOfContract, date, duration);
-            _dbContext.Contract.Add(c);
+            _dbContext.Contracts.Add(c);
             await _dbContext.SaveEntitiesAsync();
         }
     }

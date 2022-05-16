@@ -1,14 +1,14 @@
 ﻿using Domain.Core.Repositories;
-using Domain.Contract.DTOs;
-using Domain.Contract.Entities;
-using Domain.Contract.Repositories;
+using Domain.Contracts.DTOs;
+using Domain.Contracts.Entities;
+using Domain.Contracts.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Contract.Implementations
+namespace Application.Contracts.Implementations
 {
     internal class ContractService : IContractService
     {

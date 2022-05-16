@@ -1,10 +1,15 @@
 ﻿@page "/contracts"
+
+@using Domain.Contracts.DTOs
+@using Application.Contracts
+@using Domain.Contracts.Entities
+@using Presentation.Core.Components
+
 @using Domain.Projects.DTOs
 @using Application.Projects
 @using Domain.Projects.Entities
-@using Presentation.Core.Components
 
-@inject IProjectService ProjectService
+@inject IPersonService PersonService
 
 <div class="container">
     <h1>Projects</h1>

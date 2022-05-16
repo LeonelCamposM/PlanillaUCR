@@ -1,12 +1,12 @@
-﻿using Domain.Contract.DTOs;
-using Domain.Contract.Entities;
+﻿using Domain.Contracts.DTOs;
+using Domain.Contracts.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Domain.Contract.Repositories
+namespace Domain.Contracts.Repositories
 {
     public interface IContractRepository
     {

@@ -1,6 +1,6 @@
-﻿using Domain.Contract.Entities;
+﻿using Domain.Contracts.Entities;
 using Infrastructure.Core;
-using Infrastructure.Contract.EntityMappings;
+using Infrastructure.Contracts.EntityMappings;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Infrastructure.Contract
+namespace Infrastructure.Contracts
 {
     public class ContractDbContext : ApplicationDbContext
     {
@@ -17,7 +17,7 @@ namespace Infrastructure.Contract
         {
         }
 
-        public DbSet<Contract> Contract { get; set; } = null!;
+        public DbSet<Contract> Contracts { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

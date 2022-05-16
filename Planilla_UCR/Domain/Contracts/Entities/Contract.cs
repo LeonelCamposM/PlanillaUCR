@@ -1,13 +1,13 @@
 ﻿using Domain.Core.Entities;
 using Domain.Core.ValueObjects;
-using Domain.Contract.ValueObjects;
+using Domain.Contracts.ValueObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Domain.Contract.Entities
+namespace Domain.Contracts.Entities
 {
     public class Contract
     {

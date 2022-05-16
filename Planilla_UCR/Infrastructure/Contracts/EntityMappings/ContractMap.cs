@@ -1,8 +1,8 @@
 ﻿using Domain.Core.Helpers;
 using Domain.Core.ValueObjects;
-using Domain.Contract;
-using Domain.Contract.Entities;
-using Domain.Contract.ValueObjects;
+using Domain.Contracts;
+using Domain.Contracts.Entities;
+using Domain.Contracts.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Metadata;
@@ -12,7 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Infrastructure.Contract.EntityMappings
+namespace Infrastructure.Contracts.EntityMappings
 {
     public class ContracttMap : IEntityTypeConfiguration<Contract>
     {
