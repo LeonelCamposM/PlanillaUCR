@@ -14,16 +14,16 @@ else
 {
     <MudTable Items="@Elements.Take(4)" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="Color.Info">
         <HeaderContent>
-            <MudTh>Id</MudTh>
+            <MudTh>EmployerEmail</MudTh>
             <MudTh>Project_Name</MudTh>
             <MudTh>Publication</MudTh>
             <MudTh>Group</MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="Id">@context.Id</MudTd>
-            <MudTd DataLabel="Project_Name">@context.Project_Name</MudTd>
-            <MudTd DataLabel="Publication">@context.Publication</MudTd>
-            <MudTd DataLabel="Group">@context.Group</MudTd>
+            <MudTd DataLabel="EmployerEmail">@context.EmployerEmail</MudTd>
+            <MudTd DataLabel="ProjectName">@context.ProjectName</MudTd>
+            <MudTd DataLabel="ProjectDescription">@context.ProjectDescription</MudTd>
+            <MudTd DataLabel="MaximumAmountForBenefits">@context.MaximumAmountForBenefits</MudTd>
         </RowTemplate>
     </MudTable>
 }
