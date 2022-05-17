@@ -1,12 +1,17 @@
-﻿using Domain.Projects.Entities;
-using System.Threading.Tasks;
+﻿using Domain.Projects.DTOs;
 using Domain.Core.Repositories;
-
+using Domain.Projects.Entities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Domain.Projects.Repositories
 {
-    public interface IProjectRepository 
+    public interface IProjectRepository
     {
-        Task CreateProjectAsync<ProjectDTO (Project projectInfo);
+        Task<IEnumerable<ProjectDTO>> GetAllAsync();
+        Task CreateProjectAsync(Project project);
     }
 }
