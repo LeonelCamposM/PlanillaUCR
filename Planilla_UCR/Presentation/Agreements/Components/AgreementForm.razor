@@ -1,62 +1,161 @@
 ﻿@page "/agreements"
-
 @using Domain.Agreements.DTOs
 @using Application.Agreements
 @using Domain.Agreements.Entities
 @using Presentation.Core.Components
-
+@inject ISnackbar Snackbar
 @inject IAgreementService AgreementService
 
-@if (_loading)
+@if (_created)
 {
-    <h4 class="text-danger">Loading proyects :D</h4>
+    ShowSuccesNotification("Contrato establecido");
 }
-else
-{
-    @*<MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
-    <MudItem xs="2">
-        <MudSelect  @bind-Value="project" Label="Proyecto">
-            <MudSelectItem Value="@("Contrato 1")">Contrato 1</MudSelectItem>
-            <MudSelectItem Value="@("Contrato 2")">Contrato 2</MudSelectItem>
-        </MudSelect>
+
+
+ <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
+<MudGrid>
+    @*Text fields *@
+    <MudItem xs="12" sm="8">
+        <MudPaper  Height="220px" Width="90%" Outlined="false" Class="border-none pa-4" Elevation="0">
+             <MudForm @ref="form">
+                <MudText Align="Align.Center" Typo="Typo.h6">Establecimiento de contrato</MudText>
+                <MudGrid>
+                    @*Small fields *@
+                    <MudItem xs="6">
+                        <MudTextField @bind-Value="agreementObject.EmployeeEmail" Label="Email del empleado" Variant="Variant.Outlined" Required="true" RequiredError="El email del empleado es necesario"></MudTextField>
+
+                    </MudItem>
+
+                    <MudItem xs="6">
+                        <MudTextField @bind-Value="agreementObject.EmployerEmail" Label="Email del empleador" Variant="Variant.Outlined" Required="true" RequiredError="El email del empleador es necesario"></MudTextField>
+                    </MudItem>
+
+                    <MudItem xs="6">
+                        <MudTextField @bind-Value="agreementObject.ProjectName" Label="Nombre del proyecto" Variant="Variant.Outlined" Required="true" RequiredError="El nombre del proyecto es necesario"></MudTextField>
+                    </MudItem>
+
+                    <MudItem xs="6">
+                        <MudTextField @bind-Value=" agreementObject.ContractDate" Label="Fecha de inicio" Variant="Variant.Outlined" Required="true" RequiredError="La fecha de inicio es necesaria"></MudTextField>
+                    </MudItem>
+
+                     <MudItem xs="6">
+                        <MudTextField @bind-Value="agreementObject.ContractType" Label="Tipo de contrato" Variant="Variant.Outlined" Required="true" RequiredError="El tipo de contrato es necesario"></MudTextField>
+                    </MudItem>
+
+                    <MudItem xs="6">
+                        <MudTextField @bind-Value="agreementObject.MountPerHour" Label="Monto por hora" Variant="Variant.Outlined" Required="true" RequiredError="El monto por hora es necesario"></MudTextField>
+                    </MudItem>
+
+                    @*Large fields *@
+                    <MudItem xs="12">
+                        <MudTextField @bind-Value="agreementObject.Duration " Label="Duración" Variant="Variant.Outlined" Required="true" RequiredError="La duración del contrato es necesaria"></MudTextField>
+                    </MudItem> 
+                 
+                    @*Create buton *@
+                    <MudItem xs="12" sm="6" md="4">
+                           <MudButton Disabled="@_saving" @bind-IsValid="@_canSend" Variant="Variant.Filled" Color="Color.Primary" DisableElevation="true" OnClick="TryToSend">
+                    
+                                @if (_saving)
+                                {
+                                    <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true"/>
+                                    <MudText Class="ms-2">Procesando</MudText>
+                                }
+                                else
+                                {
+                                    <MudText Class="ms-2">Crear</MudText>
+                                }
+
+                            </MudButton>
+                    </MudItem>
+
+                    @*Clear buton*@
+                    <MudItem xs="12" sm="6" md="4">
+                        <MudButton OnClick="CleanForm" Variant="Variant.Filled" Color="Color.Error">
+                            <MudText>Limpiar</MudText>
+                        </MudButton>
+                    </MudItem>
+                </MudGrid>
+            </MudForm>
+        </MudPaper>
     </MudItem>
-    *@
-    <MudTable Items="@Elements.Take(4)" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="Color.Info">
-        <HeaderContent>
-            <MudTh></MudTh>
-            <MudTh>Emmail jeje</MudTh>
 
-        </HeaderContent>
-        <RowTemplate>
-            <MudTd DataLabel="Emmail">@context.EmployerEmail</MudTd>
+    @*File uploader *@
+    <MudItem xs="3">
 
-        </RowTemplate>
-    </MudTable>
-}
+    </MudItem>
+</MudGrid>
 
+@code{
+    Agreement agreementObject = new Agreement("", "", "", "", "", 0, "");
 
-@code {
-    private bool _hidePosition;
-    private bool _loading = true;
-    private IEnumerable<AgreementDTO> Elements;
-
-    public string emmail { get; set; }
-    public string project { get; set; }
+    MudForm form;
+    private bool _isLoading = true;
+    private bool _saving = false;
+    private bool _canSend = false;
+    private bool _created = false;
 
     private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
     {
-        new BreadcrumbItem("Home", href: ""),
-        new BreadcrumbItem("Proyectos", href: null, disabled: true),
-        new BreadcrumbItem("Nombre", href: null, disabled: true),
-        new BreadcrumbItem("Deducciones", href: "deductions"),
+        new BreadcrumbItem("Inicio", href: "#"),
+        new BreadcrumbItem("Cuenta", href: "#"),
     };
 
-    protected override async Task OnInitializedAsync()
+    async Task TryToSend()
     {
-        Agreement agreement = new Agreement("jeremy@ucr.ac.cr", "jeremy2@ucr.ac.cr", "ProjectNameExample", "2022-01-01", "TypeOfAgreement1", 100, "2023-01-01");
-        await AgreementService.CreateAgreementAsync(agreement);
-        _loading = false;
+        await form.Validate();
+        if (form.IsValid)
+        {
+            _saving = true;
+            await SaveAgreementType();
+            _saving = false;
+            _created = true;
+        }
+    }
 
+
+    async Task SaveAgreementType()
+    {
+        await AgreementService.CreateAgreementAsync(agreementObject);
+
+    }
+
+    void ShowSuccesNotification(string message)
+    {
+        Snackbar.Configuration.SnackbarVariant = Variant.Filled;
+        Snackbar.Add($"{message}", Severity.Success, config =>
+        {
+            config.RequireInteraction = true;
+            config.ShowCloseIcon = true;
+            config.Onclick = snackbar =>
+            {
+                return Task.CompletedTask;
+            };
+        });
+    }
+
+    void ShowErrorNotification(string message)
+    {
+        Snackbar.Configuration.SnackbarVariant = Variant.Filled;
+        Snackbar.Add($"{message}", Severity.Error, config =>
+        {
+            config.RequireInteraction = true;
+            config.ShowCloseIcon = true;
+            config.Onclick = snackbar =>
+            {
+                return Task.CompletedTask;
+            };
+        });
+    }
+
+    void CleanForm()
+    {
+        agreementObject.EmployeeEmail = "";
+        agreementObject.EmployerEmail = "";
+        agreementObject.ProjectName = "";
+        agreementObject.ContractDate = "";
+        agreementObject.ContractType = "";
+        agreementObject.MountPerHour = 0;
+        agreementObject.Duration = "";
     }
 
 }

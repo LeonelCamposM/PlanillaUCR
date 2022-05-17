@@ -15,7 +15,6 @@ namespace Application
     {
         public static IServiceCollection AddApplicationLayer(this IServiceCollection services)
         {
-            //services.AddTransient<IProjectService, ProjectService>();
             services.AddTransient<IAgreementService, Agreements.Implementations.AgreementService>();
 
             return services;

@@ -18,8 +18,6 @@ namespace Infrastructure
     {
         public static IServiceCollection AddInfrastructureLayer(this IServiceCollection services, string connectionString)
         {
-            //services.AddDbContext<ProjectDbContext>(options => options.UseSqlServer(connectionString));
-            //services.AddScoped<IProjectRepository, ProjectRepository>();
 
             services.AddDbContext<AgreementDbContext>(options => options.UseSqlServer(connectionString));
             services.AddScoped<IAgreementRepository, AgreementRepository>();

@@ -9,13 +9,13 @@ namespace Domain.Agreements.DTOs
 {
     public class AgreementDTO
     {
-        public String EmployeeEmail { get; }
-        public String EmployerEmail { get; }
-        public string ProjectName { get; }
-        public string ContractDate { get; }
-        public string ContractType { get; }
-        public int MountPerHour { get; }
-        public string Duration { get; }
+        public String EmployeeEmail { get; set; }
+        public String EmployerEmail { get; set; }
+        public string ProjectName { get; set; }
+        public string ContractDate { get; set; }
+        public string ContractType { get; set; }
+        public int MountPerHour { get; set; }
+        public string Duration { get; set; }
 
 
 
