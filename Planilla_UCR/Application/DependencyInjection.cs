@@ -1,7 +1,7 @@
 ﻿using Application.Projects;
 using Application.Projects.Implementations;
-using Application.Contracts;
-using Application.Contracts.Implementations;
+using Application.Agreements;
+using Application.Agreements.Implementations;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -15,8 +15,8 @@ namespace Application
     {
         public static IServiceCollection AddApplicationLayer(this IServiceCollection services)
         {
-            services.AddTransient<IProjectService, ProjectService>();
-            services.AddTransient<IContractService, ContractService>();
+            //services.AddTransient<IProjectService, ProjectService>();
+            services.AddTransient<IAgreementService, Agreements.Implementations.AgreementService>();
 
             return services;
         }

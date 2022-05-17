@@ -1,9 +1,9 @@
 ﻿using Domain.Core.Repositories;
 using Infrastructure.Projects;
 using Infrastructure.Projects.Repositories;
-using Domain.Contracts.Repositories;
-using Infrastructure.Contracts;
-using Infrastructure.Contracts.Repositories;
+using Domain.Agreements.Repositories;
+using Infrastructure.Agreements;
+using Infrastructure.Agreements.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -18,11 +18,11 @@ namespace Infrastructure
     {
         public static IServiceCollection AddInfrastructureLayer(this IServiceCollection services, string connectionString)
         {
-            services.AddDbContext<ProjectDbContext>(options => options.UseSqlServer(connectionString));
-            services.AddScoped<IProjectRepository, ProjectRepository>();
+            //services.AddDbContext<ProjectDbContext>(options => options.UseSqlServer(connectionString));
+            //services.AddScoped<IProjectRepository, ProjectRepository>();
 
-            services.AddDbContext<ContractDbContext>(options => options.UseSqlServer(connectionString));
-            services.AddScoped<IContractRepository, ContractRepository>();
+            services.AddDbContext<AgreementDbContext>(options => options.UseSqlServer(connectionString));
+            services.AddScoped<IAgreementRepository, AgreementRepository>();
 
             return services;
         }

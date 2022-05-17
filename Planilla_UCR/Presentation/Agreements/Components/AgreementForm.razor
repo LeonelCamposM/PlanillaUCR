@@ -1,0 +1,62 @@
+﻿@page "/agreements"
+
+@using Domain.Agreements.DTOs
+@using Application.Agreements
+@using Domain.Agreements.Entities
+@using Presentation.Core.Components
+
+@inject IAgreementService AgreementService
+
+@if (_loading)
+{
+    <h4 class="text-danger">Loading proyects :D</h4>
+}
+else
+{
+    @*<MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
+    <MudItem xs="2">
+        <MudSelect  @bind-Value="project" Label="Proyecto">
+            <MudSelectItem Value="@("Contrato 1")">Contrato 1</MudSelectItem>
+            <MudSelectItem Value="@("Contrato 2")">Contrato 2</MudSelectItem>
+        </MudSelect>
+    </MudItem>
+    *@
+    <MudTable Items="@Elements.Take(4)" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="Color.Info">
+        <HeaderContent>
+            <MudTh></MudTh>
+            <MudTh>Emmail jeje</MudTh>
+
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Emmail">@context.EmployerEmail</MudTd>
+
+        </RowTemplate>
+    </MudTable>
+}
+
+
+@code {
+    private bool _hidePosition;
+    private bool _loading = true;
+    private IEnumerable<AgreementDTO> Elements;
+
+    public string emmail { get; set; }
+    public string project { get; set; }
+
+    private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
+    {
+        new BreadcrumbItem("Home", href: ""),
+        new BreadcrumbItem("Proyectos", href: null, disabled: true),
+        new BreadcrumbItem("Nombre", href: null, disabled: true),
+        new BreadcrumbItem("Deducciones", href: "deductions"),
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        Agreement agreement = new Agreement("jeremy@ucr.ac.cr", "jeremy2@ucr.ac.cr", "ProjectNameExample", "2022-01-01", "TypeOfAgreement1", 100, "2023-01-01");
+        await AgreementService.CreateAgreementAsync(agreement);
+        _loading = false;
+
+    }
+
+}

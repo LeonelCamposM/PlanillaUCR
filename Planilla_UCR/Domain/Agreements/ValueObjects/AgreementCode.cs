@@ -7,9 +7,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 
-namespace Domain.Contracts.ValueObjects
+namespace Domain.Agreements.ValueObjects
 {
-    class ContractCode
+    class AgreementCode
     {
 
     }
