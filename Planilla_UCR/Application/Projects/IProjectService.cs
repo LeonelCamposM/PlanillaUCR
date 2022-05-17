@@ -9,6 +9,7 @@ namespace Application.Projects
 {
     public interface IProjectService
     {
-        Task<IEnumerable<ProjectDTO>> GetAllProjectsAsync(); 
+        Task<IEnumerable<ProjectDTO>> GetAllProjectsAsync();
+        Task CreateProjectAsync(Project project);
     }
 }
