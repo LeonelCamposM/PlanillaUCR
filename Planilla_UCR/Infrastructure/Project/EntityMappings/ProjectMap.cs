@@ -17,20 +17,17 @@ namespace Infrastructure.Projects.EntityMappings
     {
         public void Configure(EntityTypeBuilder<Project> builder)
         {
-            builder.ToTable("Projects");
+            builder.ToTable("Project");
 
-            builder.HasKey(p => p.Id);
+            builder.HasKey(p => new { p.EmployerEmail, p.ProjectName });
 
-            builder.Property(p => p.Project_Name)
-                   .IsRequired()
-                   .HasMaxLength(100);
+            builder.Property(p => p.ProjectDescription);
 
-            builder.Property(p => p.Publication)
-                 .IsRequired();
+            builder.Property(p => p.MaximumAmountForBenefits);
 
-            builder.Property(p => p.Group)
-                   .IsRequired()
-                   .HasMaxLength(100);
+            builder.Property(p => p.MaximumBenefitAmount);
+
+            builder.Property(p => p.PaymentInterval);
         }
 
     }

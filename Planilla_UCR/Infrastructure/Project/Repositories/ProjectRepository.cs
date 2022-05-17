@@ -1,7 +1,7 @@
 ﻿using Domain.Core.Repositories;
 using Domain.Projects.DTOs;
-using Domain.Projects.Entities;
 using Domain.Projects.Repositories;
+using Domain.Projects.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -20,10 +20,18 @@ namespace Infrastructure.Projects.Repositories
         {
             _dbContext = unitOfWork;
         }
-
         public async Task<IEnumerable<ProjectDTO>> GetAllAsync()
         {
-            return await _dbContext.Projects.Select(t => new ProjectDTO(t.Id, t.Project_Name, t.Publication, t.Group)).ToListAsync();
+            return await _dbContext.Projects.Select(t => new 
+            ProjectDTO(t.EmployerEmail, t.ProjectName, 
+            t.ProjectDescription, t.MaximumAmountForBenefits,
+            t.MaximumBenefitAmount, t.PaymentInterval)).ToListAsync();
+        }
+
+        public async Task CreateProjectAsync(Project ProjectInfo)
+        {
+            _dbContext.Projects.Add(ProjectInfo);
+            await _dbContext.SaveEntitiesAsync();
         }
     }
 }
