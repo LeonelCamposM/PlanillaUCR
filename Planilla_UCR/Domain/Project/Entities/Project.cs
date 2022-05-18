@@ -11,12 +11,12 @@ namespace Domain.Projects.Entities
 {
     public class Project /*: AggregateRoot*/
     {
-        public String EmployerEmail { get; }
-        public String ProjectName { get; }
-        public String ProjectDescription { get; }
-        public int MaximumAmountForBenefits { get; }
-        public int MaximumBenefitAmount { get; }
-        public String PaymentInterval { get; }
+        public String EmployerEmail { set; get; }
+        public String ProjectName { set; get; }
+        public String ProjectDescription { set; get; }
+        public int MaximumAmountForBenefits { set; get; }
+        public int MaximumBenefitAmount { set; get; }
+        public String PaymentInterval { set; get; }
 
         public Project(String Email, String Name,
                         String Description, int MaxAmountForBenefits,
