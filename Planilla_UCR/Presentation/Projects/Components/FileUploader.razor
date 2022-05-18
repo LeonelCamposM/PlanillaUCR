@@ -1,31 +1,6 @@
 ﻿@inject ISnackbar Snackbar
 
 <br />
-<MudText Align="Align.Center" Typo="Typo.h6">Foto de perfil</MudText>
-<MudPaper @ondragenter="@SetDragClass" @ondragleave="@ClearDragClass"
-@ondragend="@ClearDragClass" Height="150px" Outlined="true" Class="@DragClass">
-    @if (!Clearing)
-    {
-        <InputFile OnChange="OnInputFileChanged" multiple  class="absolute mud-width-full 
-        mud-height-full overflow-hidden z-2" style="opacity:0;" />
-    }
-    <MudText Typo="Typo.body1">Arrastra la imagen, o haz click aquí</MudText>
-    @foreach (var file in fileNames)
-    {
-        <MudChip Color="Color.Dark" Text="@file" />
-    }
-</MudPaper>
-<MudToolBar DisableGutters="true" Class="gap-4">
- <MudSpacer></MudSpacer>
-<MudButton OnClick="Upload" Disabled="@(!fileNames.Any())" Color="Color.Secondary" 
-    Variant="Variant.Filled" class= "align-center">Subir
-</MudButton>
-<MudSpacer></MudSpacer>
-<MudButton OnClick="Clear" Disabled="@(!fileNames.Any())" 
-    Color="Color.Error" Variant="Variant.Filled" class= "align-center">Limpiar
-</MudButton>
-<MudSpacer></MudSpacer>
-</MudToolBar>
 
 @code {
     private bool Clearing = false;
@@ -51,12 +26,6 @@
         ClearDragClass();
         await Task.Delay(0);
         Clearing = false;
-    }
-    private void Upload()
-    {
-        //Upload the files here
-        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
-        Snackbar.Add("TODO: Upload your files!", Severity.Normal);
     }
 
     private void SetDragClass()
