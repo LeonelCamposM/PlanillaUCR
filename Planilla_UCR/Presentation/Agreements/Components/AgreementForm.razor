@@ -3,8 +3,12 @@
 @using Application.Agreements
 @using Domain.Agreements.Entities
 @using Presentation.Core.Components
+@using System.ComponentModel.DataAnnotations
+
 @inject ISnackbar Snackbar
 @inject IAgreementService AgreementService
+
+
 
 @if (_created)
 {
@@ -22,7 +26,8 @@
                 <MudGrid>
                     @*Small fields *@
                     <MudItem xs="6">
-                        <MudTextField @bind-Value="agreementObject.EmployeeEmail" Label="Email del empleado" Variant="Variant.Outlined" Required="true" RequiredError="El email del empleado es necesario"></MudTextField>
+                        <MudTextField @bind-Value="agreementObject.EmployeeEmail" T="string" Label="Email del empleado" Variant="Variant.Outlined" Required="true" RequiredError="El email del empleado es necesario"
+                            Validation="@(new EmailAddressAttribute() {ErrorMessage = "Por favor, digite un correo válido"})" ></MudTextField>
 
                     </MudItem>
 
@@ -35,20 +40,30 @@
                     </MudItem>
 
                     <MudItem xs="6">
-                        <MudTextField @bind-Value=" agreementObject.ContractDate" Label="Fecha de inicio" Variant="Variant.Outlined" Required="true" RequiredError="La fecha de inicio es necesaria"></MudTextField>
+                        @*<MudTextField @bind-Value=" agreementObject.ContractDate" Label="Fecha de inicio" Variant="Variant.Outlined" Required="true" RequiredError="La fecha de inicio es necesaria"></MudTextField>*@
+                        <MudDatePicker Label="Fecha de inicio" @bind-Date="startDate" DateFormat="dd.MM.yyyy" Variant="Variant.Outlined" Required="true" RequiredError="La fecha de inicio es necesaria"/>
                     </MudItem>
 
                      <MudItem xs="6">
-                        <MudTextField @bind-Value="agreementObject.ContractType" Label="Tipo de contrato" Variant="Variant.Outlined" Required="true" RequiredError="El tipo de contrato es necesario"></MudTextField>
+                        <MudSelect @bind-Value="agreementObject.ContractType" Label="Tipo de contrato" Variant="Variant.Outlined" Required="true" RequiredError="El tipo de contrato es necesario">
+                            <MudSelectItem Value="@("Cappuccino")" />
+                            <MudSelectItem Value="@("Cafe Latte")" />
+                            <MudSelectItem Value="@("Espresso")" />
+                        </MudSelect>
                     </MudItem>
 
                     <MudItem xs="6">
-                        <MudTextField @bind-Value="agreementObject.MountPerHour" Label="Monto por hora" Variant="Variant.Outlined" Required="true" RequiredError="El monto por hora es necesario"></MudTextField>
+                        @*<MudNumericField @bind-Value="agreementObject.MountPerHour" Label="Monto por hora" Variant="Variant.Outlined" Required="true" RequiredError="El monto por hora es necesario" HideSpinButtons="true" Min = "0"> </MudNumericField>*@
+                        <MudNumericField @bind-Value="salaryPerMonth" Label="Monto por hora" Variant="Variant.Outlined" Required="true" RequiredError="El monto por hora es necesario" HideSpinButtons="true" Min = "0"> </MudNumericField>
+
+                        
                     </MudItem>
 
                     @*Large fields *@
                     <MudItem xs="12">
-                        <MudTextField @bind-Value="agreementObject.Duration " Label="Duración" Variant="Variant.Outlined" Required="true" RequiredError="La duración del contrato es necesaria"></MudTextField>
+                        <MudDatePicker Label="Fecha de finalización" @bind-Date="endDate" DateFormat="dd.MM.yyyy" Variant="Variant.Outlined" Required="true" RequiredError="La fecha de finalización es necesaria"/>
+
+                        @*<MudTextField @bind-Value="agreementObject.Duration " Label="Fecha de finalización" Variant="Variant.Outlined" Required="true" RequiredError="La fecha de finalización del contrato es necesaria"></MudTextField>*@
                     </MudItem> 
                  
                     @*Create buton *@
@@ -89,6 +104,10 @@
     Agreement agreementObject = new Agreement("", "", "", "", "", 0, "");
 
     MudForm form;
+    DateTime? startDate;
+    DateTime? endDate;
+    int? salaryPerMonth;
+
     private bool _isLoading = true;
     private bool _saving = false;
     private bool _canSend = false;
@@ -97,7 +116,7 @@
     private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
     {
         new BreadcrumbItem("Inicio", href: "#"),
-        new BreadcrumbItem("Cuenta", href: "#"),
+        new BreadcrumbItem("Contratos", href: "#"),
     };
 
     async Task TryToSend()
