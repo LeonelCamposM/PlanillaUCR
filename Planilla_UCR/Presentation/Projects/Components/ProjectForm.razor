@@ -111,7 +111,7 @@
     private bool _processing = false;
 
     SnackHandler snackHandler = new SnackHandler();
-    Project ProjectInfo = new Project("","","",Int32.Parse("0"),Int32.Parse("0"),"");
+    Project ProjectInfo = new Project("www@dad","Prueba","",Int32.Parse("0"),Int32.Parse("0"),"");
     MudForm form;
 
     private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
@@ -125,14 +125,16 @@
     async Task CreateProject()
     {
         snackHandler._saving = true;
-        await form.Validate();
-        if (form.IsValid)
-        {
-            await ProjectService.CreateProjectAsync(ProjectInfo);
-            snackHandler._saving = false;
-            ShowSnackNotification(ProjectInfo.ProjectName+" creado", Severity.Success);
-            CleanForm();
-        }
+        await ProjectService.CreateProjectAsync(ProjectInfo);
+        ShowSnackNotification(ProjectInfo.ProjectName+" creado", Severity.Success);
+        //await form.Validate();
+        //if (form.IsValid)
+        //{
+        //    await ProjectService.CreateProjectAsync(ProjectInfo);
+        //    snackHandler._saving = false;
+        //    ShowSnackNotification(ProjectInfo.ProjectName+" creado", Severity.Success);
+        //    CleanForm();
+        //}
        
         snackHandler._saving = false;
     }

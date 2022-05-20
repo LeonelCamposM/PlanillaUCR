@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Domain.Projects.Entities
 {
-    public class Project /*: AggregateRoot*/
+    public class Project
     {
         public String EmployerEmail { set; get; }
         public String ProjectName { set; get; }
@@ -29,5 +29,8 @@ namespace Domain.Projects.Entities
             MaximumBenefitAmount = MaxBenefitAmount;
             PaymentInterval = PayInterval;
         }
+
+        public Project()
+        { }
     }
 }
