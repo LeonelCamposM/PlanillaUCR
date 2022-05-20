@@ -8,81 +8,102 @@
 @inject IProjectService ProjectService
 @inject ISnackbar Snackbar
 
-<MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
+
+@*@if (_created)
+{
+    ShowSnackNotification("Proyecto establecido", Severity.Success);
+}*@
+
+@{
+    List<BreadcrumbItem> _items = new List<BreadcrumbItem>
+    {
+        new BreadcrumbItem("Inicio", href: "#"),
+        new BreadcrumbItem("Proyectos", href: "#"),
+        new BreadcrumbItem("Crear Proyecto nuevo", href: "#"),
+    };
+}
+ <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
 
 <MudGrid>
-    @*Text fields *@
-    <MudItem xs="12" sm="8">
-        <MudPaper  Height="250px" Width="90%" Outlined="false" Class="border-none pa-4" Elevation="0">
-            <MudText Align="Align.Center" Typo="Typo.h6">Crear Proyecto</MudText>
+    <MudItem xs="10" sm="12">
+        <MudPaper  Height="220px" Width="100%" Outlined="false " Class="border-none pa-4" Elevation="0">
             <MudForm @ref="form">
-            <MudGrid>
-            <MudItem xs="12">
-                <MudTextField @bind-Value="ProjectInfo.ProjectName" 
-                Label="Nombre del Proyecto" Variant="Variant.Outlined"  
-                Required="true" RequiredError="Campo requerido"></MudTextField>
-            </MudItem>
+                <MudText Align="Align.Center" Typo="Typo.h6">Crear Proyecto</MudText>
+                <MudGrid>
 
-            <MudItem xs="12">
-                <MudTextField @bind-Value="ProjectInfo.EmployerEmail" 
-                Label="Email del Empleador" Variant="Variant.Outlined"
-                Required="true" RequiredError="Campo requerido"></MudTextField>
-            </MudItem>
+                <MudItem xs="8">
+                    <MudTextField @bind-Value="ProjectInfo.ProjectName" 
+                    Label="Nombre del Proyecto" Variant="Variant.Outlined"  
+                    Required="true" RequiredError="El nombre de proyecto es necesario">
+                    </MudTextField>
+                </MudItem>
 
-            <MudItem xs="12">
-                <MudTextField @bind-Value="ProjectInfo.ProjectDescription" 
-                Label="Descripción del Proyecto" Variant="Variant.Outlined"></MudTextField>
-            </MudItem>
-            
-            <MudItem xs="12">
-                <MudSelect  @bind-Value="ProjectInfo.PaymentInterval" Label="Intervalo de pago">
-                    <MudSelectItem Value="@("Quincenal")">Pago Quincenal</MudSelectItem>
-                    <MudSelectItem Value="@("Mensual")">Pago Mensual</MudSelectItem>
-                    <MudSelectItem Value="@("Semanal")">Pago Semanal</MudSelectItem>
-                    <MudSelectItem Value="@("Bisemanal")">Pago Bisemanal</MudSelectItem>
-                </MudSelect>
-            </MudItem>
-            <MudItem xs="6">
-                <MudTextField @bind-Value="ProjectInfo.MaximumAmountForBenefits"  
-                Label="Monto máximo de beneficios" Variant="Variant.Outlined"></MudTextField>
-            </MudItem>
+                <MudDivider />
+                <MudItem xs="2"> </MudItem>
+                <MudItem xs="8">
+                    <MudTextField @bind-Value="ProjectInfo.EmployerEmail" 
+                    Label="Email del Empleador" Variant="Variant.Outlined"
+                    Required="true" RequiredError="Campo requerido"></MudTextField>
+                </MudItem>
 
-            <MudItem xs="6">
-                <MudTextField @bind-Value="ProjectInfo.MaximumBenefitAmount"  
-                Label="Cantidad máxima de beneficios" Variant="Variant.Outlined"></MudTextField>
-            </MudItem>
+                <MudDivider />
+                <MudItem xs="2"> </MudItem>
+                <MudItem xs="8">
+                    <MudTextField @bind-Value="ProjectInfo.ProjectDescription" 
+                    Label="Descripción del Proyecto" Variant="Variant.Outlined"></MudTextField>
+                </MudItem>
+                
+                <MudDivider />
+                <MudItem xs="2"> </MudItem>
+                <MudItem xs="8">
+                    <MudSelect @bind-Value="ProjectInfo.PaymentInterval" Label="Intervalo de pago" Variant="Variant.Outlined">
+                        <MudSelectItem Value="@("Quincenal")">Pago Quincenal</MudSelectItem>
+                        <MudSelectItem Value="@("Mensual")">Pago Mensual</MudSelectItem>
+                        <MudSelectItem Value="@("Semanal")">Pago Semanal</MudSelectItem>
+                        <MudSelectItem Value="@("Bisemanal")">Pago Bisemanal</MudSelectItem>
+                    </MudSelect>
+                </MudItem>
+
+                <MudDivider />
+                <MudItem xs="2"> </MudItem>
+                <MudItem xs="4">
+                    <MudTextField @bind-Value="ProjectInfo.MaximumAmountForBenefits"  
+                    Label="Monto máximo de beneficios" Variant="Variant.Outlined"></MudTextField>
+                </MudItem>
+
+                <MudDivider />
+                <MudItem xs="4">
+                    <MudTextField @bind-Value="ProjectInfo.MaximumAmountForBenefits"  
+                    Label="Monto máximo de beneficios" Variant="Variant.Outlined"></MudTextField>
+                </MudItem>
            
-            <MudItem xs="12" sm="6" md="4">
-                <MudButton Disabled="@snackHandler._saving" OnClick="CreateProject" 
-                Variant="Variant.Filled" Color="Color.Secondary">
-                    @if (snackHandler._saving)
-                    {
-                        <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true"/>
-                        <MudText Class="ms-2">Creando</MudText>
-                    }
-                    else
-                    {
-                        <MudText>Crear</MudText>
-                    }
-                </MudButton>
-            </MudItem>
-            <MudItem xs="12" sm="6" md="4">
-                <MudButton OnClick="CleanForm" Variant="Variant.Filled" Color="Color.Transparent">
-                        <MudText>Cancelar</MudText>
-                </MudButton>
-            </MudItem>
+                @*Create buton *@
+                <MudDivider />
+                <MudItem xs="6">
+                    <MudButton Disabled="@snackHandler._saving" OnClick="CreateProject" 
+                    Variant="Variant.Filled" Color="Color.Secondary">
+                        @if (snackHandler._saving)
+                        {
+                            <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true"/>
+                            <MudText Class="ms-2">Creando</MudText>
+                        }
+                        else
+                        {
+                            <MudText>Crear</MudText>
+                        }
+                    </MudButton>
 
-            </MudGrid>
-        </MudForm>
+                    <MudButton Disabled="true"> </MudButton>
+
+                    <MudButton OnClick="CleanForm" Variant="Variant.Filled" Color="Color.Transparent">
+                        <MudText>Cancelar</MudText>
+                    </MudButton>
+                </MudItem>
+                </MudGrid>
+            </MudForm>
         </MudPaper>
     </MudItem>
-    @*File uploader *@
-    <MudItem xs="3">
-            <FileUploader>
-            </FileUploader>   
-    </MudItem>
 </MudGrid>
-
 
 @code{
     public string project { get; set; }
@@ -90,7 +111,7 @@
     private bool _processing = false;
 
     SnackHandler snackHandler = new SnackHandler();
-    Project ProjectInfo = new Project("","","",0,0,"");
+    Project ProjectInfo = new Project("","","",Int32.Parse("0"),Int32.Parse("0"),"");
     MudForm form;
 
     private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
