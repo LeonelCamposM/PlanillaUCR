@@ -12,16 +12,16 @@ namespace Domain.Projects.Entities
         public int MaximumBenefitAmount { set; get; }
         public String PaymentInterval { set; get; }
 
-        public Project(String Email, String Name,
-                        String Description, int MaxAmountForBenefits,
-                        int MaxBenefitAmount, String PayInterval)
+        public Project(String employerEmail, String projectName,
+                        String projectDescription, int maximumAmountForBenefits,
+                        int maximumBenefitAmount, String paymentInterval)
         {
-            EmployerEmail = Email;
-            ProjectName = Name;
-            ProjectDescription = Description;
-            MaximumAmountForBenefits = MaxAmountForBenefits;
-            MaximumBenefitAmount = MaxBenefitAmount;
-            PaymentInterval = PayInterval;
+            EmployerEmail = employerEmail;
+            ProjectName = projectName;
+            ProjectDescription = projectDescription;
+            MaximumAmountForBenefits = maximumAmountForBenefits;
+            MaximumBenefitAmount = maximumBenefitAmount;
+            PaymentInterval = paymentInterval;
         }
 
         public Project()
