@@ -4,12 +4,14 @@
 @using Application.Projects
 @using Presentation.Projects.Models
 @using Presentation.Core.Components
+@using System.ComponentModel.DataAnnotations
+
 
 @inject IProjectService ProjectService
 @inject ISnackbar Snackbar
 
 
-@*@if (_created)
+@*if (_created)
 {
     ShowSnackNotification("Proyecto establecido", Severity.Success);
 }*@
@@ -32,31 +34,31 @@
                 <MudGrid>
 
                 <MudItem xs="8">
-                    <MudTextField @bind-Value="ProjectInfo.ProjectName" 
-                    Label="Nombre del Proyecto" Variant="Variant.Outlined"  
-                    Required="true" RequiredError="El nombre de proyecto es necesario">
+                    <MudTextField Label="Nombre del Proyecto" Class="mt-3" Variant="Variant.Outlined"  
+                    Required="true" RequiredError="Campo requerido"  @bind-Value="ProjectInfo.ProjectName" For="@(() => Limits.ProjectName)">
                     </MudTextField>
                 </MudItem>
 
                 <MudDivider />
                 <MudItem xs="2"> </MudItem>
                 <MudItem xs="8">
-                    <MudTextField @bind-Value="ProjectInfo.EmployerEmail" 
-                    Label="Email del Empleador" Variant="Variant.Outlined"
-                    Required="true" RequiredError="Campo requerido"></MudTextField>
+                    <MudTextField Label="Email del Empleador"  Class="mt-3" Variant="Variant.Outlined"
+                    Required="true" RequiredError="Campo requerido" 
+                    @bind-Value="ProjectInfo.EmployerEmail" For="@(() => Limits.Email)" ></MudTextField>
                 </MudItem>
 
                 <MudDivider />
                 <MudItem xs="2"> </MudItem>
                 <MudItem xs="8">
-                    <MudTextField @bind-Value="ProjectInfo.ProjectDescription" 
-                    Label="Descripción del Proyecto" Variant="Variant.Outlined"></MudTextField>
+                    <MudTextField Label="Descripción del Proyecto" Variant="Variant.Outlined"
+                    @bind-Value="ProjectInfo.ProjectDescription"  For="@(() => Limits.Description )"
+                    ></MudTextField>
                 </MudItem>
                 
                 <MudDivider />
                 <MudItem xs="2"> </MudItem>
                 <MudItem xs="8">
-                    <MudSelect @bind-Value="ProjectInfo.PaymentInterval" Label="Intervalo de pago" Variant="Variant.Outlined">
+                    <MudSelect typeof="int" @bind-Value="ProjectInfo.PaymentInterval" Label="Intervalo de pago" Variant="Variant.Outlined">
                         <MudSelectItem Value="@("Quincenal")">Pago Quincenal</MudSelectItem>
                         <MudSelectItem Value="@("Mensual")">Pago Mensual</MudSelectItem>
                         <MudSelectItem Value="@("Semanal")">Pago Semanal</MudSelectItem>
@@ -67,14 +69,15 @@
                 <MudDivider />
                 <MudItem xs="2"> </MudItem>
                 <MudItem xs="4">
-                    <MudTextField @bind-Value="ProjectInfo.MaximumAmountForBenefits"  
+                    @*Cambiar mensaje*@
+                    <MudTextField typeof="int" ErrorText="uuuuu" @bind-Value="MaximumAmountForBenefits"  
                     Label="Monto máximo de beneficios" Variant="Variant.Outlined"></MudTextField>
                 </MudItem>
 
                 <MudDivider />
                 <MudItem xs="4">
-                    <MudTextField @bind-Value="ProjectInfo.MaximumAmountForBenefits"  
-                    Label="Monto máximo de beneficios" Variant="Variant.Outlined"></MudTextField>
+                    <MudTextField @bind-Value="MaximumBenefitAmount"  
+                    Label="Cantidad máxima de beneficios" Variant="Variant.Outlined"></MudTextField>
                 </MudItem>
            
                 @*Create buton *@
@@ -109,9 +112,17 @@
     public string project { get; set; }
     private bool _isLoading = true;
     private bool _processing = false;
+    public double? MaximumAmountForBenefits; 
+    public int? MaximumAmountForBenefits; = ProjectInfo.MaximumAmountForBenefits
+ 
+
+    bool isShow;
+    InputType PasswordInput = InputType.Password;
+    string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
 
     SnackHandler snackHandler = new SnackHandler();
-    Project ProjectInfo = new Project("www@dad","Prueba","",Int32.Parse("0"),Int32.Parse("0"),"");
+    Project ProjectInfo = new Project("email@gmail.com","Project","",Int32.Parse("0"),Int32.Parse("0"),""); 
+    @*porque lo necesita*@
     MudForm form;
 
     private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
@@ -127,15 +138,7 @@
         snackHandler._saving = true;
         await ProjectService.CreateProjectAsync(ProjectInfo);
         ShowSnackNotification(ProjectInfo.ProjectName+" creado", Severity.Success);
-        //await form.Validate();
-        //if (form.IsValid)
-        //{
-        //    await ProjectService.CreateProjectAsync(ProjectInfo);
-        //    snackHandler._saving = false;
-        //    ShowSnackNotification(ProjectInfo.ProjectName+" creado", Severity.Success);
-        //    CleanForm();
-        //}
-       
+
         snackHandler._saving = false;
     }
 
@@ -162,9 +165,40 @@
         ProjectInfo.ProjectName = "";
         ProjectInfo.EmployerEmail = "";
         ProjectInfo.ProjectDescription = "";
-        ProjectInfo.MaximumBenefitAmount= 0;
-        ProjectInfo.MaximumAmountForBenefits = 0;
+        MaximumBenefitAmount= 0;
+        MaximumAmountForBenefits = 0;
         ProjectInfo.PaymentInterval = "";
     }
+
+    LimitsValidationForm Limits = new LimitsValidationForm();
+
+
+    public class LimitsValidationForm
+    {
+  
+        [StringLength(5, ErrorMessage = "El nombre del proyecto es muy grande")]
+        public string ProjectName { get; set; }
+
+
+        [EmailAddress (ErrorMessage = "El Email es inválido")]
+        [StringLength(5, ErrorMessage = "El Email es muy grande")]
+        public string Email { get; set; }
+
+
+        [StringLength(5, ErrorMessage = "La descripción es muy grande")]
+        public string Description { get; set; }
+
+        [Range(typeof(int), "0", "999999999",
+            ErrorMessage = "El valor que ingreso es incorrecto")]
+        public object SellEndDate  { get; set; }
+
+    }
+    void formatValues(Project ProjectObject, double? MaximumAmountForBenefits,int? MaximumAmountForBenefits;)
+    {
+        
+        
+    }
+ 
+}
      
 }
