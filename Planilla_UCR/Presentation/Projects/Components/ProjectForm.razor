@@ -70,13 +70,13 @@
                 <MudItem xs="2"> </MudItem>
                 <MudItem xs="4">
                     @*Cambiar mensaje*@
-                    <MudTextField typeof="int" ErrorText="uuuuu" @bind-Value="MaximumAmountForBenefits"  
+                    <MudTextField typeof="int" @bind-Value="ProjectInfo.MaximumAmountForBenefits"  
                     Label="Monto máximo de beneficios" Variant="Variant.Outlined"></MudTextField>
                 </MudItem>
 
                 <MudDivider />
                 <MudItem xs="4">
-                    <MudTextField @bind-Value="MaximumBenefitAmount"  
+                    <MudTextField @bind-Value="ProjectInfo.MaximumBenefitAmount"  
                     Label="Cantidad máxima de beneficios" Variant="Variant.Outlined"></MudTextField>
                 </MudItem>
            
@@ -112,17 +112,9 @@
     public string project { get; set; }
     private bool _isLoading = true;
     private bool _processing = false;
-    public double? MaximumAmountForBenefits; 
-    public int? MaximumAmountForBenefits; = ProjectInfo.MaximumAmountForBenefits
- 
-
-    bool isShow;
-    InputType PasswordInput = InputType.Password;
-    string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
 
     SnackHandler snackHandler = new SnackHandler();
-    Project ProjectInfo = new Project("email@gmail.com","Project","",Int32.Parse("0"),Int32.Parse("0"),""); 
-    @*porque lo necesita*@
+    Project ProjectInfo = new Project("email@gmail.com","Project","",Int32.Parse("0"),Int32.Parse("0"),""); @*porque lo necesita*@
     MudForm form;
 
     private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
@@ -165,8 +157,8 @@
         ProjectInfo.ProjectName = "";
         ProjectInfo.EmployerEmail = "";
         ProjectInfo.ProjectDescription = "";
-        MaximumBenefitAmount= 0;
-        MaximumAmountForBenefits = 0;
+        ProjectInfo.MaximumBenefitAmount= 0;
+        ProjectInfo.MaximumAmountForBenefits = 0;
         ProjectInfo.PaymentInterval = "";
     }
 
@@ -193,11 +185,7 @@
         public object SellEndDate  { get; set; }
 
     }
-    void formatValues(Project ProjectObject, double? MaximumAmountForBenefits,int? MaximumAmountForBenefits;)
-    {
-        
-        
-    }
+
  
 }
      
