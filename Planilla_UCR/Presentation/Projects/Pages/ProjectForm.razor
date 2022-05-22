@@ -83,10 +83,12 @@
                     <MudNumericField @bind-Value="ProjectInfo.MaximumBenefitAmount" Min="0"
                     Label="Cantidad máxima de beneficios" Variant="Variant.Outlined"></MudNumericField>
                 </MudItem>
-                <MudItem xs="1"> </MudItem>
-           
+
+                <MudItem xs="2"></MudItem>
+                <MudItem xs="4"></MudItem>
+
                 @*Create buton *@
-                <MudItem xs="4"> </MudItem>
+                <MudItem xs="8"> 
                     <MudButton Disabled="@_saving" OnClick="CreateProject" 
                     Variant="Variant.Filled" Color="Color.Primary">
                         @if (_saving)
@@ -100,12 +102,14 @@
                         }
                     </MudButton>
 
-                     <MudItem xs="1"> </MudItem>
+                    <MudButton Disabled="true"> </MudButton>
 
+                    @*Clear buton *@
                     <MudButton OnClick="CleanForm" Variant="Variant.Filled" Color="Color.Transparent">
                         <MudText>Cancelar</MudText>
                     </MudButton>
-                    <MudItem xs="16"> </MudItem>
+                </MudItem>
+                <MudItem xs="2"></MudItem>
 
                 </MudGrid>
             </MudForm>
