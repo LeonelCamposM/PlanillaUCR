@@ -85,8 +85,13 @@
                 </MudItem>
 
                 <MudItem xs="2"></MudItem>
-                <MudItem xs="4"></MudItem>
-                <MudDivider></MudDivider>
+                <MudItem xs="2"></MudItem>
+                <MudItem xs="8">
+                    <br />
+                    <MudDivider />
+                </MudItem>
+                <MudItem xs="2"></MudItem>
+                <MudItem xs="2"></MudItem>
 
                 @*Create buton *@
                 <MudItem xs="8"> 
@@ -141,19 +146,60 @@
 
     async Task CreateProject()
     {
-        @*Validate if the data is correct*@
-        @*if (ProjectService.CheckEmployerEmail(ProjectInfo.EmployerEmail) &&
-        ProjectService.CheckProjectName(ProjectInfo.ProjectName)){ *@
-            await ProjectService.CreateProjectAsync(ProjectInfo);
-        @*}*@
+        await ProjectService.CreateProjectAsync(ProjectInfo);
+
     }
 
-    @*async Task<bool> ValidateEmail(Project project)
+    async Task TryToSend()
+    {
+        await form.Validate();
+        if (form.IsValid && await(ValidateInfo(ProjectInfo)))
+        {
+            _saving = true;
+            await CreateProject();
+            _saving = false;
+            _created = true;
+            ShowSnackNotification("Información guardada correctamente", Severity.Success);
+
+        }
+
+    }
+     async Task<bool> ValidateInfo(Project projectInfo)
+    {
+        bool name =  await (ValidateName(projectInfo));
+         bool email = await (ValidateEmail(projectInfo));
+        return name && email;
+    }
+
+    async Task<bool> ValidateEmail(Project project)
     {
 
-        IEnumerable<Project> emailChecked = await ProjectService.CheckEmployerEmail(project); 
+        IEnumerable<Project> emailChecked = await ProjectService.CheckEmployerEmail(project);
+        bool valid = true;
+        if (emailChecked.Length() != 0)
+        {
+            valid=true;
+        }
+         else {
+             valid=false;
+        }   
         return valid;
-    }*@
+    }
+
+    async Task<bool> ValidateName(Project project)
+    {
+
+        IEnumerable<Project> nameCecked = await ProjectService.CheckProjectName(project);
+        bool valid = true;
+        if (nameCecked.Length() != 0)
+        {
+            valid=true;
+        }
+         else {
+             valid=false;
+        }   
+        return valid;
+    }
 
     void ShowSnackNotification(string Message, Severity Severity)
     {
@@ -203,38 +249,6 @@
 
     }
 
-    async Task TryToSend()
-    {
-        await form.Validate();
-        if (form.IsValid)
-        {
-            _saving = true;
-            await CreateProject();
-            _saving = false;
-            _created = true;
-            ShowSnackNotification("Información guardada correctamente", Severity.Success);
-
-        }
-
-    }
-
-    async Task ValidateData()
-    {
-        @*if (ProjectService.CheckEmployerEmail(ProjectInfo.EmployerEmail))
-        {
-            _saving = false;
-            ShowSnackNotification("No existe el email del empleador", Severity.Success);
-
-        }
-
-        if (ProjectService.CheckProjectName(ProjectInfo.ProjectName))
-        {
-            _saving = false;
-            ShowSnackNotification("El nombre del proyecto ya existe", Severity.Success);
-
-        }*@
-
-    }
  
 }
     
