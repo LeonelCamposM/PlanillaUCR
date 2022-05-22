@@ -3,8 +3,7 @@
 	<PropertyGroup>
 		<TargetFramework>net5.0</TargetFramework>
 	</PropertyGroup>
-<<<<<<< HEAD
-
+	
 	<ItemGroup>
 		<Compile Remove="Projects\Validators\**" />
 		<Compile Remove="Deductions\Models\**" />
@@ -30,9 +29,6 @@
 	</ItemGroup>
 
 
-=======
-	
->>>>>>> main
 	<ItemGroup>
 		<SupportedPlatform Include="browser" />
 	</ItemGroup>
@@ -59,7 +55,7 @@
 		<ProjectReference Include="..\Domain\Domain.csproj" />
 	</ItemGroup>
 
-<<<<<<< HEAD
+</Project>
 	<ItemGroup>
 	  <Folder Include="Projects\Model\" />
 	</ItemGroup>
@@ -76,6 +72,4 @@
 	  <None Include="Projects\Components\FileUploader.razor" />
 	</ItemGroup>
 
-=======
->>>>>>> main
 </Project>

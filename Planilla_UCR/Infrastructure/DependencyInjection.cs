@@ -1,9 +1,8 @@
-<<<<<<< HEAD
-﻿using Infrastructure.Projects;
+﻿using Infrastructure.People;
+using Infrastructure.Projects;
 using Infrastructure.Projects.Repositories;
 using Domain.Projects.Repositories;
-=======
-﻿using Infrastructure.People;
+
 using Infrastructure.People.Repositories;
 using Domain.People.Repositories;
 using Infrastructure.Employees;
@@ -12,7 +11,6 @@ using Domain.Employees.Repositories;
 using Domain.Subscriptions.Repositories;
 using Infrastructure.Subscriptions;
 using Infrastructure.Subscriptions.Repositories;
->>>>>>> main
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -32,6 +30,9 @@ namespace Infrastructure
 
             services.AddDbContext<SubscriptionDbContext>(options => options.UseSqlServer(connectionString));
             services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
+
+            services.AddDbContext<ProjectDbContext>(options => options.UseSqlServer(connectionString));
+            services.AddScoped<IProjectRepository, ProjectRepository>();
             return services;
         }
     }
