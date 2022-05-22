@@ -89,7 +89,7 @@
 
                 @*Create buton *@
                 <MudItem xs="8"> 
-                    <MudButton Disabled="@_saving" OnClick="CreateProject" 
+                    <MudButton Disabled="@_saving" OnClick="TryToSend" 
                     Variant="Variant.Filled" Color="Color.Primary">
                         @if (_saving)
                         {
@@ -144,7 +144,6 @@
         @*if (ProjectService.CheckEmployerEmail(ProjectInfo.EmployerEmail) &&
         ProjectService.CheckProjectName(ProjectInfo.ProjectName)){ *@
             await ProjectService.CreateProjectAsync(ProjectInfo);
-            TryToSend();
         @*}*@
     }
 
