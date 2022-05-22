@@ -33,20 +33,20 @@ namespace Infrastructure.Projects.Repositories
             await _dbContext.SaveEntitiesAsync();
         }
 
-        public async Task<IEnumerable<Project?>> CheckEmployerEmail(Project projectInfo)
+        public async Task<IEnumerable<Project?>> CheckEmployerEmail(string email)
         {
             {
-                var email = await _dbContext.Projects.FromSqlRaw("EXEC EmailCheck @EmployerEmail",
-                    new SqlParameter("@EmployerEmail", projectInfo.EmployerEmail)).ToListAsync();
-                return email;
+                var emailList = await _dbContext.Projects.FromSqlRaw("EXEC EmailCheck @EmployerEmail",
+                    new SqlParameter("email", email)).ToListAsync();
+                return emailList;
             }
         }
-        public async Task<IEnumerable<Project?>> CheckProjectName(Project projectInfo)
+        public async Task<IEnumerable<Project?>> CheckProjectName(string name)
         {
             {
-                var name = await _dbContext.Projects.FromSqlRaw("EXEC ProjectNameCheck @ProjectName",
-                    new SqlParameter("@ProjectName", projectInfo.ProjectName)).ToListAsync();
-                return name;
+                var nameList = await _dbContext.Projects.FromSqlRaw("EXEC ProjectNameCheck @ProjectName",
+                    new SqlParameter("name", name)).ToListAsync();
+                return nameList;
             }
         }
     }

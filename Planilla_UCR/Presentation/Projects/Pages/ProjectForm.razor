@@ -132,6 +132,7 @@
 
 
     SnackHandler snackHandler = new SnackHandler();
+    
     Project ProjectInfo = new Project("","","",0,0,"");
     MudForm form;
 
@@ -174,7 +175,7 @@
     async Task<bool> ValidateEmail(Project project)
     {
 
-        IEnumerable<Project> emailChecked = await ProjectService.CheckEmployerEmail(project);
+        IEnumerable<Project> emailChecked = await ProjectService.CheckEmployerEmail(project.EmployerEmail);
         bool valid = true;
         if (emailChecked.Length() != 0)
         {
@@ -188,9 +189,8 @@
 
     async Task<bool> ValidateName(Project project)
     {
-
-        IEnumerable<Project> nameCecked = await ProjectService.CheckProjectName(project);
         bool valid = true;
+        IEnumerable<Project> nameCecked = await ProjectService.CheckProjectName(project.ProjectName);
         if (nameCecked.Length() != 0)
         {
             valid=true;

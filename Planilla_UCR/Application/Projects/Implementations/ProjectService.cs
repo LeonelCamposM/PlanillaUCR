@@ -22,13 +22,13 @@ namespace Application.Projects.Implementations
         {
             await _projectRepository.CreateProjectAsync(project);
         }
-        public async Task<IEnumerable<Project>>CheckEmployerEmail(Project project)
+        public async Task<IEnumerable<Project>>CheckEmployerEmail(string email)
         {
-            return await _projectRepository.CheckEmployerEmail(project);
+            return await _projectRepository.CheckEmployerEmail(email);
         }
-        public async Task<IEnumerable<Project>>CheckProjectName(Project project)
+        public async Task<IEnumerable<Project>>CheckProjectName(string name)
         {
-            return await _projectRepository.CheckProjectName(project);
+            return await _projectRepository.CheckProjectName(name);
         }
     }
 }

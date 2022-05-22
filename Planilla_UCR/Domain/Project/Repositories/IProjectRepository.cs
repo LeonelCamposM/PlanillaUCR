@@ -9,7 +9,7 @@ namespace Domain.Projects.Repositories
     {
         Task<IEnumerable<ProjectDTO>> GetAllAsync();
         Task CreateProjectAsync(Project project);
-        Task<IEnumerable<Project>> CheckEmployerEmail(Project project);
-        Task<IEnumerable<Project>> CheckProjectName(Project project);
+        Task<IEnumerable<Project>> CheckEmployerEmail(string email);
+        Task<IEnumerable<Project>> CheckProjectName(string name);
     }
 }
