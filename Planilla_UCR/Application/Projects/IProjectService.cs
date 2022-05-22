@@ -9,5 +9,7 @@ namespace Application.Projects
     {
         Task<IEnumerable<ProjectDTO>> GetAllProjectsAsync();
         Task CreateProjectAsync(Project project);
+        Task<IEnumerable<Project>> CheckEmployerEmail(Project project);
+        Task<IEnumerable<Project>> CheckProjectName(Project project);
     }
 }

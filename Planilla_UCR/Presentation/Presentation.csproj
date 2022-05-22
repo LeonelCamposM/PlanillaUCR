@@ -25,6 +25,7 @@
 
 	<ItemGroup>
 		<Content Remove="C:\Users\leone\.nuget\packages\chartjs.blazor.fork\2.0.2\contentFiles\any\netstandard2.1\wwwroot\ChartJsBlazorInterop.js" />
+		<Content Remove="Projects\FileUploader.razor" />
 	</ItemGroup>
 
 
@@ -55,6 +56,18 @@
 
 	<ItemGroup>
 	  <Folder Include="Projects\Model\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <UpToDateCheckInput Remove="Projects\FileUploader.razor" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <_ContentIncludedByDefault Remove="Projects\FileUploader.razor" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="Projects\Components\FileUploader.razor" />
 	</ItemGroup>
 
 </Project>

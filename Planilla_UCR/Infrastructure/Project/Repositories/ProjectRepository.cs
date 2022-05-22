@@ -3,11 +3,10 @@ using Domain.Projects.DTOs;
 using Domain.Projects.Repositories;
 using Domain.Projects.Entities;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Data.SqlClient;
 
 namespace Infrastructure.Projects.Repositories
 {
@@ -28,10 +27,27 @@ namespace Infrastructure.Projects.Repositories
             t.MaximumBenefitAmount, t.PaymentInterval)).ToListAsync();
         }
 
-        public async Task CreateProjectAsync(Project ProjectInfo)
+        public async Task CreateProjectAsync(Project projectInfo)
         {
-            _dbContext.Projects.Add(ProjectInfo);
+            _dbContext.Projects.Add(projectInfo);
             await _dbContext.SaveEntitiesAsync();
+        }
+
+        public async Task<IEnumerable<Project?>> CheckEmployerEmail(Project projectInfo)
+        {
+            {
+                var email = await _dbContext.Projects.FromSqlRaw("EXEC EmailCheck @EmployerEmail",
+                    new SqlParameter("@EmployerEmail", projectInfo.EmployerEmail)).ToListAsync();
+                return email;
+            }
+        }
+        public async Task<IEnumerable<Project?>> CheckProjectName(Project projectInfo)
+        {
+            {
+                var name = await _dbContext.Projects.FromSqlRaw("EXEC ProjectNameCheck @ProjectName",
+                    new SqlParameter("@ProjectName", projectInfo.ProjectName)).ToListAsync();
+                return name;
+            }
         }
     }
 }

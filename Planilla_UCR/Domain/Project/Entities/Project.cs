@@ -24,7 +24,5 @@ namespace Domain.Projects.Entities
             PaymentInterval = paymentInterval;
         }
 
-        public Project()
-        { }
     }
 }
