@@ -1,5 +1,9 @@
-﻿using Application.Projects;
-using Application.Projects.Implementations;
+﻿using Application.People;
+using Application.People.Implementations;
+using Application.Employees;
+using Application.Employees.Implementations;
+using Application.Subscriptions;
+using Application.Subscriptions.Implementations;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Application
@@ -8,7 +12,9 @@ namespace Application
     {
         public static IServiceCollection AddApplicationLayer(this IServiceCollection services)
         {
-            services.AddTransient<IProjectService, ProjectService>();
+            services.AddTransient<IPersonService, PersonService>();
+            services.AddTransient<IEmployeeService, EmployeeService>();
+            services.AddTransient<ISubscriptionService, SubscriptionService>();
             return services;
         }
     }

@@ -58,7 +58,12 @@
     <Folder Include="Properties" />
     <Folder Include="StoredProcedures" />
     <Folder Include="Tables" />
+<<<<<<< HEAD
     <Folder Include="StoredProcedures\Project" />
+=======
+    <Folder Include="StoredProcedures\People" />
+    <Folder Include="StoredProcedures\Employee" />
+>>>>>>> main
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Account.sql" />
@@ -70,7 +75,17 @@
     <Build Include="Tables\Person.sql" />
     <Build Include="Tables\Project.sql" />
     <Build Include="Tables\Subscription.sql" />
+<<<<<<< HEAD
     <Build Include="StoredProcedures\Project\GetAllEmails.sql" />
     <Build Include="StoredProcedures\Project\GetAllNameProjects.sql" />
+=======
+    <Build Include="StoredProcedures\People\GetAllEmployees.sql" />
+    <Build Include="StoredProcedures\People\GetProjectEmployees.sql" />
+    <Build Include="StoredProcedures\People\GetPersonByEmail.sql" />
+    <Build Include="StoredProcedures\Employee\GetEmployeeByEmail.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <PostDeploy Include="Script.PostDeployment.sql" />
+>>>>>>> main
   </ItemGroup>
 </Project>
