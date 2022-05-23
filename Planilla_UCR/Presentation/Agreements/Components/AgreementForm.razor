@@ -39,7 +39,12 @@
                     <MudItem xs="2"> </MudItem>
                     <MudItem xs="2"> </MudItem>
                     <MudItem xs="4">
-                        <MudTextField @bind-Value="agreementObject.ProjectName" Label="Nombre del proyecto" Variant="Variant.Outlined" Required="true" RequiredError="El nombre del proyecto es necesario"></MudTextField>
+                        <MudSelect @bind-Value="agreementObject.ProjectName" Label="Nombre del proyecto" Variant="Variant.Outlined" Required="true" RequiredError="El nombre del proyecto es necesario">
+                            <MudSelectItem Value="@("Proyecto 1")" />
+                            <MudSelectItem Value="@("Proyecto 1")" />
+                            <MudSelectItem Value="@("Servicios profesionales")" />
+                            <MudSelectItem Value="@("Por horas")" />
+                        </MudSelect>
                     </MudItem>
 
                     <MudItem xs="4">
