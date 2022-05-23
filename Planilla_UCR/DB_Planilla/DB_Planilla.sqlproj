@@ -78,6 +78,7 @@
     <Build Include="StoredProcedures\People\GetProjectEmployees.sql" />
     <Build Include="StoredProcedures\People\GetPersonByEmail.sql" />
     <Build Include="StoredProcedures\Employee\GetEmployeeByEmail.sql" />
+    <Build Include="StoredProcedures\Project\GetEmployerByEmail.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Script.PostDeployment.sql" />
@@ -90,7 +91,6 @@
     <Build Include="Tables\Person.sql" />
     <Build Include="Tables\Project.sql" />
     <Build Include="Tables\Subscription.sql" />
-    <Build Include="StoredProcedures\Project\GetAllEmails.sql" />
     <Build Include="StoredProcedures\Project\GetAllNameProjects.sql" />
   </ItemGroup>
 </Project>

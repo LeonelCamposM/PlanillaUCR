@@ -36,7 +36,7 @@ namespace Infrastructure.Projects.Repositories
         public async Task<IEnumerable<Project?>> GetEmployerByEmail(string email)
         {
             {
-                var emailList = await _dbContext.Projects.FromSqlRaw("EXEC GetEmployerByEmail @EmployerEmail",
+                var emailList = await _dbContext.Projects.FromSqlRaw("EXEC GetEmployerByEmail @email",
                     new SqlParameter("email", email)).ToListAsync();
                 return emailList;
             }

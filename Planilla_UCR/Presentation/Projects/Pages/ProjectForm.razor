@@ -175,7 +175,7 @@
     async Task<bool> ValidateEmail(Project project)
     {
 
-        IEnumerable<Project> emailChecked = await ProjectService.CheckEmployerEmail(project.EmployerEmail);
+        IEnumerable<Project> emailChecked = await ProjectService.GetEmployerByEmail(project.EmployerEmail);
         bool valid = true;
         if (emailChecked.Length() != 0)
         {
@@ -190,7 +190,7 @@
     async Task<bool> ValidateName(Project project)
     {
         bool valid = true;
-        IEnumerable<Project> nameCecked = await ProjectService.CheckProjectName(project.ProjectName);
+        IEnumerable<Project> nameCecked = await ProjectService.GetAllNameProjects(project.ProjectName);
         if (nameCecked.Length() != 0)
         {
             valid=true;
