@@ -7,9 +7,8 @@ namespace Application.Projects
 {
     public interface IProjectService
     {
-        Task<IEnumerable<ProjectDTO>> GetAllProjectsAsync();
         Task CreateProjectAsync(Project project);
-        Task<IEnumerable<Project>> CheckEmployerEmail(string email);
-        Task<IEnumerable<Project>> CheckProjectName(string name);
+        Task<IEnumerable<Project>>  GetEmployerByEmail(string email);
+        Task<IEnumerable<Project>> GetAllNameProjects(string name);
     }
 }
