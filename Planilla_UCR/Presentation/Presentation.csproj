@@ -55,7 +55,6 @@
 		<ProjectReference Include="..\Domain\Domain.csproj" />
 	</ItemGroup>
 
-</Project>
 	<ItemGroup>
 	  <Folder Include="Projects\Model\" />
 	</ItemGroup>
