@@ -1,0 +1,156 @@
+﻿@page "/Projects/Details/{ProjectName}"
+
+@using Domain.Projects.DTOs
+@using Application.Projects
+@using Domain.Projects.Entities
+@using Presentation.Core.Components
+@inject NavigationManager nav
+@inject IProjectService ProjectService
+
+@if (_loading)
+{
+    <h4 class="text-danger">Cargando Proyectos</h4>
+}
+else
+{
+    <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
+
+    <MudToolBar DisableGutters="true" Class="gap-4">
+        <MudItem xs="2"></MudItem>
+        <MudSpacer></MudSpacer>
+        <MudButton Variant="Variant.Filled" OnClick="GoToCreate" Color="Color.Secondary">Crear Proyecto</MudButton>
+        <MudItem xs="2"></MudItem>
+    </MudToolBar>
+
+    <MudGrid>   
+        <MudItem xs="4"></MudItem>
+        <MudItem xs="3">
+            <MudPaper Elevation="0">
+                <MudText Align="Align.Center" Typo="Typo.h6" Color="Color.Secondary">@Project.ProjectName</MudText>
+            </MudPaper>
+            <MudSpacer></MudSpacer>
+        </MudItem>
+
+        <MudItem xs="2"></MudItem>
+        
+        <MudItem xs="1">
+            <MudPaper Elevation="0">
+                <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Secondary" Align="Align.Right" OnClick="GoToConfigs"/>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+
+    <MudGrid>
+        <MudItem xs="2"></MudItem>
+        <MudItem xs="8">
+            <MudText Typo="Typo.body1">Descripción</MudText>
+            <MudPaper Class="d-flex align-center justify-center mud-width-full py-8" Outlined="true" Color="Color.Secondary">@Project.ProjectDescription</MudPaper>
+        </MudItem>
+        <MudItem xs="2"></MudItem>
+
+        <MudItem xs="2"></MudItem>
+        <MudItem xs="4">
+            <MudText>Intervalo de pago: </MudText>
+            <MudPaper Class="d-flex align-center justify-center mud-width-full py-8" Outlined="true" Color="Color.Secondary">@Project.PaymentInterval</MudPaper>
+        </MudItem>
+
+        <MudItem xs="4">
+            <MudText>Asignado a:</MudText>
+            <MudPaper Class="d-flex align-center justify-center mud-width-full py-8" Outlined="true" Color="Color.Secondary">@Project.EmployerEmail</MudPaper>
+        </MudItem>
+        <MudItem xs="2"></MudItem>
+
+        <MudItem xs="2"></MudItem>
+        <MudItem xs="4">
+            <MudText>Cantidad máxima de beneficios: </MudText>
+            <MudPaper Class="d-flex align-center justify-center mud-width-full py-8" Outlined="true" Color="Color.Secondary">@Project.MaximumBenefitAmount</MudPaper>
+            <br/>
+        </MudItem>
+        <MudItem xs="4">
+            <MudText>Monto máximo de beneficios: </MudText>
+            <MudPaper Class="d-flex align-center justify-center mud-width-full py-8" Outlined="true" Color="Color.Secondary">@Project.MaximumAmountForBenefits</MudPaper>
+            <br/>
+        </MudItem>
+    </MudGrid>
+
+
+
+        @*<MudCard Outlined="true">
+            <MudCardContent>
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.body1">Descripción</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudText Typo="Typo.body2">'C:\Users\worti\Escritorio\Planilla_UCR\Planilla_UCR\Server_Planilla\bin\Debu</MudText>
+                </MudCardContent>
+            </MudCardContent>
+        </MudCard> *@
+
+        @*<MudCardContent>*@
+            @*<MudText>Descripción: </MudText>
+            <MudText Typo="Typo.body2">@Project.ProjectDescription</MudText>
+            <MudText>Mi correo:</MudText>
+            <MudText Typo="Typo.body2">@Project.EmployerEmail</MudText>
+            <MudText>Intervalo de pago: </MudText>
+            <MudText Typo="Typo.body2">@Project.PaymentInterval</MudText>
+            <MudText>Cantidad de beneficios: </MudText>
+            <MudText Typo="Typo.body2">@Project.MaximumBenefitAmount</MudText>
+            <MudText>Monto máximo de beneficios: </MudText>
+            <MudText Typo="Typo.body2">@Project.MaximumAmountForBenefits</MudText>*@
+        @*</MudCardContent>*@
+        <MudToolBar DisableGutters="true" Class="gap-4">
+            <MudSpacer></MudSpacer>
+            <MudButton Variant="Variant.Filled" OnClick="GoToMain" Color="Color.Secondary">Volver</MudButton>
+            <MudSpacer></MudSpacer>
+        </MudToolBar>
+}
+
+
+@code {
+    private bool _hidePosition;
+    private bool _loading = true;
+    private IEnumerable<ProjectDTO> Elements;
+    public Project Project = new Project("","","",0,0,"");
+
+    [Parameter] public string EmployerEmail { get; set; }
+    [Parameter] public string ProjectName { get; set; }
+    [Parameter] public string ProjectDescription { get; set; }
+    [Parameter] public string PaymentInterval { get; set; }
+    [Parameter] public int MaximumBenefitAmount { get; set; }
+    [Parameter] public int MaximumAmountForBenefits { get; set; }
+
+    private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
+    {
+        new BreadcrumbItem("Home", href: ""),
+        new BreadcrumbItem("Proyectos", href: "/Projects"),
+        new BreadcrumbItem("Nombre", href: null, disabled: true),
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        Project.EmployerEmail = EmployerEmail;
+        Project.ProjectName = ProjectName;
+        Project.ProjectDescription = ProjectDescription;
+        Project.PaymentInterval = PaymentInterval;
+        Project.MaximumBenefitAmount = MaximumBenefitAmount;
+        Project.MaximumAmountForBenefits = MaximumAmountForBenefits;
+        _loading = false;
+    }
+
+    private void GoToConfigs()
+    {
+        nav.NavigateTo($"/Projects/Details/{ProjectName}/Configurations");
+    }
+
+    private void GoToMain()
+    {
+        nav.NavigateTo("/Projects");
+    }
+
+    private void GoToCreate()
+    {
+        nav.NavigateTo("/Create_Project");
+    }
+}
