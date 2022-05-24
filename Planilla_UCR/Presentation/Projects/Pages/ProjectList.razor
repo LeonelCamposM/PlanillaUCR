@@ -15,6 +15,15 @@ else
     <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
 
     <MudGrid>   
+              <MudSpacer></MudSpacer>
+            <MudSpacer></MudSpacer>
+            <MudSpacer></MudSpacer>
+            <MudSpacer></MudSpacer>
+        <MudItem xs="3">
+            <MudTextField @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </MudItem>
+    </MudGrid>
+    <MudGrid>   
         <MudItem xs="8">
             <MudPaper Elevation="0">
                 <MudButton Variant="Variant.Filled" OnClick="GoToCreate" Color="Color.Secondary">Crear Proyecto</MudButton>
@@ -69,7 +78,7 @@ else
     private List<string> clickedEvents = new();
     private IEnumerable<ProjectDTO> Elements;
 
-    private string Search;
+    public string searchString1 = "";
 
     public string project { get; set; }
 
@@ -99,5 +108,16 @@ else
     private void PageChanged(int i)
     {
         mudTable.NavigateTo(i - 1);
+    }
+    
+    private bool FilterFunc1(Project element) => FilterFunc(element, searchString1);
+
+    private bool FilterFunc(Project element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.ProjectName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
     }
 }
