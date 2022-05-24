@@ -19,9 +19,9 @@
 @{
     List<BreadcrumbItem> _items = new List<BreadcrumbItem>
     {
-        new BreadcrumbItem("Inicio", href: "#"),
-        new BreadcrumbItem("Proyectos", href: "#"),
-        new BreadcrumbItem("Crear Proyecto nuevo", href: "#"),
+        new BreadcrumbItem("Inicio", href: ""),
+        new BreadcrumbItem("Proyectos", href: "/projects"),
+        new BreadcrumbItem("Crear Proyecto nuevo", href: null, disabled: true),
     };
 }
  <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
@@ -140,8 +140,8 @@
     private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
     {
         new BreadcrumbItem("Home", href: ""),
-        new BreadcrumbItem("Proyectos", href: "project"),
-        new BreadcrumbItem("Crear proyecto nuevo", href: "newproject")
+        new BreadcrumbItem("Proyectos", href: "projects"),
+        new BreadcrumbItem("Crear proyecto nuevo", href: null, disabled: true)
     };
 
 

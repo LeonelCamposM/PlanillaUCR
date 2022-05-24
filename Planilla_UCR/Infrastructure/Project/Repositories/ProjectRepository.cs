@@ -15,11 +15,12 @@ namespace Infrastructure.Projects.Repositories
         private readonly ProjectDbContext _dbContext;
         public IUnitOfWork UnitOfWork => _dbContext;
 
+
         public ProjectRepository(ProjectDbContext unitOfWork)
         {
             _dbContext = unitOfWork;
         }
-        public async Task<IEnumerable<ProjectDTO>> GetAllAsync()
+        public async Task<IEnumerable<ProjectDTO>> GetAllProjectsAsync()
         {
             return await _dbContext.Projects.Select(t => new 
             ProjectDTO(t.EmployerEmail, t.ProjectName, 

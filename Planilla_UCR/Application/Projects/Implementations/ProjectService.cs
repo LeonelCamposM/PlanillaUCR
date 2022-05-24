@@ -14,6 +14,10 @@ namespace Application.Projects.Implementations
             _projectRepository = projectRepository;
         }
 
+        public async Task<IEnumerable<ProjectDTO>> GetAllProjectsAsync()
+        {
+            return await _projectRepository.GetAllProjectsAsync();
+        }
         public async Task CreateProjectAsync(Project project)
         {
             await _projectRepository.CreateProjectAsync(project);
