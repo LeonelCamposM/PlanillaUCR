@@ -15,8 +15,11 @@
 @inject ISnackbar Snackbar
 
 
-<<<<<<< HEAD
-=======
+@if (_created)
+{
+    ShowSnackNotification("Proyecto Creado", Severity.Success);
+}
+
 @{
     List<BreadcrumbItem> _items = new List<BreadcrumbItem>
     {
@@ -25,7 +28,6 @@
         new BreadcrumbItem("Crear Proyecto nuevo", href: "#"),
     };
 }
->>>>>>> PCS-1_Create_Project
  <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
 
 <MudGrid>
@@ -162,14 +164,9 @@
             _saving = true;
             await CreateProject();
             _saving = false;
-<<<<<<< HEAD
             _created = true;
-            ShowSnackNotification("Proyecto creado correctamente", Severity.Success);
-
-=======
             ShowSnackNotification(ProjectInfo.ProjectName+" creado exitosamente", Severity.Success);
             CleanForm();
->>>>>>> PCS-1_Create_Project
         }
         snackHandler._saving = false;
     }
