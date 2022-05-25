@@ -1,4 +1,4 @@
-﻿@page "/Projects/Details/{ProjectName}"
+﻿@page "/Projects/Details/{EmployerEmail}/{ProjectName}"
 
 @using Domain.Projects.DTOs
 @using Application.Projects
@@ -111,15 +111,11 @@ else
 @code {
     private bool _hidePosition;
     private bool _loading = true;
-    private IEnumerable<ProjectDTO> Elements;
+    private IEnumerable<Project> Elements;
     public Project Project = new Project("","","",0,0,"");
 
     [Parameter] public string EmployerEmail { get; set; }
     [Parameter] public string ProjectName { get; set; }
-    [Parameter] public string ProjectDescription { get; set; }
-    [Parameter] public string PaymentInterval { get; set; }
-    [Parameter] public int MaximumBenefitAmount { get; set; }
-    [Parameter] public int MaximumAmountForBenefits { get; set; }
 
     private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
     {
@@ -130,12 +126,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        Project.EmployerEmail = EmployerEmail;
-        Project.ProjectName = ProjectName;
-        Project.ProjectDescription = ProjectDescription;
-        Project.PaymentInterval = PaymentInterval;
-        Project.MaximumBenefitAmount = MaximumBenefitAmount;
-        Project.MaximumAmountForBenefits = MaximumAmountForBenefits;
+        Project = await ProjectService.GetProject(EmployerEmail, ProjectName);
         _loading = false;
     }
 

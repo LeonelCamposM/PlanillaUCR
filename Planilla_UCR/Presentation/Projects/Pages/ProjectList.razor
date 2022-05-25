@@ -1,5 +1,4 @@
 ﻿@page "/Projects"
-@using Domain.Projects.DTOs
 @using Domain.Projects.Entities
 @using Application.Projects
 @using Presentation.Core.Components
@@ -49,14 +48,14 @@ else
 
     <MudItem xs="2"></MudItem>
     
-    <MudTable Items="@Elements" RowsPerPage="6" Hover="true" Breakpoint="Breakpoint.Sm" @ref="mudTable">
+    <MudTable Items="@Elements" RowsPerPage="6" Hover="true" Breakpoint="Breakpoint.Sm" @ref="mudTable" Filter="new Func<Project,bool>(FilterFunc1)">
         <HeaderContent>
             <MudTh>Nombre</MudTh>
             <MudTh>Descripción</MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="Nombre" >
-                <MudLink Color="Color.Secondary" Href="@($"/Projects/Details/{context.ProjectName}")">
+                <MudLink Color="Color.Secondary" Href="@($"/Projects/Details//{context.EmployerEmail}/{context.ProjectName}")">
                     @context.ProjectName
                 </MudLink>
             </MudTd>
@@ -74,9 +73,9 @@ else
     private bool _hidePosition;
     private bool _loading = true;
     private int selectedRowNumber = -1;
-    private MudTable<ProjectDTO> mudTable;
+    private MudTable<Project> mudTable;
     private List<string> clickedEvents = new();
-    private IEnumerable<ProjectDTO> Elements;
+    private IEnumerable<Project> Elements;
 
     public string searchString1 = "";
 

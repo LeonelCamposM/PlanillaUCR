@@ -1,5 +1,4 @@
-﻿using Domain.Projects.DTOs;
-using Domain.Projects.Entities;
+﻿using Domain.Projects.Entities;
 using Domain.Projects.Repositories;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -14,7 +13,7 @@ namespace Application.Projects.Implementations
             _projectRepository = projectRepository;
         }
 
-        public async Task<IEnumerable<ProjectDTO>> GetAllProjectsAsync()
+        public async Task<IEnumerable<Project>> GetAllProjectsAsync()
         {
             return await _projectRepository.GetAllProjectsAsync();
         }
@@ -29,6 +28,10 @@ namespace Application.Projects.Implementations
         public async Task<IEnumerable<Project>> GetAllNameProjects(string name)
         {
             return await _projectRepository.GetAllNameProjects(name);
+        }
+
+        public async Task<Project> GetProject(string employerEmail, string projectName) { 
+            return await _projectRepository.GetProject(employerEmail, projectName);
         }
     }
 }
