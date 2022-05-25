@@ -1,4 +1,4 @@
-﻿@page "/email/Create_Project"
+﻿@page "/Create_Project/{EmployerEmail}"
 @using Domain.Projects.DTOs
 @using Domain.Projects.Entities
 @using Application.Projects
@@ -11,19 +11,6 @@
 @inject ISnackbar Snackbar
 
 
-@if (_created)
-{
-    ShowSnackNotification("Proyecto Creado", Severity.Success);
-}
-
-@{
-    List<BreadcrumbItem> _items = new List<BreadcrumbItem>
-    {
-        new BreadcrumbItem("Inicio", href: ""),
-        new BreadcrumbItem("Proyectos", href: "/email/projects"),
-        new BreadcrumbItem("Crear Proyecto nuevo", href: null, disabled: true),
-    };
-}
  <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
 
 <MudGrid>
@@ -140,8 +127,8 @@
     private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
     {
         new BreadcrumbItem("Inicio", href: ""),
-        new BreadcrumbItem("Proyectos", href: "/email/projects"),
-        new BreadcrumbItem("Crear proyecto nuevo", href: null, disabled: true)
+        new BreadcrumbItem("Proyectos", href: "/Projects/{EmployerEmail}"),
+        new BreadcrumbItem("Crear proyecto", href: null, disabled: true)
     };
 
 
@@ -160,7 +147,7 @@
             await CreateProject();
             _saving = false;
             _created = true;
-            ShowSnackNotification("Información guardada correctamente", Severity.Success);
+            ShowSnackNotification("Proyecto creado correctamente", Severity.Success);
 
         }
 

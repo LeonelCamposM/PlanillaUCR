@@ -1,4 +1,4 @@
-﻿@page "/email/Projects"
+﻿@page "/Projects/{EmployerEmail}"
 @using Domain.Projects.Entities
 @using Application.Projects
 @using Presentation.Core.Components
@@ -14,12 +14,12 @@ else
     <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
 
     <MudGrid>   
-              <MudSpacer></MudSpacer>
-            <MudSpacer></MudSpacer>
-            <MudSpacer></MudSpacer>
-            <MudSpacer></MudSpacer>
+        <MudSpacer></MudSpacer>
+        <MudSpacer></MudSpacer>
+        <MudSpacer></MudSpacer>
+        <MudSpacer></MudSpacer>
         <MudItem xs="3">
-            <MudTextField @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            <MudTextField @bind-Value="searchString1" Placeholder="Buscar Proyecto" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
         </MudItem>
     </MudGrid>
     <MudGrid>   
@@ -44,7 +44,7 @@ else
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="Nombre" >
-                <MudLink Color="Color.Secondary" Href="@($"/email/Projects/Details//{context.EmployerEmail}/{context.ProjectName}")">
+                <MudLink Color="Color.Secondary" Href="@($"/Projects/Details/{context.EmployerEmail}/{context.ProjectName}")">
                     @context.ProjectName
                 </MudLink>
             </MudTd>
@@ -61,7 +61,6 @@ else
 @code {
     private bool _hidePosition;
     private bool _loading = true;
-    private int selectedRowNumber = -1;
     private MudTable<Project> mudTable;
     private List<string> clickedEvents = new();
     private IEnumerable<Project> Elements;
@@ -70,11 +69,14 @@ else
 
     public string project { get; set; }
 
+    [Parameter] public string EmployerEmail { get; set; }
+    [Parameter] public string ProjectName { get; set; }
+
 
     private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
     {
         new BreadcrumbItem("Inicio", href: ""),
-        new BreadcrumbItem("Proyectos", href: "/email/Projects"),
+        new BreadcrumbItem("Proyectos", href: null, disabled: true),
     };
 
     protected override async Task OnInitializedAsync()
@@ -85,12 +87,12 @@ else
 
     private void GoToCreate()
     {
-        nav.NavigateTo("/email/Create_Project");
+        nav.NavigateTo("/Create_Project/{EmployerEmail}");
     }
 
     private void GoToConfigs()
     {
-        nav.NavigateTo("/email/Projects/Configurations/{ProjectName}");
+        nav.NavigateTo("/Projects/Details/{EmployerEmail}/{ProjectName}/Configurations");
     }
 
     private void PageChanged(int i)
