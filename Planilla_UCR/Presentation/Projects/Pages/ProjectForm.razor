@@ -1,20 +1,19 @@
 ﻿@page "/Create_Project"
 @using Domain.Projects.DTOs
 @using Domain.Projects.Entities
+@using Domain.Employers.DTOs
+@using Domain.Employers.Entities
 @using Application.Projects
+@using Application.Employers
 @using Presentation.Projects.Models
 @using Presentation.Core.Components
 @using System.ComponentModel.DataAnnotations
 
 
 @inject IProjectService ProjectService
+@inject IEmployerService EmployerService
 @inject ISnackbar Snackbar
 
-
-@if (_created)
-{
-    ShowSnackNotification("Proyecto Creado", Severity.Success);
-}
 
 @{
     List<BreadcrumbItem> _items = new List<BreadcrumbItem>
@@ -132,7 +131,7 @@
 
 
     SnackHandler snackHandler = new SnackHandler();
-    
+
     Project ProjectInfo = new Project("","","",0,0,"");
     MudForm form;
 
@@ -154,35 +153,33 @@
     async Task TryToSend()
     {
         await form.Validate();
-        if (form.IsValid && await(ValidateInfo(ProjectInfo)))
+        snackHandler._saving = true;
+        if (form.IsValid && await (ValidateInfo(ProjectInfo)))
         {
             _saving = true;
             await CreateProject();
             _saving = false;
-            _created = true;
-            ShowSnackNotification("Información guardada correctamente", Severity.Success);
-
+            ShowSnackNotification(ProjectInfo.ProjectName+" creado exitosamente", Severity.Success);
+            CleanForm();
         }
-
+        snackHandler._saving = false;
     }
-     async Task<bool> ValidateInfo(Project projectInfo)
+
+    async Task<bool> ValidateInfo(Project projectInfo)
     {
         bool name =  await (ValidateName(projectInfo));
-         bool email = await (ValidateEmail(projectInfo));
+        bool email = await (ValidateEmail(projectInfo));
         return name && email;
     }
 
     async Task<bool> ValidateEmail(Project project)
     {
-
-        IEnumerable<Project> emailChecked = await ProjectService.GetEmployerByEmail(project.EmployerEmail);
         bool valid = true;
-        if (emailChecked.Length() != 0)
+        Employer emailChecked = await EmployerService.GetEmployerAsync(project.EmployerEmail);
+        if(emailChecked == null)
         {
-            valid=true;
-        }
-         else {
-             valid=false;
+            valid = false;
+            ShowSnackNotification("El email no pertenece a un empleador", Severity.Error);
         }   
         return valid;
     }
@@ -193,11 +190,9 @@
         IEnumerable<Project> nameCecked = await ProjectService.GetAllNameProjects(project.ProjectName);
         if (nameCecked.Length() != 0)
         {
-            valid=true;
+            valid=false;
+            ShowSnackNotification("El nombre de proyecto ya está siendo usado", Severity.Error);
         }
-         else {
-             valid=false;
-        }   
         return valid;
     }
 

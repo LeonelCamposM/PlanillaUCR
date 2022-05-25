@@ -8,7 +8,6 @@ namespace Application.Projects
     public interface IProjectService
     {
         Task CreateProjectAsync(Project project);
-        Task<IEnumerable<Project>>  GetEmployerByEmail(string email);
         Task<IEnumerable<Project>> GetAllNameProjects(string name);
     }
 }

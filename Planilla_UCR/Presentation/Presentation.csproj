@@ -71,4 +71,10 @@
 	  <None Include="Projects\Components\FileUploader.razor" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Accounts\Components\" />
+	  <Folder Include="Employees\Pages\" />
+	  <Folder Include="Employers\Models\" />
+	</ItemGroup>
+
 </Project>

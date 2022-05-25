@@ -8,7 +8,6 @@ namespace Domain.Projects.Repositories
     public interface IProjectRepository
     {
         Task CreateProjectAsync(Project project);
-        Task<IEnumerable<Project>>  GetEmployerByEmail(string email);
         Task<IEnumerable<Project>> GetAllNameProjects(string name);
     }
 }
