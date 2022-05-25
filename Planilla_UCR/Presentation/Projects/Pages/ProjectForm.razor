@@ -1,4 +1,4 @@
-﻿@page "/Create_Project/{EmployerEmail}"
+﻿@page "/Create_Project"
 @using Domain.Projects.DTOs
 @using Domain.Projects.Entities
 @using Domain.Employers.DTOs
@@ -20,15 +20,7 @@
     ShowSnackNotification("Proyecto Creado", Severity.Success);
 }
 
-@{
-    List<BreadcrumbItem> _items = new List<BreadcrumbItem>
-    {
-        new BreadcrumbItem("Inicio", href: "#"),
-        new BreadcrumbItem("Proyectos", href: "#"),
-        new BreadcrumbItem("Crear Proyecto nuevo", href: "#"),
-    };
-}
- <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
+<MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
 
 <MudGrid>
     <MudItem xs="10" sm="12">
