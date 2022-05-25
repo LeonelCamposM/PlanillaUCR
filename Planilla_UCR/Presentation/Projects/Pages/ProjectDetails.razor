@@ -1,4 +1,4 @@
-﻿@page "/Projects/Details/{EmployerEmail}/{ProjectName}"
+﻿@page "/email/Projects/Details/{EmployerEmail}/{ProjectName}"
 
 @using Domain.Projects.DTOs
 @using Application.Projects
@@ -72,34 +72,6 @@ else
             <br/>
         </MudItem>
     </MudGrid>
-
-
-
-        @*<MudCard Outlined="true">
-            <MudCardContent>
-                <MudCardHeader>
-                    <CardHeaderContent>
-                        <MudText Typo="Typo.body1">Descripción</MudText>
-                    </CardHeaderContent>
-                </MudCardHeader>
-                <MudCardContent>
-                    <MudText Typo="Typo.body2">'C:\Users\worti\Escritorio\Planilla_UCR\Planilla_UCR\Server_Planilla\bin\Debu</MudText>
-                </MudCardContent>
-            </MudCardContent>
-        </MudCard> *@
-
-        @*<MudCardContent>*@
-            @*<MudText>Descripción: </MudText>
-            <MudText Typo="Typo.body2">@Project.ProjectDescription</MudText>
-            <MudText>Mi correo:</MudText>
-            <MudText Typo="Typo.body2">@Project.EmployerEmail</MudText>
-            <MudText>Intervalo de pago: </MudText>
-            <MudText Typo="Typo.body2">@Project.PaymentInterval</MudText>
-            <MudText>Cantidad de beneficios: </MudText>
-            <MudText Typo="Typo.body2">@Project.MaximumBenefitAmount</MudText>
-            <MudText>Monto máximo de beneficios: </MudText>
-            <MudText Typo="Typo.body2">@Project.MaximumAmountForBenefits</MudText>*@
-        @*</MudCardContent>*@
         <MudToolBar DisableGutters="true" Class="gap-4">
             <MudSpacer></MudSpacer>
             <MudButton Variant="Variant.Filled" OnClick="GoToMain" Color="Color.Secondary">Volver</MudButton>
@@ -119,8 +91,8 @@ else
 
     private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
     {
-        new BreadcrumbItem("Home", href: ""),
-        new BreadcrumbItem("Proyectos", href: "/Projects"),
+        new BreadcrumbItem("Inicio", href: ""),
+        new BreadcrumbItem("Proyectos", href: "/email/Projects"),
         new BreadcrumbItem("Nombre", href: null, disabled: true),
     };
 
@@ -132,16 +104,16 @@ else
 
     private void GoToConfigs()
     {
-        nav.NavigateTo($"/Projects/Details/{ProjectName}/Configurations");
+        nav.NavigateTo($"/email/Projects/Details/{ProjectName}/Configurations");
     }
 
     private void GoToMain()
     {
-        nav.NavigateTo("/Projects");
+        nav.NavigateTo("/email/Projects");
     }
 
     private void GoToCreate()
     {
-        nav.NavigateTo("/Create_Project");
+        nav.NavigateTo("/email/Create_Project");
     }
 }

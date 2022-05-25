@@ -1,4 +1,4 @@
-﻿@page "/Create_Project"
+﻿@page "/email/Create_Project"
 @using Domain.Projects.DTOs
 @using Domain.Projects.Entities
 @using Application.Projects
@@ -20,7 +20,7 @@
     List<BreadcrumbItem> _items = new List<BreadcrumbItem>
     {
         new BreadcrumbItem("Inicio", href: ""),
-        new BreadcrumbItem("Proyectos", href: "/projects"),
+        new BreadcrumbItem("Proyectos", href: "/email/projects"),
         new BreadcrumbItem("Crear Proyecto nuevo", href: null, disabled: true),
     };
 }
@@ -139,8 +139,8 @@
 
     private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
     {
-        new BreadcrumbItem("Home", href: ""),
-        new BreadcrumbItem("Proyectos", href: "projects"),
+        new BreadcrumbItem("Inicio", href: ""),
+        new BreadcrumbItem("Proyectos", href: "/email/projects"),
         new BreadcrumbItem("Crear proyecto nuevo", href: null, disabled: true)
     };
 

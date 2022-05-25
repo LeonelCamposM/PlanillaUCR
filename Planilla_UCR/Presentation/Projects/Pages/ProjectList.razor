@@ -1,4 +1,4 @@
-﻿@page "/Projects"
+﻿@page "/email/Projects"
 @using Domain.Projects.Entities
 @using Application.Projects
 @using Presentation.Core.Components
@@ -35,17 +35,6 @@ else
         <MudDivider></MudDivider>
     </MudGrid>
 
-
-    @*<MudToolBar DisableGutters="true" Class="gap-4">
-        <MudSpacer></MudSpacer>
-        <MudHeadRow Class="bold-text">
-            <MudTd>
-                    <MudButton Variant="Variant.Filled" OnClick="GoToCreate" Color="Color.Secondary">Crear Proyecto</MudButton>
-            </MudTd>
-        </MudHeadRow>
-
-    </MudToolBar>*@
-
     <MudItem xs="2"></MudItem>
     
     <MudTable Items="@Elements" RowsPerPage="6" Hover="true" Breakpoint="Breakpoint.Sm" @ref="mudTable" Filter="new Func<Project,bool>(FilterFunc1)">
@@ -55,7 +44,7 @@ else
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="Nombre" >
-                <MudLink Color="Color.Secondary" Href="@($"/Projects/Details//{context.EmployerEmail}/{context.ProjectName}")">
+                <MudLink Color="Color.Secondary" Href="@($"/email/Projects/Details//{context.EmployerEmail}/{context.ProjectName}")">
                     @context.ProjectName
                 </MudLink>
             </MudTd>
@@ -84,8 +73,8 @@ else
 
     private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
     {
-        new BreadcrumbItem("Home", href: ""),
-        new BreadcrumbItem("Proyectos", href: "Projects"),
+        new BreadcrumbItem("Inicio", href: ""),
+        new BreadcrumbItem("Proyectos", href: "/email/Projects"),
     };
 
     protected override async Task OnInitializedAsync()
@@ -96,12 +85,12 @@ else
 
     private void GoToCreate()
     {
-        nav.NavigateTo("/Create_Project");
+        nav.NavigateTo("/email/Create_Project");
     }
 
     private void GoToConfigs()
     {
-        nav.NavigateTo("/Projects/Configurations/{ProjectName}");
+        nav.NavigateTo("/email/Projects/Configurations/{ProjectName}");
     }
 
     private void PageChanged(int i)
