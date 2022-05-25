@@ -21,10 +21,7 @@ namespace Application.Projects.Implementations
         {
             await _projectRepository.CreateProjectAsync(project);
         }
-        public async Task<IEnumerable<Project>> GetEmployerByEmail(string email)
-        {
-            return await _projectRepository.GetEmployerByEmail(email);
-        }
+
         public async Task<IEnumerable<Project>> GetAllNameProjects(string name)
         {
             return await _projectRepository.GetAllNameProjects(name);

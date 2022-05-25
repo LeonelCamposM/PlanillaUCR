@@ -1,8 +1,10 @@
 ﻿using Infrastructure.People;
 using Infrastructure.Projects;
 using Infrastructure.Projects.Repositories;
+using Infrastructure.Employers;
+using Infrastructure.Employers.Repositories;
 using Domain.Projects.Repositories;
-
+using Domain.Employers.Repositories;
 using Infrastructure.People.Repositories;
 using Domain.People.Repositories;
 using Infrastructure.Employees;
@@ -27,6 +29,9 @@ namespace Infrastructure
 
             services.AddDbContext<EmployeeDbContext>(options => options.UseSqlServer(connectionString));
             services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+
+            services.AddDbContext<EmployerDbContext>(options => options.UseSqlServer(connectionString));
+            services.AddScoped<IEmployerRepository, EmployerRepository>();
 
             services.AddDbContext<SubscriptionDbContext>(options => options.UseSqlServer(connectionString));
             services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();

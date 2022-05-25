@@ -8,7 +8,6 @@ namespace Application.Projects
     {
         Task<IEnumerable<Project>> GetAllProjectsAsync();
         Task CreateProjectAsync(Project project);
-        Task<IEnumerable<Project>>  GetEmployerByEmail(string email);
         Task<IEnumerable<Project>> GetAllNameProjects(string name);
         Task<Project> GetProject(string employerEmail, string projectName);
     }

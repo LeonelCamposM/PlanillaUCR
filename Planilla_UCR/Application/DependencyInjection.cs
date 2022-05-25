@@ -2,6 +2,8 @@
 using Application.People.Implementations;
 using Application.Employees;
 using Application.Employees.Implementations;
+using Application.Employers;
+using Application.Employers.Implementations;
 using Application.Subscriptions;
 using Application.Subscriptions.Implementations;
 using Application.Projects;
@@ -16,6 +18,7 @@ namespace Application
         {
             services.AddTransient<IPersonService, PersonService>();
             services.AddTransient<IEmployeeService, EmployeeService>();
+            services.AddTransient<IEmployerService, EmployerService>();
             services.AddTransient<ISubscriptionService, SubscriptionService>();
             services.AddTransient<IProjectService, ProjectService>();
             return services;

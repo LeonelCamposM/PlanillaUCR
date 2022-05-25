@@ -41,4 +41,7 @@ VALUES('leonel@ucr.ac.cr')
 
 INSERT INTO Employee
 VALUES('mau@ucr.ac.cr')
+	
+
+
 
