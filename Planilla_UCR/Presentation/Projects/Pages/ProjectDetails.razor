@@ -1,5 +1,4 @@
-﻿@page "/email/Projects/Details/{EmployerEmail}/{ProjectName}"
-
+﻿@page "/Projects/Details/{EmployerEmail}/{ProjectName}"
 @using Domain.Projects.DTOs
 @using Application.Projects
 @using Domain.Projects.Entities
@@ -44,76 +43,102 @@ else
         <MudItem xs="2"></MudItem>
         <MudItem xs="8">
             <MudText Typo="Typo.body1">Descripción</MudText>
-            <MudPaper Class="d-flex align-center justify-center mud-width-full py-8" Outlined="true" Color="Color.Secondary">@Project.ProjectDescription</MudPaper>
+            <MudTextField @bind-Value="ReadOnly" Label=@Project.ProjectDescription Variant="Variant.Outlined" ReadOnly="true"/>
         </MudItem>
         <MudItem xs="2"></MudItem>
 
         <MudItem xs="2"></MudItem>
         <MudItem xs="4">
             <MudText>Intervalo de pago: </MudText>
-            <MudPaper Class="d-flex align-center justify-center mud-width-full py-8" Outlined="true" Color="Color.Secondary">@Project.PaymentInterval</MudPaper>
+             <MudTextField @bind-Value="ReadOnly" Label=@Project.PaymentInterval Variant="Variant.Outlined" ReadOnly="true"/>
         </MudItem>
 
         <MudItem xs="4">
             <MudText>Asignado a:</MudText>
-            <MudPaper Class="d-flex align-center justify-center mud-width-full py-8" Outlined="true" Color="Color.Secondary">@Project.EmployerEmail</MudPaper>
+             <MudTextField @bind-Value="ReadOnly" Label=@Project.EmployerEmail Variant="Variant.Outlined" ReadOnly="true"/>
         </MudItem>
         <MudItem xs="2"></MudItem>
 
         <MudItem xs="2"></MudItem>
         <MudItem xs="4">
             <MudText>Cantidad máxima de beneficios: </MudText>
-            <MudPaper Class="d-flex align-center justify-center mud-width-full py-8" Outlined="true" Color="Color.Secondary">@Project.MaximumBenefitAmount</MudPaper>
+             <MudTextField @bind-Value="ReadOnly" Label=@MaximumBenefitAmount Variant="Variant.Outlined" ReadOnly="true"/>
             <br/>
         </MudItem>
         <MudItem xs="4">
             <MudText>Monto máximo de beneficios: </MudText>
-            <MudPaper Class="d-flex align-center justify-center mud-width-full py-8" Outlined="true" Color="Color.Secondary">@Project.MaximumAmountForBenefits</MudPaper>
+             <MudTextField @bind-Value="ReadOnly" Label=@MaximumAmountForBenefits Variant="Variant.Outlined" ReadOnly="true"/>
             <br/>
         </MudItem>
     </MudGrid>
         <MudToolBar DisableGutters="true" Class="gap-4">
+
             <MudSpacer></MudSpacer>
-            <MudButton Variant="Variant.Filled" OnClick="GoToMain" Color="Color.Secondary">Volver</MudButton>
             <MudSpacer></MudSpacer>
+            <MudButton Variant="Variant.Filled" OnClick="GoToDeductions" Color="Color.Secondary">Deducciones</MudButton>
+            <MudSpacer></MudSpacer>
+            <MudButton Variant="Variant.Filled" OnClick="GoToBenefits" Color="Color.Secondary">Beneficios</MudButton>
+            <MudSpacer></MudSpacer>
+            <MudButton Variant="Variant.Filled" OnClick="GoToEmployees" Color="Color.Secondary">Empleados</MudButton>
+            <MudSpacer></MudSpacer>
+            <MudButton Variant="Variant.Filled" OnClick="GoToMain" Color="Color.Transparent">Volver</MudButton>
+            <MudSpacer></MudSpacer>
+            <MudSpacer></MudSpacer>
+
         </MudToolBar>
 }
 
 
 @code {
-    private bool _hidePosition;
     private bool _loading = true;
-    private IEnumerable<Project> Elements;
     public Project Project = new Project("","","",0,0,"");
 
     [Parameter] public string EmployerEmail { get; set; }
     [Parameter] public string ProjectName { get; set; }
+    public string MaximumAmountForBenefits { get; set; }
+    public string MaximumBenefitAmount { get; set; }
+
+    public string ReadOnly { get; set; }
 
     private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
     {
         new BreadcrumbItem("Inicio", href: ""),
-        new BreadcrumbItem("Proyectos", href: "/email/Projects"),
-        new BreadcrumbItem("Nombre", href: null, disabled: true),
+        new BreadcrumbItem("Proyectos", href: "/Projects/{EmployerEmail}"),
+        new BreadcrumbItem("Detalles del proyecto",href: null, disabled: true)
     };
 
     protected override async Task OnInitializedAsync()
     {
         Project = await ProjectService.GetProject(EmployerEmail, ProjectName);
+        MaximumAmountForBenefits = Project.MaximumAmountForBenefits+"";
+        MaximumBenefitAmount = Project.MaximumBenefitAmount+"";
         _loading = false;
     }
 
     private void GoToConfigs()
     {
-        nav.NavigateTo($"/email/Projects/Details/{ProjectName}/Configurations");
+        nav.NavigateTo($"/Projects/Details/{EmployerEmail}/{ProjectName}/Configurations"); 
     }
 
     private void GoToMain()
     {
-        nav.NavigateTo("/email/Projects");
+        nav.NavigateTo("/Projects/{EmployerEmail}");
     }
 
     private void GoToCreate()
     {
-        nav.NavigateTo("/email/Create_Project");
+        nav.NavigateTo("/Create_Project/{EmployerEmail}");
+    }
+    private void GoToDeductions()
+    {
+        nav.NavigateTo($"/Projects/{EmployerEmail}/{ProjectName}/Deductions");
+    }
+    private void GoToBenefits()
+    {
+        nav.NavigateTo($"/Projects/{EmployerEmail}/{ProjectName}/Benefit");
+    }
+    private void GoToEmployees()
+    {
+        nav.NavigateTo($"/View_Project_Employees/{ProjectName}");
     }
 }
