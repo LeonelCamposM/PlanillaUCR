@@ -87,12 +87,12 @@ else
 
     private void GoToCreate()
     {
-        nav.NavigateTo("/Create_Project");
+        nav.NavigateTo($"/Create_Project/{EmployerEmail}");
     }
 
     private void GoToConfigs()
     {
-        nav.NavigateTo("/Projects/Details/{EmployerEmail}/{ProjectName}/Configurations");
+        nav.NavigateTo($"/Projects/Details/{EmployerEmail}/{ProjectName}/Configurations");
     }
 
     private void PageChanged(int i)

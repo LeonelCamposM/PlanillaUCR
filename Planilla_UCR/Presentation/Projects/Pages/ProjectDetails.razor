@@ -103,7 +103,7 @@ else
     private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
     {
         new BreadcrumbItem("Inicio", href: ""),
-        new BreadcrumbItem("Proyectos", href: "/Projects/{EmployerEmail}"),
+        new BreadcrumbItem("Proyectos", href: "" @*$"/Projects/{EmployerEmail}"*@),
         new BreadcrumbItem("Detalles del proyecto",href: null, disabled: true)
     };
 
@@ -122,12 +122,12 @@ else
 
     private void GoToMain()
     {
-        nav.NavigateTo("/Projects/{EmployerEmail}");
+        nav.NavigateTo($"/Projects/{EmployerEmail}");
     }
 
     private void GoToCreate()
     {
-        nav.NavigateTo("/Create_Project");
+        nav.NavigateTo($"/Create_Project/{EmployerEmail}");
     }
     private void GoToDeductions()
     {

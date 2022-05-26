@@ -1,4 +1,4 @@
-﻿@page "/Create_Project"
+﻿@page "/Create_Project/{EmployerEmail}"
 @using Domain.Projects.DTOs
 @using Domain.Projects.Entities
 @using Domain.Employers.DTOs
@@ -130,6 +130,8 @@
     SnackHandler snackHandler = new SnackHandler();
 
     Project ProjectInfo = new Project("","","",0,0,"");
+    [Parameter] public string EmployerEmail { get; set; }
+    [Parameter] public string ProjectName { get; set; }
     MudForm form;
 
 
