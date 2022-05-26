@@ -3,30 +3,6 @@
 	<PropertyGroup>
 		<TargetFramework>net5.0</TargetFramework>
 	</PropertyGroup>
-	
-	<ItemGroup>
-		<Compile Remove="Projects\Validators\**" />
-		<Compile Remove="Deductions\Models\**" />
-		<Compile Remove="Deductions\Pages\**" />
-		<Compile Remove="Deductions\Validators\**" />
-		<Content Remove="Projects\Validators\**" />
-		<Content Remove="Deductions\Models\**" />
-		<Content Remove="Deductions\Pages\**" />
-		<Content Remove="Deductions\Validators\**" />
-		<EmbeddedResource Remove="Projects\Validators\**" />
-		<EmbeddedResource Remove="Deductions\Models\**" />
-		<EmbeddedResource Remove="Deductions\Pages\**" />
-		<EmbeddedResource Remove="Deductions\Validators\**" />
-		<None Remove="Projects\Validators\**" />
-		<None Remove="Deductions\Models\**" />
-		<None Remove="Deductions\Pages\**" />
-		<None Remove="Deductions\Validators\**" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Content Remove="C:\Users\leone\.nuget\packages\chartjs.blazor.fork\2.0.2\contentFiles\any\netstandard2.1\wwwroot\ChartJsBlazorInterop.js" />
-		<Content Remove="Projects\FileUploader.razor" />
-	</ItemGroup>
 
 
 	<ItemGroup>

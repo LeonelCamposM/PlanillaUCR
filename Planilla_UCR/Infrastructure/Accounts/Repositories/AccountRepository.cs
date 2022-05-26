@@ -1,13 +1,11 @@
 ﻿using Domain.Core.Repositories;
 using Domain.Accounts.Entities;
 using Domain.Accounts.Repositories;
+using Domain.Accounts.DTOs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Data.SqlClient;
-using System;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using Infrastructure.Accounts.Repositories;
 
 namespace Infrastructure.Accounts.Repositories
 {
@@ -22,25 +20,22 @@ namespace Infrastructure.Accounts.Repositories
         }
 
 
-        public async Task InsertAccountData(Account accountData)
+        public async Task InsertAccountData(AccountsDTO accountData)
         {
 
             System.FormattableString query = $"EXECUTE InsertDataToAccountWithPasswordEncripted @EmailAccount = {accountData.Email}, @UserPasswordToEncrypt = {accountData.UserPassword}";
             _dbContext.Database.ExecuteSqlInterpolated(query);
         }
+        
 
-
-        public async Task<IEnumerable<Account?>> CheckEmail(Account accountData)
+        public async Task<IEnumerable<Account?>> CheckEmail(AccountsDTO accountData)
         {
-
-            {
-                var email = await _dbContext.Accounts.FromSqlRaw("EXEC EmailCheckLoggin @UserEmail",
-                    new SqlParameter("@UserEmail", accountData.Email)).ToListAsync();
-                return email;
-            }
+            var email = await _dbContext.Accounts.FromSqlRaw("EXEC EmailCheckLoggin @UserEmail",
+            new SqlParameter("@UserEmail", accountData.Email)).ToListAsync();
+            return email;
         }
 
-        public async Task<IEnumerable<Account?>> CheckPassword(Account accountData)
+        public async Task<IEnumerable<Account?>> CheckPassword(AccountsDTO accountData)
         {
 
             var password = await _dbContext.Accounts.FromSqlRaw("EXEC PasswordCheckLoggin @UserEmail, @UserPassword",
@@ -49,10 +44,23 @@ namespace Infrastructure.Accounts.Repositories
 
         }
 
-        public async Task SendEmail(string message, string receiver)
+        public void SendEmail(string message, string receiver)
         {
             EmailSender emailSender = new();
-            await emailSender.Execute(message, receiver);
+            emailSender.SendMail(message, receiver);
+        }
+
+        public async Task<IEnumerable<Account?>> GetAuthenticationState(AccountsDTO accountData)
+        {
+            var  state = await _dbContext.Accounts.FromSqlRaw("EXEC GetAuthenticationState @email",
+            new SqlParameter("@email", accountData.Email)).ToListAsync();
+            return state;
+        }
+
+        public async Task SetAuthenticationState(AccountsDTO accountData, byte state)
+        {
+            System.FormattableString query = $"EXECUTE SetAuthenticationState @email = {accountData.Email}, @state = {state}";
+            _dbContext.Database.ExecuteSqlInterpolated(query);
         }
     }
 }

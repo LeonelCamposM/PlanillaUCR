@@ -56,25 +56,35 @@
   <Import Condition="'$(SQLDBExtensionsRefPath)' == ''" Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
   <ItemGroup>
     <Folder Include="Properties" />
+    <Folder Include="Tables" />
     <Folder Include="StoredProcedures" />
     <Folder Include="Tables" />
     <Folder Include="StoredProcedures\People" />
     <Folder Include="StoredProcedures\Employee" />
-    <Folder Include="StoredProcedures" />
-    <Folder Include="Tables" />
-    <Folder Include="StoredProcedures\Project" />
     <Folder Include="StoredProcedures\Account" />
+    <Folder Include="StoredProcedures\Subscription" />
+    <Folder Include="StoredProcedures\Project\" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Account.sql" />
     <Build Include="Tables\Agreement.sql" />
     <Build Include="Tables\AgreementType.sql" />
-    <Build Include="Tables\Acquire.sql" />
     <Build Include="Tables\Employee.sql" />
     <Build Include="Tables\Employer.sql" />
     <Build Include="Tables\Person.sql" />
     <Build Include="Tables\Project.sql" />
     <Build Include="Tables\Subscription.sql" />
+    <Build Include="Tables\Employee.sql" />
+    <Build Include="Tables\Employer.sql" />
+    <Build Include="Tables\Person.sql" />
+    <Build Include="Tables\Project.sql" />
+    <Build Include="Tables\Subscription.sql" />
+    <Build Include="StoredProcedures\Account\EmailCheckLoggin.sql" />
+    <Build Include="StoredProcedures\Account\InsertDataToAccountWithPasswordEncripted.sql" />
+    <Build Include="StoredProcedures\Account\PasswordCheckLoggin.sql" />
+    <Build Include="StoredProcedures\Account\GetAuthenticationState.sql" />
+    <Build Include="StoredProcedures\Account\SetAuthenticationState.sql" />
+    <Folder Include="StoredProcedures" />
     <Folder Include="Tables" />
     <Folder Include="StoredProcedures" />
     <Folder Include="StoredProcedures\People" />
@@ -83,14 +93,12 @@
     <Build Include="StoredProcedures\People\GetProjectEmployees.sql" />
     <Build Include="StoredProcedures\People\GetPersonByEmail.sql" />
     <Build Include="StoredProcedures\Employee\GetEmployeeByEmail.sql" />
-    <Build Include="StoredProcedures\Project\GetEmployerByEmail.sql" />
     <Build Include="StoredProcedures\Account\EmailCheckLoggin.sql" />
     <Build Include="StoredProcedures\Account\InsertDataToAccountWithPasswordEncripted.sql" />
     <Build Include="StoredProcedures\Account\PasswordCheckLoggin.sql" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Account.sql" />
-    <Build Include="Tables\Acquire.sql" />
     <Build Include="Tables\Agreement.sql" />
     <Build Include="Tables\AgreementType.sql" />
     <Build Include="Tables\Employee.sql" />
@@ -98,8 +106,13 @@
     <Build Include="Tables\Person.sql" />
     <Build Include="Tables\Project.sql" />
     <Build Include="Tables\Subscription.sql" />
+    <Build Include="StoredProcedures\People\GetAllEmployees.sql" />
+    <Build Include="StoredProcedures\People\GetProjectEmployees.sql" />
+    <Build Include="StoredProcedures\People\GetPersonByEmail.sql" />
+    <Build Include="StoredProcedures\Employee\GetEmployeeByEmail.sql" />
   </ItemGroup>
   <ItemGroup>
+    <RefactorLog Include="DB_Planilla.refactorlog" />
     <PostDeploy Include="Script.PostDeployment.sql" />
     <Build Include="Tables\Account.sql" />
     <Build Include="Tables\Agreement.sql" />
@@ -112,5 +125,9 @@
     <Build Include="Tables\Subscription.sql" />
     <Build Include="StoredProcedures\Project\GetAllNameProjects.sql" />
     <RefactorLog Include="DB_Planilla.refactorlog" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="StoredProcedures\Subscription\GetAllDeductions.sql" />
+    <None Include="StoredProcedures\Subscription\GetAllBenefits.sql" />
   </ItemGroup>
 </Project>
