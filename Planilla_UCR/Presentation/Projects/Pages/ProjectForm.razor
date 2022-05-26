@@ -1,4 +1,4 @@
-﻿@page "/Create_Project"
+﻿@page "/Create_Project/{EmployerEmail}"
 @using Domain.Projects.DTOs
 @using Domain.Projects.Entities
 @using Domain.Employers.DTOs
@@ -15,15 +15,12 @@
 @inject ISnackbar Snackbar
 
 
-@{
-    List<BreadcrumbItem> _items = new List<BreadcrumbItem>
-    {
-        new BreadcrumbItem("Inicio", href: "#"),
-        new BreadcrumbItem("Proyectos", href: "#"),
-        new BreadcrumbItem("Crear Proyecto nuevo", href: "#"),
-    };
+@if (_created)
+{
+    ShowSnackNotification("Proyecto Creado", Severity.Success);
 }
- <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
+
+<MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
 
 <MudGrid>
     <MudItem xs="10" sm="12">
@@ -133,14 +130,16 @@
     SnackHandler snackHandler = new SnackHandler();
 
     Project ProjectInfo = new Project("","","",0,0,"");
+    [Parameter] public string EmployerEmail { get; set; }
+    [Parameter] public string ProjectName { get; set; }
     MudForm form;
 
 
     private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
     {
-        new BreadcrumbItem("Home", href: ""),
-        new BreadcrumbItem("Proyectos", href: "project"),
-        new BreadcrumbItem("Crear proyecto nuevo", href: "newproject")
+        new BreadcrumbItem("Inicio", href: ""),
+        new BreadcrumbItem("Proyectos", href: "/Projects/{EmployerEmail}"),
+        new BreadcrumbItem("Crear proyecto", href: null, disabled: true)
     };
 
 
@@ -159,6 +158,7 @@
             _saving = true;
             await CreateProject();
             _saving = false;
+            _created = true;
             ShowSnackNotification(ProjectInfo.ProjectName+" creado exitosamente", Severity.Success);
             CleanForm();
         }
