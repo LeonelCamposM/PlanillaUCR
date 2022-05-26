@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Domain.Employers.Entities;
+using System;
 using Domain.Employers.Entities;
 using System.Threading.Tasks;
 

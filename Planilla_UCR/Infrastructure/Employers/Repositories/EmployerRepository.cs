@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
 
+
+
 namespace Infrastructure.Employers.Repositories
 {
     internal class EmployerRepository : IEmployerRepository
@@ -36,5 +38,7 @@ namespace Infrastructure.Employers.Repositories
             }
             return employer;
         }
+
+
     }
 }

@@ -19,7 +19,8 @@ namespace Application.Employers.Implementations
         {
             await _employerRepository.CreateEmployerAsync(email);
         }
-        public async Task<Employer>? GetEmployerAsync(String email) 
+
+        public async Task<Employer>? GetEmployerAsync(String email)
         {
             return await _employerRepository.GetEmployerAsync(email);
         }

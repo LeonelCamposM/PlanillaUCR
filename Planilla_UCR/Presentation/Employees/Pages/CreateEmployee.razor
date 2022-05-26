@@ -1,4 +1,4 @@
-﻿@page "/Create_Employee"
+@page "/Create_Employee/{email}/{projectName}"
 @using Application.People
 @using Domain.People.Entities
 @*@using Application.Accounts
@@ -8,21 +8,45 @@
 @using Application.Employees
 @using Presentation.Employees.Models
 @using Presentation.Core.Components
+========
+﻿@page "/Register_Form"
+@using Domain.People.Entities
+@using Domain.Employees.Entities 
+@using Domain.Employees.DTOs
+@using Application.Accounts
+@using Application.People
+@using Application.Employees
+@using Application.Employers
+@using Domain.Accounts.Entities
+@using Domain.Accounts.DTOs
+@using Presentation.Shared.Models
+@using Presentation.Core.Components
+@using System.Text.RegularExpressions
+>>>>>>>> main:Planilla_UCR/Presentation/Accounts/Pages/RegisterForm.razor
 @using System.ComponentModel.DataAnnotations
+@using Application.Accounts
+@using Domain.Accounts.Entities
+@using Presentation.Core.Layout.Visitor
 
+@layout VisitorMainLayout
+@inject NavigationManager nav
 @inject ISnackbar Snackbar
 @inject IPersonService PersonService
+<<<<<<<< HEAD:Planilla_UCR/Presentation/Employees/Pages/CreateEmployee.razor
+========
+@inject IAccountService AccountService
+>>>>>>>> main:Planilla_UCR/Presentation/Accounts/Pages/RegisterForm.razor
 @inject IEmployeeService EmployeeService
+@inject IEmployerService EmployerService
 
 @*Navigation footprint *@
 @{
     List<BreadcrumbItem> _items = new List<BreadcrumbItem>
     {
-        new BreadcrumbItem("Inicio", href: "#"),
-        new BreadcrumbItem("Cuenta", href: "#"),
     };
 }
  <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
+
 
 <MudGrid>
     <MudItem xs="10" sm="12">
@@ -95,8 +119,13 @@
                         </MudButton>
                         <MudButton Disabled="true"> </MudButton>
 
+<<<<<<<< HEAD:Planilla_UCR/Presentation/Employees/Pages/CreateEmployee.razor
                         @*Clear buton *@
                         <MudButton OnClick="CleanForm" Variant="Variant.Filled" Color="Color.Tertiary">
+========
+                        @*Clear buton *@
+                        <MudButton OnClick="CleanForm" Variant="Variant.Filled" Color="Color.Transparent">
+>>>>>>>> main:Planilla_UCR/Presentation/Accounts/Pages/RegisterForm.razor
                                 <MudText>Limpiar</MudText>
                         </MudButton>
                         
@@ -111,14 +140,24 @@
 
 @code {
     Person personInfo = new Person("", "", "", "", Int32.Parse("0"), "", "", "");
+<<<<<<<< HEAD:Planilla_UCR/Presentation/Employees/Pages/CreateEmployee.razor
     //Account accountInfo = new Account("","");
     SnackHandler snackHandler = new SnackHandler();
     MudForm form;
+========
+    AccountsDTO accountData = new AccountsDTO("","");
+    MudTextField<string> pwField1;
+    SnackHandler snackHandler = new SnackHandler();
+    MudForm form;
+    String Rol;
+    public bool SendEmail { get; set; } = false;
+
 
     async Task SavePersonInfo()
     {
         snackHandler._saving = true;
         await form.Validate();
+<<<<<<<< HEAD:Planilla_UCR/Presentation/Employees/Pages/CreateEmployee.razor
         bool validPerson = await validatePersonInfo(personInfo);
         if (form.IsValid && validPerson)
         {
@@ -130,10 +169,43 @@
             snackHandler._saving = false;
             ShowSnackNotification("Cuenta para empleado "+personInfo.Name+" creada", Severity.Success);
             ShowSnackNotification("Se utilizó la contraseña por defecto: Nombre_Cedula", Severity.Info);
+========
+        if (form.IsValid && ValidateInfo(personInfo)){
+            await PersonService.CreatePersonAsync(personInfo);
+            if (Rol.Equals("RolEmployee")){
+                //await EmployeeService.CreateEmployeeAsync(personInfo.Email);
+                //accountData.Email = personInfo.Email;
+                //await AccountService.InsertAccountData(accountData);
+                //snackHandler._saving = false;
+                //ShowSnackNotification("Cuenta para "+personInfo.Name+" registrada", Severity.Success);
+                //await AccountService.SetAuthenticationState(accountData, 1);
+            }
+            else{
+                await EmployerService.CreateEmployerAsync(personInfo.Email);
+                accountData.Email = personInfo.Email;
+                IEnumerable<Account> emailChecked = await AccountService.CheckEmail(accountData);
+                if (emailChecked.Length() != 0)
+                {
+                    ShowSnackNotification("El email ya se encuentra en uso", Severity.Error);
+                }
+                else
+                {
+                    await AccountService.InsertAccountData(accountData);
+                    snackHandler._saving = false;
+                    ShowSnackNotification("Cuenta para "+personInfo.Name+" registrada", Severity.Success);
+                    await AccountService.SetAuthenticationState(accountData,1);
+                    nav.NavigateTo($"/Projects/{accountData.Email}");
+        }
+            }
+            if (SendEmail == true) {
+                AccountService.SendEmail("Ha registrado su cuenta correctamente, bienvenido a Planilla_UCR",personInfo.Email);
+            } 
+>>>>>>>> main:Planilla_UCR/Presentation/Accounts/Pages/RegisterForm.razor
         }
         snackHandler._saving = false;
     }
 
+<<<<<<<< HEAD:Planilla_UCR/Presentation/Employees/Pages/CreateEmployee.razor
     async Task<bool> validatePersonInfo(Person personInfo)
     {
         bool Ssn = ValidateSsn(personInfo);
@@ -142,33 +214,65 @@
     }
 
     async Task<bool> ValidateEmail(Person personInfo)
+========
+    bool ValidateSsn(Person personInfo)
+>>>>>>>> main:Planilla_UCR/Presentation/Accounts/Pages/RegisterForm.razor
     {
         bool valid = true;
-        IEnumerable<Person> personList = await PersonService.GetPersonByEmail(personInfo.Email);
-        IEnumerable<Employee> employeeList = await EmployeeService.GetEmployeeByEmail(personInfo.Email);
-
-        if (personList.Length() == 0 && employeeList.Length() == 0)
         {
-            valid=true;
-        }
-        else {
-            valid=false;
-            ShowSnackNotification("El email " + personInfo.Email + " se encuentra en uso", Severity.Error);
         }   
         return valid;
     }
 
-    bool ValidateSsn(Person personInfo)
     {
         bool valid = true; 
-        if (personInfo.Ssn == 0 || personInfo.Ssn < 0)
         {
-            ShowSnackNotification("Número de cédula incorrecta", Severity.Error);
-            valid = false;
         }
         return valid;
     }
 
+    bool ValidateInfo(Person personInfo)
+    {
+        bool ssn = ValidateSsn(personInfo);
+        bool email = ValidateEmail(personInfo);
+        return ssn && email;
+    }
+
+
+    private IEnumerable<string> PasswordStrength(string pw)
+    {
+        if (string.IsNullOrWhiteSpace(pw))
+        {
+            yield return "Contraseña es requerida!";
+            yield break;
+        }
+        if (pw.Length < 8)
+        {
+            yield return "La contraseña debe tener al menos 8 caracteres";
+        }
+        if (!Regex.IsMatch(pw, @"[A-Z]"))
+        {
+            yield return "Debe contener al menos una letra mayúscula";
+        }
+        if (!Regex.IsMatch(pw, @"[a-z]"))
+        {
+            yield return "Debe contener al menos una letra minúscula";
+        }
+
+        if (!Regex.IsMatch(pw, @"[0-9]"))
+        {
+            yield return "Debe contener al menos un dígito";
+        }
+    }
+
+    private string PasswordMatch(string arg)
+    {
+        if (pwField1.Value != arg)
+            return "Contraseñas no coinciden";
+        return null;
+    }
+
+>>>>>>>> main:Planilla_UCR/Presentation/Accounts/Pages/RegisterForm.razor
     void ShowSnackNotification(string message, Severity severity)
     {
         Snackbar.Configuration.SnackbarVariant = Variant.Filled;
