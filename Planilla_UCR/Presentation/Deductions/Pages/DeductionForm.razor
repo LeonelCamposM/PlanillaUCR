@@ -1,8 +1,9 @@
-﻿@page "/Projects/{EmployerEmail}/{ProjectName}/Deductions/New"
+﻿@page "/Projects/{employerEmail}/{projectName}/Deductions/New"
 @using Domain.Subscriptions.Entities
 @using Application.Subscriptions
 @using Presentation.Deductions.Models
 @using Presentation.Core.Components
+
 
 @inject ISubscriptionService SubscriptionService
 @inject ISnackbar Snackbar
@@ -12,8 +13,8 @@
 @{List<BreadcrumbItem> _items = new List<BreadcrumbItem>
     {
         new BreadcrumbItem("Home", href: ""),
-        new BreadcrumbItem("Proyectos", href: $"/Projects/{EmployerEmail}"),
-        new BreadcrumbItem("Deducciones", href: $"/Projects/{EmployerEmail}/{ProjectName}/Deductions"),
+        new BreadcrumbItem("Proyectos", href: $"/Projects/{employerEmail}"),
+        new BreadcrumbItem("Deducciones", href: $"/Projects/{employerEmail}/{projectName}/Deductions"),
         new BreadcrumbItem("Nuevo", href: "newdeduction")
     };
 }
@@ -91,14 +92,14 @@
     Subscription subscriptionInfo = new Subscription("", "", "", "", "", 0, 0, 1);
     MudForm form;
 
-    [Parameter] public string EmployerEmail { get; set; }
-    [Parameter] public string ProjectName { get; set; }
+    [Parameter] public string employerEmail { get; set; }
+    [Parameter] public string projectName { get; set; }
 
 
     async Task SaveDeduction()
     {
-        subscriptionInfo.EmployerEmail = EmployerEmail;
-        subscriptionInfo.ProjectName = ProjectName;
+        subscriptionInfo.EmployerEmail = employerEmail;
+        subscriptionInfo.ProjectName = projectName;
         Subscription subscriptionToAdd = subscriptionInfo;
         snackHandler._saving = true;
         await form.Validate();

@@ -1,4 +1,4 @@
-﻿@page "/Projects/{EmployerEmail}/{ProjectName}/Deductions/Configurations"
+﻿@page "/Projects/{employerEmail}/{projectName}/Deductions/Configurations"
 @using Application.Subscriptions
 @using Domain.Subscriptions.Entities
 @using Presentation.Core.Components
@@ -9,9 +9,9 @@
 @{List<BreadcrumbItem> _items = new List<BreadcrumbItem>
     {
         new BreadcrumbItem("Home", href: ""),
-        new BreadcrumbItem("Proyectos", href: $"/Projects/{EmployerEmail}"),
-        new BreadcrumbItem("Deducciones", href: $"/Projects/{EmployerEmail}/{ProjectName}/Deductions"),
-        new BreadcrumbItem("Configuraciones", href: $"/Projects/{EmployerEmail}/{ProjectName}/Deductions/Configurations"),
+        new BreadcrumbItem("Proyectos", href: $"/Projects/{employerEmail}"),
+        new BreadcrumbItem("Deducciones", href: $"/Projects/{employerEmail}/{projectName}/Deductions"),
+        new BreadcrumbItem("Configuraciones", href: $"/Projects/{employerEmail}/{projectName}/Deductions/Configurations"),
     };
 }
 <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
@@ -66,12 +66,12 @@ else
     public string searchString1 = "";
     public string project { get; set; }
 
-    [Parameter] public string EmployerEmail { get; set; }
-    [Parameter] public string ProjectName { get; set; }
+    [Parameter] public string employerEmail { get; set; }
+    [Parameter] public string projectName { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        Elements = await SubscriptionService.GetDeductionsByProject(EmployerEmail, ProjectName);
+        Elements = await SubscriptionService.GetDeductionsByProject(employerEmail, projectName);
         if (Elements.Length() > 0){
         _loading = false;
         }

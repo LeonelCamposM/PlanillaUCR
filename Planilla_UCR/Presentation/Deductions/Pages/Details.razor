@@ -1,4 +1,4 @@
-﻿@page "/Projects/{EmployerEmail}/{ProjectName}/Deductions/{SubscriptionName}"
+﻿@page "/Projects/{employerEmail}/{projectName}/Deductions/{SubscriptionName}"
 
 @using Domain.Subscriptions.DTOs
 @using Application.Subscriptions
@@ -10,8 +10,8 @@
 @{List<BreadcrumbItem> _items = new List<BreadcrumbItem>
     {
         new BreadcrumbItem("Home", href: ""),
-        new BreadcrumbItem("Proyectos", href: $"/Projects/{EmployerEmail}"),
-        new BreadcrumbItem("Deducciones", href: $"/Projects/{EmployerEmail}/{ProjectName}/Deductions"),
+        new BreadcrumbItem("Proyectos", href: $"/Projects/{employerEmail}"),
+        new BreadcrumbItem("Deducciones", href: $"/Projects/{employerEmail}/{projectName}/Deductions"),
     };
 }
 <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
@@ -54,13 +54,13 @@ else
     private IEnumerable<Subscription> Elements;
     public Subscription subscription = new Subscription("","","","","",0,0,1);
 
-    [Parameter] public string EmployerEmail { get; set; }
-    [Parameter] public string ProjectName { get; set; }
+    [Parameter] public string employerEmail { get; set; }
+    [Parameter] public string projectName { get; set; }
     [Parameter] public string SubscriptionName { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        subscription = await SubscriptionService.GetSubscription(EmployerEmail, ProjectName, SubscriptionName);
+        subscription = await SubscriptionService.GetSubscription(employerEmail, projectName, SubscriptionName);
         if (subscription != null)
         {
             _loading = false;
@@ -69,11 +69,11 @@ else
 
     private void GoToConfigs()
     {
-        nav.NavigateTo($"/Projects/{EmployerEmail}/{ProjectName}/Deductions/{SubscriptionName}/Configurations");
+        nav.NavigateTo($"/Projects/{employerEmail}/{projectName}/Deductions/{SubscriptionName}/Configurations");
     }
 
     private void GoToMain()
     {
-        nav.NavigateTo($"/Projects/{EmployerEmail}/{ProjectName}/Deductions");
+        nav.NavigateTo($"/Projects/{employerEmail}/{projectName}/Deductions");
     }
 }

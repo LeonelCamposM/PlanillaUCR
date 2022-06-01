@@ -1,8 +1,9 @@
-﻿@page "/Projects/{EmployerEmail}/{ProjectName}/Deductions/{SubscriptionName}/Configurations"
+﻿@page "/Projects/{employerEmail}/{projectName}/Deductions/{SubscriptionName}/Configurations"
 @using Application.Subscriptions
 @using Domain.Subscriptions.Entities
 @using Presentation.Core.Components
 @using Presentation.Deductions.Models
+@using System.Globalization
 @inject NavigationManager nav
 @inject ISnackbar Snackbar
 @inject ISubscriptionService SubscriptionService
@@ -11,7 +12,7 @@
     {
         new BreadcrumbItem("Home", href: ""),
         new BreadcrumbItem("Proyectos", href: null, disabled: true),
-        new BreadcrumbItem("Deducciones", href: $"/Projects/{EmployerEmail}/{ProjectName}/Deductions"),
+        new BreadcrumbItem("Deducciones", href: $"/Projects/{employerEmail}/{projectName}/Deductions"),
     };
 }
 <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
@@ -24,26 +25,44 @@ else
 {
     <MudGrid>
         @*Text fields *@
-        <MudItem xs="12" sm="8">
-            <MudPaper  Height="250px" Width="90%" Outlined="false" Class="border-none pa-4" Elevation="0">
+        <MudItem xs="12" sm="12">
+            <MudPaper  Height="250px" Width="100%" Outlined="false" Class="border-none pa-4" Elevation="0">
                 <MudText Align="Align.Center" Typo="Typo.h6">Modificar deducción</MudText>
-                <MudText Align="Align.Center" Typo="Typo.h6">@subscription.SubscriptionName</MudText>
                 <MudForm @ref="form">
                 <MudGrid>
 
-                <MudItem xs="6">
-                    <MudTextField @bind-Value="subscription.Cost" Label="Costo" Variant="Variant.Outlined"></MudTextField>
+                <MudItem xs="2">
+                </MudItem>
+                <MudItem xs="8">
+                    <MudTextField @bind-Value="subscription.SubscriptionName" Label="Nombre" Variant="Variant.Outlined"></MudTextField>
+                </MudItem>
+                <MudItem xs="2">
                 </MudItem>
 
-                <MudItem xs="6">
+                <MudItem xs="2"></MudItem>
+
+                <MudItem xs="4">
+                    <MudNumericField Immediate="false" Label="Costo" Format="N2" Culture="@cultureCR" Variant="Variant.Outlined" @bind-Value="tempCost" 
+                    Adornment="Adornment.Start" AdornmentText="@cultureCR.NumberFormat.CurrencySymbol"/>
+                </MudItem>
+
+                <MudItem xs="4">
                     <MudTextField @bind-Value="subscription.ProviderName"  Label="Organización" Variant="Variant.Outlined"></MudTextField>
                 </MudItem>
 
-                <MudItem xs="12">
+                <MudItem xs="2"></MudItem>  
+
+                <MudItem xs="2"></MudItem>  
+
+                <MudItem xs="8">
                     <MudTextField @bind-Value="subscription.SubscriptionDescription" Label="Descripcion" Variant="Variant.Outlined"></MudTextField>
                 </MudItem>
 
+                <MudItem xs="2"></MudItem>  
+                <MudItem xs="2"></MudItem>  
+
                 <MudItem xs="12" sm="6" md="4">
+                    <MudItem xs="2"></MudItem>  
                     <MudButton Disabled="@snackHandler._saving" OnClick="SaveDeduction" Variant="Variant.Filled" Color="Color.Secondary">
                         @if (snackHandler._saving)
                         {
@@ -73,21 +92,24 @@ else
 @code {
     private bool _hidePosition;
     private bool _loading = true;
-    private IEnumerable<Subscription> Elements;
+    private double tempCost = 0.0;
     public Subscription subscription = new Subscription("","","","CCSS","Deducción1",2000,0,1);
     MudForm form;
     SnackHandler snackHandler = new SnackHandler();
+    public CultureInfo cultureCR = CultureInfo.GetCultureInfo("es-CR");
 
 
-    [Parameter] public string EmployerEmail { get; set; }
-    [Parameter] public string ProjectName { get; set; }
+    [Parameter] public string employerEmail { get; set; }
+    [Parameter] public string projectName { get; set; }
     [Parameter] public string SubscriptionName { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        subscription = await SubscriptionService.GetSubscription(EmployerEmail, ProjectName, SubscriptionName);
+        subscription = await SubscriptionService.GetSubscription(employerEmail, projectName, SubscriptionName);
         if (subscription != null)
         {
+            tempCost = Convert.ToDouble(subscription.Cost);
+            CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("es-CR");
             _loading = false;
         }
     }
@@ -98,6 +120,7 @@ else
         await form.Validate();
         if (form.IsValid)
         {
+            subscription.Cost = Convert.ToInt32(tempCost);
             snackHandler._saving = false;
             ShowSnackNotification("Deducción "+subscription.SubscriptionName+" modificada", Severity.Success);
         }
@@ -133,6 +156,6 @@ else
 
     private void GoToMain()
     {
-        nav.NavigateTo($"/Projects/{EmployerEmail}/{ProjectName}/Deductions");
+        nav.NavigateTo($"/Projects/{employerEmail}/{projectName}/Deductions");
     }
 }

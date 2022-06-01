@@ -1,4 +1,4 @@
-﻿@page "/Projects/{EmployerEmail}/{ProjectName}/Deductions"
+﻿@page "/Projects/{employerEmail}/{projectName}/Deductions"
 @using Domain.Subscriptions.Entities
 @using Application.Subscriptions
 @using Presentation.Core.Components
@@ -9,12 +9,12 @@
 @{List<BreadcrumbItem> _items = new List<BreadcrumbItem>
 {
         new BreadcrumbItem("Home", href: ""),
-        new BreadcrumbItem("Proyectos", href: $"/Projects/{EmployerEmail}"),
-        new BreadcrumbItem("Deducciones", href: $"/Projects/{EmployerEmail}/{ProjectName}/Deductions"),
+        new BreadcrumbItem("Proyectos", href: $"/Projects/{employerEmail}"),
+        new BreadcrumbItem("Deducciones", href: $"/Projects/{employerEmail}/{projectName}/Deductions"),
     };
 }
 
-<Authenticator email="@EmployerEmail" SendAuthenticationState="ReceiveAuthenticationState"> </Authenticator>
+<Authenticator email="@employerEmail" SendAuthenticationState="ReceiveAuthenticationState"> </Authenticator>
 @if (_loading)
 {
     <MudPaper  Height="220px" Width="100%" Outlined="false" Class="border-none pa-4" Elevation="0">
@@ -51,7 +51,7 @@ else
                     <MudSpacer></MudSpacer>
                      <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Secondary" OnClick="GoToConfigs"/>
                 </MudToolBar>
-                <MudTable @ref="mudTable" Items="@Elements" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm"  Loading="@_empty" Filter="new Func<Subscription,bool>(FilterFunc1)">
+                <MudTable @ref="mudTable" Items="@elements" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm"  Loading="@_empty" Filter="new Func<Subscription,bool>(FilterFunc1)">
                     <ToolBarContent>
                         <MudText Align="Align.Center" Typo="Typo.h6">Lista de deducciones</MudText>
                         <MudSpacer />
@@ -64,7 +64,7 @@ else
                     </HeaderContent>
                     <RowTemplate>
                         <MudTd DataLabel="Nombre">
-                            <MudLink Color="Color.Secondary" Href="@($"/Projects/{EmployerEmail}/{ProjectName}/Deductions/{context.SubscriptionName}")">
+                            <MudLink Color="Color.Secondary" Href="@($"/Projects/{employerEmail}/{projectName}/Deductions/{context.SubscriptionName}")">
                                 @context.SubscriptionName
                             </MudLink>
                         </MudTd>
@@ -91,17 +91,13 @@ else
     }
 }
 
-
-
-
-
 @code {
     private bool _hidePosition;
     private bool _empty = true;
     private int selectedRowNumber = -1;
     private MudTable<Subscription> mudTable;
     private List<string> clickedEvents = new();
-    private IEnumerable<Subscription> Elements;
+    private IEnumerable<Subscription> elements;
     bool _loading = true;
     bool authenticationState = false;
     private int currentCount = 0;
@@ -111,32 +107,32 @@ else
 
     public string searchString1 = "";
 
-    [Parameter] public string EmployerEmail { get; set; }
-    [Parameter] public string ProjectName { get; set; }
+    [Parameter] public string employerEmail { get; set; }
+    [Parameter] public string projectName { get; set; }
 
     public async Task ReceiveAuthenticationState(bool state)
     {
         authenticationState = state;
         _loading = false;
-        await setEmail.InvokeAsync(EmployerEmail);
+        await setEmail.InvokeAsync(employerEmail);
     }
 
     protected override async Task OnInitializedAsync()
     {
-        Elements = await SubscriptionService.GetDeductionsByProject(EmployerEmail, ProjectName);
-        if (Elements.Length() > 0){
+        elements = await SubscriptionService.GetDeductionsByProject(employerEmail, projectName);
+        if (elements.Length() > 0){
             _empty = false;
         }
     }
 
     private void GoToCreate()
     {
-        nav.NavigateTo($"/Projects/{EmployerEmail}/{ProjectName}/Deductions/New");
+        nav.NavigateTo($"/Projects/{employerEmail}/{projectName}/Deductions/New");
     }
 
     private void GoToConfigs()
     {
-        nav.NavigateTo($"/Projects/{EmployerEmail}/{ProjectName}/Deductions/Configurations");
+        nav.NavigateTo($"/Projects/{employerEmail}/{projectName}/Deductions/Configurations");
     }
 
     private void PageChanged(int i)
