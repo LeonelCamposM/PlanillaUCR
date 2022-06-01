@@ -14,6 +14,7 @@
 @using System.ComponentModel.DataAnnotations
 @using Presentation.Core.Layout.Visitor
 
+
 @layout VisitorMainLayout
 @inject NavigationManager nav
 @inject ISnackbar Snackbar
@@ -101,13 +102,19 @@
                         <MudSelectItem Value="@("RolEmployer")">Empleador</MudSelectItem>
                         </MudSelect>
                     </MudItem>
-                    <MudItem xs="2"></MudItem>
-                    <MudItem xs="2"></MudItem>
-                    <MudItem xs="8">
-                    <MudCheckBox @bind-Checked="@SendEmail" Label="Enviar email de confirmación" Color="Color.Secondary" Variant="Variant.Outlined"></MudCheckBox>
-                    </MudItem>
+                 
                     <MudItem xs="2"></MudItem>
                     <MudSpacer></MudSpacer>
+                    <MudSpacer></MudSpacer>
+                    <MudItem xs="2"></MudItem>
+                    <MudItem xs="8">
+                    <MudText>Se envia email con el código de confirmación para validar su cuenta</MudText></MudItem>
+                    <MudItem xs="2"></MudItem>
+                 
+                    <MudSpacer></MudSpacer>
+                    <MudSpacer></MudSpacer>
+                    
+
                     @*Create buton *@
                     <MudItem xs="2"></MudItem>
                     <MudItem xs="8">
@@ -148,8 +155,7 @@
     SnackHandler snackHandler = new SnackHandler();
     MudForm form;
     String Rol;
-    public bool SendEmail { get; set; } = false;
-
+    Random rnd = new Random();
 
     async Task SavePersonInfo()
     {
@@ -180,9 +186,9 @@
                     snackHandler._saving = false;
                     ShowSnackNotification("Cuenta para "+personInfo.Name+" registrada", Severity.Success);
                     await AccountService.SetAuthenticationState(accountData,1);
-                    if (SendEmail == true) {
-                      AccountService.SendEmail("Ha registrado su cuenta correctamente, bienvenido a Planilla_UCR",personInfo.Email);
-                    } 
+                    int confirmationCode = rnd.Next(100000,999999); 
+                    string confirmationCodeString = confirmationCode.ToString();
+                    AccountService.SendEmail(confirmationCodeString,personInfo.Email);
                     nav.NavigateTo($"/Projects/{accountData.Email}");
                 }  
             }
@@ -253,6 +259,7 @@
             return "Contraseñas no coinciden";
         return null;
     }
+
 
     void ShowSnackNotification(string message, Severity severity)
     {
