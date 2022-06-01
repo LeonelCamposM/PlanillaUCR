@@ -1,4 +1,4 @@
-﻿@page "/Projects/{employerEmail}/{projectName}/Deductions/{SubscriptionName}"
+﻿@page "/Projects/{employerEmail}/{projectName}/Deductions/{subscriptionName}"
 
 @using Domain.Subscriptions.DTOs
 @using Application.Subscriptions
@@ -12,6 +12,7 @@
         new BreadcrumbItem("Home", href: ""),
         new BreadcrumbItem("Proyectos", href: $"/Projects/{employerEmail}"),
         new BreadcrumbItem("Deducciones", href: $"/Projects/{employerEmail}/{projectName}/Deductions"),
+        new BreadcrumbItem($"{subscriptionName}", href: $"/Projects/{employerEmail}/{projectName}/Deductions/{subscriptionName}")
     };
 }
 <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
@@ -56,11 +57,11 @@ else
 
     [Parameter] public string employerEmail { get; set; }
     [Parameter] public string projectName { get; set; }
-    [Parameter] public string SubscriptionName { get; set; }
+    [Parameter] public string subscriptionName { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        subscription = await SubscriptionService.GetSubscription(employerEmail, projectName, SubscriptionName);
+        subscription = await SubscriptionService.GetSubscription(employerEmail, projectName, subscriptionName);
         if (subscription != null)
         {
             _loading = false;
@@ -69,7 +70,7 @@ else
 
     private void GoToConfigs()
     {
-        nav.NavigateTo($"/Projects/{employerEmail}/{projectName}/Deductions/{SubscriptionName}/Configurations");
+        nav.NavigateTo($"/Projects/{employerEmail}/{projectName}/Deductions/{subscriptionName}/Configurations");
     }
 
     private void GoToMain()
