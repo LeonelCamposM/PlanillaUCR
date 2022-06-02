@@ -27,7 +27,7 @@
         };
             <MudPaper Height="60px" Width="100%" Outlined="false" Class="border-none" Elevation="0">
                 <MudToolBar>
-                    <MudIconButton Size="Size.Small" Icon="@Icons.Filled.ArrowBackIos" aria-label="delete" Link="Projects" ></MudIconButton> 
+                    <MudIconButton Size="Size.Small" Icon="@Icons.Filled.ArrowBackIos" aria-label="delete" OnClick="GoToProjects" ></MudIconButton> 
                     <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
                 </MudToolBar>
             </MudPaper>
@@ -36,7 +36,7 @@
              <MudGrid>
                 <MudItem xs="4"></MudItem>
                 <MudItem xs="6">
-                <MudItem xs="6">
+                <MudItem xs="8">
                 <MudField Variant="Variant.Text"><MudIcon Icon="@Icons.Filled.Email" Color="@Color.Secondary" /> Email: @employerData.Email</MudField>
                 </MudItem>
                 <MudItem xs="8">
@@ -88,5 +88,11 @@
             empty = false;
         }
         _loading = false;
+    }
+
+
+    private void GoToProjects()
+    {
+        nav.NavigateTo($"Projects/{employerEmail}");
     }
 }
