@@ -1,4 +1,4 @@
-﻿--use [DB_Planilla]
+﻿--use [PatatasConSueno]
 
 --INSERT INTO Person
 --VALUES('jeremy@ucr.ac.cr',
@@ -25,7 +25,7 @@
 --INSERT INTO Person
 --VALUES('mau@ucr.ac.cr',
 --'Mauricio',
---'Palomero',
+--'Palma',
 --'Vitra',
 --8857655,
 --'CR4024220012',
@@ -33,17 +33,21 @@
 --'677774'
 --)
 
+--EXECUTE InsertDataToAccountWithPasswordEncripted @EmailAccount = 'leonel@ucr.ac.cr', @UserPasswordToEncrypt = 'Prueba01'
+--EXECUTE InsertDataToAccountWithPasswordEncripted @EmailAccount = 'jeremy@ucr.ac.cr', @UserPasswordToEncrypt = 'Prueba01'
+--EXECUTE InsertDataToAccountWithPasswordEncripted @EmailAccount = 'mau@ucr.ac.cr', @UserPasswordToEncrypt = 'Prueba01'
+
 --INSERT INTO Employer
 --VALUES('jeremy@ucr.ac.cr')
 
---INSERT INTO Employee
+--INSERT INTO Employer
 --VALUES('leonel@ucr.ac.cr')
 
 --INSERT INTO Employee
 --VALUES('mau@ucr.ac.cr')
 
 --INSERT INTO Project
---VALUES('jeremychaman@gmail.com',
+--VALUES('leonel@ucr.ac.cr',
 --'Proyecto 1',
 --'Emprendimiento de chocolates',
 --15000,
@@ -51,3 +55,102 @@
 --'Quincenal'
 --)
 
+--INSERT INTO Project
+--VALUES('leonel@ucr.ac.cr',
+--'Proyecto 2',
+--'Emprendimiento de galletas',
+--20000,
+--6,
+--'Mensual'
+--)
+
+--INSERT INTO Project
+--VALUES('leonel@ucr.ac.cr',
+--'Proyecto 3',
+--'Emprendimiento de confites',
+--22000,
+--7,
+--'Quincenal'
+--)
+
+--INSERT INTO Project
+--VALUES('leonel@ucr.ac.cr',
+--'Proyecto 4',
+--'Emprendimiento de camisetas',
+--40000,
+--12,
+--'Mensual'
+--)
+
+--INSERT INTO Project
+--VALUES('leonel@ucr.ac.cr',
+--'Proyecto 5',
+--'Emprendimiento de perfumes',
+--20000,
+--5,
+--'Mensual'
+--)
+
+--INSERT INTO Project
+--VALUES('jeremy@ucr.ac.cr',
+--'Proyecto 1',
+--'Emprendimiento de panadería',
+--30000,
+--20,
+--'Mensual'
+--)
+
+--INSERT INTO Subscription
+--VALUES('leonel@ucr.ac.cr',
+--'Proyecto 1',
+--'Fondo de pensiones',
+--'CCSS',
+--'Contribuición voluntaria para el fondo de pensiones.',
+--12000,
+--0,
+--1
+--)
+
+--INSERT INTO Subscription
+--VALUES('leonel@ucr.ac.cr',
+--'Proyecto 1',
+--'Ayudemos a los niños',
+--'Hospital de los niños',
+--'Cuota voluntaria para ayudar a los más necesitados.',
+--25000,
+--0,
+--1
+--)
+
+--INSERT INTO Subscription
+--VALUES('leonel@ucr.ac.cr',
+--'Proyecto 1',
+--'Rescate de perros',
+--'Refugio de perros',
+--'Cuota voluntaria para ayudar a los más necesitados.',
+--12000,
+--0,
+--1
+--)
+
+--INSERT INTO Subscription
+--VALUES('leonel@ucr.ac.cr',
+--'Proyecto 1',
+--'Gym',
+--'Golden Gym',
+--'Gimnasio equipado con todo lo necesario.',
+--25000,
+--1,
+--1
+--)
+
+--INSERT INTO Subscription
+--VALUES('leonel@ucr.ac.cr',
+--'Proyecto 1',
+--'Piscina',
+--'Aquanautas',
+--'Piscinas temperadas, ubicadas en San Pedro.',
+--12000,
+--1,
+--1
+--)
