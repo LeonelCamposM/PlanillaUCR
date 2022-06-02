@@ -41,5 +41,10 @@ namespace Application.Subscriptions.Implementations
         {
             return await _subscriptionRepository.GetBenefitsByProject(employerEmail, projectName);
         }
+
+        public async Task<bool> ModifySubscription(Subscription subscription)
+        {
+            return await _subscriptionRepository.ModifySubscription(subscription);
+        }
     }
 }

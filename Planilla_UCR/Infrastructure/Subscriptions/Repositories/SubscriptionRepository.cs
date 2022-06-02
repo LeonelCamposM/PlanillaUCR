@@ -62,5 +62,10 @@ namespace Infrastructure.Subscriptions.Repositories
                 && e.TypeSubscription == 1 && e.IsEnabled == 1).ToListAsync();
             return subscriptionResult;
         }
+
+        public async Task<bool> ModifySubscription(Subscription subscription) {
+
+            return false;
+        }
     }
 }
