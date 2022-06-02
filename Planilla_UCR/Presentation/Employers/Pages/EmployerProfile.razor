@@ -20,15 +20,19 @@
 }else{
     @if (!empty && !_loading)
     {
+          
         List<BreadcrumbItem> _items = new List<BreadcrumbItem>
         {
             new BreadcrumbItem("Proyectos", href: $"Projects/{employerEmail}"),
         };
-
-        <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
-
-        <MudText Align="Align.Center" Typo="Typo.h6" GutterBottom="true">Mi perfil</MudText>
+            <MudPaper Height="60px" Width="100%" Outlined="false" Class="border-none" Elevation="0">
+                <MudToolBar>
+                    <MudIconButton Size="Size.Small" Icon="@Icons.Filled.ArrowBackIos" aria-label="delete" Link="Projects" ></MudIconButton> 
+                    <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
+                </MudToolBar>
+            </MudPaper>
              <MudPaper  Height="220px" Width="100%" Outlined="false" Class="border-none pa-4" Elevation="0">
+             <MudText Align="Align.Center" Typo="Typo.h6" GutterBottom="true">Mi perfil</MudText>
              <MudGrid>
                 <MudItem xs="4"></MudItem>
                 <MudItem xs="6">

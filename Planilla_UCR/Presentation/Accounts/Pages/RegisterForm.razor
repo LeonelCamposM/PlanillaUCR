@@ -29,10 +29,16 @@
     List<BreadcrumbItem> _items = new List<BreadcrumbItem>
     {
         new BreadcrumbItem("Inicio", href: "#"),
-        new BreadcrumbItem("Cuenta", href: "#"),
+        new BreadcrumbItem("Cuenta", href: "Register_Form"),
     };
 }
- <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
+
+<MudPaper Height="60px" Width="100%" Outlined="false" Class="border-none" Elevation="0">
+    <MudToolBar>
+        <MudIconButton Size="Size.Small" Icon="@Icons.Filled.ArrowBackIos" aria-label="delete" Link="#" ></MudIconButton> 
+        <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
+    </MudToolBar>
+</MudPaper>
 
 <MudGrid>
     <MudItem xs="10" sm="12">

@@ -12,20 +12,17 @@ namespace Infrastructure.Accounts.Repositories
         public EmailSender() { }
         private string user = "i/MVRXAfhPPNVbUc0F0ILYn2xj4vSGjeCu1sXhBD7I0fFZBI5H7wD/8GHhHlMzPo";
         private string key = "p/ZNHkzgSrYi7TogkFKN7qRHrBb0lc/XTw8DmUZ2Jro=";
-
         public void SendMail(string textMessage, string email)
         {
             try
             {
                 var encriptor = new EncryptionHelper();
                 var htmlContent = "<section>" + "<div>" + "<center>" + "<FONT SIZE=4 COLOR=#00695c>" + "<strong>" + "Planilla_UCR" +
-                    "</strong>" + "</FONT>" + "</center>" + "<br>" + "</br>" + "</div>" +
-                    "<div>" + "<center>" + "¡Ya casi! " + "</center>" + "<br>" + "</br>" + "</div>" +
-                     "<div>" + "<center>" + "¡Gracias por registrarte en Planilla_UCR! " +
-                    "El código que se encuentra abajo es el que tienes que ingresar para verificar tu email:     " +
-                    "</center>" + "<br>" + "</br>" + "</div>" + "</section>" +
-                    "<section>" + "<div>" + "<center>" + "<strong>" + textMessage + "</strong>" + "</center>" + "<br>" +
-                    "</br>" + "</div>" + "</section>" + "<section>" + "<div>" +
+                    "</strong>" + "</FONT>" + "</center>" + "<br>" + "</br>" + "</div>" + "<div>" + "<center>" + "¡Ya casi! " + 
+                    "</center>" + "<br>" + "</br>" + "</div>" + "<div>" + "<center>" + "¡Gracias por registrarte en Planilla_UCR! " +
+                    "El código que se encuentra abajo es el que tienes que ingresar para verificar tu email:  " + "</center>" + 
+                    "<br>" + "</br>" + "</div>" + "</section>" + "<section>" + "<div>" + "<center>" + "<strong>" + textMessage + 
+                    "</strong>" + "</center>" + "<br>" + "</br>" + "</div>" + "</section>" + "<section>" + "<div>" +
                     "Recibiste este email porque te registraste en una cuenta de Planilla_UCR con esta dirección de email. " +
                     "Si piensas que fue un error, por favor, ignora este email. No te preocupes la cuenta aún no ha sido creada." +
                     "</div>" + "<div>" + "<FONT COLOR=#00695c>" + "Planilla_UCR" + "</FONT>" + "<br>" + "</br>" + "</div>" + "</section>";
@@ -72,6 +69,7 @@ namespace Infrastructure.Accounts.Repositories
             }
             return clearText;
         }
+
         public string Decrypt(string cipherText)
         {
             string EncryptionKey = "abc123";
