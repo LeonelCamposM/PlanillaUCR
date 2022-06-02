@@ -1,7 +1,7 @@
 ﻿@page "/Projects/{employerEmail}/{projectName}/Deductions/New"
 @using Domain.Subscriptions.Entities
 @using Application.Subscriptions
-@using Presentation.Deductions.Models
+@using Presentation.Deductions.Components
 @using Presentation.Core.Components
 
 
@@ -89,7 +89,7 @@
     private bool _processing = false;
 
     SnackHandler snackHandler = new SnackHandler();
-    Subscription subscriptionInfo = new Subscription("", "", "", "", "", 0, 0, 1);
+    Subscription subscriptionInfo = new Subscription("", "", "", "", "", 0.0, 0, 1);
     MudForm form;
 
     [Parameter] public string employerEmail { get; set; }
@@ -145,6 +145,6 @@
         subscriptionInfo.ProjectName = "";
         subscriptionInfo.SubscriptionDescription = "";
         subscriptionInfo.ProviderName= "";
-        subscriptionInfo.Cost = 0;
+        subscriptionInfo.Cost = 0.0;
     }
 }

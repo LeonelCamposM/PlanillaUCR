@@ -1,8 +1,8 @@
-﻿@page "/Projects/{employerEmail}/{projectName}/Deductions/{subscriptionName}/Configurations"
+﻿@page "/Projects/{employerEmail}/{projectName}/Deductions/{subscriptionName}"
 @using Application.Subscriptions
 @using Domain.Subscriptions.Entities
 @using Presentation.Core.Components
-@using Presentation.Deductions.Models
+@using Presentation.Deductions.Components
 @using System.Globalization
 @inject NavigationManager nav
 @inject ISnackbar Snackbar
@@ -60,7 +60,7 @@ else
                 <MudItem xs="2"></MudItem>
 
                 <MudItem xs="4">
-                    <MudNumericField Immediate="false" Label="Costo" Format="N2" Culture="@cultureCR" Variant="Variant.Outlined" @bind-Value="tempCost" 
+                    <MudNumericField Immediate="false" Label="Costo" Format="N2" Culture="@cultureCR" Variant="Variant.Outlined" @bind-Value="subscription.Cost" 
                     Adornment="Adornment.Start" AdornmentText="@cultureCR.NumberFormat.CurrencySymbol" ReadOnly = "@_disabled"/>
                 </MudItem>
 
@@ -73,7 +73,7 @@ else
                 <MudItem xs="2"></MudItem>  
 
                 <MudItem xs="8">
-                    <MudTextField @bind-Value="subscription.SubscriptionDescription" Label="Descripcion" Variant="Variant.Outlined" ReadOnly = "@_disabled"></MudTextField>
+                    <MudTextField @bind-Value="subscription.SubscriptionDescription" Label="Descripcion" Lines="4" Variant="Variant.Outlined" ReadOnly = "@_disabled"></MudTextField>
                 </MudItem>
 
                 <MudItem xs="2"></MudItem>  
@@ -112,9 +112,8 @@ else
 @code {
     private bool _hidePosition;
     private bool _loading = true;
-    private double tempCost = 0.0;
     private bool _disabled = true;
-    public Subscription subscription = new Subscription("","","","","",0,0,1);
+    public Subscription subscription = new Subscription("", "", "", "", "", 0.0, 0, 1);
     MudForm form;
     SnackHandler snackHandler = new SnackHandler();
     public CultureInfo cultureCR = CultureInfo.GetCultureInfo("es-CR");
@@ -129,8 +128,6 @@ else
         subscription = await SubscriptionService.GetSubscription(employerEmail, projectName, subscriptionName);
         if (subscription != null)
         {
-            tempCost = Convert.ToDouble(subscription.Cost);
-            CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("es-CR");
             _loading = false;
         }
     }
@@ -141,7 +138,6 @@ else
         await form.Validate();
         if (form.IsValid)
         {
-            subscription.Cost = Convert.ToInt32(tempCost);
             snackHandler._saving = false;
             ShowSnackNotification("Deducción "+subscription.SubscriptionName+" modificada", Severity.Success);
         }
@@ -171,7 +167,7 @@ else
     {
         subscription.SubscriptionDescription = "";
         subscription.ProviderName= "";
-        subscription.Cost = 0;
+        subscription.Cost = 0.0;
     }
 
 
