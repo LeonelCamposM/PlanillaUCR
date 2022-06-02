@@ -1,0 +1,217 @@
+﻿@page "/Projects/{EmployerEmail}/{ProjectName}/Agreements/New"
+@using Domain.Agreements.DTOs
+@using Application.Agreements
+@using Domain.Agreements.Entities
+@using Presentation.Core.Components
+@using System.ComponentModel.DataAnnotations
+
+@inject ISnackbar Snackbar
+@inject IAgreementService AgreementService
+
+
+
+@if (_created)
+{
+    ShowSnackNotification("Contrato establecido", Severity.Success);
+}
+
+
+ <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
+<MudGrid>
+    @*Text fields *@
+    <MudItem xs="10" sm="12">
+        <MudPaper  Height="220px" Width="100%" Outlined="false" Class="border-none pa-4" Elevation="0">
+             <MudForm @ref="form">
+                <MudText Align="Align.Center" Typo="Typo.h6">Establecimiento de contrato</MudText>
+                <MudGrid>
+                    @*Small fields *@
+                    <MudItem xs="2"> </MudItem>
+                    <MudItem xs="4">
+                        <MudTextField @bind-Value="agreementObject.EmployeeEmail" Label="Email del empleado" Variant="Variant.Outlined" Required="true" RequiredError="El email del empleado es necesario"
+                            Validation="@(new EmailAddressAttribute() {ErrorMessage = "Por favor, digite un correo válido"})" ></MudTextField>
+
+                    </MudItem>
+
+                    <MudItem xs="4">
+                        <MudTextField @bind-Value="agreementObject.EmployerEmail" Label="Email del empleador" Variant="Variant.Outlined" Required="true" RequiredError="El email del empleador es necesario"
+                         Validation="@(new EmailAddressAttribute() {ErrorMessage = "Por favor, digite un correo válido"})" ></MudTextField>
+                    </MudItem>
+                    <MudItem xs="2"> </MudItem>
+                    <MudItem xs="2"> </MudItem>
+                    <MudItem xs="4">
+                        <MudTextField @bind-Value="agreementObject.ProjectName" Label="Nombre del proyecto" Variant="Variant.Outlined" Required="true" RequiredError="El nombre del proyecto es necesario">
+                        </MudTextField>
+                    </MudItem>
+
+                    <MudItem xs="4">
+                        <MudSelect @bind-Value="agreementObject.ContractType" Label="Tipo de contrato" Variant="Variant.Outlined" Required="true" RequiredError="El tipo de contrato es necesario">
+                            <MudSelectItem Value="@("Tiempo completo")" />
+                            <MudSelectItem Value="@("Medio tiempo")" />
+                            <MudSelectItem Value="@("Servicios profesionales")" />
+                            <MudSelectItem Value="@("Por horas")" />
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="2"> </MudItem>
+        
+                    <MudItem xs="2"> </MudItem>
+                    <MudItem xs="4">
+                        <MudNumericField @bind-Value="agreementObject.MountPerHour" Label="Monto por hora" Variant="Variant.Outlined" Required="true" RequiredError="El monto por hora es necesario" HideSpinButtons="true" Min = "0"> </MudNumericField>
+                    </MudItem>
+
+                    <MudItem xs="4">
+                        <MudTextField @bind-Value="ReadOnly" Label="Deducciones" Variant="Variant.Outlined" Required="true" ReadOnly="true" RequiredError="El nombre del proyecto es necesario"></MudTextField>
+                    </MudItem>
+                    <MudItem xs="2"> </MudItem>
+                    <MudItem xs="2"> </MudItem>
+                    <MudItem xs="4">
+                        <MudDatePicker Label="Fecha de inicio" @bind-Date="startDate" DateFormat="yyyy.MM.dd" Variant="Variant.Outlined" Required="true" RequiredError="La fecha de inicio es necesaria"/>
+                    </MudItem>
+
+                    <MudItem xs="4">
+                        <MudDatePicker Label="Fecha de finalización" @bind-Date="endDate" DateFormat="yyyy.MM.dd" Variant="Variant.Outlined" Required="true" RequiredError="La fecha de finalización es necesaria"/>
+                    </MudItem> 
+                    <MudItem xs="2"> </MudItem>
+                    @*Create buton *@
+                    <MudItem xs="2"> </MudItem>
+                           <MudButton Disabled="@_saving" @bind-IsValid="@_canSend" Variant="Variant.Filled" Color="Color.Primary" DisableElevation="true" OnClick="TryToSend">
+                    
+                                @if (_saving)
+                                {
+                                    <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true"/>
+                                    <MudText Class="ms-2">Procesando</MudText>
+                                }
+                                else
+                                {
+                                    <MudText Class="ms-2">Crear</MudText>
+                                }
+
+                            </MudButton>
+                    @*Clear buton*@
+                    <MudButton Disabled = "true">   </MudButton>
+
+                    <MudButton OnClick="CleanForm" Variant="Variant.Filled" Color="Color.Error">
+                        <MudText>Limpiar</MudText>
+                    </MudButton>
+                   
+                </MudGrid>
+            </MudForm>
+        </MudPaper>
+    </MudItem>
+
+    @*File uploader *@
+    <MudItem xs="3">
+
+    </MudItem>
+</MudGrid>
+
+@code{
+    Agreement agreementObject = new Agreement("", "", "", "", "", 0, "");
+
+    MudForm form;
+    DateTime? startDate;
+    DateTime? endDate;
+    int? salaryPerMonth;
+
+    private bool _isLoading = true;
+    private bool _saving = false;
+    private bool _canSend = false;
+    private bool _created = false;
+    public string ReadOnly { get; set; } = "100 000";
+    [Parameter] public string EmployerEmail { get; set; }
+    [Parameter] public string ProjectName { get; set; }
+
+
+    private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
+    {
+        new BreadcrumbItem("Inicio", href: "#"),
+        new BreadcrumbItem("Contratos", href: "#"),
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        agreementObject.EmployerEmail = EmployerEmail;
+        agreementObject.ProjectName = ProjectName;
+    }
+
+    async Task TryToSend()
+    {
+        await form.Validate();
+        if (form.IsValid)
+        {
+            if (checkDates())
+            {
+                _saving = true;
+                formatDates(agreementObject,startDate,endDate);
+                await SaveAgreementType();
+                _saving = false;
+                _created = true;
+                ShowSnackNotification("Información guardada correctamente", Severity.Success);
+
+            }
+
+            else
+            {
+                ShowSnackNotification("Por favor, digite fechas de inicio y finalización válidas", Severity.Error);
+            }
+        }
+
+    }
+
+
+    async Task SaveAgreementType()
+    {
+        await AgreementService.CreateAgreementAsync(agreementObject);
+
+    }
+
+
+    void CleanForm()
+    {
+        agreementObject.EmployeeEmail = "";
+        agreementObject.EmployerEmail = "";
+        agreementObject.ProjectName = "";
+        agreementObject.ContractDate = "";
+        agreementObject.ContractType = "";
+        salaryPerMonth = null;
+        startDate = null;
+        endDate = null;
+    }
+
+    bool checkDates()
+    {
+        bool isValid = true;
+        if (startDate > endDate)
+        {
+            isValid = false;
+        }
+        return isValid;
+    }
+
+
+    void ShowSnackNotification(string message, Severity severity)
+    {
+        Snackbar.Configuration.SnackbarVariant = Variant.Filled;
+        Snackbar.Configuration.PreventDuplicates = false;
+        Snackbar.Configuration.MaxDisplayedSnackbars = 10;
+        Snackbar.Configuration.NewestOnTop = true;
+        Snackbar.Add($"{message}", severity, config =>
+        {
+            config.RequireInteraction = false;
+            config.ShowCloseIcon = true;
+            config.Onclick = snackbar =>
+            {
+                return Task.CompletedTask;
+            };
+        });
+    }
+
+    void formatDates(Agreement agreementObject, DateTime? startDate, DateTime? endDate)
+    {
+        string format = "YYYY/MM/DD";
+        DateTime lstartDate = (DateTime)startDate;
+        DateTime lendDate = (DateTime)endDate;
+        agreementObject.ContractDate = lstartDate.ToString(format);
+        agreementObject.Duration = lendDate.ToString(format);
+   
+    }
+}
