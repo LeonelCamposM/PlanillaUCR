@@ -30,16 +30,16 @@ else
         </ToolBarContent>
         <HeaderContent>
             <MudTh>Nombre</MudTh>
-            <MudTh>Descripción</MudTh>
+            <MudTh>Proveedor</MudTh>
             <MudTh>Costo</MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="Nombre">
-                <MudLink Color="Color.Secondary" Href="@($"/Projects/{@context.EmployerEmail}/{@context.ProjectName}/Deductions/{@context.SubscriptionName}/Configurations")">
+                <MudLink Color="Color.Secondary" Href="@($"/Projects/{@context.EmployerEmail}/{@context.ProjectName}/Deductions/{@context.SubscriptionName}")">
                     @context.SubscriptionName
                 </MudLink>
             </MudTd>
-            <MudTd DataLabel="Descripción">@context.SubscriptionDescription</MudTd>
+            <MudTd DataLabel="Descripción">@context.ProviderName</MudTd>
             <MudTd DataLabel="Costo">@context.Cost</MudTd>
         </RowTemplate>
         <FooterContent>
@@ -58,7 +58,6 @@ else
 
 
 @code {
-    private bool _hidePosition;
     private bool _loading = true;
     private HashSet<Subscription> selectedItems1 = new HashSet<Subscription>();
     private IEnumerable<Subscription> Elements;

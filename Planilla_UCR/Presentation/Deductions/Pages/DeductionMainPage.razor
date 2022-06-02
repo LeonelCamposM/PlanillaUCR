@@ -60,7 +60,7 @@ else
                     </ToolBarContent>
                     <HeaderContent>
                         <MudTh>Nombre</MudTh>
-                        <MudTh>Descripción</MudTh>
+                        <MudTh>Proveedor</MudTh>
                         <MudTh>Costo</MudTh>
                     </HeaderContent>
                     <RowTemplate>
@@ -69,7 +69,7 @@ else
                                 @context.SubscriptionName
                             </MudLink>
                         </MudTd>
-                        <MudTd DataLabel="Descripción">@context.SubscriptionDescription</MudTd>
+                        <MudTd DataLabel="Descripción">@context.ProviderName</MudTd>
                         <MudTd DataLabel="Costo">@context.Cost</MudTd>
                     </RowTemplate>
                     <FooterContent>
@@ -93,15 +93,12 @@ else
 }
 
 @code {
-    private bool _hidePosition;
     private bool _empty = true;
-    private int selectedRowNumber = -1;
     private MudTable<Subscription> mudTable;
     private List<string> clickedEvents = new();
     private IEnumerable<Subscription> elements;
     bool _loading = true;
     bool authenticationState = false;
-    private int currentCount = 0;
 
     [CascadingParameter]
     protected EventCallback<string> setEmail { get; set; }

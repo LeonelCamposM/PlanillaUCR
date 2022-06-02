@@ -52,7 +52,7 @@ else
                 <MudItem xs="2">
                 </MudItem>
                 <MudItem xs="8">
-                    <MudTextField @bind-Value="subscription.SubscriptionName" Label="Nombre" Variant="Variant.Outlined" ReadOnly = "@_disabled"></MudTextField>
+                    <MudTextField @bind-Value="subscription.SubscriptionName" MaxLength="255" Label="Nombre" Variant="Variant.Outlined" ReadOnly = "@_disabled"></MudTextField>
                 </MudItem>
                 <MudItem xs="2">
                 </MudItem>
@@ -60,12 +60,12 @@ else
                 <MudItem xs="2"></MudItem>
 
                 <MudItem xs="4">
-                    <MudNumericField Immediate="false" Label="Costo" Format="N2" Culture="@cultureCR" Variant="Variant.Outlined" @bind-Value="subscription.Cost" 
+                    <MudNumericField Immediate="true" Label="Costo" Format="N2" Culture="@cultureCR" Variant="Variant.Outlined" @bind-Value="subscription.Cost" 
                     Adornment="Adornment.Start" AdornmentText="@cultureCR.NumberFormat.CurrencySymbol" ReadOnly = "@_disabled"/>
                 </MudItem>
 
                 <MudItem xs="4">
-                    <MudTextField @bind-Value="subscription.ProviderName"  Label="Organización" Variant="Variant.Outlined" ReadOnly = "@_disabled"></MudTextField>
+                    <MudTextField @bind-Value="subscription.ProviderName"  MaxLength="255" Label="Organización" Variant="Variant.Outlined" ReadOnly = "@_disabled"></MudTextField>
                 </MudItem>
 
                 <MudItem xs="2"></MudItem>  
@@ -73,7 +73,7 @@ else
                 <MudItem xs="2"></MudItem>  
 
                 <MudItem xs="8">
-                    <MudTextField @bind-Value="subscription.SubscriptionDescription" Label="Descripcion" Lines="4" Variant="Variant.Outlined" ReadOnly = "@_disabled"></MudTextField>
+                    <MudTextField @bind-Value="subscription.SubscriptionDescription" MaxLength="600" Label="Descripcion" Lines="6" Variant="Variant.Outlined" ReadOnly = "@_disabled"></MudTextField>
                 </MudItem>
 
                 <MudItem xs="2"></MudItem>  
@@ -110,7 +110,6 @@ else
 
 
 @code {
-    private bool _hidePosition;
     private bool _loading = true;
     private bool _disabled = true;
     public Subscription subscription = new Subscription("", "", "", "", "", 0.0, 0, 1);

@@ -3,6 +3,7 @@
 @using Application.Subscriptions
 @using Presentation.Deductions.Components
 @using Presentation.Core.Components
+@using System.Globalization
 
 
 @inject ISubscriptionService SubscriptionService
@@ -29,7 +30,7 @@
             <MudItem xs="2">
             </MudItem>
             <MudItem xs="8">
-                <MudTextField @bind-Value="subscriptionInfo.SubscriptionName" Label="Nombre" Variant="Variant.Outlined"  Required="true" RequiredError="Campo requerido"></MudTextField>
+                <MudTextField @bind-Value="subscriptionInfo.SubscriptionName" MaxLength="255" Label="Nombre" Variant="Variant.Outlined"  Required="true" RequiredError="Campo requerido"></MudTextField>
             </MudItem>
             <MudItem xs="2">
             </MudItem>
@@ -37,11 +38,12 @@
             <MudItem xs="2">
             </MudItem>
             <MudItem xs="4">
-                <MudTextField @bind-Value="subscriptionInfo.Cost" Label="Costo" Variant="Variant.Outlined"  Required="true" RequiredError="Campo requerido"></MudTextField>
+                <MudNumericField Immediate="true" Label="Costo" Format="N2" Culture="@cultureCR" Variant="Variant.Outlined" @bind-Value="_cost" 
+                    Adornment="Adornment.Start" AdornmentText="@cultureCR.NumberFormat.CurrencySymbol" Required="true" RequiredError="Campo requerido"/>
             </MudItem>
 
             <MudItem xs="4">
-                <MudTextField @bind-Value="subscriptionInfo.ProviderName"  Label="Organización" Variant="Variant.Outlined"  Required="true" RequiredError="Campo requerido"></MudTextField>
+                <MudTextField @bind-Value="subscriptionInfo.ProviderName" MaxLength="255" Label="Organización" Variant="Variant.Outlined"  Required="true" RequiredError="Campo requerido"></MudTextField>
             </MudItem>
 
             <MudItem xs="2">
@@ -49,7 +51,7 @@
             <MudItem xs="2">
             </MudItem>
             <MudItem xs="8">
-                <MudTextField @bind-Value="subscriptionInfo.SubscriptionDescription" Label="Descripción" Variant="Variant.Outlined"  Required="true" RequiredError="Campo requerido"></MudTextField>
+                <MudTextField @bind-Value="subscriptionInfo.SubscriptionDescription" MaxLength="600" Label="Descripción" Variant="Variant.Outlined"  Required="true" RequiredError="Campo requerido"></MudTextField>
             </MudItem>
 
             <MudItem xs="2">
@@ -85,12 +87,11 @@
 
 
 @code{
-    private bool _isLoading = true;
-    private bool _processing = false;
-
+    private double? _cost;
     SnackHandler snackHandler = new SnackHandler();
     Subscription subscriptionInfo = new Subscription("", "", "", "", "", 0.0, 0, 1);
     MudForm form;
+    public CultureInfo cultureCR = CultureInfo.GetCultureInfo("es-CR");
 
     [Parameter] public string employerEmail { get; set; }
     [Parameter] public string projectName { get; set; }
@@ -100,6 +101,7 @@
     {
         subscriptionInfo.EmployerEmail = employerEmail;
         subscriptionInfo.ProjectName = projectName;
+        subscriptionInfo.Cost = Convert.ToDouble(_cost);
         Subscription subscriptionToAdd = subscriptionInfo;
         snackHandler._saving = true;
         await form.Validate();
