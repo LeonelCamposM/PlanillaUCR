@@ -9,11 +9,11 @@ namespace Domain.Agreements.DTOs
         public String projectName { get; set; }
         public DateTime contractStartDate { get; set; }
         public String contractType { get; set; }
-        public String mountPerHour { get; set; }
+        public int mountPerHour { get; set; }
         public DateTime contractFinishDate { get; set; }
 
 
-        public AgreementDTO(string employeeEmail, string employerEmail, string projectName, DateTime contractStartDate, string contractType, string mountPerHour, DateTime contractFinishDate)
+        public AgreementDTO(string employeeEmail, string employerEmail, string projectName, DateTime contractStartDate, string contractType, int mountPerHour, DateTime contractFinishDate)
         {
             this.employeeEmail = employeeEmail;
             this.employerEmail = employerEmail;
