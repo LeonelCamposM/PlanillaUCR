@@ -12,11 +12,17 @@
     {
         new BreadcrumbItem("Home", href: ""),
         new BreadcrumbItem("Proyectos", href: $"/Projects/{employerEmail}"),
+        new BreadcrumbItem($"{projectName}", href: $"/Projects/Details/{employerEmail}/{projectName}"),
         new BreadcrumbItem("Deducciones", href: $"/Projects/{employerEmail}/{projectName}/Deductions"),
         new BreadcrumbItem($"{subscriptionName}", href: $"/Projects/{employerEmail}/{projectName}/Deductions/{subscriptionName}")
     };
 }
-<MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
+<MudPaper Height="60px" Width="100%" Outlined="false" Class="border-none" Elevation="0">
+    <MudToolBar>
+        <MudIconButton Size="Size.Small" Icon="@Icons.Filled.ArrowBackIos" aria-label="delete" OnClick="GoToMain"></MudIconButton> 
+        <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
+    </MudToolBar>
+</MudPaper>
 
 @if (_loading)
 {
@@ -108,7 +114,6 @@ else
     </MudGrid>
 }
 
-
 @code {
     private bool _loading = true;
     private bool _disabled = true;
@@ -116,7 +121,6 @@ else
     MudForm form;
     SnackHandler snackHandler = new SnackHandler();
     public CultureInfo cultureCR = CultureInfo.GetCultureInfo("es-CR");
-
 
     [Parameter] public string employerEmail { get; set; }
     [Parameter] public string projectName { get; set; }
@@ -161,14 +165,12 @@ else
         });
     }
 
-
     void CleanForm()
     {
         subscription.SubscriptionDescription = "";
         subscription.ProviderName= "";
         subscription.Cost = 0.0;
     }
-
 
     private void GoToMain()
     {

@@ -7,10 +7,12 @@
 @inject NavigationManager nav
 @inject ISubscriptionService SubscriptionService
 
-@{List<BreadcrumbItem> _items = new List<BreadcrumbItem>
+@{
+    List<BreadcrumbItem> _items = new List<BreadcrumbItem>
 {
         new BreadcrumbItem("Home", href: ""),
         new BreadcrumbItem("Proyectos", href: $"/Projects/{employerEmail}"),
+        new BreadcrumbItem($"{projectName}", href: $"/Projects/Details/{employerEmail}/{projectName}"),
         new BreadcrumbItem("Deducciones", href: $"/Projects/{employerEmail}/{projectName}/Deductions"),
     };
 }
@@ -28,7 +30,12 @@ else
 {
     if (authenticationState == true && _loading == false)
     {
-        <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
+        <MudPaper Height="60px" Width="100%" Outlined="false" Class="border-none" Elevation="0">
+            <MudToolBar>
+                <MudIconButton Size="Size.Small" Icon="@Icons.Filled.ArrowBackIos" aria-label="delete" OnClick="GoToProject"></MudIconButton> 
+                <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
+            </MudToolBar>
+        </MudPaper>
             @if (_empty)
             {
                 <MudText Typo="Typo.h6" Align="Align.Center">No hay deducciones asociadas al proyecto
@@ -97,13 +104,12 @@ else
     private MudTable<Subscription> mudTable;
     private List<string> clickedEvents = new();
     private IEnumerable<Subscription> elements;
-    bool _loading = true;
+    private bool _loading = true;
     bool authenticationState = false;
+    public string searchString1 = "";
 
     [CascadingParameter]
     protected EventCallback<string> setEmail { get; set; }
-
-    public string searchString1 = "";
 
     [Parameter] public string employerEmail { get; set; }
     [Parameter] public string projectName { get; set; }
@@ -131,6 +137,11 @@ else
     private void GoToConfigs()
     {
         nav.NavigateTo($"/Projects/{employerEmail}/{projectName}/Deductions/Configurations");
+    }
+    
+    private void GoToProject()
+    {
+        nav.NavigateTo($"/Projects/Details/{employerEmail}/{projectName}");
     }
 
     private void PageChanged(int i)

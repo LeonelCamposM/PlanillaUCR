@@ -4,22 +4,25 @@
 @using Presentation.Deductions.Components
 @using Presentation.Core.Components
 @using System.Globalization
-
-
 @inject ISubscriptionService SubscriptionService
+@inject NavigationManager nav
 @inject ISnackbar Snackbar
-
-
 
 @{List<BreadcrumbItem> _items = new List<BreadcrumbItem>
     {
         new BreadcrumbItem("Home", href: ""),
         new BreadcrumbItem("Proyectos", href: $"/Projects/{employerEmail}"),
+        new BreadcrumbItem($"{projectName}", href: $"/Projects/Details/{employerEmail}/{projectName}"),
         new BreadcrumbItem("Deducciones", href: $"/Projects/{employerEmail}/{projectName}/Deductions"),
         new BreadcrumbItem("Nuevo", href: "newdeduction")
     };
 }
-<MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
+<MudPaper Height="60px" Width="100%" Outlined="false" Class="border-none" Elevation="0">
+    <MudToolBar>
+        <MudIconButton Size="Size.Small" Icon="@Icons.Filled.ArrowBackIos" aria-label="delete" OnClick="GoToMain"></MudIconButton> 
+        <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
+    </MudToolBar>
+</MudPaper>
 <MudGrid>
     @*Text fields *@
     <MudItem xs="12" sm="12">
@@ -85,7 +88,6 @@
     </MudItem>
 </MudGrid>
 
-
 @code{
     private double? _cost;
     SnackHandler snackHandler = new SnackHandler();
@@ -148,5 +150,10 @@
         subscriptionInfo.SubscriptionDescription = "";
         subscriptionInfo.ProviderName= "";
         subscriptionInfo.Cost = 0.0;
+    }
+
+    private void GoToMain()
+    {
+        nav.NavigateTo($"/Projects/{employerEmail}/{projectName}/Deductions");
     }
 }
