@@ -73,7 +73,9 @@
                     <MudItem xs="2"> </MudItem>
                     @*Create buton *@
                     <MudItem xs="2"> </MudItem>
-                           <MudButton Disabled="@_saving" @bind-IsValid="@_canSend" Variant="Variant.Filled" Color="Color.Primary" DisableElevation="true" OnClick="TryToSend">
+                           <MudButton Disabled="@_saving" @bind-IsValid="@_canSend" Variant="Variant.Filled" Color="Color.Primary" DisableElevation="true" >
+                            @*                           <MudButton Disabled="@_saving" @bind-IsValid="@_canSend" Variant="Variant.Filled" Color="Color.Primary" DisableElevation="true" OnClick="TryToSend">
+*@
                     
                                 @if (_saving)
                                 {
@@ -89,7 +91,9 @@
                     @*Clear buton*@
                     <MudButton Disabled = "true">   </MudButton>
 
-                    <MudButton OnClick="CleanForm" Variant="Variant.Filled" Color="Color.Error">
+                    <MudButton Variant="Variant.Filled" Color="Color.Error">
+                        @*                    <MudButton OnClick="CleanForm" Variant="Variant.Filled" Color="Color.Error">
+*@
                         <MudText>Limpiar</MudText>
                     </MudButton>
                    
@@ -129,9 +133,17 @@
 
     protected override async Task OnInitializedAsync()
     {
-        agreementObject.EmployerEmail = EmployerEmail;
-        agreementObject.ProjectName = ProjectName;
+        //agreementObject.EmployerEmail = EmployerEmail;
+        //agreementObject.ProjectName = ProjectName;
+
+        Agreement agreement = new Agreement("mau@ucr.ac.cr", "jeremy@ucr.ac.cr", "Proyecto 1", "2022/01/01", "Tiempo completo", 1000, "2023/01/01");
+        await AgreementService.CreateAgreementAsync(agreement);
     }
+
+    
+
+    
+    @*
 
     async Task TryToSend()
     {
@@ -161,7 +173,8 @@
     async Task SaveAgreementType()
     {
         //employeeEmail, employerEmail, projectName, contractStartDate, contractType, mountPerHour, contractFinishDate
-        await AgreementService.CreateAgreementAsync(agreementObject.EmployeeEmail, agreementObject.EmployerEmail, agreementObject.ProjectName, agreementObject.ContractStartDate, agreementObject.ContractType, agreementObject.MountPerHour, agreementObject.ContractFinishDate);
+        //await AgreementService.CreateAgreementAsync(agreementObject.EmployeeEmail, agreementObject.EmployerEmail, agreementObject.ProjectName, agreementObject.ContractStartDate, agreementObject.ContractType, agreementObject.MountPerHour, agreementObject.ContractFinishDate);
+        await AgreementService.CreateAgreementAsync(agreementObject);
 
     }
 
@@ -188,7 +201,7 @@
         return isValid;
     }
 
-
+    *@
     void ShowSnackNotification(string message, Severity severity)
     {
         Snackbar.Configuration.SnackbarVariant = Variant.Filled;
@@ -205,14 +218,15 @@
             };
         });
     }
-
+    @*
     void formatDates(Agreement agreementObject, DateTime? startDate, DateTime? endDate)
     {
-        string format = "YYYY/MM/DD";
+        string format = "yyyy/MM/dd";
         DateTime lstartDate = (DateTime)startDate;
         DateTime lendDate = (DateTime)endDate;
         agreementObject.ContractStartDate = lstartDate.ToString(format);
         agreementObject.ContractFinishDate = lendDate.ToString(format);
    
     }
+    *@
 }
