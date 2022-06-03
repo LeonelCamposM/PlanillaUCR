@@ -15,8 +15,10 @@ namespace Application.Accounts.Implementations
             _accountRepository = accountRepository;
         }
 
-        public async Task InsertAccountData(AccountsDTO accountData)
+        public async Task InsertAccountData(AccountsDTO accountData, string message)
         {
+            EmailSender emailSender = new();
+            emailSender.SendMail(message, accountData.Email);
             await _accountRepository.InsertAccountData(accountData);
         }
 
@@ -28,11 +30,6 @@ namespace Application.Accounts.Implementations
         public async Task<IEnumerable<Account>>CheckPassword(AccountsDTO accountData)
         {
            return await _accountRepository.CheckPassword(accountData);
-        }
-
-        public void  SendEmail(string message, string receiver)
-        {
-             _accountRepository.SendEmail(message, receiver);
         }
 
         public async Task SetAuthenticationState(AccountsDTO accountData, byte state)
