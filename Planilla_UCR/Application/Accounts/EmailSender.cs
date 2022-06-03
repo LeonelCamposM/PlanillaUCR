@@ -31,7 +31,7 @@ namespace Application.Accounts
                 message.From = new MailAddress(encriptor.Decrypt(user));
                 message.To.Add(new MailAddress(email));
                 message.Subject = "Confirmación de registro Planilla_UCR";
-                message.IsBodyHtml = true; //to make message body as html  
+                message.IsBodyHtml = true;
                 message.Body = htmlContent;
                 smtp.Port = 587;
                 smtp.Host = "smtp.gmail.com"; //for gmail host  
