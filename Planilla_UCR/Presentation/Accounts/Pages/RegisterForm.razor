@@ -165,7 +165,7 @@
             {
                 int confirmationCode = random.Next(100000,999999); 
                 string confirmationCodeString = confirmationCode.ToString();
-				await AccountService.InsertAccountData(accountData, confirmationCodeString);
+				await AccountService.InsertAccountData(accountData,   "El siguiente código es el que tienes que ingresar para verificar tu email:  "+confirmationCodeString);
                 snackHandler._saving = false;
                 ShowSnackNotification("Cuenta para "+personInfo.Name+" registrada", Severity.Success);
                 await AccountService.SetAuthenticationState(accountData,1);

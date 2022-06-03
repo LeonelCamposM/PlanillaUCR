@@ -20,7 +20,7 @@ namespace Application.Accounts
                 var htmlContent = "<section>" + "<div>" + "<center>" + "<FONT SIZE=4 COLOR=#00695c>" + "<strong>" + "Planilla_UCR" +
                     "</strong>" + "</FONT>" + "</center>" + "<br>" + "</br>" + "</div>" + "<div>" + "<center>" + "¡Ya casi! " + 
                     "</center>" + "<br>" + "</br>" + "</div>" + "<div>" + "<center>" + "¡Gracias por registrarte en Planilla_UCR! " +
-                    "El código que se encuentra abajo es el que tienes que ingresar para verificar tu email:  " + "</center>" + 
+                    "</center>" + 
                     "<br>" + "</br>" + "</div>" + "</section>" + "<section>" + "<div>" + "<center>" + "<strong>" + textMessage + 
                     "</strong>" + "</center>" + "<br>" + "</br>" + "</div>" + "</section>" + "<section>" + "<div>" +
                     "Recibiste este email porque te registraste en una cuenta de Planilla_UCR con esta dirección de email. " +
