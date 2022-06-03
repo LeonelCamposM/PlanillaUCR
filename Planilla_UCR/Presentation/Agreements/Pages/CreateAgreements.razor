@@ -5,9 +5,10 @@
 @using Presentation.Core.Components
 @using System.ComponentModel.DataAnnotations
 
+
+
 @inject ISnackbar Snackbar
 @inject IAgreementService AgreementService
-
 
 
 @if (_created)
@@ -18,7 +19,7 @@
 
  <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
 <MudGrid>
-    @*Text fields *@
+    @*Text fields *@ 
     <MudItem xs="10" sm="12">
         <MudPaper  Height="220px" Width="100%" Outlined="false" Class="border-none pa-4" Elevation="0">
              <MudForm @ref="form">
@@ -73,10 +74,7 @@
                     <MudItem xs="2"> </MudItem>
                     @*Create buton *@
                     <MudItem xs="2"> </MudItem>
-                           <MudButton Disabled="@_saving" @bind-IsValid="@_canSend" Variant="Variant.Filled" Color="Color.Primary" DisableElevation="true" >
-                            @*                           <MudButton Disabled="@_saving" @bind-IsValid="@_canSend" Variant="Variant.Filled" Color="Color.Primary" DisableElevation="true" OnClick="TryToSend">
-*@
-                    
+                           <MudButton Disabled="@_saving" @bind-IsValid="@_canSend" Variant="Variant.Filled" Color="Color.Primary" DisableElevation="true" OnClick="TryToSend">                    
                                 @if (_saving)
                                 {
                                     <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true"/>
@@ -89,11 +87,7 @@
 
                             </MudButton>
                     @*Clear buton*@
-                    <MudButton Disabled = "true">   </MudButton>
-
-                    <MudButton Variant="Variant.Filled" Color="Color.Error">
-                        @*                    <MudButton OnClick="CleanForm" Variant="Variant.Filled" Color="Color.Error">
-*@
+                    <MudButton Disabled = "true" OnClick="CleanForm" Variant="Variant.Filled" Color="Color.Error">
                         <MudText>Limpiar</MudText>
                     </MudButton>
                    
@@ -102,10 +96,6 @@
         </MudPaper>
     </MudItem>
 
-    @*File uploader *@
-    <MudItem xs="3">
-
-    </MudItem>
 </MudGrid>
 
 @code{
@@ -124,29 +114,29 @@
     [Parameter] public string EmployerEmail { get; set; }
     [Parameter] public string ProjectName { get; set; }
 
-
+    
     private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
     {
         new BreadcrumbItem("Inicio", href: "#"),
         new BreadcrumbItem("Contratos", href: "#"),
     };
-
+    
     protected override async Task OnInitializedAsync()
     {
         //agreementObject.EmployerEmail = EmployerEmail;
         //agreementObject.ProjectName = ProjectName;
 
-        Agreement agreement = new Agreement("mau@ucr.ac.cr", "jeremy@ucr.ac.cr", "Proyecto 1", "2022/01/01", "Tiempo completo", 1000, "2023/01/01");
-        await AgreementService.CreateAgreementAsync(agreement);
     }
 
-    
-
-    
-    @*
 
     async Task TryToSend()
     {
+
+        Agreement agreement = new Agreement("email@ucr.ac.cr", "jeremy@ucr.ac.cr", "Proyecto 1", "2022/01/01", "Tiempo completo", 1000, "2023/01/01");
+        await AgreementService.CreateAgreementAsync(agreement);
+        ShowSnackNotification("Esto se deberia ver solo una vez", Severity.Success);
+        Console.WriteLine("My debug output.");
+        @*
         await form.Validate();
         if (form.IsValid)
         {
@@ -166,7 +156,7 @@
                 ShowSnackNotification("Por favor, digite fechas de inicio y finalización válidas", Severity.Error);
             }
         }
-
+        *@
     }
 
 
@@ -201,7 +191,7 @@
         return isValid;
     }
 
-    *@
+    
     void ShowSnackNotification(string message, Severity severity)
     {
         Snackbar.Configuration.SnackbarVariant = Variant.Filled;
@@ -218,7 +208,7 @@
             };
         });
     }
-    @*
+    
     void formatDates(Agreement agreementObject, DateTime? startDate, DateTime? endDate)
     {
         string format = "yyyy/MM/dd";
@@ -228,5 +218,5 @@
         agreementObject.ContractFinishDate = lendDate.ToString(format);
    
     }
-    *@
+    
 }
