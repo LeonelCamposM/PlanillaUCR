@@ -10,19 +10,14 @@
 
 @{List<BreadcrumbItem> _items = new List<BreadcrumbItem>
     {
-        new BreadcrumbItem("Home", href: ""),
+        new BreadcrumbItem("Inicio", href: ""),
         new BreadcrumbItem("Proyectos", href: $"/Projects/{employerEmail}"),
         new BreadcrumbItem($"{projectName}", href: $"/Projects/Details/{employerEmail}/{projectName}"),
         new BreadcrumbItem("Deducciones", href: $"/Projects/{employerEmail}/{projectName}/Deductions"),
-        new BreadcrumbItem("Nuevo", href: "newdeduction")
+        new BreadcrumbItem("Nueva deducción", href: "newdeduction")
     };
 }
-<MudPaper Height="60px" Width="100%" Outlined="false" Class="border-none" Elevation="0">
-    <MudToolBar>
-        <MudIconButton Size="Size.Small" Icon="@Icons.Filled.ArrowBackIos" aria-label="delete" OnClick="GoToMain"></MudIconButton> 
-        <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
-    </MudToolBar>
-</MudPaper>
+<MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
 <MudGrid>
     @*Text fields *@
     <MudItem xs="12" sm="12">

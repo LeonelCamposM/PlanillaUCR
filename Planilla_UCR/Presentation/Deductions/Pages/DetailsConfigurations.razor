@@ -10,26 +10,26 @@
 
 @{List<BreadcrumbItem> _items = new List<BreadcrumbItem>
     {
-        new BreadcrumbItem("Home", href: ""),
+        new BreadcrumbItem("Inicio", href: ""),
         new BreadcrumbItem("Proyectos", href: $"/Projects/{employerEmail}"),
         new BreadcrumbItem($"{projectName}", href: $"/Projects/Details/{employerEmail}/{projectName}"),
         new BreadcrumbItem("Deducciones", href: $"/Projects/{employerEmail}/{projectName}/Deductions"),
         new BreadcrumbItem($"{subscriptionName}", href: $"/Projects/{employerEmail}/{projectName}/Deductions/{subscriptionName}")
     };
 }
-<MudPaper Height="60px" Width="100%" Outlined="false" Class="border-none" Elevation="0">
-    <MudToolBar>
-        <MudIconButton Size="Size.Small" Icon="@Icons.Filled.ArrowBackIos" aria-label="delete" OnClick="GoToMain"></MudIconButton> 
-        <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
-    </MudToolBar>
-</MudPaper>
+
 
 @if (_loading)
 {
-    <h4 class="text-danger">Deduction not found</h4>
+    <MudPaper  Height="220px" Width="100%" Outlined="false" Class="border-none pa-4" Elevation="0">
+         <MudText Align="Align.Center" Typo="Typo.h6">
+              <MudProgressCircular Color="Color.Secondary" Style="height:70px;width:70px;" Indeterminate="true" />
+         </MudText>
+    </MudPaper>
 }
 else
 {
+    <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
     <MudToolBar DisableGutters="true" Class="gap-4">
         <MudSpacer></MudSpacer>
         @if(_disabled)
