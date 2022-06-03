@@ -10,11 +10,11 @@
 
 @{List<BreadcrumbItem> _items = new List<BreadcrumbItem>
     {
-        new BreadcrumbItem("Home", href: ""),
+        new BreadcrumbItem("Inicio", href: ""),
         new BreadcrumbItem("Proyectos", href: $"/Projects/{employerEmail}"),
         new BreadcrumbItem($"{projectName}", href: $"/Projects/Details/{employerEmail}/{projectName}"),
         new BreadcrumbItem("Beneficios", href: $"/Projects/{employerEmail}/{projectName}/Benefits"),
-        new BreadcrumbItem("Nuevo", href: "newbenefit")
+        new BreadcrumbItem("Nuevo beneficio", href: "newbenefit")
     };
 }
 <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
