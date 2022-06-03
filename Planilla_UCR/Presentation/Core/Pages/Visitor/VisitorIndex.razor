@@ -1,7 +1,20 @@
 ﻿@using Presentation.Core.Layout.Visitor
+@using Domain.Accounts.DTOs
+@using Application.Authentication
+@using  Domain.Authentication
+@inject IAuthenticationService authService
+
 @layout VisitorMainLayout
 @page "/"
 
+<AuthorizeView>
+    <Authorized> 
+        <MudText>Esta autenticado</MudText>
+    </Authorized>
+    <NotAuthorized>
+        <MudText>No esta autenticado</MudText>
+    </NotAuthorized>
+</AuthorizeView>
 
 <MudPaper  Height="220px" Width="100%" Outlined="false" Class="border-none pa-16" Elevation="0">
      <MudText Align="Align.Justify" Typo="Typo.h5">Para emprendedores y pequeñas empresas quienes requieren agilizar
@@ -15,4 +28,10 @@
 </MudPaper>
 
 @code{
+
+    protected override async Task OnInitializedAsync()
+    {
+        AccountsDTO accountData = new AccountsDTO("tes22t@gmail.com", "Prueba.12");
+        var couldSign = await authService.RegisterRequestAsync(accountData);
+    }
 }

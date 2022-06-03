@@ -26,8 +26,12 @@ namespace Server
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddMudServices();
-            services.AddInfrastructureLayer(Configuration.GetConnectionString("DefaultConnection"));
+            services.AddInfrastructureLayer(Configuration.GetConnectionString("DefaultConnection"), Configuration.GetConnectionString("AuthenticationDB"));
             services.AddApplicationLayer();
+            services.AddMudServices(config =>
+            {
+                config.SnackbarConfiguration.PositionClass = MudBlazor.Defaults.Classes.Position.BottomRight;
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
