@@ -14,7 +14,6 @@
 @using System.ComponentModel.DataAnnotations
 @using Presentation.Core.Layout.Visitor
 
-
 @layout VisitorMainLayout
 @inject NavigationManager nav
 @inject ISnackbar Snackbar
@@ -32,7 +31,6 @@
         new BreadcrumbItem("Cuenta", href: "Register_Form"),
     };
 }
-
 <MudPaper Height="60px" Width="100%" Outlined="false" Class="border-none" Elevation="0">
     <MudToolBar>
         <MudIconButton Size="Size.Small" Icon="@Icons.Filled.ArrowBackIos" aria-label="delete" Link="#" ></MudIconButton> 
@@ -108,9 +106,6 @@
                     <MudItem xs="2"></MudItem>
                  
                     <MudSpacer></MudSpacer>
-                    <MudSpacer></MudSpacer>
-                    
-
                     @*Create buton *@
                     <MudItem xs="2"></MudItem>
                     <MudItem xs="8">
@@ -122,7 +117,7 @@
                             }
                             else
                             {
-                                <MudText>Crear</MudText>
+                                <MudText>Registrar</MudText>
                             }
                         </MudButton>
                     <MudButton Disabled="true"> </MudButton>
@@ -152,40 +147,12 @@
     MudForm form;
     Random random = new Random();
 
-    async Task SavePersonInfo()
+
+     async Task SavePersonInfo()
     {
         snackHandler._saving = true;
         await form.Validate();
         if (form.IsValid && ValidateInfo(personInfo)){
-            if (Rol.Equals("RolEmployee")){
-                //await EmployeeService.CreateEmployeeAsync(personInfo.Email);
-                //accountData.Email = personInfo.Email;
-                //await AccountService.InsertAccountData(accountData);
-                //snackHandler._saving = false;
-                //ShowSnackNotification("Cuenta para "+personInfo.Name+" registrada", Severity.Success);
-                //await AccountService.SetAuthenticationState(accountData, 1);
-                ShowSnackNotification("No se puede registrar un empleado", Severity.Error);
-            }
-            else{
-                await PersonService.CreatePersonAsync(personInfo);
-                await EmployerService.CreateEmployerAsync(personInfo.Email);
-                accountData.Email = personInfo.Email;
-                IEnumerable<Account> emailChecked = await AccountService.CheckEmail(accountData);
-                if (emailChecked.Length() != 0)
-                {
-                    ShowSnackNotification("El email ya se encuentra en uso", Severity.Error);
-                }
-                else
-                {
-                    string message = "Ha registrado su cuenta correctamente, bienvenido2 a Planilla_UCR";
-                    await AccountService.InsertAccountData(accountData, message);
-                    snackHandler._saving = false;
-                    ShowSnackNotification("Cuenta para "+personInfo.Name+" registrada", Severity.Success);
-                    await AccountService.SetAuthenticationState(accountData,1);
-                    nav.NavigateTo($"/Projects/{accountData.Email}");
-                }  
-            }
-        }
             await PersonService.CreatePersonAsync(personInfo);
             await EmployerService.CreateEmployerAsync(personInfo.Email);
             accountData.Email = personInfo.Email;
@@ -196,18 +163,18 @@
             }
             else
             {
-                await AccountService.InsertAccountData(accountData);
+                int confirmationCode = random.Next(100000,999999); 
+                string confirmationCodeString = confirmationCode.ToString();
+				await AccountService.InsertAccountData(accountData, confirmationCodeString);
                 snackHandler._saving = false;
                 ShowSnackNotification("Cuenta para "+personInfo.Name+" registrada", Severity.Success);
                 await AccountService.SetAuthenticationState(accountData,1);
-                int confirmationCode = random.Next(100000,999999); 
-                string confirmationCodeString = confirmationCode.ToString();
-                AccountService.SendEmail(confirmationCodeString,personInfo.Email);
                 nav.NavigateTo($"/Projects/{accountData.Email}");
             }       
         }
         snackHandler._saving = false;
     }
+
 
     bool ValidateSsn(Person personInfo)
     {
@@ -272,7 +239,6 @@
             return "Contraseñas no coinciden";
         return null;
     }
-
 
     void ShowSnackNotification(string message, Severity severity)
     {
