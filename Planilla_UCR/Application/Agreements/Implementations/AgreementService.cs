@@ -15,12 +15,12 @@ namespace Application.Agreements.Implementations
             _agreementRepository = agreementRepository;
         }
 
-        public async Task CreateAgreementAsync(string employeeEmail, string employerEmail, string projectName, DateTime contractStartDate, string contractType, int mountPerHour, DateTime contractFinishDate)
+        public async Task CreateAgreementAsync(string employeeEmail, string employerEmail, string projectName, string contractStartDate, string contractType, int mountPerHour, string contractFinishDate)
         {
             await _agreementRepository.CreateAgreementAsync(employeeEmail, employerEmail, projectName, contractStartDate, contractType, mountPerHour, contractFinishDate);
         }
 
-        public async Task<IEnumerable<Agreement>> GetAgreement(string employeeEmail, string employerEmail, string projectName, DateTime contractStartDate, string contractType, int mountPerHour, DateTime contractFinishDate)
+        public async Task<IEnumerable<Agreement>> GetAgreement(string employeeEmail, string employerEmail, string projectName, string contractStartDate, string contractType, int mountPerHour, string contractFinishDate)
         {
             return await _agreementRepository.GetAgreement(employeeEmail, employerEmail, projectName, contractStartDate, contractType, mountPerHour, contractFinishDate);
         }

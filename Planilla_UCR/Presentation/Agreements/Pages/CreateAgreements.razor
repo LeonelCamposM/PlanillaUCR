@@ -160,7 +160,8 @@
 
     async Task SaveAgreementType()
     {
-        await AgreementService.CreateAgreementAsync(agreementObject);
+        //employeeEmail, employerEmail, projectName, contractStartDate, contractType, mountPerHour, contractFinishDate
+        await AgreementService.CreateAgreementAsync(agreementObject.EmployeeEmail, agreementObject.EmployerEmail, agreementObject.ProjectName, agreementObject.ContractStartDate, agreementObject.ContractType, agreementObject.MountPerHour, agreementObject.ContractFinishDate);
 
     }
 
@@ -170,7 +171,7 @@
         agreementObject.EmployeeEmail = "";
         agreementObject.EmployerEmail = "";
         agreementObject.ProjectName = "";
-        agreementObject.ContractDate = "";
+        agreementObject.ContractFinishDate = "";
         agreementObject.ContractType = "";
         salaryPerMonth = null;
         startDate = null;
@@ -210,8 +211,8 @@
         string format = "YYYY/MM/DD";
         DateTime lstartDate = (DateTime)startDate;
         DateTime lendDate = (DateTime)endDate;
-        agreementObject.ContractDate = lstartDate.ToString(format);
-        agreementObject.Duration = lendDate.ToString(format);
+        agreementObject.ContractStartDate = lstartDate.ToString(format);
+        agreementObject.ContractFinishDate = lendDate.ToString(format);
    
     }
 }

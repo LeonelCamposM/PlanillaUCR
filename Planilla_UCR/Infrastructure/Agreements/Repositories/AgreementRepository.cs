@@ -19,13 +19,13 @@ namespace Infrastructure.Agreements.Repositories
             _dbContext = unitOfWork;
         }
 
-        public async Task CreateAgreementAsync(string employeeEmail, string employerEmail, string projectName, DateTime contractStartDate, string contractType, int mountPerHour, DateTime contractFinishDate)
+        public async Task CreateAgreementAsync(string employeeEmail, string employerEmail, string projectName, string contractStartDate, string contractType, int mountPerHour, string contractFinishDate)
         {
             _dbContext.Add(new Agreement(employeeEmail, employerEmail, projectName, contractStartDate, contractType, mountPerHour, contractFinishDate));
             await _dbContext.SaveEntitiesAsync();
         }
 
-        public async Task<IEnumerable<Agreement?>> GetAgreement(string employeeEmail, string employerEmail, string projectName, DateTime contractStartDate, string contractType, int mountPerHour, DateTime contractFinishDate)
+        public async Task<IEnumerable<Agreement?>> GetAgreement(string employeeEmail, string employerEmail, string projectName, string contractStartDate, string contractType, int mountPerHour, string contractFinishDate)
         {
             // TODO: StoredProcedure. Next code is just a placeholder
             var employeeList = await _dbContext.Agreements.FromSqlRaw("EXEC GetEmployeeByEmail @email",

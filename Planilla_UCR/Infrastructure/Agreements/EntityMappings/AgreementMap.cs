@@ -9,12 +9,12 @@ namespace Infrastructure.Agreements.EntityMappings
         public void Configure(EntityTypeBuilder<Agreement> builder)
         {
             builder.ToTable("Agreement");
-            builder.HasKey(p => new { p.employeeEmail, p.employerEmail, p.projectName, p.contractStartDate });
-            builder.Property(p => p.mountPerHour)
+            builder.HasKey(p => new { p.EmployeeEmail, p.EmployerEmail, p.ProjectName, p.ContractStartDate });
+            builder.Property(p => p.MountPerHour)
                  .IsRequired();
-            builder.Property(p => p.contractType)
+            builder.Property(p => p.ContractType)
                    .IsRequired();
-            builder.Property(p => p.contractFinishDate)
+            builder.Property(p => p.ContractFinishDate)
                     .IsRequired();
         }
     }

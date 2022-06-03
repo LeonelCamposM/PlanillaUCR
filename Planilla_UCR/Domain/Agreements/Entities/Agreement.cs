@@ -4,24 +4,24 @@ namespace Domain.Agreements.Entities
 {
     public class Agreement
     {
-        public String employeeEmail { get; set; }
-        public String employerEmail { get; set; }
-        public String projectName { get; set; }
-        public DateTime contractStartDate { get; set; }
-        public String contractType { get; set; }
-        public int mountPerHour { get; set; }
-        public DateTime contractFinishDate { get; set; }
+        public String EmployeeEmail { get; set; }
+        public String EmployerEmail { get; set; }
+        public String ProjectName { get; set; }
+        public string ContractStartDate { get; set; }
+        public String ContractType { get; set; }
+        public int MountPerHour { get; set; }
+        public string ContractFinishDate { get; set; }
 
 
-        public Agreement(string employeeEmail, string employerEmail, string projectName, DateTime contractStartDate, string contractType, int mountPerHour, DateTime contractFinishDate)
+        public Agreement(string employeeEmail, string employerEmail, string projectName, string contractStartDate, string contractType, int mountPerHour, string contractFinishDate)
         {
-            this.employeeEmail = employeeEmail;
-            this.employerEmail = employerEmail;
-            this.projectName = projectName;
-            this.contractStartDate = contractStartDate;
-            this.contractType = contractType;
-            this.mountPerHour = mountPerHour;
-            this.contractFinishDate = contractFinishDate;
+            this.EmployeeEmail = employeeEmail;
+            this.EmployerEmail = employerEmail;
+            this.ProjectName = projectName;
+            this.ContractStartDate = contractStartDate;
+            this.ContractType = contractType;
+            this.MountPerHour = mountPerHour;
+            this.ContractFinishDate = contractFinishDate;
         }
     }
 }
