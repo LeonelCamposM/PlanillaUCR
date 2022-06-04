@@ -17,15 +17,12 @@ namespace Application.Accounts
             try
             {
                 var encriptor = new EncryptionHelper();
-                var htmlContent = "<section>" + "<div>" + "<center>" + "<FONT SIZE=4 COLOR=#00695c>" + "<strong>" + "Planilla_UCR" +
-                    "</strong>" + "</FONT>" + "</center>" + "<br>" + "</br>" + "</div>" + "<div>" + "<center>" + "¡Ya casi! " + 
-                    "</center>" + "<br>" + "</br>" + "</div>" + "<div>" + "<center>" + "¡Gracias por registrarte en Planilla_UCR! " +
-                    "</center>" + 
-                    "<br>" + "</br>" + "</div>" + "</section>" + "<section>" + "<div>" + "<center>" + "<strong>" + textMessage + 
-                    "</strong>" + "</center>" + "<br>" + "</br>" + "</div>" + "</section>" + "<section>" + "<div>" +
-                    "Recibiste este email porque te registraste en una cuenta de Planilla_UCR con esta dirección de email. " +
+                var htmlContent = "<section>" + "<div>" + "<center>" + "<FONT SIZE=4 COLOR=#00695c>" + "<strong>" + "PlanillaUCR" +
+                    "</strong>" + "</FONT>" + "</center>" + "<br>" + "</br>" +  "</div>" + "<div>" + "¡Ya casi! Gracias por registrarte en PlanillaUCR" + 
+                    "<br>" + "</br>" +  "</div>" + "</section>" + "<section>" + "<div>" + "<strong>" + textMessage +  "</strong>" + "<br>" + "</br>" + "</div>" + 
+                    "</section>" + "<section>" + "<div>" +  "Recibiste este email porque te registraste en una cuenta de PlanillaUCR con esta dirección de email. " +
                     "Si piensas que fue un error, por favor, ignora este email. No te preocupes la cuenta aún no ha sido creada." +
-                    "</div>" + "<div>" + "<FONT COLOR=#00695c>" + "Planilla_UCR" + "</FONT>" + "<br>" + "</br>" + "</div>" + "</section>";
+                    "</div>" + "<div>" + "<FONT COLOR=#00695c>" + "PlanillaUCR" + "</FONT>" + "<br>" + "</br>" + "</div>" + "</section>";
                 MailMessage message = new MailMessage();
                 SmtpClient smtp = new SmtpClient();
                 message.From = new MailAddress(encriptor.Decrypt(user));

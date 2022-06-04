@@ -26,14 +26,7 @@
     };
 }
 
-<MudPaper Height="60px" Width="100%" Outlined="false" Class="border-none" Elevation="0">
-    <MudToolBar>
-        <MudIconButton Size="Size.Small" Icon="@Icons.Filled.ArrowBackIos" aria-label="delete" Link="#" ></MudIconButton> 
-        <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
-    </MudToolBar>
-</MudPaper>
-
-
+<MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
 
 <MudGrid>
  <MudItem xs="10" sm="12">
@@ -71,7 +64,7 @@
                 <MudButton Disabled="true"> </MudButton>
               
                 <MudButton OnClick="GoToCreateAccount" Variant="Variant.Filled" Color="Color.Transparent">
-                    <MudText>Registrarse</MudText>
+                    <MudText>Registrar cuenta empleador</MudText>
                  </MudButton>
                </MudItem>
             </MudGrid>
