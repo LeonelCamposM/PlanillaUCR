@@ -1,12 +1,9 @@
-﻿@using Presentation.Core.Layout.Visitor
-@using Domain.Accounts.DTOs
+﻿@using Domain.Accounts.DTOs
 @using Application.Authentication
 @using  Domain.Authentication
 @inject IAuthenticationService authService
 
-@layout VisitorMainLayout
 @page "/"
-
 <AuthorizeView>
     <Authorized> 
         <MudText>Esta autenticado</MudText>

@@ -19,9 +19,9 @@ namespace Infrastructure.Authentication
             {
                 var key = context.Request.Query["key"];
 
-               /* var result = await auth.SignInInternalAsync(key, true);*/
+                var result = await auth.SignInInternalAsync(key, true);
 
-                /*if (result)
+                if (result)
                 {
                     context.Response.Redirect("/");
                     return;
@@ -29,11 +29,11 @@ namespace Infrastructure.Authentication
                 else
                 {
                     await _next.Invoke(context);
-                }*/
+                }
             }
             else if (context.Request.Path.StartsWithSegments("/logout"))
             {
-                /*await auth.SignOut();*/
+                await auth.SignOut();
                 context.Response.Redirect("/");
                 return;
             }

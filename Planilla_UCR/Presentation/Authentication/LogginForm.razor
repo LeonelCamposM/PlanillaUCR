@@ -8,14 +8,14 @@
 @using System.Text.RegularExpressions
 @using System.ComponentModel.DataAnnotations
 @using Shared.Models
-@using Presentation.Core.Layout.Visitor
+@using Application.Authentication
 
-@layout VisitorMainLayout
 @inject NavigationManager nav
 @inject ISnackbar Snackbar
 @inject IPersonService PersonService
 @inject IAccountService AccountService
 @inject IAccountService AccountService
+@inject IAuthenticationService authService
 
 
 @{
@@ -96,7 +96,7 @@
             if (emailChecked.Length() != 0){
                 IEnumerable<Account> passwordChecked = await AccountService.CheckPassword(accountData);
                 if (passwordChecked.Length() != 0){
-                    await AccountService.SetAuthenticationState(accountData,1);
+                    await authService.SignInRequestAsync(accountData, true);
                     nav.NavigateTo($"/Projects/{accountData.Email}");
                 }
                 else{

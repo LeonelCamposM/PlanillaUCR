@@ -20,16 +20,14 @@
 @{
     List<BreadcrumbItem> _items = new List<BreadcrumbItem>
     {
-        new BreadcrumbItem("Proyecto", href: $"/Projects/{email}"),
+        new BreadcrumbItem("Proyectos", href: $"/Projects/{email}"),
         new BreadcrumbItem(@projectName, href: $"/Projects/Details/{email}/{projectName}"),
         new BreadcrumbItem("Empleados", href: $"/View_Project_Employees/{email}/{projectName}"),
-        new BreadcrumbItem("Nuevo", href: $"/Create_Employee/{email}/{projectName}")
+        new BreadcrumbItem("Nuevo empleado", href: $"/Create_Employee/{email}/{projectName}")
     };
 }
-<MudToolBar>
-    <MudIconButton Size="Size.Small"  OnClick="GoToProjectEmployees" Icon="@Icons.Filled.ArrowBackIos" aria-label="delete"></MudIconButton> 
-    <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
-</MudToolBar>
+<MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
+
 
 
 <MudGrid>
@@ -137,7 +135,7 @@
             await PersonService.CreatePersonAsync(personInfo);
             await EmployeeService.CreateEmployeeAsync(personInfo.Email);
             AccountsDTO accountData = new AccountsDTO(personInfo.Email,personInfo.Name+"_"+personInfo.Ssn);
-            string message = "Sus credenciales son password: "+accountData.UserPassword+" email: "+accountData.Email;
+            string message = "Sus credenciales son: Usuario = "+accountData.Email+ "Clave =  "+accountData.UserPassword;
             await AccountService.InsertAccountData(accountData, message);
             snackHandler._saving = false;
             ShowSnackNotification("Cuenta para empleado "+personInfo.Name+" creada", Severity.Success);
