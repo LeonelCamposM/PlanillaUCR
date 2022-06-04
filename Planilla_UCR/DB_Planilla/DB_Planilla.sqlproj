@@ -82,8 +82,6 @@
     <Build Include="StoredProcedures\Account\EmailCheckLoggin.sql" />
     <Build Include="StoredProcedures\Account\InsertDataToAccountWithPasswordEncripted.sql" />
     <Build Include="StoredProcedures\Account\PasswordCheckLoggin.sql" />
-    <Build Include="StoredProcedures\Account\GetAuthenticationState.sql" />
-    <Build Include="StoredProcedures\Account\SetAuthenticationState.sql" />
     <Folder Include="StoredProcedures" />
     <Folder Include="Tables" />
     <Folder Include="StoredProcedures" />

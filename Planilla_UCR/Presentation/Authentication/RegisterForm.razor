@@ -150,7 +150,7 @@
     Random random = new Random();
 
 
-     async Task SavePersonInfo()
+    async Task SavePersonInfo()
     {
         snackHandler._saving = true;
         await form.Validate();
@@ -167,11 +167,11 @@
             {
                 int confirmationCode = random.Next(100000,999999); 
                 string confirmationCodeString = confirmationCode.ToString();
-				await AccountService.InsertAccountData(accountData,   "El siguiente código es el que tienes que ingresar para verificar tu email:  "+confirmationCodeString);
+                await AccountService.InsertAccountData(accountData,   "El siguiente código es el que tienes que ingresar para verificar tu email:  "+confirmationCodeString);
                 snackHandler._saving = false;
                 ShowSnackNotification("Cuenta para "+personInfo.Name+" registrada", Severity.Success);
                 await authService.RegisterRequestAsync(accountData);
-                nav.NavigateTo($"/Projects/{accountData.Email}");
+                await authService.SignInRequestAsync(accountData, true);
             }       
         }
         snackHandler._saving = false;

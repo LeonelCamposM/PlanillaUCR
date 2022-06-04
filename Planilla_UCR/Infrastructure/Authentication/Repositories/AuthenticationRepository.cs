@@ -72,9 +72,7 @@ namespace Infrastructure.Authentication.Repositories
             {
 
                 await _userManager.ResetAccessFailedCountAsync(identityUser);
-
                 await signInManag.SignInAsync(identityUser, isPersistent);
-
                 return true;
             }
 
@@ -95,16 +93,6 @@ namespace Infrastructure.Authentication.Repositories
                         string data = user.Id + "|" + token;
                         var protector = _dataProtecter.CreateProtector("Login");
                         var protectedData = protector.Protect(data);
-                        string persistent;
-                        if (isPersistent)
-                        {
-                            persistent = "true";
-                        }
-                        else
-                        {
-                            persistent = "false";
-                        }
-
                         navigationManager.NavigateTo("/login?key=" + protectedData, true);
                         result = true;
                     }
@@ -114,7 +102,6 @@ namespace Infrastructure.Authentication.Repositories
                     }
                 }
             }
-
             return result;
         }
 

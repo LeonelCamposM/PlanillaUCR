@@ -4,4 +4,4 @@ Declare @UserPassword varbinary(150)
 Declare @EncryptedPassword varbinary(150)
 Set @UserPassword = CONVERT(varbinary(150),@UserPasswordToEncrypt);
 Set @EncryptedPassword = HASHBYTES('SHA2_256', @UserPassword);
-Insert into Account values (@EmailAccount, @EncryptedPassword, 1) 
+Insert into Account values (@EmailAccount, @EncryptedPassword) 
