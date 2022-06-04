@@ -15,12 +15,18 @@ namespace Application.Accounts.Implementations
             _accountRepository = accountRepository;
         }
 
-        public async Task InsertAccountData(AccountsDTO accountData, string message)
+        public async Task InsertAccountData(AccountsDTO accountData)
+        {
+            await _accountRepository.InsertAccountData(accountData);
+        }
+
+        public bool SendEmail1(AccountsDTO accountData, string message)
         {
             EmailSender emailSender = new();
             emailSender.SendMail(message, accountData.Email);
-            await _accountRepository.InsertAccountData(accountData);
+            return true;
         }
+
 
         public async Task<IEnumerable<Account>>CheckEmail(AccountsDTO accountData)
         {

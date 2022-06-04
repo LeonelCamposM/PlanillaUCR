@@ -7,10 +7,11 @@ namespace Application.Accounts
 {
     public interface IAccountService
     {
-        Task InsertAccountData(AccountsDTO accountData, string message);
+        Task InsertAccountData(AccountsDTO accountData);
         Task<IEnumerable<Account>> CheckEmail(AccountsDTO accountData);
         Task<IEnumerable<Account>> CheckPassword(AccountsDTO accountData);
         Task<IEnumerable<Account>> GetAuthenticationState(AccountsDTO accountData);
         Task SetAuthenticationState(AccountsDTO accountData, byte state);
+        bool SendEmail1(AccountsDTO accountData, string message);
     }
 }

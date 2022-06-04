@@ -100,12 +100,11 @@
                     <MudItem xs="8">
                     <MudText>Se envia email con el código de confirmación para validar su cuenta</MudText></MudItem>
                     <MudItem xs="2"></MudItem>
-                 
                     <MudSpacer></MudSpacer>
                     @*Create buton *@
                     <MudItem xs="2"></MudItem>
-                    <MudItem xs="8">
-                        <MudButton Disabled="@snackHandler._saving" OnClick="SavePersonInfo" Variant="Variant.Filled" Color="Color.Secondary">
+                    
+                        <MudButton Disabled="@snackHandler._saving" OnClick="OpenPopOver" Variant="Variant.Filled" Color="Color.Secondary">
                             @if (snackHandler._saving)
                             {
                                 <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true"/>
@@ -115,14 +114,34 @@
                             {
                                 <MudText>Registrar</MudText>
                             }
-                        </MudButton>
-                    <MudButton Disabled="true"> </MudButton>
-
-                     @*Clear buton *@
+                             <MudPopover Open="@isOpen"  Fixed="true" Class="px-3000 pt-4000">
+                            <MudPaper Elevation="0" Height="220px" Width="90%" Outlined="true" Class="pa-4">
+                                <MudText>Por favor ingrese el código de confirmación enviado a su email: </MudText>
+                                <MudItem xs="12"  Class="d-flex justify-center align-center">
+                                    <MudTextField @bind-Value="@ConfirmationCodeEmployer"  Label="Código de confirmación" Variant="Variant.Outlined" Required="true" RequiredError="Campo requerido" ></MudTextField>
+                                </MudItem>
+                                <MudButton Disabled="true"> </MudButton>
+                                <MudButton OnClick="@OpenPopOver" Class="ml-auto mr-n3 mb-1" Color="Color.Primary">Ingresar</MudButton>
+                                <MudButton Disabled="true"> </MudButton>
+                                <MudButton OnClick="@OpenPopOver" Class="ml-auto mr-n3 mb-1" Color="Color.Secondary">Volver a enviar</MudButton>
+                            </MudPaper>    
+                        </MudPopover>
+                         </MudButton>
+                           
+                       
+                    
+                         <MudButton Disabled="true"> </MudButton>
+                        @*Clear buton *@
                         <MudButton OnClick="CleanForm" Variant="Variant.Filled" Color="Color.Transparent">
                                 <MudText>Limpiar</MudText>
                         </MudButton>
-                    </MudItem>
+
+                 
+                        
+                        
+               
+
+                   
                      <MudItem xs="2"></MudItem>
                 </MudGrid>
             </MudForm>
@@ -142,9 +161,18 @@
     SnackHandler snackHandler = new SnackHandler();
     MudForm form;
     Random random = new Random();
+    public string ConfirmationCodeEmployer { get; set; }
+    public bool isOpen;
 
+    public void OpenPopOver()
+    {
+        if (isOpen)
+            isOpen = false;
+        else
+            isOpen = true;
+    }
 
-     async Task SavePersonInfo()
+    async Task SavePersonInfo()
     {
         snackHandler._saving = true;
         await form.Validate();
@@ -161,7 +189,8 @@
             {
                 int confirmationCode = random.Next(100000,999999); 
                 string confirmationCodeString = confirmationCode.ToString();
-				await AccountService.InsertAccountData(accountData,   "El siguiente código es el que tienes que ingresar para verificar tu email:  "+confirmationCodeString);
+                await AccountService.InsertAccountData(accountData);
+                AccountService.SendEmail1(accountData,"El siguiente código es el que tienes que ingresar para verificar tu email:  "+confirmationCodeString);
                 snackHandler._saving = false;
                 ShowSnackNotification("Cuenta para "+personInfo.Name+" registrada", Severity.Success);
                 await AccountService.SetAuthenticationState(accountData,1);
@@ -171,7 +200,7 @@
         snackHandler._saving = false;
     }
 
-
+    
     bool ValidateSsn(Person personInfo)
     {
         bool valid = true;

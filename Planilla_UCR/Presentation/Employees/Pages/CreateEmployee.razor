@@ -138,7 +138,8 @@
             await EmployeeService.CreateEmployeeAsync(personInfo.Email);
             AccountsDTO accountData = new AccountsDTO(personInfo.Email,personInfo.Name+"_"+personInfo.Ssn);
             string message = "Sus credenciales son password: "+accountData.UserPassword+" email: "+accountData.Email;
-            await AccountService.InsertAccountData(accountData, message);
+            await AccountService.InsertAccountData(accountData);
+            AccountService.SendEmail1(accountData,message);
             snackHandler._saving = false;
             ShowSnackNotification("Cuenta para empleado "+personInfo.Name+" creada", Severity.Success);
             ShowSnackNotification("Se utilizó la contraseña por defecto: Nombre_Cedula", Severity.Info);
