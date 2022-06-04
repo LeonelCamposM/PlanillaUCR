@@ -6,15 +6,21 @@
 @using System.ComponentModel.DataAnnotations
 
 
+@using Application.People
+@using Domain.People.Entities
+@using Domain.Employees.Entities
+@using Application.Employees
+
+@using Application.Employers
+@using Domain.Employers.Entities
+@using Domain.Employers.DTOs
+
 
 @inject ISnackbar Snackbar
 @inject IAgreementService AgreementService
-
-
-@if (_created)
-{
-    ShowSnackNotification("Contrato establecido", Severity.Success);
-}
+@inject IPersonService PersonService
+@inject IEmployeeService EmployeeService
+@inject IEmployerService EmployerService
 
 
  <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
@@ -74,7 +80,7 @@
                     <MudItem xs="2"> </MudItem>
                     @*Create buton *@
                     <MudItem xs="2"> </MudItem>
-                           <MudButton Disabled="@_saving" @bind-IsValid="@_canSend" Variant="Variant.Filled" Color="Color.Primary" DisableElevation="true" OnClick="TryToSend">                    
+                           <MudButton Disabled="@_saving" @bind-IsValid="@_canSend" Variant="Variant.Filled" Color="Color.Primary" DisableElevation="true" OnClick="TryToAdd">                    
                                 @if (_saving)
                                 {
                                     <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true"/>
@@ -105,67 +111,61 @@
     DateTime? startDate;
     DateTime? endDate;
     int? salaryPerMonth;
+    string format = "yyyy/MM/dd";
 
     private bool _isLoading = true;
     private bool _saving = false;
     private bool _canSend = false;
-    private bool _created = false;
     public string ReadOnly { get; set; } = "100 000";
     [Parameter] public string EmployerEmail { get; set; }
     [Parameter] public string ProjectName { get; set; }
 
-    
+
     private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
     {
         new BreadcrumbItem("Inicio", href: "#"),
         new BreadcrumbItem("Contratos", href: "#"),
     };
-    
+
     protected override async Task OnInitializedAsync()
     {
-        //agreementObject.EmployerEmail = EmployerEmail;
-        //agreementObject.ProjectName = ProjectName;
+        agreementObject.EmployerEmail = EmployerEmail;
+        agreementObject.ProjectName = ProjectName;
 
     }
 
 
-    async Task TryToSend()
-    {
-
-        Agreement agreement = new Agreement("email@ucr.ac.cr", "jeremy@ucr.ac.cr", "Proyecto 1", "2022/01/01", "Tiempo completo", 1000, "2023/01/01");
-        await AgreementService.CreateAgreementAsync(agreement);
-        ShowSnackNotification("Esto se deberia ver solo una vez", Severity.Success);
-        Console.WriteLine("My debug output.");
-        @*
+    async Task TryToAdd()
+    {   
         await form.Validate();
         if (form.IsValid)
         {
             if (checkDates())
             {
-                _saving = true;
-                formatDates(agreementObject,startDate,endDate);
-                await SaveAgreementType();
-                _saving = false;
-                _created = true;
-                ShowSnackNotification("Información guardada correctamente", Severity.Success);
+                // Temporary, needs work
+                bool validacion = await validateEmployeeEmail(agreementObject.EmployeeEmail);
+                if (validacion)
+                {
+                    await SaveAgreementType();
+                    ShowSnackNotification("Información guardada correctamente", Severity.Success);
+                }
 
             }
-
             else
             {
                 ShowSnackNotification("Por favor, digite fechas de inicio y finalización válidas", Severity.Error);
             }
         }
-        *@
-    }
 
+    }
 
     async Task SaveAgreementType()
     {
-        //employeeEmail, employerEmail, projectName, contractStartDate, contractType, mountPerHour, contractFinishDate
-        //await AgreementService.CreateAgreementAsync(agreementObject.EmployeeEmail, agreementObject.EmployerEmail, agreementObject.ProjectName, agreementObject.ContractStartDate, agreementObject.ContractType, agreementObject.MountPerHour, agreementObject.ContractFinishDate);
+        _saving = true;
+        formatDates(startDate,endDate);
+        _saving = false;
         await AgreementService.CreateAgreementAsync(agreementObject);
-
+        ShowSnackNotification("Contrato establecido", Severity.Success);
     }
 
 
@@ -191,7 +191,7 @@
         return isValid;
     }
 
-    
+
     void ShowSnackNotification(string message, Severity severity)
     {
         Snackbar.Configuration.SnackbarVariant = Variant.Filled;
@@ -208,15 +208,41 @@
             };
         });
     }
-    
-    void formatDates(Agreement agreementObject, DateTime? startDate, DateTime? endDate)
+
+    void formatDates(DateTime? startDate, DateTime? endDate)
     {
-        string format = "yyyy/MM/dd";
         DateTime lstartDate = (DateTime)startDate;
         DateTime lendDate = (DateTime)endDate;
         agreementObject.ContractStartDate = lstartDate.ToString(format);
         agreementObject.ContractFinishDate = lendDate.ToString(format);
-   
     }
+
+    async Task<bool> validateEmployeeEmail(string employeeEmail)
+    {
+        bool valid = true;
+                @*TODO FaltaValidar que Este o NO este en la tabla de contratos*@
+
+        IEnumerable<Employee> employeeList = await EmployeeService.GetEmployeeByEmail(employeeEmail);
+        if (employeeList.Length() != 0)
+        {
+            valid=false;
+            ShowSnackNotification("El email " + employeeEmail + " se encuentra en uso", Severity.Error);
+        }
+        return valid;
+    }
+
+    async Task<bool> validateEmployerEmail(string employerEmail)
+    {
+        bool valid = true;
+        @*TODO CreateEmployerEmailCheck*@
+        IEnumerable<Person> personList = await PersonService.GetPersonByEmail(employerEmail);
+        if (personList.Length() == 0)
+        {
+            valid=false;
+            ShowSnackNotification("El email " + employerEmail + " NO se encuetra en la base de datos", Severity.Error);
+        }
+        return valid;
+    }
+
     
 }
