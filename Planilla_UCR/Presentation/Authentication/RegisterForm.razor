@@ -2,29 +2,27 @@
 @using Domain.People.Entities
 @using Domain.Employees.Entities 
 @using Domain.Employees.DTOs
-@using Application.Accounts
 @using Application.People
 @using Application.Employees
 @using Application.Employers
-@using Domain.Accounts.Entities
-@using Domain.Accounts.DTOs
 @using Presentation.Shared.Models
 @using Presentation.Core.Components
 @using System.Text.RegularExpressions
 @using System.ComponentModel.DataAnnotations
 @using Application.Authorization;
 @using Application.Authorization.Implementations;
-
 @using Application.Authentication;
+@using Domain.Authentication.DTOs
+@using Application.Email
 
 @inject NavigationManager nav
 @inject ISnackbar Snackbar
 @inject IPersonService PersonService
-@inject IAccountService AccountService
 @inject IEmployeeService EmployeeService
 @inject IEmployerService EmployerService
-@inject IAuthenticationService authService;
+@inject IAuthenticationService AuthenticationService
 @inject IAuthorizationServices AuthorizationService
+@inject IEmailServices EmailService
 
 @*Navigation footprint *@
 @{
@@ -93,7 +91,7 @@
                    
                     <MudItem xs="2"></MudItem>
                     <MudItem xs="4">
-                       <MudTextField @bind-Value="accountData.UserPassword" Label="Contraseña" Variant="Variant.Outlined" @ref="pwField1" InputType="InputType.Password"  Required="true" RequiredError="Campo requerido" 
+                       <MudTextField @bind-Value="accountData.Password" Label="Contraseña" Variant="Variant.Outlined" @ref="pwField1" InputType="InputType.Password"  Required="true" RequiredError="Campo requerido" 
                             Validation="@(new Func<string, IEnumerable<string>>(PasswordStrength))" ></MudTextField>
                    </MudItem>
                     
@@ -144,7 +142,7 @@
 
 @code {
     Person personInfo = new Person("", "", "", "", Int32.Parse("0"), "", "", "");
-    AccountsDTO accountData = new AccountsDTO("","");
+    AccountDTO accountData = new AccountDTO("","");
     MudTextField<string> pwField1;
     SnackHandler snackHandler = new SnackHandler();
     MudForm form;
@@ -159,8 +157,9 @@
             await PersonService.CreatePersonAsync(personInfo);
             await EmployerService.CreateEmployerAsync(personInfo.Email);
             accountData.Email = personInfo.Email;
-            IEnumerable<Account> emailChecked = await AccountService.CheckEmail(accountData);
-            if (emailChecked.Length() != 0)
+
+            bool emailExist = await AuthenticationService.emailIsAlreadyRegistered(accountData.Email);
+            if (emailExist)
             {
                 ShowSnackNotification("El email ya se encuentra en uso", Severity.Error);
             }
@@ -168,12 +167,13 @@
             {
                 int confirmationCode = random.Next(100000,999999); 
                 string confirmationCodeString = confirmationCode.ToString();
-                await AccountService.InsertAccountData(accountData,   "El siguiente código es el que tienes que ingresar para verificar tu email:  "+confirmationCodeString);
+                EmailService.SendConfirmationEmail("El siguiente código es el que tienes que ingresar para verificar tu email:  " + confirmationCodeString, accountData.Email);
+                await AuthenticationService.RegisterRequestAsync(accountData);
+                await AuthorizationService.assignRole( accountData.Email, "Employer");
                 snackHandler._saving = false;
                 ShowSnackNotification("Cuenta para "+personInfo.Name+" registrada", Severity.Success);
-                await authService.RegisterRequestAsync(accountData);
-                await AuthorizationService.assignRole(accountData.Email, "Employer");
-                await authService.SignInRequestAsync(accountData, true);
+                await AuthenticationService.SignInRequestAsync(accountData, true);
+
             }       
         }
         snackHandler._saving = false;
@@ -271,6 +271,6 @@
         personInfo.BankAccount = "";
         personInfo.PhoneNumber = "";
         personInfo.Ssn = 0;
-        accountData.UserPassword = "";
+        accountData.Password = "";
     }
 }
