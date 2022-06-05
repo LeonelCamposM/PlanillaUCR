@@ -16,6 +16,7 @@
 
 @layout VisitorMainLayout
 @inject NavigationManager nav
+@inject IDialogService DialogService
 @inject ISnackbar Snackbar
 @inject IPersonService PersonService
 @inject IAccountService AccountService
@@ -104,7 +105,7 @@
                     @*Create buton *@
                     <MudItem xs="2"></MudItem>
                     
-                        <MudButton Disabled="@snackHandler._saving" OnClick="OpenPopOver" Variant="Variant.Filled" Color="Color.Secondary">
+                        <MudButton Disabled="@snackHandler._saving" @onclick="OpenDialog" Variant="Variant.Filled" Color="Color.Secondary">
                             @if (snackHandler._saving)
                             {
                                 <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true"/>
@@ -113,36 +114,24 @@
                             else
                             {
                                 <MudText>Registrar</MudText>
+                                    
                             }
-                             <MudPopover Open="@isOpen"  Fixed="true" Class="px-3000 pt-4000">
-                            <MudPaper Elevation="0" Height="220px" Width="90%" Outlined="true" Class="pa-4">
-                                <MudText>Por favor ingrese el código de confirmación enviado a su email: </MudText>
-                                <MudItem xs="12"  Class="d-flex justify-center align-center">
-                                    <MudTextField @bind-Value="@ConfirmationCodeEmployer"  Label="Código de confirmación" Variant="Variant.Outlined" Required="true" RequiredError="Campo requerido" ></MudTextField>
-                                </MudItem>
-                                <MudButton Disabled="true"> </MudButton>
-                                <MudButton OnClick="@OpenPopOver" Class="ml-auto mr-n3 mb-1" Color="Color.Primary">Ingresar</MudButton>
-                                <MudButton Disabled="true"> </MudButton>
-                                <MudButton OnClick="@OpenPopOver" Class="ml-auto mr-n3 mb-1" Color="Color.Secondary">Volver a enviar</MudButton>
-                            </MudPaper>    
-                        </MudPopover>
-                         </MudButton>
+                          
+                        </MudButton>
                            
-                       
-                    
                          <MudButton Disabled="true"> </MudButton>
                         @*Clear buton *@
-                        <MudButton OnClick="CleanForm" Variant="Variant.Filled" Color="Color.Transparent">
+                        <MudButton OnClick="OpenDialog" Variant="Variant.Filled" Color="Color.Transparent">
                                 <MudText>Limpiar</MudText>
                         </MudButton>
 
-                 
-                        
-                        
-               
-
-                   
+                         
                      <MudItem xs="2"></MudItem>
+
+
+                  
+
+
                 </MudGrid>
             </MudForm>
         </MudPaper>
@@ -162,14 +151,11 @@
     MudForm form;
     Random random = new Random();
     public string ConfirmationCodeEmployer { get; set; }
-    public bool isOpen;
+    private bool visible;
 
-    public void OpenPopOver()
-    {
-        if (isOpen)
-            isOpen = false;
-        else
-            isOpen = true;
+    private void OpenDialog()
+    {    
+       DialogService.Show<Dialog>("Por favor ingrese el código de confirmación enviado a su email: ");
     }
 
     async Task SavePersonInfo()

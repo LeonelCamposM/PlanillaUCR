@@ -1,0 +1,18 @@
+﻿
+<MudDialog>
+    <DialogContent>
+        <MudTextField @bind-Value="ConfirmationCodeEmployer" Label="Código de confirmación" Variant="Variant.Outlined" Required="true" RequiredError="Campo requerido" ></MudTextField>
+    </DialogContent>
+    <DialogActions>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Submit" Class="px-10">Aceptar</MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Tertiary" OnClick="Cancel" Class="px-10">Volver a enviar</MudButton>
+    </DialogActions>
+</MudDialog> 
+
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    public string ConfirmationCodeEmployer { get; set; }
+    void Submit() => MudDialog.Close(DialogResult.Ok(true));
+    void Cancel() => MudDialog.Cancel();
+}
