@@ -9,7 +9,7 @@ namespace Application.Agreements
     {
         Task CreateAgreementAsync(Agreement agreement);
 
-        //Task CreateAgreementAsync(string employeeEmail, string employerEmail, string projectName, string contractStartDate, string contractType, int mountPerHour, string contractFinishDate);
+        Task<Agreement>? GetContracteeByEmail(Agreement agreement);
 
         Task<IEnumerable<Agreement>> GetAgreement(string employeeEmail, string employerEmail, string projectName, string contractStartDate, string contractType, int mountPerHour, string contractFinishDate);
     }

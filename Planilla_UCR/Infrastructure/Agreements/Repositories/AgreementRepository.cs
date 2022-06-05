@@ -7,6 +7,9 @@ using System.Collections.Generic;
 using Microsoft.Data.SqlClient;
 using System.Threading.Tasks;
 
+
+using System.Linq;
+
 namespace Infrastructure.Agreements.Repositories
 {
     internal class AgreementRepository : IAgreementRepository
@@ -21,13 +24,58 @@ namespace Infrastructure.Agreements.Repositories
 
         public async Task CreateAgreementAsync(Agreement agreement)
 
-        //public async Task CreateAgreementAsync(string employeeEmail, string employerEmail, string projectName, string contractStartDate, string contractType, int mountPerHour, string contractFinishDate)
         {
             _dbContext.Agreements.Add(agreement);
-            //_dbContext.Add(new Agreement(employeeEmail, employerEmail, projectName, contractStartDate, contractType, mountPerHour, contractFinishDate));
-
             await _dbContext.SaveEntitiesAsync();
         }
+        /*
+        public async Task<IEnumerable<Agreement?>> GetContracteeByEmail(Agreement agreement)
+        {
+        /*
+        public String EmployeeEmail { get; set; }
+        public String EmployerEmail { get; set; }
+        public String ProjectName { get; set; }
+        public string ContractStartDate { get; set; }
+        public String ContractType { get; set; }
+        public int MountPerHour { get; set; }
+        public string ContractFinishDate { get; set; }
+        
+
+
+        var contracteeList = await _dbContext.Agreements.FromSqlRaw("EXEC GetContracteeByEmail @agreement.EmployeeEmail",
+                new SqlParameter("employeeEmail", agreement.EmployeeEmail)).ToListAsync();
+            return contracteeList;
+        }
+        */
+        public async Task<Agreement>? GetContracteeByEmail(Agreement agreement)
+        {
+            IList<Agreement> agreementList = await _dbContext.Agreements.Where
+                (e => e.EmployeeEmail == agreement.EmployeeEmail && e.EmployerEmail == agreement.EmployerEmail
+                && e.ProjectName == agreement.ProjectName).ToListAsync();
+            Agreement agreementAux = null;
+            if (agreementList.Length() > 0)
+            {
+                agreementAux = agreementList.First();
+            }
+            return agreementAux;
+
+        }
+
+
+        /*public async Task<Subscription>? GetSubscription(string employerEmail, string projectName, string subscriptionName)
+        {
+            IList<Subscription> subscriptionResult = await _dbContext.Subscriptions.Where
+                (e => e.EmployerEmail == employerEmail && e.SubscriptionName == subscriptionName
+                && e.ProjectName == projectName).ToListAsync();
+            Subscription subscription = null;
+            if (subscriptionResult.Length() > 0)
+            {
+                subscription = subscriptionResult.First();
+            }
+            return subscription;
+        }
+
+        */
 
         public async Task<IEnumerable<Agreement?>> GetAgreement(string employeeEmail, string employerEmail, string projectName, string contractStartDate, string contractType, int mountPerHour, string contractFinishDate)
         {
@@ -38,3 +86,13 @@ namespace Infrastructure.Agreements.Repositories
         }
     }
 }
+
+/*
+         public async Task<IEnumerable<Employee?>> GetEmployeeByEmail(string email)
+        {
+            var employeeList = await _dbContext.Employees.FromSqlRaw("EXEC GetEmployeeByEmail @email",
+                new SqlParameter("email", email)).ToListAsync();
+            return employeeList;
+        }
+~~~
+ */

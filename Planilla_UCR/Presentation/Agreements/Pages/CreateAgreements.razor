@@ -105,7 +105,8 @@
 </MudGrid>
 
 @code{
-    Agreement agreementObject = new Agreement("", "", "", "", "", 0, "");
+    Agreement agreementObject = new Agreement("", "", "", null, "", 0, null);
+    Agreement anAgreement = new Agreement("", "", "", null, "", 0, null);
 
     MudForm form;
     DateTime? startDate;
@@ -162,7 +163,6 @@
     async Task SaveAgreementType()
     {
         _saving = true;
-        formatDates(startDate,endDate);
         _saving = false;
         await AgreementService.CreateAgreementAsync(agreementObject);
         ShowSnackNotification("Contrato establecido", Severity.Success);
@@ -174,7 +174,7 @@
         agreementObject.EmployeeEmail = "";
         agreementObject.EmployerEmail = "";
         agreementObject.ProjectName = "";
-        agreementObject.ContractFinishDate = "";
+        agreementObject.ContractFinishDate = null;
         agreementObject.ContractType = "";
         salaryPerMonth = null;
         startDate = null;
@@ -188,6 +188,7 @@
         {
             isValid = false;
         }
+        formatDates(startDate,endDate); // TODO Move this
         return isValid;
     }
 
@@ -213,21 +214,35 @@
     {
         DateTime lstartDate = (DateTime)startDate;
         DateTime lendDate = (DateTime)endDate;
-        agreementObject.ContractStartDate = lstartDate.ToString(format);
-        agreementObject.ContractFinishDate = lendDate.ToString(format);
+        @* agreementObject.ContractStartDate = lstartDate.ToString(format); 
+        agreementObject.ContractFinishDate = lendDate.ToString(format); *@
+        agreementObject.ContractStartDate = startDate;
+        agreementObject.ContractFinishDate = endDate;
     }
 
     async Task<bool> validateEmployeeEmail(string employeeEmail)
     {
         bool valid = true;
-                @*TODO FaltaValidar que Este o NO este en la tabla de contratos*@
+        @*TODO FaltaValidar que Este o NO este en la tabla de contratos*@
 
         IEnumerable<Employee> employeeList = await EmployeeService.GetEmployeeByEmail(employeeEmail);
+        @*IEnumerable<Agreement> agreementList = await AgreementService.GetContracteeByEmail(agreementObject);*@
+               
+        anAgreement = await AgreementService.GetContracteeByEmail(agreementObject);
+
         if (employeeList.Length() != 0)
+        {   
+            valid=false;
+
+            ShowSnackNotification("El email " + employeeEmail + " se encuentra en uso en el proyecto ", Severity.Error);
+        }
+        if (anAgreement == null) @*Check This *@
         {
             valid=false;
-            ShowSnackNotification("El email " + employeeEmail + " se encuentra en uso", Severity.Error);
+            ShowSnackNotification("El email " + employeeEmail + " no se encuentra registrado en el sistema", Severity.Error);
+
         }
+
         return valid;
     }
 

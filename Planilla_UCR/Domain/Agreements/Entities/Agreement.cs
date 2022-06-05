@@ -7,13 +7,13 @@ namespace Domain.Agreements.Entities
         public String EmployeeEmail { get; set; }
         public String EmployerEmail { get; set; }
         public String ProjectName { get; set; }
-        public string ContractStartDate { get; set; }
+        public DateTime? ContractStartDate { get; set; }
         public String ContractType { get; set; }
         public int MountPerHour { get; set; }
-        public string ContractFinishDate { get; set; }
+        public DateTime? ContractFinishDate { get; set; }
 
 
-        public Agreement(string employeeEmail, string employerEmail, string projectName, string contractStartDate, string contractType, int mountPerHour, string contractFinishDate)
+        public Agreement(string employeeEmail, string employerEmail, string projectName, DateTime? contractStartDate, string contractType, int mountPerHour, DateTime? contractFinishDate)
         {
             this.EmployeeEmail = employeeEmail;
             this.EmployerEmail = employerEmail;
