@@ -15,6 +15,8 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Application.Authentication;
 using Application.Authentication.Implementations;
 using Microsoft.AspNetCore.Identity;
+using Application.Authorization;
+using Application.Authorization.Implementations;
 
 namespace Application
 {
@@ -31,6 +33,7 @@ namespace Application
             services.AddTransient<IProjectService, ProjectService>();
             services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
             services.AddTransient<IAuthenticationService, AuthenticationService>();
+            services.AddTransient<IAuthorizationServices, AuthorizationServices>();
             return services;
         }
     }

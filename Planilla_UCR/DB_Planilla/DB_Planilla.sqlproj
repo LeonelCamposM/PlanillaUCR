@@ -110,7 +110,6 @@
     <Build Include="StoredProcedures\Employee\GetEmployeeByEmail.sql" />
   </ItemGroup>
   <ItemGroup>
-    <RefactorLog Include="DB_Planilla.refactorlog" />
     <PostDeploy Include="Script.PostDeployment.sql" />
   </ItemGroup>
   <ItemGroup>

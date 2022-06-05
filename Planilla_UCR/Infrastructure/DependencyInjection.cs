@@ -22,6 +22,8 @@ using Infrastructure.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Domain.Authentication.Repositories;
 using Infrastructure.Authentication.Repositories;
+using Domain.Authorization.Repositories;
+using Infrastructure.Authorization.Repositories;
 
 namespace Infrastructure
 {
@@ -48,12 +50,12 @@ namespace Infrastructure
             services.AddDbContext<ProjectDbContext>(options => options.UseSqlServer(connectionString));
             services.AddScoped<IProjectRepository, ProjectRepository>();
 
-
-            services.AddDbContext<AccountsADbContext>(options => options.UseSqlServer(AuthenticationDB), ServiceLifetime.Transient);
+            services.AddDbContext<AccountsDbContext>(options => options.UseSqlServer(AuthenticationDB), ServiceLifetime.Transient);
             services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
                .AddRoles<IdentityRole>()
-               .AddEntityFrameworkStores<AccountsADbContext>();
+               .AddEntityFrameworkStores<AccountsDbContext>();
             services.AddScoped<IAuthenticationRepository, AuthenticationRepository>();
+            services.AddScoped<IAuthorizationRepository, AuthorizationRepository>();
             return services;
         }
     }

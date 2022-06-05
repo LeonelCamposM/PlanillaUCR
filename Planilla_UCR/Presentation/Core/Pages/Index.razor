@@ -1,9 +1,13 @@
 ﻿@using Domain.Accounts.DTOs
 @using Application.Authentication
 @using  Domain.Authentication
-@inject IAuthenticationService authService
+@using Application.Authorization;
+@using Application.Authorization.Implementations;
+@inject IAuthenticationService AuthenticationService
+@inject IAuthorizationServices AuthorizationService
 
 @page "/"
+
 <AuthorizeView>
     <Authorized> 
         <MudText>Esta autenticado</MudText>
@@ -12,6 +16,25 @@
         <MudText>No esta autenticado</MudText>
     </NotAuthorized>
 </AuthorizeView>
+
+<AuthorizeView Roles="Employer">
+    <Authorized> 
+        <MudText>ES Employer</MudText>
+    </Authorized>
+    <NotAuthorized>
+        <MudText>No es employer </MudText>
+    </NotAuthorized>
+</AuthorizeView>
+
+<AuthorizeView Roles="Employee">
+    <Authorized> 
+        <MudText>Es employee</MudText>
+    </Authorized>
+    <NotAuthorized>
+        <MudText>No es employee </MudText>
+    </NotAuthorized>
+</AuthorizeView>
+
 
 <MudPaper  Height="220px" Width="100%" Outlined="false" Class="border-none pa-16" Elevation="0">
      <MudText Align="Align.Justify" Typo="Typo.h5">Para emprendedores y pequeñas empresas quienes requieren agilizar
@@ -25,10 +48,4 @@
 </MudPaper>
 
 @code{
-
-    protected override async Task OnInitializedAsync()
-    {
-        AccountsDTO accountData = new AccountsDTO("tes22t@gmail.com", "Prueba.12");
-        var couldSign = await authService.RegisterRequestAsync(accountData);
-    }
 }

@@ -8,7 +8,7 @@ using System;
 
 namespace Infrastructure.Authentication.Migrations
 {
-    [DbContext(typeof(AccountsADbContext))]
+    [DbContext(typeof(AccountsDbContext))]
     [Migration("00000000000000_CreateIdentitySchema")]
     partial class CreateIdentitySchema
     {

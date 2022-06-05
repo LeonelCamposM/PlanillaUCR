@@ -12,6 +12,8 @@
 @using Presentation.Core.Components
 @using System.Text.RegularExpressions
 @using System.ComponentModel.DataAnnotations
+@using Application.Authorization;
+@using Application.Authorization.Implementations;
 
 @using Application.Authentication;
 
@@ -21,9 +23,8 @@
 @inject IAccountService AccountService
 @inject IEmployeeService EmployeeService
 @inject IEmployerService EmployerService
-
 @inject IAuthenticationService authService;
-
+@inject IAuthorizationServices AuthorizationService
 
 @*Navigation footprint *@
 @{
@@ -171,6 +172,7 @@
                 snackHandler._saving = false;
                 ShowSnackNotification("Cuenta para "+personInfo.Name+" registrada", Severity.Success);
                 await authService.RegisterRequestAsync(accountData);
+                await AuthorizationService.assignRole(accountData.Email, "Employer");
                 await authService.SignInRequestAsync(accountData, true);
             }       
         }

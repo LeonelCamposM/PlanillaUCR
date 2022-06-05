@@ -2,9 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 namespace Infrastructure.Authentication
 {
-    public class AccountsADbContext : IdentityDbContext
+    public class AccountsDbContext : IdentityDbContext
     {
-        public AccountsADbContext(DbContextOptions<AccountsADbContext> options)
+        public AccountsDbContext(DbContextOptions<AccountsDbContext> options)
             : base(options)
         {
         }

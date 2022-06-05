@@ -97,7 +97,6 @@
                 IEnumerable<Account> passwordChecked = await AccountService.CheckPassword(accountData);
                 if (passwordChecked.Length() != 0){
                     await authService.SignInRequestAsync(accountData, true);
-                    nav.NavigateTo($"/Projects/{accountData.Email}");
                 }
                 else{
                     ShowSnackNotification("Contraseña incorrecta", Severity.Error);
