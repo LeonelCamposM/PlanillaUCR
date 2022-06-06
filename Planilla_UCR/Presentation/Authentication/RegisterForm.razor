@@ -1,4 +1,4 @@
-﻿@page "/Register_Form2"
+﻿@page "/Register_Form"
 @using Domain.People.Entities
 @using Domain.Employees.Entities 
 @using Domain.Employees.DTOs
@@ -106,7 +106,7 @@
                     @*Create buton *@
                     <MudItem xs="2"></MudItem>
                     
-                        <MudButton Disabled="@snackHandler._saving" @onclick="OpenDialog" Variant="Variant.Filled" Color="Color.Secondary">
+                        <MudButton Disabled="@snackHandler._saving" @onclick="SavePersonInfo" Variant="Variant.Filled" Color="Color.Secondary">
                             @if (snackHandler._saving)
                             {
                                 <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true"/>
@@ -129,9 +129,22 @@
                          
                      <MudItem xs="2"></MudItem>
 
-
-                  
-
+                     <MudDialog @bind-IsVisible="visible" Options="dialogOptions">
+                        <TitleContent>
+                            <MudText Typo="Typo.h6">
+                                <MudIcon Icon="@Icons.Material.Filled.Email" Class="mr-2"/> Por favor ingrese el código de confirmación enviado a su email: 
+                            </MudText>
+                        </TitleContent>
+                        <DialogContent>
+                            <MudItem xs="12" Class="d-flex justify-center align-center">
+                                <MudTextField @bind-Value="confirmationCodeEmployer" Label="Código de confirmación" Variant="Variant.Outlined" Required="true" RequiredError="Campo requerido" ></MudTextField>
+                            </MudItem>
+                         </DialogContent>
+                        <DialogActions>
+                            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AcceptConfirmationCode" Class="px-10">Aceptar</MudButton>
+                            <MudButton Variant="Variant.Filled" Color="Color.Transparent" OnClick="ResendConfirmationCode" Class="px-10">Volver a enviar</MudButton>
+                        </DialogActions>
+                    </MudDialog>
 
                 </MudGrid>
             </MudForm>
@@ -151,19 +164,23 @@
     SnackHandler snackHandler = new SnackHandler();
     MudForm form;
     Random random = new Random();
-    public string ConfirmationCodeEmployer { get; set; }
+    public string confirmationCodeEmployer { get; set; }
+    public string confirmationCodeEmail { get; set; }
     private bool visible;
+    private bool open;
 
-     async Task OpenDialog()
-    {    
-        snackHandler._saving = true;
-        await form.Validate();
-        if (form.IsValid && ValidateInfo(personInfo))
-        {
 
-        }
+    private void OpenDialog() => visible = true;
+    void CloseDialog() => visible = false;
 
-       DialogService.Show<Dialog>("Por favor ingrese el código de confirmación enviado a su email: ");
+    private DialogOptions dialogOptions = new() { FullWidth = true };
+
+
+    private string CreateConfirmationCode()
+    {
+        int confirmationCode = random.Next(100000,999999); 
+        string confirmationCodeString = confirmationCode.ToString();
+        return confirmationCodeString;
     }
 
     async Task SavePersonInfo()
@@ -172,31 +189,78 @@
         await form.Validate();
         if (form.IsValid && ValidateInfo(personInfo))
         {
-            await PersonService.CreatePersonAsync(personInfo);
-            await EmployerService.CreateEmployerAsync(personInfo.Email);
             accountData.Email = personInfo.Email;
-
             bool emailExist = await AuthenticationService.emailIsAlreadyRegistered(accountData.Email);
+            confirmationCodeEmail = CreateConfirmationCode();
             if (emailExist)
             {
                 ShowSnackNotification("El email ya se encuentra en uso", Severity.Error);
             }
             else
             {
-                int confirmationCode = random.Next(100000,999999); 
-                string confirmationCodeString = confirmationCode.ToString();
-                EmailService.SendConfirmationEmail("El siguiente código es el que tienes que ingresar para verificar tu email:  " + confirmationCodeString, accountData.Email);
-                await AuthenticationService.RegisterRequestAsync(accountData);
-                await AuthorizationService.assignRole( accountData.Email, "Employer");
-                snackHandler._saving = false;
-                ShowSnackNotification("Cuenta para "+personInfo.Name+" registrada", Severity.Success);
-                await AuthenticationService.SignInRequestAsync(accountData, true);
-
-            }       
+                OpenDialog();
+                EmailService.SendConfirmationEmail("El siguiente código es el que tienes que ingresar para verificar tu email:  " + confirmationCodeEmail, accountData.Email);
+            }   
         }
         snackHandler._saving = false;
     }
 
+
+    async Task AcceptConfirmationCode(){
+        OpenDialog();
+        open = true;
+        if (open && confirmationCodeEmployer!=null)
+        {
+            if( ConfirmationCodeMatch(confirmationCodeEmployer, confirmationCodeEmail))
+            {
+                ShowSnackNotification("coincide", Severity.Success);
+                await PersonService.CreatePersonAsync(personInfo);
+                await EmployerService.CreateEmployerAsync(personInfo.Email);
+                await AuthenticationService.RegisterRequestAsync(accountData);
+                await AuthorizationService.assignRole( accountData.Email, "Employer");
+                ShowSnackNotification("Cuenta para "+personInfo.Name+" registrada", Severity.Success);
+                await AuthenticationService.SignInRequestAsync(accountData, true);
+                open = false;
+                CloseDialog();
+            }
+            else 
+            {
+                ShowSnackNotification("no coincide", Severity.Error);
+            }      
+        }
+    }
+
+    async Task ResendConfirmationCode(){
+        OpenDialog();
+        open = true;
+        if (open)
+        {
+            confirmationCodeEmail = CreateConfirmationCode();
+            EmailService.SendConfirmationEmail("El siguiente código es el que tienes que ingresar para verificar tu email:  " + confirmationCodeEmail, accountData.Email);
+            ShowSnackNotification("Se ha enviado el nuevo correo", Severity.Success);
+            if (confirmationCodeEmployer!=null)
+            {
+                await AcceptConfirmationCode();
+                open = false;
+                CloseDialog();
+            } 
+        }
+        else 
+        {
+            ShowSnackNotification("No se ha enviado el nuevo correo, espere por favor", Severity.Error);
+        }   
+    }
+
+
+    bool ConfirmationCodeMatch(string confirmationCodeEmployer, string confirmationCodeString)
+    {
+        bool valid = true;
+        if (confirmationCodeEmployer != confirmationCodeString)
+        {
+            valid = false;
+        }
+        return valid;
+    }
     
     bool ValidateSsn(Person personInfo)
     {
