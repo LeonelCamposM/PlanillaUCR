@@ -56,7 +56,7 @@
                     </MudItem>
 
                     <MudItem xs="4">
-                        <MudSelect @bind-Value="agreementObject.ContractType" Label="Tipo de contrato" Variant="Variant.Outlined" Required="true" RequiredError="El tipo de contrato es necesario">
+                        <MudSelect @bind-Value="MyProperty" Label="Tipo de contrato" Variant="Variant.Outlined" Required="true"  RequiredError="El tipo de contrato es necesario">
                             <MudSelectItem Value="@("Tiempo completo")" />
                             <MudSelectItem Value="@("Medio tiempo")" />
                             <MudSelectItem Value="@("Servicios profesionales")" />
@@ -67,7 +67,7 @@
         
                     <MudItem xs="2"> </MudItem>
                     <MudItem xs="4">
-                        <MudNumericField @bind-Value="agreementObject.MountPerHour" Label="Monto por hora" Variant="Variant.Outlined" Required="true" RequiredError="El monto por hora es necesario" HideSpinButtons="true" Min = "0"> </MudNumericField>
+                        <MudNumericField @bind-Value="salaryPerMonth" ReadOnly="true" Label="Monto por hora" Variant="Variant.Outlined" Required="true" OnClick="setSalary()" RequiredError="El monto por hora es necesario" HideSpinButtons="true" Min = "0"> </MudNumericField>
                     </MudItem>
 
                     <MudItem xs="4">
@@ -123,10 +123,30 @@
     private bool _isLoading = true;
     private bool _saving = false;
     private bool _canSend = false;
-    public string ReadOnly { get; set; } = "100 000";
+    public string ReadOnly { get; set; } = "10 000";
     [Parameter] public string EmployerEmail { get; set; }
     [Parameter] public string ProjectName { get; set; }
 
+    AgreementType anAgreementType2 = new AgreementType("",0);
+
+
+    private string myVar;
+
+    public string MyProperty
+    {
+        get { return myVar; }
+        set
+        {
+            myVar = value;
+            SomeMethod();
+        }
+    }
+
+    private void SomeMethod()
+    {
+        ShowSnackNotification("Prueba de concepto: ", Severity.Error);
+        salaryPerMonth = 4;
+    }
 
     private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
     {
@@ -139,7 +159,6 @@
         agreementObject.EmployerEmail = EmployerEmail;
         agreementObject.ProjectName = ProjectName;
         IEnumerable<AgreementType> agreementList = await AgreementTypeService.GetTypesOfAgreement(anAgreementType);
-        AgreementType anAgreementType2 = new AgreementType("",0);
 
         for (int index = 0; index < agreementList.Length(); index++)
         {
@@ -228,7 +247,7 @@
     {
         DateTime lstartDate = (DateTime)startDate;
         DateTime lendDate = (DateTime)endDate;
-        @* agreementObject.ContractStartDate = lstartDate.ToString(format); 
+    @* agreementObject.ContractStartDate = lstartDate.ToString(format); 
         agreementObject.ContractFinishDate = lendDate.ToString(format); *@
         agreementObject.ContractStartDate = startDate;
         agreementObject.ContractFinishDate = endDate;
@@ -237,7 +256,7 @@
     async Task<bool> validateEmployeeEmail(string employeeEmail)
     {
         bool valid = true;
-        @*TODO FaltaValidar que Este o NO este en la tabla de contratos*@
+    @*TODO FaltaValidar que Este o NO este en la tabla de contratos*@
 
         IEnumerable<Employee> employeeList = await EmployeeService.GetEmployeeByEmail(employeeEmail);
          
@@ -262,7 +281,7 @@
     async Task<bool> validateEmployerEmail(string employerEmail)
     {
         bool valid = true;
-        @*TODO CreateEmployerEmailCheck*@
+    @*TODO CreateEmployerEmailCheck*@
         IEnumerable<Person> personList = await PersonService.GetPersonByEmail(employerEmail);
         if (personList.Length() == 0)
         {
@@ -272,5 +291,21 @@
         return valid;
     }
 
-    
+    async Task<bool> validateTypeOfAgreement(string employerEmail)
+    {
+        bool valid = true;
+    @*TODO CreateEmployerEmailCheck*@
+        IEnumerable<Person> personList = await PersonService.GetPersonByEmail(employerEmail);
+        if (personList.Length() == 0)
+        {
+            valid=false;
+            ShowSnackNotification("El email " + employerEmail + " NO se encuetra en la base de datos", Severity.Error);
+        }
+        return valid;
+    }
+
+    void setSalary()
+    {
+        agreementObject.MountPerHour = 1000;
+    }
 }
