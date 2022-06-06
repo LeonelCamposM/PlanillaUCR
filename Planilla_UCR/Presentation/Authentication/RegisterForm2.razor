@@ -141,8 +141,8 @@
                             </MudItem>
                          </DialogContent>
                         <DialogActions>
-                            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="accept" Class="px-10">Aceptar</MudButton>
-                            <MudButton Variant="Variant.Filled" Color="Color.Transparent" OnClick="Submit" Class="px-10">Volver a enviar</MudButton>
+                            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AcceptConfirmationCode" Class="px-10">Aceptar</MudButton>
+                            <MudButton Variant="Variant.Filled" Color="Color.Transparent" OnClick="CloseDialog" Class="px-10">Volver a enviar</MudButton>
                         </DialogActions>
                     </MudDialog>
 
@@ -170,9 +170,8 @@
     private bool open;
 
 
-
     private void OpenDialog() => visible = true;
-    void Submit()
+    void CloseDialog()
     {
         visible = false;
         open = false;
@@ -211,14 +210,21 @@
     }
 
 
-    void accept(){
-         OpenDialog();
-         open = true;
-         if (open && confirmationCodeEmployer!=null)
-         {
+    async Task AcceptConfirmationCode(){
+        OpenDialog();
+        open = true;
+        if (open && confirmationCodeEmployer!=null)
+        {
             if( ConfirmationCodeMatch(confirmationCodeEmployer, confirmationCodeEmail))
             {
                 ShowSnackNotification("coincide", Severity.Success);
+                await PersonService.CreatePersonAsync(personInfo);
+                await EmployerService.CreateEmployerAsync(personInfo.Email);
+                await AuthenticationService.RegisterRequestAsync(accountData);
+                await AuthorizationService.assignRole( accountData.Email, "Employer");
+                ShowSnackNotification("Cuenta para "+personInfo.Name+" registrada", Severity.Success);
+                await AuthenticationService.SignInRequestAsync(accountData, true);
+                CloseDialog();
             }
             else 
             {
@@ -226,10 +232,6 @@
             }      
          }
     }
-
-
-
-
 
     bool ConfirmationCodeMatch(string confirmationCodeEmployer, string confirmationCodeString)
     {
@@ -240,9 +242,6 @@
         }
         return valid;
     }
-
-
-
     
     bool ValidateSsn(Person personInfo)
     {
