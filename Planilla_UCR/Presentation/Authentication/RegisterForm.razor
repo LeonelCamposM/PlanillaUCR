@@ -318,7 +318,7 @@
             yield return "Debe contener al menos un dígito";
         }
 
-        if(!Regex.IsMatch(pw, @"[!-/]"))
+        if(!Regex.IsMatch(pw, @"[!-/:;<=>?@[\]^_'{|}~]"))
         {
             yield return "Debe contener al menos un símbolo";
         }
