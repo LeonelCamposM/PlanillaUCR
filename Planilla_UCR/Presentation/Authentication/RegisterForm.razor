@@ -213,7 +213,7 @@
         {
             if( ConfirmationCodeMatch(confirmationCodeEmployer, confirmationCodeEmail))
             {
-                ShowSnackNotification("coincide", Severity.Success);
+                ShowSnackNotification("Coincide el código de confirmación", Severity.Success);
                 await PersonService.CreatePersonAsync(personInfo);
                 await EmployerService.CreateEmployerAsync(personInfo.Email);
                 await AuthenticationService.RegisterRequestAsync(accountData);
@@ -225,7 +225,7 @@
             }
             else 
             {
-                ShowSnackNotification("no coincide", Severity.Error);
+                ShowSnackNotification("No coincide el código de confirmación", Severity.Error);
             }      
         }
     }
