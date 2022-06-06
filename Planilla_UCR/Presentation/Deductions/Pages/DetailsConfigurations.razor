@@ -58,7 +58,7 @@ else
                 <MudItem xs="2">
                 </MudItem>
                 <MudItem xs="8">
-                    <MudTextField @bind-Value="subscription.SubscriptionName" MaxLength="255" Label="Nombre" Variant="Variant.Outlined" ReadOnly = "@_disabled"></MudTextField>
+                    <MudTextField @bind-Value="newName" MaxLength="255" Label="Nombre" Variant="Variant.Outlined" ReadOnly = "@_disabled"></MudTextField>
                 </MudItem>
                 <MudItem xs="2">
                 </MudItem>
@@ -117,6 +117,7 @@ else
 @code {
     private bool _loading = true;
     private bool _disabled = true;
+    private string newName = "";
     public Subscription subscription = new Subscription("", "", "", "", "", 0.0, 0, 1);
     MudForm form;
     SnackHandler snackHandler = new SnackHandler();
@@ -129,6 +130,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         subscription = await SubscriptionService.GetSubscription(employerEmail, projectName, subscriptionName);
+        newName = subscription.SubscriptionName;
         if (subscription != null)
         {
             _loading = false;
@@ -142,7 +144,17 @@ else
         if (form.IsValid)
         {
             snackHandler._saving = false;
-            ShowSnackNotification("Deducción "+subscription.SubscriptionName+" modificada", Severity.Success);
+            bool isModified = await SubscriptionService.ModifySubscription(subscription, newName);
+            if (isModified)
+            {
+                ShowSnackNotification("Deducción "+subscription.SubscriptionName+" modificada", Severity.Success);
+                DisableForm();
+            }
+            else
+            {
+                ShowSnackNotification("Deducción "+subscription.SubscriptionName+" no pudo ser modificada", Severity.Success);
+                newName = subscription.SubscriptionName;
+            }
         }
 
         snackHandler._saving = false;

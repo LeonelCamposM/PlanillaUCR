@@ -1,7 +1,9 @@
 ﻿using Domain.Core.Repositories;
 using Domain.Subscriptions.Entities;
 using Domain.Subscriptions.Repositories;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -63,8 +65,30 @@ namespace Infrastructure.Subscriptions.Repositories
             return subscriptionResult;
         }
 
-        public async Task<bool> ModifySubscription(Subscription subscription) {
+        public async Task<bool> ModifySubscription(Subscription subscription, string newName) 
+        {
+            var EmployerEmail = new SqlParameter("EmployerEmail", subscription.EmployerEmail);
+            var ProjectName = new SqlParameter("ProjectName", subscription.ProjectName);
+            var SubscriptionName = new SqlParameter("SubscriptionName", subscription.SubscriptionName);
+            var NewSubscriptionName = new SqlParameter("NewSubscriptionName", newName);
+            var ProviderName = new SqlParameter("ProviderName", subscription.ProviderName);
+            var SubscriptionDescription = new SqlParameter("SubscriptionDescription", subscription.SubscriptionDescription);
+            var Cost = new SqlParameter("Cost", subscription.Cost);
+            var TypeSubscription = new SqlParameter("TypeSubscription", subscription.TypeSubscription);
+            var IsEnabled = new SqlParameter("IsEnabled", subscription.IsEnabled);
+            var Transaction = new SqlParameter("Transaction", 0);
+            Transaction.Direction = System.Data.ParameterDirection.Output;
 
+            var nameList = await _dbContext.Subscriptions.FromSqlRaw("EXEC ModifySubscription @EmployerEmail," +
+                "@ProjectName, @SubscriptionName, @NewSubscriptionName, @ProviderName, @SubscriptionDescription," +
+                "@Cost, @TypeSubscription, @IsEnabled, @Transaction OUTPUT", EmployerEmail, ProjectName,
+                SubscriptionName, NewSubscriptionName, ProviderName, SubscriptionDescription, Cost,
+                TypeSubscription, IsEnabled, Transaction).ToListAsync();
+
+            if (Convert.ToInt32(Transaction.Value) == 1) {
+                return true;
+            }
+            else
             return false;
         }
     }
