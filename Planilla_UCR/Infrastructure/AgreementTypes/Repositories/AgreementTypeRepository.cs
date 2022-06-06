@@ -30,16 +30,21 @@ namespace Infrastructure.AgreementTypes.Repositories
         }
   
         public async Task<IEnumerable<AgreementType>>? GetTypesOfAgreement(AgreementType agreement) 
-        { 
+        {
             // TODO Look for better names && test it
-            IList<AgreementType> agreementTpeList = await _dbContext.AgreementTypes.Where
-                (e => e.TypeAgreement == agreement.TypeAgreement && e.MountPerHour == agreement.MountPerHour).ToListAsync();
+            /*
+            IList<AgreementType> agreementTypeList = await _dbContext.AgreementTypes.Where
+                (e => e.TypeAgreement == *).ToListAsync();
             AgreementType agreementAux = null;
-            if (agreementTpeList.Length() > 0)
+            if (agreementTypeList.Length() > 0)
             {
-                agreementAux = agreementTpeList.First();
+                agreementAux = agreementTypeList.First();
             }
-            return agreementTpeList;
+            return agreementTypeList;
+            */
+
+            var agreementTypeList = await _dbContext.AgreementTypes.FromSqlRaw("EXEC GetTypesOfAgreement").ToListAsync();
+            return agreementTypeList;
         }
 
 

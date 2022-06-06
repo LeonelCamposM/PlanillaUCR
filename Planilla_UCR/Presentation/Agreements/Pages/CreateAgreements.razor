@@ -15,9 +15,14 @@
 @using Domain.Employers.Entities
 @using Domain.Employers.DTOs
 
+@using Application.AgreementTypes
+@using Domain.AgreementTypes.Entities
+@using Domain.AgreementTypes.DTOs
+
 
 @inject ISnackbar Snackbar
 @inject IAgreementService AgreementService
+@inject IAgreementTypeService AgreementTypeService
 @inject IPersonService PersonService
 @inject IEmployeeService EmployeeService
 @inject IEmployerService EmployerService
@@ -107,6 +112,7 @@
 @code{
     Agreement agreementObject = new Agreement("", "", "", null, "", 0, null);
     Agreement anAgreement = new Agreement("", "", "", null, "", 0, null);
+    AgreementType anAgreementType = new AgreementType("",0);
 
     MudForm form;
     DateTime? startDate;
@@ -132,6 +138,14 @@
     {
         agreementObject.EmployerEmail = EmployerEmail;
         agreementObject.ProjectName = ProjectName;
+        IEnumerable<AgreementType> agreementList = await AgreementTypeService.GetTypesOfAgreement(anAgreementType);
+        AgreementType anAgreementType2 = new AgreementType("",0);
+
+        for (int index = 0; index < agreementList.Length(); index++)
+        {
+            ShowSnackNotification("Lista de agreementTypes: " + agreementList.ElementAt(index).TypeAgreement +"En vuelta: "+ index, Severity.Error);
+        }
+       
 
     }
 
@@ -226,8 +240,7 @@
         @*TODO FaltaValidar que Este o NO este en la tabla de contratos*@
 
         IEnumerable<Employee> employeeList = await EmployeeService.GetEmployeeByEmail(employeeEmail);
-        @*IEnumerable<Agreement> agreementList = await AgreementService.GetContracteeByEmail(agreementObject);*@
-               
+         
         anAgreement = await AgreementService.GetContracteeByEmail(agreementObject);
 
         if (employeeList.Length() == 0)
