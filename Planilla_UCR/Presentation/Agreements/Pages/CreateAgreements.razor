@@ -230,16 +230,16 @@
                
         anAgreement = await AgreementService.GetContracteeByEmail(agreementObject);
 
-        if (employeeList.Length() != 0)
+        if (employeeList.Length() == 0)
         {   
             valid=false;
 
-            ShowSnackNotification("El email " + employeeEmail + " se encuentra en uso en el proyecto ", Severity.Error);
+            ShowSnackNotification("El email " + employeeEmail + " NO se encuentra en registrado en el sistema, no es posible asignarlo al contrato ", Severity.Error);
         }
-        if (anAgreement == null) @*Check This *@
+        if (anAgreement != null) @*Check This *@
         {
             valid=false;
-            ShowSnackNotification("El email " + employeeEmail + " no se encuentra registrado en el sistema", Severity.Error);
+            ShowSnackNotification("El email " + employeeEmail + " ya posee un contrato con el proyecto : del empleador: ", Severity.Error);
 
         }
 

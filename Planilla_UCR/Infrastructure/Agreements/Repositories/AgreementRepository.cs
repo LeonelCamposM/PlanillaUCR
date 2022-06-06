@@ -49,6 +49,7 @@ namespace Infrastructure.Agreements.Repositories
         */
         public async Task<Agreement>? GetContracteeByEmail(Agreement agreement)
         {
+            // TODO Look for better 
             IList<Agreement> agreementList = await _dbContext.Agreements.Where
                 (e => e.EmployeeEmail == agreement.EmployeeEmail && e.EmployerEmail == agreement.EmployerEmail
                 && e.ProjectName == agreement.ProjectName).ToListAsync();

@@ -10,6 +10,8 @@ using Application.Employers;
 using Application.Employers.Implementations;
 using Application.Agreements;
 using Application.Agreements.Implementations;
+using Application.AgreementTypes;
+using Application.AgreementTypes.Implementations;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Application
@@ -25,6 +27,8 @@ namespace Application
             services.AddTransient<IAccountService, AccountService>();
             services.AddTransient<IEmployerService, EmployerService>();
             services.AddTransient<IAgreementService, AgreementService>();
+            services.AddTransient<IAgreementTypeService, AgreementTypeService>();
+
 
             return services;
         }

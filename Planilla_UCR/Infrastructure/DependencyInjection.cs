@@ -15,6 +15,9 @@ using Domain.Accounts.Repositories;
 using Infrastructure.Agreements;
 using Infrastructure.Agreements.Repositories;
 using Domain.Agreements.Repositories;
+using Infrastructure.AgreementTypes;
+using Infrastructure.AgreementTypes.Repositories;
+using Domain.AgreementTypes.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Infrastructure.Employers;
@@ -43,6 +46,9 @@ namespace Infrastructure
 
             services.AddDbContext<AgreementDbContext>(options => options.UseSqlServer(connectionString));
             services.AddScoped<IAgreementRepository, AgreementRepository>();
+
+            services.AddDbContext<AgreementTypeDbContext>(options => options.UseSqlServer(connectionString));
+            services.AddScoped<IAgreementTypeRepository, AgreementTypeRepository>();
             return services;
         }
     }
