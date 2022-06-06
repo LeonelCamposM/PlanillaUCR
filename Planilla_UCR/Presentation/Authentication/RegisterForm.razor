@@ -317,6 +317,11 @@
         {
             yield return "Debe contener al menos un dígito";
         }
+
+        if(!Regex.IsMatch(pw, @"[!-/]"))
+        {
+            yield return "Debe contener al menos un símbolo";
+        }
     }
 
     private string PasswordMatch(string arg)
