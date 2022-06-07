@@ -33,7 +33,7 @@ CREATE TABLE Employer(
 CREATE TABLE Project(
 	EmployerEmail varchar(255) NOT NULL,
 	ProjectName varchar(255) NOT NULL,
-	ProjectDescription varchar(255),
+	ProjectDescription varchar(600),
 	MaximumAmountForBenefits int, 
 	MaximumBenefitAmount int,
 	PaymentInterval varchar(255),
