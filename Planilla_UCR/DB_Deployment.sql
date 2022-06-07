@@ -108,7 +108,6 @@ BEGIN
 	IF ((@NewSubscriptionName in (SELECT SubscriptionName FROM Subscription WHERE EmployerEmail = @EmployerEmail AND ProjectName = @ProjectName)) AND (@SubscriptionName <> @NewSubscriptionName))
 	BEGIN 
 		SET @Transaction = 0;
-		SELECT * FROM Subscription WHERE  EmployerEmail= @EmployerEmail AND ProjectName = @ProjectName AND SubscriptionName = @SubscriptionName;
 	END
 	ELSE
 		BEGIN
@@ -117,7 +116,6 @@ BEGIN
 			UPDATE Subscription
 			SET SubscriptionName = @NewSubscriptionName, SubscriptionDescription = @SubscriptionDescription,Cost = @Cost, ProviderName = @ProviderName 
 			WHERE EmployerEmail= @EmployerEmail AND ProjectName = @ProjectName AND SubscriptionName = @SubscriptionName;
-			SELECT * FROM Subscription WHERE  EmployerEmail= @EmployerEmail AND ProjectName = @ProjectName AND SubscriptionName = @NewSubscriptionName;
 		END
 END
 
