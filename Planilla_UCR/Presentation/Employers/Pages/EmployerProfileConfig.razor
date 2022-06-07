@@ -1,0 +1,248 @@
+﻿@page "/Employer_Profile/{employerEmail}/Configurations"
+
+@using Domain.Authentication.DTOs
+@using Domain.Employers.Entities
+@using Domain.Employers.DTOs
+@using Domain.People.Entities
+@using Application.Employers
+@using Application.People
+@using Application.Email
+@using Presentation.Shared.Models
+@using Presentation.Core.Components
+@using System.Text.RegularExpressions
+@using System.ComponentModel.DataAnnotations
+@inject NavigationManager nav
+@inject IPersonService PersonService
+@inject NavigationManager nav
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+@inject IPersonService PersonService
+@inject IEmployerService EmployerService
+
+@if(_loading) {
+
+    <MudPaper  Height="220px" Width="100%" Outlined="false" Class="border-none pa-4" Elevation="0">
+         <MudText Align="Align.Center" Typo="Typo.h6">
+              <MudProgressCircular Color="Color.Secondary" Style="height:70px;width:70px;" Indeterminate="true" />
+         </MudText>
+       
+    </MudPaper>
+}else{
+    @if (!_empty && !_loading)
+    {
+          
+        List<BreadcrumbItem> _items = new List<BreadcrumbItem>
+        {
+            new BreadcrumbItem("Proyectos", href: $"Projects/{employerEmail}"),
+            new BreadcrumbItem("Mi perfil empleador", href: $"Employer_Profile/{employerEmail}"),
+            new BreadcrumbItem("Configuraciones", href: $"Employer_Profile/{employerEmail}/Configurations")
+        };
+
+        <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
+
+    <MudItem xs="10" sm="12">
+        <MudPaper  Height="220px" Width="100%" Outlined="false" Class="border-none pa-4" Elevation="0">
+            <MudSpacer></MudSpacer>
+            <MudText Align="Align.Center" Typo="Typo.h6">Editar cuenta empleador</MudText>
+             <MudSpacer></MudSpacer>
+             <MudItem xs="12"></MudItem>
+             <MudSpacer></MudSpacer>
+            <MudForm @ref="form">
+                    <MudGrid>
+                    @*Small fields *@
+                    <MudItem xs="2"></MudItem>
+                    <MudItem xs="4">
+                        <MudTextField @bind-Value="personInfo.Name" Label="@employerData.Name" Variant="Variant.Outlined" Required="true" RequiredError="Campo requerido"></MudTextField>
+                    </MudItem>
+
+                    <MudItem xs="4">
+                        <MudTextField @bind-Value="personInfo.LastName1" Label="@employerData.LastName1" Variant="Variant.Outlined"></MudTextField>
+                    </MudItem>
+                    <MudItem xs="2"></MudItem>
+
+
+                    <MudItem xs="2"></MudItem>
+                    <MudItem xs="4">
+                        <MudTextField @bind-Value="personInfo.LastName2" Label="@employerData.LastName2" Variant="Variant.Outlined"></MudTextField>
+                    </MudItem>
+                  
+                    <MudItem xs="4">
+                        <MudTextField @bind-Value="personInfo.Ssn" Label="Cédula" Variant="Variant.Outlined" Required="true" RequiredError="Campo requerido"></MudTextField>
+                    </MudItem>
+                    <MudItem xs="2"></MudItem>
+
+
+                    <MudItem xs="2"></MudItem>
+                    <MudItem xs="8">
+                        <MudTextField @bind-Value="personInfo.BankAccount" Label="@employerData.BankAccount" Variant="Variant.Outlined" Required="true" RequiredError="Campo requerido"></MudTextField>
+                    <MudDivider />
+                    </MudItem>
+                    <MudItem xs="2"></MudItem>
+
+                     @*Large fields *@
+                    <MudItem xs="2"></MudItem>
+                    <MudItem xs="8">
+                        <MudTextField @bind-Value="personInfo.Adress" Label="@employerData.Adress" Variant="Variant.Outlined"></MudTextField>
+                    </MudItem>
+                    <MudItem xs="2"></MudItem>
+
+                   
+                    <MudItem xs="2"></MudItem>
+                     <MudItem xs="4">
+                        <MudTextField @bind-Value="personInfo.PhoneNumber" Label="@employerData.PhoneNumber" Variant="Variant.Outlined" ></MudTextField>
+                    </MudItem>
+                    <MudItem xs="6"></MudItem>
+                     <MudSpacer></MudSpacer>
+                     <MudItem xs="12"></MudItem>
+                    <MudSpacer></MudSpacer>
+                    @*Create buton *@
+                    <MudItem xs="2"></MudItem>
+                    
+                        <MudButton Disabled="@snackHandler._saving" @onclick="Modificar" Variant="Variant.Filled" Color="Color.Secondary">
+                            @if (snackHandler._saving)
+                            {
+                                <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true"/>
+                                <MudText Class="ms-2">Procesando</MudText>
+                            }
+                            else
+                            {
+                                <MudText>Modificar</MudText>
+                                    
+                            }
+                          
+                        </MudButton>
+                           
+                         <MudButton Disabled="true"> </MudButton>
+                        @*Clear buton *@
+                        <MudButton OnClick="CleanForm" Variant="Variant.Filled" Color="Color.Transparent">
+                                <MudText>Cancelar</MudText>
+                        </MudButton>
+
+                         
+                     <MudItem xs="2"></MudItem>
+
+                </MudGrid>
+            </MudForm>
+        </MudPaper>
+    </MudItem>
+
+
+    }
+    else
+    {
+        <MudText Align="Align.Center" Typo="Typo.h4"> Email incorrecto</MudText>
+    }
+}
+
+
+@code {
+    private bool _hidePosition;
+    private bool _loading = true;
+    private bool _empty = true;
+    Person personInfo = new Person("", "", "", "", Int32.Parse("0"), "", "", "");
+    public Person employerData = new Person("", "", "", "", Int32.Parse("0"), "", "", "");
+    [Parameter] public string employerEmail { get; set; }
+    private IEnumerable<Person> _elements = new List<Person>();  
+    SnackHandler snackHandler = new SnackHandler();
+    MudForm form;
+
+
+      protected override async Task OnInitializedAsync()
+    {
+        personInfo.Email = employerEmail;
+        _elements = await PersonService.GetAllInfoEmployer(personInfo);
+        employerData = _elements.FirstOrDefault();
+        if ( _elements.Length() == 0){
+            _empty = true;
+        }
+        else{
+            _empty = false;
+        }
+        _loading = false;
+    }
+
+    async Task SavePersonInfo()
+    {
+        snackHandler._saving = true;
+        await form.Validate();
+        if (form.IsValid && ValidateInfo(personInfo)){
+             ShowSnackNotification("Cuenta para "+personInfo.Name+" modificada", Severity.Success);
+
+
+
+
+        }
+        snackHandler._saving = false;
+    }
+
+    bool ValidateSsn(Person personInfo)
+    {
+        bool valid = true;
+        if (personInfo.Ssn == 0 || personInfo.Ssn < 0)
+        {
+            ShowSnackNotification("Número de cédula incorrecta", Severity.Error);
+            valid = false;
+        }
+        return valid;
+    }
+
+    bool ValidateEmail(Person personInfo)
+    {
+        bool valid = true;
+
+        valid = personInfo.Email.Contains('@');
+        if (!valid)
+        {
+            ShowSnackNotification("El email debe contener un @", Severity.Error);
+        }
+        return valid;
+    }
+
+    bool ValidateInfo(Person personInfo)
+    {
+        bool ssn = ValidateSsn(personInfo);
+        bool email = ValidateEmail(personInfo);
+        return ssn && email;
+    }
+
+
+    void ShowSnackNotification(string message, Severity severity)
+    {
+        Snackbar.Configuration.SnackbarVariant = Variant.Filled;
+        Snackbar.Configuration.PreventDuplicates = false;
+        Snackbar.Configuration.MaxDisplayedSnackbars = 10;
+        Snackbar.Configuration.NewestOnTop = true;
+        Snackbar.Add($"{message}", severity, config =>
+        {
+            config.RequireInteraction = false;
+            config.ShowCloseIcon = true;
+            config.Onclick = snackbar =>
+            {
+                return Task.CompletedTask;
+            };
+        });
+    }
+
+    void CleanForm()
+    {
+        personInfo.Name = "";
+        personInfo.LastName1 = "";
+        personInfo.LastName2 = "";
+        personInfo.Adress = "";
+        personInfo.BankAccount = "";
+        personInfo.PhoneNumber = "";
+        personInfo.Ssn = 0;
+    }
+
+  
+
+    private void Modificar()
+    {
+        nav.NavigateTo($"Projects/{employerEmail}");
+    }
+
+    private void GoToModifyPerfilForm()
+    {
+        nav.NavigateTo($"Projects/{employerEmail}");
+    }
+}

@@ -97,9 +97,7 @@
     public Person employerData = new Person("", "", "", "", Int32.Parse("0"), "", "", "");
     [Parameter] public string employerEmail { get; set; }
     private IEnumerable<Person> _elements = new List<Person>();  
-    private MudTable<Person> _table;
-     private bool _disabled = true;
-
+  
     protected override async Task OnInitializedAsync()
     {
         personInfo.Email = employerEmail;
@@ -122,6 +120,6 @@
 
     private void GoToModifyPerfilForm()
     {
-        nav.NavigateTo($"Projects/{employerEmail}");
+        nav.NavigateTo($"/Employer_Profile/{employerEmail}/Configurations");
     }
 }
