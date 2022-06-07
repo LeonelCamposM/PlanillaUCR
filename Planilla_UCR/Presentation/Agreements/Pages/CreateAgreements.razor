@@ -56,18 +56,45 @@
                     </MudItem>
 
                     <MudItem xs="4">
-                        <MudSelect @bind-Value="MyProperty" Label="Tipo de contrato" Variant="Variant.Outlined" Required="true"  RequiredError="El tipo de contrato es necesario">
+                           
+
+                        @*<MudSelect @bind-Value="MyProperty" Label="Tipo de contrato" Variant="Variant.Outlined" Required="true"  RequiredError="El tipo de contrato es necesario">
                             <MudSelectItem Value="@("Tiempo completo")" />
                             <MudSelectItem Value="@("Medio tiempo")" />
                             <MudSelectItem Value="@("Servicios profesionales")" />
                             <MudSelectItem Value="@("Por horas")" />
                         </MudSelect>
+                        *@
+                        @if (!_isLoading)
+                        {
+                            
+                            <MudSelect T="String" @bind-Value="MyProperty" Label="Tipo de contrato" Variant="Variant.Outlined" Required="true"  RequiredError="El tipo de contrato es necesario">
+                                @for (int index = 0; index < agreementList.Length(); index++)
+                                {
+                                    <MudSelectItem T="String" Value="agreementList.ElementAt(index).TypeAgreement"/>
+                                }
+                            </MudSelect>
+
+                        } 
+
+
+
+
                     </MudItem>
                     <MudItem xs="2"> </MudItem>
         
                     <MudItem xs="2"> </MudItem>
                     <MudItem xs="4">
-                        <MudNumericField @bind-Value="salaryPerMonth" ReadOnly="true" Label="Monto por hora" Variant="Variant.Outlined" Required="true" OnClick="setSalary()" RequiredError="El monto por hora es necesario" HideSpinButtons="true" Min = "0"> </MudNumericField>
+                        @if (!_isUpdated)
+                        {
+                            <MudNumericField @bind-Value="finalMountPerHour" ReadOnly="true" Label="Monto por hora" Variant="Variant.Outlined" Required="true" RequiredError="El monto por hora es necesario" HideSpinButtons="true" Min = "0"> </MudNumericField>
+                        } 
+                        else
+                        {
+                            <MudNumericField @bind-Value="agreementObject.MountPerHour" ReadOnly="true" Label="Monto por hora" Variant="Variant.Outlined" Required="true" RequiredError="El monto por hora es necesario" HideSpinButtons="true" Min = "0"> </MudNumericField>
+
+                        }
+
                     </MudItem>
 
                     <MudItem xs="4">
@@ -124,13 +151,19 @@
     private bool _saving = false;
     private bool _canSend = false;
     public string ReadOnly { get; set; } = "10 000";
+
+    public int? finalMountPerHour { get; set; }
+
     [Parameter] public string EmployerEmail { get; set; }
     [Parameter] public string ProjectName { get; set; }
 
     AgreementType anAgreementType2 = new AgreementType("",0);
 
+    IEnumerable<AgreementType> agreementList;
 
-    private string myVar;
+
+    private bool _isUpdated = false;
+
 
     public string MyProperty
     {
@@ -142,17 +175,22 @@
         }
     }
 
-    async Task<bool> SomeMethod()
+    async void SomeMethod()
     {
-        ShowSnackNotification("Prueba de concepto: ", Severity.Error);
-        salaryPerMonth = 4;
-        int newSalary = salaryPerMonth ?? default(int);  
+        IEnumerable<AgreementType> salaryList = await AgreementTypeService.GetSalaryPerAgreement(agreementObject.ContractType);
+        finalMountPerHour = salaryList.ElementAt(0).MountPerHour;
+        await InvokeAsync(StateHasChanged);
+        ShowSnackNotification("Prueba de salario: " + salaryList.ElementAt(0).MountPerHour, Severity.Error);
+        ShowSnackNotification("Prueba de salario: " + finalMountPerHour, Severity.Error);
 
-        IEnumerable<AgreementType> salaryList = await AgreementTypeService.GetSalaryPerAgreement(agreementObject.ContractType, newSalary);
-        salaryPerMonth = salaryList.ElementAt(0).MountPerHour;
-        ShowSnackNotification("Prueba de salario: " +salaryPerMonth, Severity.Error);
+        agreementObject.MountPerHour = salaryList.ElementAt(0).MountPerHour;
+        _isUpdated = true;
+    @*
+        IEnumerable<AgreementType> agreementTypesList = await AgreementTypeService.GetSalaryPerAgreement(agreementObject.ContractType);
+        agreementObject.MountPerHour = agreementTypesList.ElementAt(0).MountPerHour;
+        salaryPerMonth = agreementObject.MountPerHour;
+        *@
 
-        return true;
     }
 
     private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
@@ -163,15 +201,16 @@
 
     protected override async Task OnInitializedAsync()
     {
+        agreementList = await AgreementTypeService.GetTypesOfAgreement();
+
         agreementObject.EmployerEmail = EmployerEmail;
         agreementObject.ProjectName = ProjectName;
-        IEnumerable<AgreementType> agreementList = await AgreementTypeService.GetTypesOfAgreement(anAgreementType);
-
         for (int index = 0; index < agreementList.Length(); index++)
         {
             ShowSnackNotification("Lista de agreementTypes: " + agreementList.ElementAt(index).TypeAgreement +"En vuelta: "+ index, Severity.Error);
         }
        
+        _isLoading = false;
 
     }
 

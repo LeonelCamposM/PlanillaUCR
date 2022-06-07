@@ -20,14 +20,14 @@ namespace Application.AgreementTypes.Implementations
             await _agreementTypeRepository.CreateAgreementTypeAsync(agreement);
         }
 
-        public async Task<IEnumerable<AgreementType>>? GetTypesOfAgreement(AgreementType agreement)
+        public async Task<IEnumerable<AgreementType>>? GetTypesOfAgreement()
         {
-            return await _agreementTypeRepository.GetTypesOfAgreement(agreement);
+            return await _agreementTypeRepository.GetTypesOfAgreement();
         }
 
-        public async Task<IEnumerable<AgreementType>>? GetSalaryPerAgreement(string typeOfAgreement, int salary)
+        public async Task<IEnumerable<AgreementType>>? GetSalaryPerAgreement(string typeOfAgreement)
         {
-            return await _agreementTypeRepository.GetSalaryPerAgreement(typeOfAgreement, salary);
+            return await _agreementTypeRepository.GetSalaryPerAgreement(typeOfAgreement);
         }
     }
 }

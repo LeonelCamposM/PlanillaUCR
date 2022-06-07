@@ -29,7 +29,7 @@ namespace Infrastructure.AgreementTypes.Repositories
             await _dbContext.SaveEntitiesAsync();
         }
   
-        public async Task<IEnumerable<AgreementType>>? GetTypesOfAgreement(AgreementType agreement) 
+        public async Task<IEnumerable<AgreementType>>? GetTypesOfAgreement() 
         {
             // TODO Look for better names && test it
             /*
@@ -48,7 +48,7 @@ namespace Infrastructure.AgreementTypes.Repositories
         }
 
 
-        public async Task<IEnumerable<AgreementType?>> GetSalaryPerAgreement(string Agreement, int salary)
+        public async Task<IEnumerable<AgreementType?>> GetSalaryPerAgreement(string Agreement)
         {
             var agreementsSalary = await _dbContext.AgreementTypes.FromSqlRaw("EXEC GetSalaryPerAgreement @Agreement",
                 new SqlParameter("@Agreement", Agreement)).ToListAsync();

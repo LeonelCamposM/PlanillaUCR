@@ -9,7 +9,7 @@ namespace Application.AgreementTypes
     {
         Task CreateAgreementTypeAsync(AgreementType agreement);
 
-        Task<IEnumerable<AgreementType>>? GetTypesOfAgreement(AgreementType agreement);
-        Task<IEnumerable<AgreementType>>? GetSalaryPerAgreement(string typeOfAgreement, int salary);
+        Task<IEnumerable<AgreementType>>? GetTypesOfAgreement();
+        Task<IEnumerable<AgreementType>>? GetSalaryPerAgreement(string typeOfAgreement);
     }
 }
