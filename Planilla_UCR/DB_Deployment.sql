@@ -14,12 +14,6 @@ Create Table Person(
 	PhoneNumber varchar(255)
 );
 
-CREATE TABLE Account(
-	Email varchar(255) NOT NULL PRIMARY KEY,
-	UserPassword VARBINARY(500) NOT NULL,
-    FOREIGN KEY(Email) REFERENCES Person(Email),
-);
-
 CREATE TABLE Employee(
 	Email varchar(255) NOT NULL PRIMARY KEY,
 	FOREIGN KEY(Email) REFERENCES Person(Email)
@@ -154,10 +148,12 @@ END
 -- Employee Stored Procedures
 GO
 CREATE PROCEDURE [dbo].[GetAllEmployees]
+@projectName VARCHAR(255)
 AS
 BEGIN
-	SELECT Employee.Email, Person.Name, Person.LastName1, Person.LastName2, Person.SSN, Person.BankAccount, Person.Adress, Person.PhoneNumber
-	FROM Employee JOIN  Person ON Employee.Email = Person.Email
+	SELECT P.Email, P.Name, P.LastName1, P.LastName2, P.SSN, P.BankAccount, P.Adress, P.PhoneNumber
+	FROM Employee JOIN  Person AS P ON Employee.Email = P.Email left JOIN Agreement as A ON A.EmployeeEmail = Employee.Email
+	Where A.ProjectName IS NULL OR A.ProjectName != @projectName
 END
 
 GO
@@ -175,30 +171,6 @@ CREATE PROCEDURE GetEmployeeByEmail(@email varchar(255))
 AS
 BEGIN
     SELECT * FROM Employee AS E WHERE E.Email = @email
-END
-
--- Account Stored Procedures
-GO
-CREATE Procedure EmailCheckLoggin(@UserEmail varchar(255))
-AS
-BEGIN
-    Select * from Account where Account.Email = @UserEmail
-END
-
-GO
-Create proc InsertDataToAccountWithPasswordEncripted(@EmailAccount varchar(255),@UserPasswordToEncrypt varchar(255))
-As 
-Declare @UserPassword varbinary(150)
-Declare @EncryptedPassword varbinary(150)
-Set @UserPassword = CONVERT(varbinary(150),@UserPasswordToEncrypt);
-Set @EncryptedPassword = HASHBYTES('SHA2_256', @UserPassword);
-Insert into Account values (@EmailAccount, @EncryptedPassword) 
-
-GO
-CREATE PROCEDURE PasswordCheckLoggin(@UserEmail varchar(255), @UserPassword varchar(255))
-AS
-BEGIN
-	Select * from Account where [UserPassword] =  HASHBYTES('SHA2_256',@UserPassword) AND Account.Email = @UserEmail
 END
 
 -- Data Insert
@@ -358,3 +330,4 @@ VALUES('Empleado fijo', 22)
 
 INSERT INTO Agreement
 VALUES('mau@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Proyecto 1', '9999-12-31','Empleado fijo',22, '9999-12-31')
+
