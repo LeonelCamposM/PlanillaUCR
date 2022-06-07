@@ -48,8 +48,12 @@ namespace Infrastructure.AgreementTypes.Repositories
         }
 
 
+        public async Task<IEnumerable<AgreementType?>> GetSalaryPerAgreement(string Agreement, int salary)
+        {
+            var agreementsSalary = await _dbContext.AgreementTypes.FromSqlRaw("EXEC GetSalaryPerAgreement @Agreement",
+                new SqlParameter("@Agreement", Agreement)).ToListAsync();
+            return agreementsSalary;
 
-
-
+        }
     }
 }

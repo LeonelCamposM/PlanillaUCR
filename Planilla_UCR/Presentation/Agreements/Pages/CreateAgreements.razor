@@ -134,18 +134,25 @@
 
     public string MyProperty
     {
-        get { return myVar; }
+        get { return agreementObject.ContractType; }
         set
         {
-            myVar = value;
+            agreementObject.ContractType = value;
             SomeMethod();
         }
     }
 
-    private void SomeMethod()
+    async Task<bool> SomeMethod()
     {
         ShowSnackNotification("Prueba de concepto: ", Severity.Error);
         salaryPerMonth = 4;
+        int newSalary = salaryPerMonth ?? default(int);  
+
+        IEnumerable<AgreementType> salaryList = await AgreementTypeService.GetSalaryPerAgreement(agreementObject.ContractType, newSalary);
+        salaryPerMonth = salaryList.ElementAt(0).MountPerHour;
+        ShowSnackNotification("Prueba de salario: " +salaryPerMonth, Severity.Error);
+
+        return true;
     }
 
     private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
