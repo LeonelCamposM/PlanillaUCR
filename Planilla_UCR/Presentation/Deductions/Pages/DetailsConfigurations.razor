@@ -87,24 +87,23 @@ else
 
                 @if(_disabled == false)
                 {
-                <MudItem xs="12" sm="6" md="4">
-                    <MudItem xs="2"></MudItem>  
+                 <MudItem xs="8" >
                     <MudButton Disabled="@snackHandler._saving" OnClick="SaveDeduction" Variant="Variant.Filled" Color="Color.Secondary">
                         @if (snackHandler._saving)
                         {
                             <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true"/>
-                            <MudText Class="ms-2">Guardando</MudText>
+                            <MudText Class="ms-2">Modificando</MudText>
                         }
                         else
                         {
                             <MudText>Actualizar</MudText>
                         }
                     </MudButton>
-                </MudItem>
-                <MudItem xs="12" sm="6" md="4">
-                            <MudButton OnClick="CleanForm" Variant="Variant.Filled" Color="Color.Transparent">
-                                    <MudText>Limpiar</MudText>
-                            </MudButton>
+                    <MudButton Disabled="true"> </MudButton>
+                    @*Clear buton *@
+                    <MudButton OnClick="CleanForm" Variant="Variant.Filled" Color="Color.Transparent">
+                            <MudText>Cancelar</MudText>
+                    </MudButton>
                 </MudItem>
                 }
                 </MudGrid>
@@ -147,12 +146,14 @@ else
             bool isModified = await SubscriptionService.ModifySubscription(subscription, newName);
             if (isModified)
             {
-                ShowSnackNotification("Deducción "+subscription.SubscriptionName+" modificada", Severity.Success);
+                ShowSnackNotification("Deducción " + subscription.SubscriptionName + " modificada", Severity.Success);
+                subscription = await SubscriptionService.GetSubscription(employerEmail, projectName, newName);
+                subscriptionName = newName;
                 DisableForm();
             }
             else
             {
-                ShowSnackNotification("Deducción "+subscription.SubscriptionName+" no pudo ser modificada", Severity.Success);
+                ShowSnackNotification("El nombre de la deducción " + newName + " ya está en uso", Severity.Error);
                 newName = subscription.SubscriptionName;
             }
         }
@@ -192,10 +193,12 @@ else
     private void EnableForm()
     {
         _disabled = false;
+        newName = subscription.SubscriptionName;
     }
 
     private void DisableForm()
     {
         _disabled = true;
+        newName = subscription.SubscriptionName;
     }
 }
