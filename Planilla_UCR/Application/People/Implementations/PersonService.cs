@@ -25,10 +25,6 @@ namespace Application.People.Implementations
             return await _personRepository.GetPersonByEmail(email);
         }
         
-        public async  Task<IEnumerable<Person>> GetAllInfoEmployer(Person personInfo)
-        {
-            return await _personRepository.GetAllInfoEmployer(personInfo);
-        }
-        
+       
     }
 }

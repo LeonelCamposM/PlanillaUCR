@@ -8,6 +8,5 @@ namespace Application.People
     {
         Task CreatePersonAsync(Person personInfo);
         Task<IEnumerable<Person>> GetPersonByEmail(string email);
-        Task<IEnumerable<Person>> GetAllInfoEmployer(Person personInfo);
     }
 }

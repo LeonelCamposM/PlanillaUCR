@@ -148,7 +148,7 @@
       protected override async Task OnInitializedAsync()
     {
         personInfo.Email = employerEmail;
-        _elements = await PersonService.GetAllInfoEmployer(personInfo);
+        _elements = await EmployerService.GetAllInfoEmployer(personInfo);
         employerData = _elements.FirstOrDefault();
         if ( _elements.Length() == 0){
             _empty = true;
