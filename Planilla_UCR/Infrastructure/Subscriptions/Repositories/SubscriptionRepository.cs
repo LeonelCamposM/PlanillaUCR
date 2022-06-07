@@ -77,6 +77,7 @@ namespace Infrastructure.Subscriptions.Repositories
                 @TypeSubscription = {subscription.TypeSubscription}, @IsEnabled = {subscription.IsEnabled},
                 @Transaction = {Transaction} OUT");
             _dbContext.Database.ExecuteSqlInterpolated(query);
+            await _dbContext.SaveEntitiesAsync();
             if (Convert.ToInt32(Transaction.Value) == 1) {
                 return true;
             }
