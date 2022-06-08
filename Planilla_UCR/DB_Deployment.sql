@@ -69,6 +69,17 @@ CREATE TABLE Subscription
 	FOREIGN KEY(EmployerEmail, ProjectName) REFERENCES Project(EmployerEmail, ProjectName)
 );
 
+CREATE TABLE ReportOfHours(
+	EmployerEmail varchar(255) NOT NULL,
+	ProjectName varchar(255) NOT NULL,
+	EmployeeEmail varchar(255) NOT NULL,
+	ReportDate date NOT NULL,
+	ReportHours float NOT NULL,
+	PRIMARY KEY(EmployerEmail, ProjectName, EmployeeEmail, ReportDate),
+	FOREIGN KEY(EmployerEmail, ProjectName) REFERENCES Project(EmployerEmail, ProjectName),
+	FOREIGN KEY(EmployeeEmail) REFERENCES Employee(Email)
+);
+
 -- Suscription Stored Procedures
 GO
 CREATE PROCEDURE GetAllBenefits
@@ -173,6 +184,7 @@ BEGIN
     SELECT * FROM Employee AS E WHERE E.Email = @email
 END
 
+GO
 -- Data Insert
 INSERT INTO Person
 VALUES('jeremy@ucr.ac.cr',
@@ -331,3 +343,8 @@ VALUES('Empleado fijo', 22)
 INSERT INTO Agreement
 VALUES('mau@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Proyecto 1', '9999-12-31','Empleado fijo',22, '9999-12-31')
 
+INSERT INTO ReportOfHours
+VALUES('leonel@ucr.ac.cr', 'Proyecto 1','mau@ucr.ac.cr', '9999-12-31',22.2)
+
+INSERT INTO ReportOfHours
+VALUES('leonel@ucr.ac.cr', 'Proyecto 2','mau@ucr.ac.cr', '9999-12-31',22.2)
