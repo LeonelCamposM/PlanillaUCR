@@ -7,6 +7,7 @@ namespace Domain.People.Repositories
     public interface IPersonRepository
     {
         Task CreatePersonAsync(Person personInfo);
-        Task<IEnumerable<Person>> GetPersonByEmail(string email);   
+        Task<IEnumerable<Person>> GetPersonByEmail(string email);
+        Task UpdatePerson(Person personInfo);
     }
 }

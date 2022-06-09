@@ -97,7 +97,7 @@
                     @*Create buton *@
                     <MudItem xs="2"></MudItem>
                     
-                        <MudButton Disabled="@snackHandler._saving" @onclick="Modificar" Variant="Variant.Filled" Color="Color.Secondary">
+                        <MudButton Disabled="@snackHandler._saving" @onclick="SavePersonInfo" Variant="Variant.Filled" Color="Color.Secondary">
                             @if (snackHandler._saving)
                             {
                                 <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true"/>
@@ -164,11 +164,11 @@
         snackHandler._saving = true;
         await form.Validate();
         if (form.IsValid && ValidateInfo(personInfo)){
+            //VALIDACIONES DEL FORM PARA VERIFICAR QUE NO SEAN LOS MISMOS DATOS 
+             await PersonService.UpdatePerson(personInfo);
              ShowSnackNotification("Cuenta para "+personInfo.Name+" modificada", Severity.Success);
-
-
-
-
+             _elements = await EmployerService.GetAllInfoEmployer(personInfo);
+             nav.NavigateTo($"/Employer_Profile/{employerEmail}");
         }
         snackHandler._saving = false;
     }
@@ -231,8 +231,6 @@
         personInfo.PhoneNumber = "";
         personInfo.Ssn = 0;
     }
-
-  
 
     private void Modificar()
     {

@@ -24,7 +24,12 @@ namespace Application.People.Implementations
         {
             return await _personRepository.GetPersonByEmail(email);
         }
-        
-       
+
+
+        public async Task UpdatePerson(Person personInfo)
+        {
+            await _personRepository.UpdatePerson(personInfo);
+        }
+
     }
 }
