@@ -42,16 +42,5 @@ namespace Infrastructure.Agreements.Repositories
             return myAgreement;
 
         }
-
-        public async Task<IEnumerable<Agreement>>? GetAllAgreementsByProjectAndEmployer(Agreement agreement)
-        {
-            var agreementList = await _dbContext.Agreements.FromSqlRaw("EXEC GetAllAgreementsByProjectAndEmployer").ToListAsync();
-            return agreementList;
-        }
-        public async Task<IEnumerable<Agreement>>? GetTypesOfProjects(Agreement agreement)
-        {
-            var agreementList = await _dbContext.Agreements.FromSqlRaw("EXEC GetTypesOfProjects").ToListAsync();
-            return agreementList;
-        }
     }
 }

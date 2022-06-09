@@ -10,7 +10,5 @@ namespace Domain.Agreements.Repositories
         Task CreateAgreementAsync(Agreement agreement);
         Task<Agreement>? GetContracteeByEmail(Agreement agreement);
 
-        Task<IEnumerable<Agreement>>? GetAllAgreementsByProjectAndEmployer(Agreement agreement);
-        Task<IEnumerable<Agreement>>? GetTypesOfProjects(Agreement agreement);
     }
 }

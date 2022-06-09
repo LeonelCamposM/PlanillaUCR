@@ -36,7 +36,7 @@ namespace Infrastructure.AgreementTypes.Repositories
         }
 
 
-        public async Task<IEnumerable<AgreementType?>> GetSalaryPerAgreement(string Agreement)
+        public async Task<IEnumerable<AgreementType?>> GetSalaryPerAgreement(int Agreement)
         {
             var agreementsSalary = await _dbContext.AgreementTypes.FromSqlRaw("EXEC GetSalaryPerAgreement @Agreement",
                 new SqlParameter("@Agreement", Agreement)).ToListAsync();

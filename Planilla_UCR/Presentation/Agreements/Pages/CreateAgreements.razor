@@ -4,17 +4,13 @@
 @using Domain.Agreements.Entities
 @using Presentation.Core.Components
 @using System.ComponentModel.DataAnnotations
-
-
 @using Application.People
 @using Domain.People.Entities
 @using Domain.Employees.Entities
 @using Application.Employees
-
 @using Application.Employers
 @using Domain.Employers.Entities
 @using Domain.Employers.DTOs
-
 @using Application.AgreementTypes
 @using Domain.AgreementTypes.Entities
 @using Domain.AgreementTypes.DTOs
@@ -155,12 +151,16 @@
                 bool isValid = await validateEmployeeEmail(agreementObject.EmployeeEmail);
                 if (isValid)
                 {
-                    isValid = await validateAgreementsSalary(agreementObject.ContractType);
+                    isValid = await validateAgreementsSalary();
                     if (isValid)
                     {
                         isValid = await validateEmployerEmail(agreementObject.EmployerEmail);
-                        await SaveAgreementType();
-                        ShowSnackNotification("Información guardada correctamente", Severity.Success);
+                        if (isValid)
+                        {
+                            await SaveAgreementType();
+                            ShowSnackNotification("Información guardada correctamente", Severity.Success);   
+                        }
+ 
                     }
                 }
 
@@ -225,9 +225,6 @@
 
     void formatDates(DateTime? startDate, DateTime? endDate)
     {
-        DateTime lstartDate = (DateTime)startDate;
-        DateTime lendDate = (DateTime)endDate;
-
         agreementObject.ContractStartDate = startDate;
         agreementObject.ContractFinishDate = endDate;
     }
@@ -257,21 +254,22 @@
 
     async Task<bool> validateEmployerEmail(string employerEmail)
     {
-        bool valid = true;
+        bool isValid = true;
         IEnumerable<Person> personList = await PersonService.GetPersonByEmail(employerEmail);
         if (personList.Length() == 0)
         {
-            valid=false;
+            isValid=false;
             ShowSnackNotification("El email " + employerEmail + " NO se encuetra en la base de datos", Severity.Error);
         }
-        return valid;
+        return isValid;
     }
 
-    async Task<bool> validateAgreementsSalary(string agreementType)
+    async Task<bool> validateAgreementsSalary()
     {
         bool isValid = true;
+        agreementObject.MountPerHour = (int)salaryPerMonth;
 
-        IEnumerable<AgreementType> salaryList = await AgreementTypeService.GetSalaryPerAgreement(agreementType);
+        IEnumerable<AgreementType> salaryList = await AgreementTypeService.GetSalaryPerAgreement(agreementObject.MountPerHour);
 
         if (salaryList.Length() == 0)
         {
@@ -280,4 +278,5 @@
         }
         return isValid;
     }
+
 }

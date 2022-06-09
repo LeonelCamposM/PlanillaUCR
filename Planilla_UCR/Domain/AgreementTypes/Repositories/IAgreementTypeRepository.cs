@@ -11,6 +11,6 @@ namespace Domain.AgreementTypes.Repositories
 
         Task<IEnumerable<AgreementType>>? GetTypesOfAgreement();
 
-        Task<IEnumerable<AgreementType>>? GetSalaryPerAgreement(string typeOfAgreement);
+        Task<IEnumerable<AgreementType>>? GetSalaryPerAgreement(int mountPerHour);
     }
 }
