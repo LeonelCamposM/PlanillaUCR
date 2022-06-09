@@ -54,7 +54,7 @@ else
                 <MudItem xs="2">
                 </MudItem>
                 <MudItem xs="8">
-                    <MudTextField @bind-Value="newName" MaxLength="255" Label="Nombre" Variant="Variant.Outlined" ReadOnly = "@_disabled"></MudTextField>
+                    <MudTextField @bind-Value="newName" MaxLength="255" Label="Nombre" Variant="Variant.Outlined" ReadOnly = "@_disabled" Required="true" RequiredError="Campo requerido"></MudTextField>
                 </MudItem>
                 <MudItem xs="2">
                 </MudItem>
@@ -62,12 +62,12 @@ else
                 <MudItem xs="2"></MudItem>
 
                 <MudItem xs="4">
-                    <MudNumericField Immediate="true" Label="Costo" Format="N2" Culture="@cultureCR" Variant="Variant.Outlined" @bind-Value="subscription.Cost" 
-                    Adornment="Adornment.Start" AdornmentText="@cultureCR.NumberFormat.CurrencySymbol" ReadOnly = "@_disabled"/>
+                    <MudNumericField Immediate="true" Label="Costo" Format="N2" Culture="@cultureCR" Variant="Variant.Outlined" @bind-Value="tempCost" 
+                    Adornment="Adornment.Start" AdornmentText="@cultureCR.NumberFormat.CurrencySymbol" ReadOnly = "@_disabled" Required="true" RequiredError="Campo requerido"/>
                 </MudItem>
 
                 <MudItem xs="4">
-                    <MudTextField @bind-Value="subscription.ProviderName"  MaxLength="255" Label="Organización" Variant="Variant.Outlined" ReadOnly = "@_disabled"></MudTextField>
+                    <MudTextField @bind-Value="providerName"  MaxLength="255" Label="Organización" Variant="Variant.Outlined" ReadOnly = "@_disabled" Required="true" RequiredError="Campo requerido"></MudTextField>
                 </MudItem>
 
                 <MudItem xs="2"></MudItem>  
@@ -75,7 +75,7 @@ else
                 <MudItem xs="2"></MudItem>  
 
                 <MudItem xs="8">
-                    <MudTextField @bind-Value="subscription.SubscriptionDescription" MaxLength="600" Label="Descripcion" Lines="6" Variant="Variant.Outlined" ReadOnly = "@_disabled"></MudTextField>
+                    <MudTextField @bind-Value="sDescription" MaxLength="600" Label="Descripcion" Lines="6" Variant="Variant.Outlined" ReadOnly = "@_disabled" Required="true" RequiredError="Campo requerido"></MudTextField>
                 </MudItem>
 
                 <MudItem xs="2"></MudItem>  
@@ -114,6 +114,9 @@ else
     private bool _loading = true;
     private bool _disabled = true;
     private string newName = "";
+    private double? tempCost;
+    private string providerName = "";
+    private string sDescription = "";
     public Subscription subscription = new Subscription("","","","","",0.0,1,1);
     MudForm form;
     SnackHandler snackHandler = new SnackHandler();
@@ -128,6 +131,9 @@ else
     {
         subscription = await SubscriptionService.GetSubscription(employerEmail, projectName, subscriptionName);
         newName = subscription.SubscriptionName;
+        tempCost = subscription.Cost;
+        providerName =subscription.ProviderName;
+        sDescription = subscription.SubscriptionDescription;
         if (subscription != null)
         {
             _loading = false;
@@ -141,6 +147,9 @@ else
         if (form.IsValid)
         {
             snackHandler._saving = false;
+            subscription.Cost = (double)tempCost;
+            subscription.ProviderName = providerName;
+            subscription.SubscriptionDescription = sDescription;
             bool isModified = await SubscriptionService.ModifySubscription(subscription, newName);
             if (isModified)
             {
@@ -195,11 +204,17 @@ else
     {
         _disabled = false;
         newName = subscription.SubscriptionName;
+        tempCost = subscription.Cost;
+        providerName =subscription.ProviderName;
+        sDescription = subscription.SubscriptionDescription;
     }
 
     private void DisableForm()
     {
         _disabled = true;
         newName = subscription.SubscriptionName;
+        tempCost = subscription.Cost;
+        providerName =subscription.ProviderName;
+        sDescription = subscription.SubscriptionDescription;
     }
 }
