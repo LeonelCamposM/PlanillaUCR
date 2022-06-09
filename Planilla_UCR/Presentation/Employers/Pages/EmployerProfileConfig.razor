@@ -145,7 +145,7 @@
     MudForm form;
 
 
-      protected override async Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
         personInfo.Email = employerEmail;
         _elements = await EmployerService.GetAllInfoEmployer(personInfo);
@@ -159,19 +159,35 @@
         _loading = false;
     }
 
+
     async Task SavePersonInfo()
     {
         snackHandler._saving = true;
         await form.Validate();
-        if (form.IsValid && ValidateInfo(personInfo)){
-            //VALIDACIONES DEL FORM PARA VERIFICAR QUE NO SEAN LOS MISMOS DATOS 
-             await PersonService.UpdatePerson(personInfo);
-             ShowSnackNotification("Cuenta para "+personInfo.Name+" modificada", Severity.Success);
-             _elements = await EmployerService.GetAllInfoEmployer(personInfo);
-             nav.NavigateTo($"/Employer_Profile/{employerEmail}");
+        if (form.IsValid && ValidateInfo(personInfo) && ValidateUpdate(personInfo)){
+            await PersonService.UpdatePerson(personInfo);
+            ShowSnackNotification("Cuenta para "+personInfo.Name+" modificada", Severity.Success);
+            nav.NavigateTo($"/Employer_Profile/{employerEmail}");
         }
         snackHandler._saving = false;
     }
+
+
+    bool ValidateUpdate(Person personInfo){
+        bool valid = true;
+        if (employerData.Name == personInfo.Name && employerData.LastName1== personInfo.LastName1 && 
+            employerData.LastName2 == personInfo.LastName2 && employerData.Ssn == personInfo.Ssn && 
+            employerData.BankAccount == personInfo.BankAccount && employerData.Adress == personInfo.Adress 
+            && employerData.PhoneNumber == personInfo.PhoneNumber)
+        {
+            valid = false;
+            ShowSnackNotification("La información actual es igual a la información que desea ingresar", Severity.Error);
+            ShowSnackNotification("No hay cambio para actualizar", Severity.Error);
+        }
+        return valid;
+    }
+
+
 
     bool ValidateSsn(Person personInfo)
     {
