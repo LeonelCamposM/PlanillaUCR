@@ -143,7 +143,8 @@
     private IEnumerable<Person> _elements = new List<Person>();  
     SnackHandler snackHandler = new SnackHandler();
     MudForm form;
-
+    [Parameter]
+    public EventCallback<Person> UpdatePersonInfo{ get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -168,6 +169,7 @@
             await PersonService.UpdatePerson(personInfo);
             ShowSnackNotification("Cuenta para "+personInfo.Name+" modificada", Severity.Success);
             nav.NavigateTo($"/Employer_Profile/{employerEmail}");
+            await UpdatePersonInfo.InvokeAsync(personInfo);
         }
         snackHandler._saving = false;
     }
