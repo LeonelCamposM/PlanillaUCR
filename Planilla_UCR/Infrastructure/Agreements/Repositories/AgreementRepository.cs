@@ -28,72 +28,30 @@ namespace Infrastructure.Agreements.Repositories
             _dbContext.Agreements.Add(agreement);
             await _dbContext.SaveEntitiesAsync();
         }
-        /*
-        public async Task<IEnumerable<Agreement?>> GetContracteeByEmail(Agreement agreement)
-        {
-        /*
-        public String EmployeeEmail { get; set; }
-        public String EmployerEmail { get; set; }
-        public String ProjectName { get; set; }
-        public string ContractStartDate { get; set; }
-        public String ContractType { get; set; }
-        public int MountPerHour { get; set; }
-        public string ContractFinishDate { get; set; }
-        
 
-
-        var contracteeList = await _dbContext.Agreements.FromSqlRaw("EXEC GetContracteeByEmail @agreement.EmployeeEmail",
-                new SqlParameter("employeeEmail", agreement.EmployeeEmail)).ToListAsync();
-            return contracteeList;
-        }
-        */
         public async Task<Agreement>? GetContracteeByEmail(Agreement agreement)
         {
-            // TODO Look for better 
             IList<Agreement> agreementList = await _dbContext.Agreements.Where
                 (e => e.EmployeeEmail == agreement.EmployeeEmail && e.EmployerEmail == agreement.EmployerEmail
                 && e.ProjectName == agreement.ProjectName).ToListAsync();
-            Agreement agreementAux = null;
+            Agreement myAgreement = null;
             if (agreementList.Length() > 0)
             {
-                agreementAux = agreementList.First();
+                myAgreement = agreementList.First();
             }
-            return agreementAux;
+            return myAgreement;
 
         }
 
-
-        /*public async Task<Subscription>? GetSubscription(string employerEmail, string projectName, string subscriptionName)
+        public async Task<IEnumerable<Agreement>>? GetAllAgreementsByProjectAndEmployer(Agreement agreement)
         {
-            IList<Subscription> subscriptionResult = await _dbContext.Subscriptions.Where
-                (e => e.EmployerEmail == employerEmail && e.SubscriptionName == subscriptionName
-                && e.ProjectName == projectName).ToListAsync();
-            Subscription subscription = null;
-            if (subscriptionResult.Length() > 0)
-            {
-                subscription = subscriptionResult.First();
-            }
-            return subscription;
+            var agreementList = await _dbContext.Agreements.FromSqlRaw("EXEC GetAllAgreementsByProjectAndEmployer").ToListAsync();
+            return agreementList;
         }
-
-        */
-
-        public async Task<IEnumerable<Agreement?>> GetAgreement(string employeeEmail, string employerEmail, string projectName, string contractStartDate, string contractType, int mountPerHour, string contractFinishDate)
+        public async Task<IEnumerable<Agreement>>? GetTypesOfProjects(Agreement agreement)
         {
-            // TODO: StoredProcedure. Next code is just a placeholder
-            var employeeList = await _dbContext.Agreements.FromSqlRaw("EXEC GetEmployeeByEmail @email",
-                new SqlParameter("email", employeeEmail)).ToListAsync();
-            return employeeList;
+            var agreementList = await _dbContext.Agreements.FromSqlRaw("EXEC GetTypesOfProjects").ToListAsync();
+            return agreementList;
         }
     }
 }
-
-/*
-         public async Task<IEnumerable<Employee?>> GetEmployeeByEmail(string email)
-        {
-            var employeeList = await _dbContext.Employees.FromSqlRaw("EXEC GetEmployeeByEmail @email",
-                new SqlParameter("email", email)).ToListAsync();
-            return employeeList;
-        }
-~~~
- */

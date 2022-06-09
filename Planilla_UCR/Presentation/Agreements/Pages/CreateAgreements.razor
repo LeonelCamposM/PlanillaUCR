@@ -56,45 +56,18 @@
                     </MudItem>
 
                     <MudItem xs="4">
-                           
-
-                        @*<MudSelect @bind-Value="MyProperty" Label="Tipo de contrato" Variant="Variant.Outlined" Required="true"  RequiredError="El tipo de contrato es necesario">
-                            <MudSelectItem Value="@("Tiempo completo")" />
-                            <MudSelectItem Value="@("Medio tiempo")" />
-                            <MudSelectItem Value="@("Servicios profesionales")" />
-                            <MudSelectItem Value="@("Por horas")" />
-                        </MudSelect>
-                        *@
-                        @if (!_isLoading)
-                        {
-                            
-                            <MudSelect T="String" @bind-Value="MyProperty" Label="Tipo de contrato" Variant="Variant.Outlined" Required="true"  RequiredError="El tipo de contrato es necesario">
-                                @for (int index = 0; index < agreementList.Length(); index++)
-                                {
-                                    <MudSelectItem T="String" Value="agreementList.ElementAt(index).TypeAgreement"/>
-                                }
-                            </MudSelect>
-
-                        } 
-
-
-
-
+                    <MudSelect @bind-Value="agreementObject.ContractType" Label="Tipo de contrato" Variant="Variant.Outlined" Required="true"  RequiredError="El tipo de contrato es necesario">
+                        <MudSelectItem Value="@("Tiempo completo")" />
+                        <MudSelectItem Value="@("Medio tiempo")" />
+                        <MudSelectItem Value="@("Servicios profesionales")" />
+                        <MudSelectItem Value="@("Por horas")" />
+                    </MudSelect>
                     </MudItem>
                     <MudItem xs="2"> </MudItem>
         
                     <MudItem xs="2"> </MudItem>
                     <MudItem xs="4">
-                        @if (!_isUpdated)
-                        {
-                            <MudNumericField @bind-Value="finalMountPerHour" ReadOnly="true" Label="Monto por hora" Variant="Variant.Outlined" Required="true" RequiredError="El monto por hora es necesario" HideSpinButtons="true" Min = "0"> </MudNumericField>
-                        } 
-                        else
-                        {
-                            <MudNumericField @bind-Value="agreementObject.MountPerHour" ReadOnly="true" Label="Monto por hora" Variant="Variant.Outlined" Required="true" RequiredError="El monto por hora es necesario" HideSpinButtons="true" Min = "0"> </MudNumericField>
-
-                        }
-
+                        <MudNumericField @bind-Value="salaryPerMonth" Label="Monto por hora" Variant="Variant.Outlined" Required="true" RequiredError="El monto por hora es necesario" HideSpinButtons="true" Min = "0"> </MudNumericField>
                     </MudItem>
 
                     <MudItem xs="4">
@@ -137,8 +110,10 @@
 </MudGrid>
 
 @code{
+    [Parameter] public string EmployerEmail { get; set; }
+    [Parameter] public string ProjectName { get; set; }
+
     Agreement agreementObject = new Agreement("", "", "", null, "", 0, null);
-    Agreement anAgreement = new Agreement("", "", "", null, "", 0, null);
     AgreementType anAgreementType = new AgreementType("",0);
 
     MudForm form;
@@ -152,46 +127,8 @@
     private bool _canSend = false;
     public string ReadOnly { get; set; } = "10 000";
 
-    public int? finalMountPerHour { get; set; }
-
-    [Parameter] public string EmployerEmail { get; set; }
-    [Parameter] public string ProjectName { get; set; }
-
-    AgreementType anAgreementType2 = new AgreementType("",0);
-
-    IEnumerable<AgreementType> agreementList;
 
 
-    private bool _isUpdated = false;
-
-
-    public string MyProperty
-    {
-        get { return agreementObject.ContractType; }
-        set
-        {
-            agreementObject.ContractType = value;
-            SomeMethod();
-        }
-    }
-
-    async void SomeMethod()
-    {
-        IEnumerable<AgreementType> salaryList = await AgreementTypeService.GetSalaryPerAgreement(agreementObject.ContractType);
-        finalMountPerHour = salaryList.ElementAt(0).MountPerHour;
-        await InvokeAsync(StateHasChanged);
-        ShowSnackNotification("Prueba de salario: " + salaryList.ElementAt(0).MountPerHour, Severity.Error);
-        ShowSnackNotification("Prueba de salario: " + finalMountPerHour, Severity.Error);
-
-        agreementObject.MountPerHour = salaryList.ElementAt(0).MountPerHour;
-        _isUpdated = true;
-    @*
-        IEnumerable<AgreementType> agreementTypesList = await AgreementTypeService.GetSalaryPerAgreement(agreementObject.ContractType);
-        agreementObject.MountPerHour = agreementTypesList.ElementAt(0).MountPerHour;
-        salaryPerMonth = agreementObject.MountPerHour;
-        *@
-
-    }
 
     private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
     {
@@ -201,15 +138,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        agreementList = await AgreementTypeService.GetTypesOfAgreement();
-
         agreementObject.EmployerEmail = EmployerEmail;
         agreementObject.ProjectName = ProjectName;
-        for (int index = 0; index < agreementList.Length(); index++)
-        {
-            ShowSnackNotification("Lista de agreementTypes: " + agreementList.ElementAt(index).TypeAgreement +"En vuelta: "+ index, Severity.Error);
-        }
-       
         _isLoading = false;
 
     }
@@ -222,12 +152,16 @@
         {
             if (checkDates())
             {
-                // Temporary, needs work
-                bool validacion = await validateEmployeeEmail(agreementObject.EmployeeEmail);
-                if (validacion)
+                bool isValid = await validateEmployeeEmail(agreementObject.EmployeeEmail);
+                if (isValid)
                 {
-                    await SaveAgreementType();
-                    ShowSnackNotification("Información guardada correctamente", Severity.Success);
+                    isValid = await validateAgreementsSalary(agreementObject.ContractType);
+                    if (isValid)
+                    {
+                        isValid = await validateEmployerEmail(agreementObject.EmployerEmail);
+                        await SaveAgreementType();
+                        ShowSnackNotification("Información guardada correctamente", Severity.Success);
+                    }
                 }
 
             }
@@ -267,7 +201,7 @@
         {
             isValid = false;
         }
-        formatDates(startDate,endDate); // TODO Move this
+        formatDates(startDate,endDate);
         return isValid;
     }
 
@@ -293,41 +227,37 @@
     {
         DateTime lstartDate = (DateTime)startDate;
         DateTime lendDate = (DateTime)endDate;
-    @* agreementObject.ContractStartDate = lstartDate.ToString(format); 
-        agreementObject.ContractFinishDate = lendDate.ToString(format); *@
+
         agreementObject.ContractStartDate = startDate;
         agreementObject.ContractFinishDate = endDate;
     }
 
     async Task<bool> validateEmployeeEmail(string employeeEmail)
     {
-        bool valid = true;
-    @*TODO FaltaValidar que Este o NO este en la tabla de contratos*@
-
+        bool isValid = true;
         IEnumerable<Employee> employeeList = await EmployeeService.GetEmployeeByEmail(employeeEmail);
-         
-        anAgreement = await AgreementService.GetContracteeByEmail(agreementObject);
+        Agreement myAgreement = new Agreement("", "", "", null, "", 0, null);
+
+        myAgreement = await AgreementService.GetContracteeByEmail(agreementObject);
 
         if (employeeList.Length() == 0)
         {   
-            valid=false;
+            isValid=false;
 
             ShowSnackNotification("El email " + employeeEmail + " NO se encuentra en registrado en el sistema, no es posible asignarlo al contrato ", Severity.Error);
         }
-        if (anAgreement != null) @*Check This *@
+        if (myAgreement != null)
         {
-            valid=false;
-            ShowSnackNotification("El email " + employeeEmail + " ya posee un contrato con el proyecto : del empleador: ", Severity.Error);
+            isValid=false;
+            ShowSnackNotification("El email " + employeeEmail + " ya posee un contrato en el contexto actual ", Severity.Error);
 
         }
-
-        return valid;
+        return isValid;
     }
 
     async Task<bool> validateEmployerEmail(string employerEmail)
     {
         bool valid = true;
-    @*TODO CreateEmployerEmailCheck*@
         IEnumerable<Person> personList = await PersonService.GetPersonByEmail(employerEmail);
         if (personList.Length() == 0)
         {
@@ -337,21 +267,17 @@
         return valid;
     }
 
-    async Task<bool> validateTypeOfAgreement(string employerEmail)
+    async Task<bool> validateAgreementsSalary(string agreementType)
     {
-        bool valid = true;
-    @*TODO CreateEmployerEmailCheck*@
-        IEnumerable<Person> personList = await PersonService.GetPersonByEmail(employerEmail);
-        if (personList.Length() == 0)
-        {
-            valid=false;
-            ShowSnackNotification("El email " + employerEmail + " NO se encuetra en la base de datos", Severity.Error);
-        }
-        return valid;
-    }
+        bool isValid = true;
 
-    void setSalary()
-    {
-        agreementObject.MountPerHour = 1000;
+        IEnumerable<AgreementType> salaryList = await AgreementTypeService.GetSalaryPerAgreement(agreementType);
+
+        if (salaryList.Length() == 0)
+        {
+            isValid=false;
+            ShowSnackNotification("El monto introducido NO es válido, inserte un monto válido", Severity.Error);
+        }
+        return isValid;
     }
 }

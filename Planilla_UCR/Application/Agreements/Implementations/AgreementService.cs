@@ -17,7 +17,6 @@ namespace Application.Agreements.Implementations
 
         public async Task CreateAgreementAsync(Agreement agreement)
 
-        //public async Task CreateAgreementAsync(string employeeEmail, string employerEmail, string projectName, string contractStartDate, string contractType, int mountPerHour, string contractFinishDate)
         {
             await _agreementRepository.CreateAgreementAsync(agreement);
         }
@@ -27,9 +26,13 @@ namespace Application.Agreements.Implementations
             return await _agreementRepository.GetContracteeByEmail(agreement);
         }
 
-        public async Task<IEnumerable<Agreement>> GetAgreement(string employeeEmail, string employerEmail, string projectName, string contractStartDate, string contractType, int mountPerHour, string contractFinishDate)
+        public async Task<IEnumerable<Agreement>>? GetAllAgreementsByProjectAndEmployer(Agreement agreement)
         {
-            return await _agreementRepository.GetAgreement(employeeEmail, employerEmail, projectName, contractStartDate, contractType, mountPerHour, contractFinishDate);
+            return await _agreementRepository.GetAllAgreementsByProjectAndEmployer(agreement);
+        }
+        public async Task<IEnumerable<Agreement>>? GetTypesOfProjects(Agreement agreement)
+        {
+            return await _agreementRepository.GetTypesOfProjects(agreement);
         }
     }
 }

@@ -11,9 +11,9 @@ namespace Application.Agreements
 
         Task<Agreement>? GetContracteeByEmail(Agreement agreement);
 
-        //Task<IEnumerable<Agreement>>? GetTypesOfAgreement(Agreement agreement);
+        Task<IEnumerable<Agreement>>? GetAllAgreementsByProjectAndEmployer(Agreement agreement);
 
+        Task<IEnumerable<Agreement>>? GetTypesOfProjects(Agreement agreement);
 
-        Task<IEnumerable<Agreement>> GetAgreement(string employeeEmail, string employerEmail, string projectName, string contractStartDate, string contractType, int mountPerHour, string contractFinishDate);
     }
 }
