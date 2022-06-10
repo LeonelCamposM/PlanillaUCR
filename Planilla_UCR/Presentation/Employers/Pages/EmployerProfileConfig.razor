@@ -113,7 +113,7 @@
                            
                          <MudButton Disabled="true"> </MudButton>
                         @*Clear buton *@
-                        <MudButton OnClick="GoToModifyPerfilForm" Variant="Variant.Filled" Color="Color.Transparent">
+                        <MudButton OnClick="GoToEmployerProfileConfig" Variant="Variant.Filled" Color="Color.Transparent">
                                 <MudText>Cancelar</MudText>
                         </MudButton>
 
@@ -241,8 +241,8 @@
         nav.NavigateTo($"Projects/{employerEmail}");
     }
 
-    private void GoToModifyPerfilForm()
+    private void GoToEmployerProfileConfig()
     {
-        nav.NavigateTo($"Projects/{employerEmail}");
+        nav.NavigateTo($"Employer_Profile/{employerEmail}/Configurations");
     }
 }
