@@ -140,13 +140,28 @@
     [Parameter] public string employerEmail { get; set; }
     SnackHandler snackHandler = new SnackHandler();
     MudForm form;
-  
+    private string oldName = "";
+    private string oldLastName1 = "";
+    private string oldLastName2 = "";
+    private int oldSsn = 0;
+    private string oldBankAccount = "";
+    private string oldAdress = "";
+    private string oldPhoneNumber = "";
 
-     protected override async Task OnInitializedAsync()
+
+
+    protected override async Task OnInitializedAsync()
     {
         personInfo.Email = employerEmail;
         personInfo = await EmployerService.GetInfoEmployer(personInfo);
-        if ( personInfo != null)
+        oldName = personInfo.Name;
+        oldLastName1 = personInfo.LastName1;
+        oldLastName2 = personInfo.LastName2;
+        oldSsn = personInfo.Ssn;
+        oldBankAccount = personInfo.BankAccount;
+        oldAdress = personInfo.Adress;
+        oldPhoneNumber = personInfo.PhoneNumber;
+        if (personInfo != null)
         {
             _loading = false;
         }
@@ -157,7 +172,7 @@
     {
         snackHandler._saving = true;
         await form.Validate();
-        if (form.IsValid && ValidateInfo(personInfo)){
+        if (form.IsValid && ValidateSsn(personInfo) && ValidateUpdate(personInfo)){
             await PersonService.UpdatePerson(personInfo);
             ShowSnackNotification("Cuenta para "+personInfo.Name+" modificada", Severity.Success);
             nav.NavigateTo($"/Employer_Profile/{employerEmail}");
@@ -166,7 +181,21 @@
         snackHandler._saving = false;
     }
 
-  
+
+     bool ValidateUpdate(Person personInfo){
+        bool valid = true;
+        if (oldName == personInfo.Name && oldLastName1== personInfo.LastName1 && 
+            oldLastName2 == personInfo.LastName2 && oldSsn == personInfo.Ssn && 
+            oldBankAccount == personInfo.BankAccount && oldAdress == personInfo.Adress 
+            && oldPhoneNumber == personInfo.PhoneNumber)
+        {
+            valid = false;
+            ShowSnackNotification("La información actual es igual a la información que desea ingresar", Severity.Error);
+            ShowSnackNotification("No hay cambio para actualizar", Severity.Error);
+        }
+        return valid;
+    }
+
 
     bool ValidateSsn(Person personInfo)
     {
@@ -178,26 +207,6 @@
         }
         return valid;
     }
-
-    bool ValidateEmail(Person personInfo)
-    {
-        bool valid = true;
-
-        valid = personInfo.Email.Contains('@');
-        if (!valid)
-        {
-            ShowSnackNotification("El email debe contener un @", Severity.Error);
-        }
-        return valid;
-    }
-
-    bool ValidateInfo(Person personInfo)
-    {
-        bool ssn = ValidateSsn(personInfo);
-        bool email = ValidateEmail(personInfo);
-        return ssn && email;
-    }
-
 
     void ShowSnackNotification(string message, Severity severity)
     {

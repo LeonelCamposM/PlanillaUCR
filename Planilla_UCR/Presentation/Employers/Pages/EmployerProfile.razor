@@ -93,10 +93,8 @@
 @code {
     private bool _loading = true;
     Person personInfo = new Person("", "", "", "", Int32.Parse("0"), "", "", "");
-    [Parameter] public string employerEmail { get; set; }
-    private IEnumerable<Person> _elements;  
+    [Parameter] public string employerEmail { get; set; }  
   
- 
     protected override async Task OnInitializedAsync()
     {
         personInfo.Email = employerEmail;
