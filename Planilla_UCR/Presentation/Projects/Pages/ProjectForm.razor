@@ -61,7 +61,7 @@
 
                 <MudItem xs="2"> </MudItem>
                 <MudItem xs="4">
-                    <MudTextField @bind-Value="projectInfo.MaximumAmountForBenefits" Label="Monto máximo para beneficios" Variant="Variant.Outlined"  Required="false" RequiredError="Campo no requerido"></MudTextField>
+             
                     <MudNumericField Immediate="true" Label="Monto máximo para beneficios" Format="N2" Culture="@cultureCR" Variant="Variant.Outlined" @bind-Value="_maximumAmountForBenefits" 
                     Adornment="Adornment.Start" AdornmentText="@cultureCR.NumberFormat.CurrencySymbol" Required="false" RequiredError="Campo no requerido"/>
                 </MudItem>
