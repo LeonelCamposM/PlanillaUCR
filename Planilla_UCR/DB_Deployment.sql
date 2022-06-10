@@ -122,7 +122,7 @@ BEGIN
 END
 
 GO
-CREATE PROCEDURE ProjectNameCheck(@ProjectName VARCHAR(255))
+CREATE OR ALTER PROCEDURE ProjectNameCheck(@ProjectName VARCHAR(255))
 AS
 BEGIN
     SELECT * FROM Project WHERE Project.ProjectName = @ProjectName

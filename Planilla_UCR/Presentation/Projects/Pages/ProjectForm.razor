@@ -1,7 +1,5 @@
 ﻿@page "/Create_Project/{employerEmail}"
-@using Domain.Projects.DTOs
 @using Domain.Projects.Entities
-@using Domain.Employers.DTOs
 @using Domain.Employers.Entities
 @using Application.Projects
 @using Application.Employers
@@ -15,11 +13,11 @@
 @inject ISnackbar Snackbar
 
 @{List<BreadcrumbItem> _items = new List<BreadcrumbItem>
-{
-    new BreadcrumbItem("Inicio", href: ""),
-    new BreadcrumbItem("Proyectos", href: $"/Projects/{employerEmail}"),
-    new BreadcrumbItem("Nuevo proyecto", href: null, disabled: true)
-};
+    {
+        new BreadcrumbItem("Inicio", href: ""),
+        new BreadcrumbItem("Proyectos", href: $"/Projects/{employerEmail}"),
+        new BreadcrumbItem("Nuevo proyecto", href: null, disabled: true)
+    };
 }
 
 <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
@@ -61,7 +59,7 @@
 
                 <MudItem xs="2"> </MudItem>
                 <MudItem xs="4">
-                    <MudTextField @bind-Value="projectInfo.MaximumAmountForBenefits" Label="Monto máximo para beneficios" Variant="Variant.Outlined"  Required="false" RequiredError="Campo no requerido"></MudTextField>
+             
                     <MudNumericField Immediate="true" Label="Monto máximo para beneficios" Format="N2" Culture="@cultureCR" Variant="Variant.Outlined" @bind-Value="_maximumAmountForBenefits" 
                     Adornment="Adornment.Start" AdornmentText="@cultureCR.NumberFormat.CurrencySymbol" Required="false" RequiredError="Campo no requerido"/>
                 </MudItem>
@@ -81,9 +79,9 @@
                 <MudItem xs="2"></MudItem>
 
                 <MudItem xs="8"> 
-                    <MudButton Disabled="@_saving" OnClick="TryToSend" 
+                    <MudButton Disabled="@snackHandler._saving" OnClick="SaveProject" 
                     Variant="Variant.Filled" Color="Color.Primary">
-                        @if (_saving)
+                        @if (@snackHandler._saving)
                         {
                             <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true"/>
                             <MudText Class="ms-2">Creando</MudText>
@@ -108,13 +106,7 @@
 </MudGrid>
 
 @code{
-    public string project { get; set; }
-    private bool _isLoading = true;
-    private bool _processing = false;
-    private bool _created = false;
-    private bool _saving = false;
     private double? _maximumAmountForBenefits;
-
     Project projectInfo = new Project("","","",0.0,0,"");
     SnackHandler snackHandler = new SnackHandler();
     LimitsValidationForm limits = new LimitsValidationForm();
@@ -123,27 +115,23 @@
 
     [Parameter] public string employerEmail { get; set; }
     [Parameter] public string projectName { get; set; }
-    
 
-    async Task CreateProject()
-    {
-        projectInfo.MaximumAmountForBenefits = Convert.ToDouble(_maximumAmountForBenefits);
-        await ProjectService.CreateProjectAsync(projectInfo);
-    }
 
-    async Task TryToSend()
+    async Task SaveProject()
     {
         projectInfo.EmployerEmail = employerEmail;
-        await form.Validate();
+        projectInfo.MaximumAmountForBenefits = Convert.ToDouble(_maximumAmountForBenefits);
+        Project projectToAdd = projectInfo;
         snackHandler._saving = true;
+
+        await form.Validate();
         if (form.IsValid && await (ValidateInfo(projectInfo)))
         {
-            _saving = true;
-            await CreateProject();
-            _saving = false;
-            _created = true;
-            ShowSnackNotification(projectInfo.ProjectName+" creado exitosamente", Severity.Success);
-            CleanForm();
+
+            await ProjectService.CreateProjectAsync(projectToAdd);
+            snackHandler._saving = false;
+            ShowSnackNotification(projectInfo.ProjectName + " creado exitosamente", Severity.Success);
+            
         }
         snackHandler._saving = false;
     }
@@ -170,11 +158,17 @@
     async Task<bool> ValidateName(Project project)
     {
         bool valid = true;
-        IEnumerable<Project> nameCecked = await ProjectService.GetAllNameProjects(project.ProjectName);
+        IEnumerable<Project> nameCecked = await ProjectService.GetEmployerProyects(project.EmployerEmail);
+
         if (nameCecked.Length() != 0)
         {
-            valid=false;
-            ShowSnackNotification("El nombre de proyecto ya está siendo usado", Severity.Error);
+            foreach (Project element in nameCecked){
+                if (element.ProjectName == project.ProjectName)
+                {
+                    valid=false;
+                    ShowSnackNotification("El nombre de proyecto ya está siendo usado", Severity.Error);
+                }
+            }
         }
         return valid;
     }
