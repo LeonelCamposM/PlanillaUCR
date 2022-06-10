@@ -13,7 +13,7 @@
         new BreadcrumbItem("Inicio", href: ""),
         new BreadcrumbItem("Proyectos", href: $"/Projects/{employerEmail}"),
         new BreadcrumbItem($"{projectName}", href: $"/Projects/Details/{employerEmail}/{projectName}"),
-        new BreadcrumbItem("Deducciones", href: $"/Projects/{employerEmail}/{projectName}/Deductions"),
+        new BreadcrumbItem("Deducciones voluntarias", href: $"/Projects/{employerEmail}/{projectName}/Deductions"),
         new BreadcrumbItem($"{subscriptionName}", href: $"/Projects/{employerEmail}/{projectName}/Deductions/{subscriptionName}")
     };
 }
@@ -47,10 +47,10 @@ else
             <MudPaper  Height="250px" Width="100%" Outlined="false" Class="border-none pa-4" Elevation="0">
                 @if (_disabled)
                 {
-                    <MudText Align="Align.Center" Typo="Typo.h6">Detalles de la deducción</MudText>
+                    <MudText Align="Align.Center" Typo="Typo.h6">Detalles de la deducción voluntaria</MudText>
                 }else
                 {
-                    <MudText Align="Align.Center" Typo="Typo.h6">Modificar deducción</MudText>
+                    <MudText Align="Align.Center" Typo="Typo.h6">Modificar deducción voluntaria</MudText>
                 }
                 <MudForm @ref="form">
                 <MudGrid>

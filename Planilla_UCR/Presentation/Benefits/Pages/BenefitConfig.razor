@@ -3,6 +3,7 @@
 @using Domain.Subscriptions.Entities
 @using Presentation.Core.Components
 @using Presentation.Benefits.Components
+@using System.Globalization
 @inject ISnackbar Snackbar
 @inject ISubscriptionService SubscriptionService
 @inject NavigationManager nav
@@ -43,7 +44,7 @@ else
                 </MudLink>
             </MudTd>
             <MudTd DataLabel="Descripción">@context.ProviderName</MudTd>
-            <MudTd DataLabel="Costo">@context.Cost</MudTd>
+            <MudTd DataLabel="Costo"> @cultureCR.NumberFormat.CurrencySymbol @formatearCosto(context.Cost) </MudTd>
         </RowTemplate>
         <FooterContent>
             <MudTd colspan="5">Seleccionar todo</MudTd>
@@ -53,8 +54,11 @@ else
         </PagerContent>
     </MudTable>
     <MudText Inline="true">Beneficios seleccionados: @(selectedItems1==null ? "" : string.Join(", ", selectedItems1.OrderBy(x=>x.SubscriptionName).Select(x=>x.SubscriptionName)))</MudText>
+    <br>
+    <br>
+    <br>
+    <MudDivider />
     <MudToolBar DisableGutters="true" Class="gap-4">
-        <MudSpacer></MudSpacer>
         <MudButton Variant="Variant.Filled" OnClick="DeleteBenefits" Color="Color.Error">Borrar</MudButton>
     </MudToolBar>
 }
@@ -66,6 +70,7 @@ else
     private MudTable<Subscription> mudTable;
     public string searchString1 = "";
     public string project { get; set; }
+    public CultureInfo cultureCR = CultureInfo.GetCultureInfo("es-CR");
 
     [Parameter] public string employerEmail { get; set; }
     [Parameter] public string projectName { get; set; }
@@ -119,5 +124,11 @@ else
     private void GoToMain()
     {
         nav.NavigateTo($"/Projects/{employerEmail}/{projectName}/Benefits");
+    }
+
+    private string formatearCosto(double cost)
+    {
+        string costo = string.Format("{0:N}", cost);
+        return costo;
     }
 }
