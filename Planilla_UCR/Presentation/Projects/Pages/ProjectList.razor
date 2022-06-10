@@ -52,7 +52,7 @@ else
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="Nombre" >
-                <MudLink Color="Color.Secondary" Href="@($"/Projects/{@context.EmployerEmail}/{@context.ProjectName}/Configurations")">
+                <MudLink Color="Color.Secondary" Underline="Underline.Always" Href="@($"/Projects/{@context.EmployerEmail}/{@context.ProjectName}/Configurations")">
                     @context.ProjectName
                 </MudLink>
             </MudTd>
