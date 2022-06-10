@@ -42,7 +42,7 @@
                 </MudItem>
                
                 <MudItem xs="4">
-                    <MudIconButton  Icon="@Icons.Material.Filled.Settings" Color="Color.Secondary" OnClick="GoToModifyPerfilForm"/>
+                    <MudIconButton  Icon="@Icons.Material.Filled.Settings" Color="Color.Secondary" OnClick="GoToEmployerProfileConfig"/>
                 </MudItem>
                 
 
@@ -110,7 +110,7 @@
         nav.NavigateTo($"Projects/{employerEmail}");
     }
 
-    private void GoToModifyPerfilForm()
+    private void GoToEmployerProfileConfig()
     {
         nav.NavigateTo($"/Employer_Profile/{employerEmail}/Configurations");
     }
