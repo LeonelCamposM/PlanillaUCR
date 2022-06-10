@@ -14,6 +14,7 @@ List<BreadcrumbItem> _items = new List<BreadcrumbItem>
 
 };
 }
+<MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
 
 <AuthorizeView>
     <Authorized> 
@@ -26,17 +27,12 @@ List<BreadcrumbItem> _items = new List<BreadcrumbItem>
 
 @if (_loading)
 {
-    <MudPaper  Height="220px" Width="100%" Outlined="false" Class="border-none pa-4" Elevation="0">
-         <MudText Align="Align.Center" Typo="Typo.h6">
-              <MudProgressCircular Color="Color.Secondary" Style="height:70px;width:70px;" Indeterminate="true" />
-         </MudText>
-    </MudPaper>
+      <MudText Typo="Typo.h6">No hay proyectos asociados al empleador</MudText>
 }
 else
 {
-    <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
 
-    <MudTable Items="@Elements" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" @ref="mudTable" Filter="new Func<Project,bool>(FilterFunc1)">  
+    <MudTable @ref="mudTable" Items="@Elements" RowsPerPage="6" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="Color.Info" Filter="new Func<Project,bool>(FilterFunc1)">  
 
         <ToolBarContent>
             <MudText Align="Align.Center" Typo="Typo.h6">Lista de proyectos</MudText>
@@ -87,12 +83,9 @@ else
 
 
 @code {
-    private bool _hidePosition;
     private bool _loading = true;
     public string searchString = "";
-
     private MudTable<Project> mudTable;
-    private List<string> clickedEvents = new();
     private IEnumerable<Project> Elements;
     
     [Parameter] public string employerEmail { get; set; }
@@ -104,7 +97,20 @@ else
     {
         await setEmail.InvokeAsync(employerEmail);
         Elements = await ProjectService.GetEmployerProyects(employerEmail);
-        _loading = false;
+        if (Elements.Length() > 0){
+            _loading = false;
+        }
+    }
+    
+    private bool FilterFunc1(Project element) => FilterFunc(element, searchString);
+
+    private bool FilterFunc(Project element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.ProjectName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
     }
 
     private void GoToCreate()
@@ -120,16 +126,5 @@ else
     private void PageChanged(int i)
     {
         mudTable.NavigateTo(i - 1);
-    }
-    
-    private bool FilterFunc1(Project element) => FilterFunc(element, searchString);
-
-    private bool FilterFunc(Project element, string searchString)
-    {
-        if (string.IsNullOrWhiteSpace(searchString))
-            return true;
-        if (element.ProjectName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        return false;
     }
 }
