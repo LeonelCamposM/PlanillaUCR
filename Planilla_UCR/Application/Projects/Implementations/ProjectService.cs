@@ -38,5 +38,10 @@ namespace Application.Projects.Implementations
         { 
             return await _projectRepository.GetEmployerProyects(email);
         }
+
+        public async Task<bool> ModifyProject(Project project, string newProjectName)
+        {
+            return await _projectRepository.ModifyProject(project, newProjectName);
+        }
     }
 }

@@ -1,7 +1,9 @@
 ﻿using Domain.Core.Repositories;
 using Domain.Projects.Repositories;
 using Domain.Projects.Entities;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -61,6 +63,34 @@ namespace Infrastructure.Projects.Repositories
             IList<Project> projectsResult = await _dbContext.Projects.Where
                 (e => e.EmployerEmail == email).ToListAsync();
             return projectsResult;
+        }
+
+        public async Task<bool> ModifyProject(Project project, string newProjectName)
+        {
+            var EmployerEmail = new SqlParameter("EmployerEmail", project.EmployerEmail);
+            var ProjectName = new SqlParameter("ProjectName", project.ProjectName);
+            var NewProjectName = new SqlParameter("NewProjectName", newProjectName);
+            var ProjectDescription = new SqlParameter("ProjectDescription", project.ProjectDescription);
+            var MaximumAmountForBenefits = new SqlParameter("MaximumAmountForBenefits", project.MaximumAmountForBenefits);
+            var MaximumBenefitAmount = new SqlParameter("MaximumBenefitAmount", project.MaximumBenefitAmount);
+            var PaymentInterval = new SqlParameter("PaymentInterval", project.PaymentInterval);
+            var Transaction = new SqlParameter("Transaction", 0);
+            Transaction.Direction = System.Data.ParameterDirection.Output;
+
+            var nameList = await _dbContext.Projects.FromSqlRaw("EXEC ModifyProject @EmployerEmail," +
+                "@ProjectName, @NewProjectName,@NewProjectDescription,@NewMaximumAmountForBenefits," +
+                "@NewMaximumBenefitAmount,@NewPaymentInterva @Transaction OUTPUT", EmployerEmail, ProjectName,
+                NewProjectName, ProjectDescription, MaximumAmountForBenefits, MaximumBenefitAmount,
+                PaymentInterval, Transaction).ToListAsync();
+
+            if (Convert.ToInt32(Transaction.Value) == 1)
+            {
+                return true;
+            }
+            else 
+            { 
+                return false;
+            }
         }
     }
 }
