@@ -115,6 +115,7 @@
     private bool _saving = false;
     private double? _maximumAmountForBenefits;
 
+
     Project projectInfo = new Project("","","",0.0,0,"");
     SnackHandler snackHandler = new SnackHandler();
     LimitsValidationForm limits = new LimitsValidationForm();
@@ -123,7 +124,7 @@
 
     [Parameter] public string employerEmail { get; set; }
     [Parameter] public string projectName { get; set; }
-    
+
 
     async Task CreateProject()
     {
@@ -170,11 +171,17 @@
     async Task<bool> ValidateName(Project project)
     {
         bool valid = true;
-        IEnumerable<Project> nameCecked = await ProjectService.GetAllNameProjects(project.ProjectName);
+        IEnumerable<Project> nameCecked = await ProjectService.GetEmployerProyects(project.EmployerEmail);
+
         if (nameCecked.Length() != 0)
         {
-            valid=false;
-            ShowSnackNotification("El nombre de proyecto ya está siendo usado", Severity.Error);
+            foreach (Project element in nameCecked){
+                if (element.ProjectName == project.ProjectName)
+                {
+                    valid=false;
+                    ShowSnackNotification("El nombre de proyecto ya está siendo usado", Severity.Error);
+                }
+            }
         }
         return valid;
     }
