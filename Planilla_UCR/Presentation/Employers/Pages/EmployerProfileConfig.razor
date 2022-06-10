@@ -133,7 +133,6 @@
     }
 }
 
-
 @code {
     private bool _loading = true;
     Person personInfo = new Person("", "", "", "", Int32.Parse("0"), "", "", "");
@@ -147,8 +146,6 @@
     private string oldBankAccount = "";
     private string oldAdress = "";
     private string oldPhoneNumber = "";
-
-
 
     protected override async Task OnInitializedAsync()
     {
@@ -167,7 +164,6 @@
         }
     }
 
-
     async Task SavePersonInfo()
     {
         snackHandler._saving = true;
@@ -181,8 +177,7 @@
         snackHandler._saving = false;
     }
 
-
-     bool ValidateUpdate(Person personInfo){
+    bool ValidateUpdate(Person personInfo){
         bool valid = true;
         if (oldName == personInfo.Name && oldLastName1== personInfo.LastName1 && 
             oldLastName2 == personInfo.LastName2 && oldSsn == personInfo.Ssn && 
@@ -195,7 +190,6 @@
         }
         return valid;
     }
-
 
     bool ValidateSsn(Person personInfo)
     {
@@ -234,11 +228,6 @@
         personInfo.BankAccount = "";
         personInfo.PhoneNumber = "";
         personInfo.Ssn = 0;
-    }
-
-    private void Modificar()
-    {
-        nav.NavigateTo($"Projects/{employerEmail}");
     }
 
     private void GoToEmployerProfileConfig()
