@@ -127,17 +127,11 @@
         await form.Validate();
         if (form.IsValid && await (ValidateInfo(projectInfo)))
         {
-            try
-            {
-                await ProjectService.CreateProjectAsync(projectToAdd);
-                snackHandler._saving = false;
-                ShowSnackNotification(projectInfo.ProjectName + " creado exitosamente", Severity.Success);
-            }
-            catch (Exception)
-            {
-                snackHandler._saving = false;
-                ShowSnackNotification("ERROR ", Severity.Error);
-            }
+
+            await ProjectService.CreateProjectAsync(projectToAdd);
+            snackHandler._saving = false;
+            ShowSnackNotification(projectInfo.ProjectName + " creado exitosamente", Severity.Success);
+            
         }
         snackHandler._saving = false;
     }
