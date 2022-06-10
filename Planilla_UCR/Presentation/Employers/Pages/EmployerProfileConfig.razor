@@ -11,12 +11,12 @@
 @using System.Text.RegularExpressions
 @using System.ComponentModel.DataAnnotations
 @inject NavigationManager nav
-@inject IPersonService PersonService
 @inject NavigationManager nav
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
-@inject IPersonService PersonService
 @inject IEmployerService EmployerService
+@inject IPersonService PersonService
+
 
 @if(_loading) {
 
@@ -27,7 +27,7 @@
        
     </MudPaper>
 }else{
-    @if (!_empty && !_loading)
+    @if (!_loading)
     {
           
         List<BreadcrumbItem> _items = new List<BreadcrumbItem>
@@ -136,27 +136,20 @@
 
 @code {
     private bool _loading = true;
-    private bool _empty = true;
     Person personInfo = new Person("", "", "", "", Int32.Parse("0"), "", "", "");
-    Person previousPersonInfo = new Person("", "", "", "", Int32.Parse("0"), "", "", "");
     [Parameter] public string employerEmail { get; set; }
-    private IEnumerable<Person> _elements = new List<Person>();  
     SnackHandler snackHandler = new SnackHandler();
     MudForm form;
   
 
-    protected override async Task OnInitializedAsync()
+     protected override async Task OnInitializedAsync()
     {
         personInfo.Email = employerEmail;
-        _elements = await EmployerService.GetAllInfoEmployer(personInfo);
-        personInfo = _elements.FirstOrDefault();
-        if ( _elements.Length() == 0){
-            _empty = true;
+        personInfo = await EmployerService.GetInfoEmployer(personInfo);
+        if ( personInfo != null)
+        {
+            _loading = false;
         }
-        else{
-            _empty = false;
-        }
-        _loading = false;
     }
 
 
@@ -164,33 +157,16 @@
     {
         snackHandler._saving = true;
         await form.Validate();
-        if (form.IsValid && ValidateInfo(personInfo) && ValidateUpdate(personInfo)){
+        if (form.IsValid && ValidateInfo(personInfo)){
             await PersonService.UpdatePerson(personInfo);
             ShowSnackNotification("Cuenta para "+personInfo.Name+" modificada", Severity.Success);
-            personInfo = _elements.FirstOrDefault();
             nav.NavigateTo($"/Employer_Profile/{employerEmail}");
            
         }
         snackHandler._saving = false;
     }
 
-    /*ARREGLAR*/
-    bool ValidateUpdate(Person personInfo){
-        bool valid = true;
-        previousPersonInfo = _elements.FirstOrDefault();
-        if (previousPersonInfo.Name == personInfo.Name && previousPersonInfo.LastName1== personInfo.LastName1 && 
-            previousPersonInfo.LastName2 == personInfo.LastName2 && previousPersonInfo.Ssn == personInfo.Ssn && 
-            previousPersonInfo.BankAccount == personInfo.BankAccount && previousPersonInfo.Adress == personInfo.Adress 
-            && previousPersonInfo.PhoneNumber == personInfo.PhoneNumber)
-        {
-            valid = false;
-            ShowSnackNotification("La información actual es igual a la información que desea ingresar", Severity.Error);
-            ShowSnackNotification("No hay cambio para actualizar", Severity.Error);
-        }
-        return valid;
-    }
-
-
+  
 
     bool ValidateSsn(Person personInfo)
     {

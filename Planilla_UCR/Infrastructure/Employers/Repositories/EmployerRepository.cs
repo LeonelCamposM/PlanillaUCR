@@ -9,13 +9,6 @@ using System.Threading.Tasks;
 using System.Linq;
 using Microsoft.Data.SqlClient;
 
-
-
-
-
-
-
-
 namespace Infrastructure.Employers.Repositories
 {
     internal class EmployerRepository : IEmployerRepository
@@ -46,10 +39,17 @@ namespace Infrastructure.Employers.Repositories
             return employer;
         }
 
-        public async Task<IEnumerable<Person?>> GetAllInfoEmployer(Person personInfo)
+        public async Task<Person?> GetInfoEmployer(Person personInfo)
         {
-            var employerInfo = await _dbContext.People.FromSqlRaw("EXEC GetInfoEmployer @EmailEmployer",
+            IList<Person> employerInfoResult = await _dbContext.People.FromSqlRaw("EXEC GetInfoEmployer @EmailEmployer",
                   new SqlParameter("@EmailEmployer", personInfo.Email)).ToListAsync();
+            Person employerInfo = null;
+            if (employerInfoResult.Length() > 0)
+            {
+                employerInfo = employerInfoResult.First();
+            }
+           
+
             return employerInfo;
         }
     }
