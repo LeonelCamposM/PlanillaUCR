@@ -128,6 +128,35 @@ BEGIN
     SELECT * FROM Project WHERE Project.ProjectName = @ProjectName
 END
 
+
+--GO
+--CREATE OR ALTER PROCEDURE ModifyProject(
+--	@ProjectName varchar(255),
+--	@EmployerEmail varchar(255),
+--	@NewProjectName varchar(255),
+--	@NewProjectDescription varchar(600),
+--	@NewMaximumAmountForBenefits float,
+--	@NewMaximumBenefitAmount int,
+--	@NewPaymentInterval varchar(255),
+--	@Transaction int output
+--) AS
+--BEGIN
+--	IF ((@NewProjectName in (SELECT ProjectName FROM Project WHERE EmployerEmail = @EmployerEmail)) AND (@ProjectName <> @NewProjectName))
+--	BEGIN 
+--		SET @Transaction = 0;
+--	END
+--	ELSE
+--		BEGIN
+--			SET @Transaction = 1;
+
+--			UPDATE Project
+--			SET ProjectName = @NewProjectName, ProjectDescription = @NewProjectDescription, MaximumAmountForBenefits = @NewMaximumAmountForBenefits, 
+--				MaximumBenefitAmount = @NewMaximumBenefitAmount,PaymentInterval = @NewPaymentInterval
+--			WHERE EmployerEmail= @EmployerEmail AND ProjectName = @ProjectName;
+--		END
+--END
+
+
 -- People Stored Procedures
 GO
 CREATE PROCEDURE GetPersonByEmail(@email varchar(255))
