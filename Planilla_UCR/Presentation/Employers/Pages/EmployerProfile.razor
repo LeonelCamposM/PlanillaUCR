@@ -52,22 +52,22 @@
         <MudItem xs="4"></MudItem>
         <MudItem xs="6">
         <MudItem xs="8">
-        <MudField Variant="Variant.Text"> <MudIcon Icon="@Icons.Filled.Email" Color="@Color.Secondary" /> Email: @employerData.Email</MudField>
+        <MudField Variant="Variant.Text"> <MudIcon Icon="@Icons.Filled.Email" Color="@Color.Secondary" /> Email: @personInfo.Email</MudField>
         </MudItem>
         <MudItem xs="8">
-        <MudField Variant="Variant.Text"><MudIcon Icon="@Icons.Filled.Person" Color="@Color.Secondary" /> Nombre: @employerData.Name @employerData.LastName1 @employerData.LastName2</MudField>
+        <MudField Variant="Variant.Text"><MudIcon Icon="@Icons.Filled.Person" Color="@Color.Secondary" /> Nombre: @personInfo.Name @personInfo.LastName1 @personInfo.LastName2</MudField>
         </MudItem>
         <MudItem xs="8">
-        <MudField Variant="Variant.Text"><MudIcon Icon="@Icons.Filled.Photo" Color="@Color.Secondary" /> Cédula: @employerData.Ssn </MudField>
+        <MudField Variant="Variant.Text"><MudIcon Icon="@Icons.Filled.Photo" Color="@Color.Secondary" /> Cédula: @personInfo.Ssn </MudField>
         </MudItem>
             <MudItem xs="8">
-        <MudField Variant="Variant.Text"><MudIcon Icon="@Icons.Filled.CreditCard" Color="@Color.Secondary" />  Cuenta bancaria: @employerData.BankAccount</MudField>
+        <MudField Variant="Variant.Text"><MudIcon Icon="@Icons.Filled.CreditCard" Color="@Color.Secondary" />  Cuenta bancaria: @personInfo.BankAccount</MudField>
         </MudItem>
         <MudItem xs="8">
-        <MudField Variant="Variant.Text"><MudIcon Icon="@Icons.Filled.LocationOn" Color="@Color.Secondary" /> Dirección: @employerData.Adress</MudField>
+        <MudField Variant="Variant.Text"><MudIcon Icon="@Icons.Filled.LocationOn" Color="@Color.Secondary" /> Dirección: @personInfo.Adress</MudField>
         </MudItem>
         <MudItem xs="8">
-        <MudField Variant="Variant.Text"><MudIcon Icon="@Icons.Filled.ContactPhone" Color="@Color.Secondary" /> Teléfono: @employerData.PhoneNumber</MudField>
+        <MudField Variant="Variant.Text"><MudIcon Icon="@Icons.Filled.ContactPhone" Color="@Color.Secondary" /> Teléfono: @personInfo.PhoneNumber</MudField>
         </MudItem> 
 
         <MudButton Disabled="true"> </MudButton>
@@ -94,7 +94,6 @@
     private bool _loading = true;
     private bool _empty = true;
     Person personInfo = new Person("", "", "", "", Int32.Parse("0"), "", "", "");
-    public Person employerData = new Person("", "", "", "", Int32.Parse("0"), "", "", "");
     [Parameter] public string employerEmail { get; set; }
     private IEnumerable<Person> _elements = new List<Person>();  
   
@@ -102,7 +101,7 @@
     {
         personInfo.Email = employerEmail;
         _elements = await PersonService.GetAllInfoEmployer(personInfo);
-        employerData = _elements.FirstOrDefault();
+        personInfo = _elements.FirstOrDefault();
         if ( _elements.Length() == 0){
             _empty = true;
         }

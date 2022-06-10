@@ -51,18 +51,18 @@
                     @*Small fields *@
                     <MudItem xs="2"></MudItem>
                     <MudItem xs="4">
-                        <MudTextField @bind-Value="personInfo.Name" Label="@employerData.Name" Variant="Variant.Outlined" Required="true" RequiredError="Campo requerido"></MudTextField>
+                        <MudTextField @bind-Value="personInfo.Name" Label="Nombre" Variant="Variant.Outlined" Required="true" RequiredError="Campo requerido"></MudTextField>
                     </MudItem>
 
                     <MudItem xs="4">
-                        <MudTextField @bind-Value="personInfo.LastName1" Label="@employerData.LastName1" Variant="Variant.Outlined"></MudTextField>
+                        <MudTextField @bind-Value="personInfo.LastName1" Label="Primer Apellido" Variant="Variant.Outlined"></MudTextField>
                     </MudItem>
                     <MudItem xs="2"></MudItem>
 
 
                     <MudItem xs="2"></MudItem>
                     <MudItem xs="4">
-                        <MudTextField @bind-Value="personInfo.LastName2" Label="@employerData.LastName2" Variant="Variant.Outlined"></MudTextField>
+                        <MudTextField @bind-Value="personInfo.LastName2" Label="Segundo Apellido" Variant="Variant.Outlined"></MudTextField>
                     </MudItem>
                   
                     <MudItem xs="4">
@@ -73,7 +73,7 @@
 
                     <MudItem xs="2"></MudItem>
                     <MudItem xs="8">
-                        <MudTextField @bind-Value="personInfo.BankAccount" Label="@employerData.BankAccount" Variant="Variant.Outlined" Required="true" RequiredError="Campo requerido"></MudTextField>
+                        <MudTextField @bind-Value="personInfo.BankAccount" Label="Cuenta Bancaria" Variant="Variant.Outlined" Required="true" RequiredError="Campo requerido"></MudTextField>
                     <MudDivider />
                     </MudItem>
                     <MudItem xs="2"></MudItem>
@@ -81,14 +81,14 @@
                      @*Large fields *@
                     <MudItem xs="2"></MudItem>
                     <MudItem xs="8">
-                        <MudTextField @bind-Value="personInfo.Adress" Label="@employerData.Adress" Variant="Variant.Outlined"></MudTextField>
+                        <MudTextField @bind-Value="personInfo.Adress" Label="Dirección" Variant="Variant.Outlined"></MudTextField>
                     </MudItem>
                     <MudItem xs="2"></MudItem>
 
                    
                     <MudItem xs="2"></MudItem>
                      <MudItem xs="4">
-                        <MudTextField @bind-Value="personInfo.PhoneNumber" Label="@employerData.PhoneNumber" Variant="Variant.Outlined" ></MudTextField>
+                        <MudTextField @bind-Value="personInfo.PhoneNumber" Label="Teléfono" Variant="Variant.Outlined" ></MudTextField>
                     </MudItem>
                     <MudItem xs="6"></MudItem>
                      <MudSpacer></MudSpacer>
@@ -113,7 +113,7 @@
                            
                          <MudButton Disabled="true"> </MudButton>
                         @*Clear buton *@
-                        <MudButton OnClick="CleanForm" Variant="Variant.Filled" Color="Color.Transparent">
+                        <MudButton OnClick="GoToModifyPerfilForm" Variant="Variant.Filled" Color="Color.Transparent">
                                 <MudText>Cancelar</MudText>
                         </MudButton>
 
@@ -138,19 +138,18 @@
     private bool _loading = true;
     private bool _empty = true;
     Person personInfo = new Person("", "", "", "", Int32.Parse("0"), "", "", "");
-    public Person employerData = new Person("", "", "", "", Int32.Parse("0"), "", "", "");
+    Person previousPersonInfo = new Person("", "", "", "", Int32.Parse("0"), "", "", "");
     [Parameter] public string employerEmail { get; set; }
     private IEnumerable<Person> _elements = new List<Person>();  
     SnackHandler snackHandler = new SnackHandler();
     MudForm form;
-    [Parameter]
-    public EventCallback<Person> UpdatePersonInfo{ get; set; }
+  
 
     protected override async Task OnInitializedAsync()
     {
         personInfo.Email = employerEmail;
         _elements = await EmployerService.GetAllInfoEmployer(personInfo);
-        employerData = _elements.FirstOrDefault();
+        personInfo = _elements.FirstOrDefault();
         if ( _elements.Length() == 0){
             _empty = true;
         }
@@ -168,19 +167,21 @@
         if (form.IsValid && ValidateInfo(personInfo) && ValidateUpdate(personInfo)){
             await PersonService.UpdatePerson(personInfo);
             ShowSnackNotification("Cuenta para "+personInfo.Name+" modificada", Severity.Success);
+            personInfo = _elements.FirstOrDefault();
             nav.NavigateTo($"/Employer_Profile/{employerEmail}");
-            await UpdatePersonInfo.InvokeAsync(personInfo);
+           
         }
         snackHandler._saving = false;
     }
 
-
+    /*ARREGLAR*/
     bool ValidateUpdate(Person personInfo){
         bool valid = true;
-        if (employerData.Name == personInfo.Name && employerData.LastName1== personInfo.LastName1 && 
-            employerData.LastName2 == personInfo.LastName2 && employerData.Ssn == personInfo.Ssn && 
-            employerData.BankAccount == personInfo.BankAccount && employerData.Adress == personInfo.Adress 
-            && employerData.PhoneNumber == personInfo.PhoneNumber)
+        previousPersonInfo = _elements.FirstOrDefault();
+        if (previousPersonInfo.Name == personInfo.Name && previousPersonInfo.LastName1== personInfo.LastName1 && 
+            previousPersonInfo.LastName2 == personInfo.LastName2 && previousPersonInfo.Ssn == personInfo.Ssn && 
+            previousPersonInfo.BankAccount == personInfo.BankAccount && previousPersonInfo.Adress == personInfo.Adress 
+            && previousPersonInfo.PhoneNumber == personInfo.PhoneNumber)
         {
             valid = false;
             ShowSnackNotification("La información actual es igual a la información que desea ingresar", Severity.Error);
