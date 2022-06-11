@@ -1,0 +1,43 @@
+﻿@page "/Agreements/{employeeEmail}"/Projects/{EmployerEmail}/{ProjectName}/Agreements/See
+
+@using Domain.Projects.DTOs
+@using Domain.Projects.Entities
+@using Application.Projects
+@using Presentation.Projects.Models
+@using Presentation.Core.Components
+@using System.ComponentModel.DataAnnotations
+@inject NavigationManager nav
+
+
+@using Presentation.Core.Components
+@using System.ComponentModel.DataAnnotations
+@using Domain.Projects.Entities
+@using System.Globalization
+
+@using Domain.Agreements.DTOs
+@using Application.Agreements
+@using Domain.Agreements.Entities
+@using Application.People
+@using Domain.People.Entities
+@using Domain.Employees.Entities
+@using Application.Employees
+@using Application.Employers
+@using Domain.Employers.Entities
+@using Domain.Employers.DTOs
+@using Application.AgreementTypes
+@using Domain.AgreementTypes.Entities
+@using Domain.AgreementTypes.DTOs
+@using Domain.Projects.DTOs
+@using Application.Projects
+
+
+@inject IProjectService ProjectService
+@inject ISnackbar Snackbar
+
+@{List <BreadcrumbItem> _items = new List<BreadcrumbItem>
+    {
+        new BreadcrumbItem("Inicio", href: ""),
+        new BreadcrumbItem("Proyectos", href: $"/Projects/{EmployerEmail}"),
+    };
+}
+
