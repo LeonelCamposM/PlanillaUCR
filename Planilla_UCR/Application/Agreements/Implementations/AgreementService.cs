@@ -21,9 +21,9 @@ namespace Application.Agreements.Implementations
             await _agreementRepository.CreateAgreementAsync(agreement);
         }
 
-        public async Task<Agreement>? GetContracteeByEmail(Agreement agreement)
+        public async Task<Agreement>? GetContractee(Agreement agreement)
         {
-            return await _agreementRepository.GetContracteeByEmail(agreement);
+            return await _agreementRepository.GetContractee(agreement);
         }
     }
 }

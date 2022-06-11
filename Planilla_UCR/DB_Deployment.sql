@@ -45,11 +45,11 @@ CREATE TABLE Agreement(
 	EmployeeEmail varchar(255) NOT NULL,
 	EmployerEmail varchar(255) NOT NULL,
 	ProjectName varchar(255) NOT NULL,
-	ContractDate date NOT NULL,
+	ContractStartDate date NOT NULL,
 	ContractType varchar(255) NOT NULL,
 	MountPerHour int NOT NULL,
-	Duration date NOT NULL,
-	PRIMARY KEY(EmployeeEmail,EmployerEmail,ProjectName,ContractDate),
+	ContractFinishDate date NOT NULL,
+	PRIMARY KEY(EmployeeEmail,EmployerEmail,ProjectName,ContractStartDate),
 	FOREIGN KEY(EmployeeEmail) REFERENCES Employee(Email),
 	FOREIGN KEY(EmployerEmail, ProjectName) REFERENCES Project(EmployerEmail, ProjectName),
 	FOREIGN KEY(ContractType, MountPerHour) REFERENCES AgreementType(TypeAgreement, MountPerHour)
@@ -94,6 +94,7 @@ BEGIN
 END
 
 GO
+
 CREATE PROCEDURE ProjectNameCheck(@ProjectName VARCHAR(255))
 AS
 BEGIN
@@ -141,6 +142,32 @@ CREATE PROCEDURE GetEmployeeByEmail(@email varchar(255))
 AS
 BEGIN
     SELECT * FROM Employee AS E WHERE E.Email = @email
+END
+
+-- AgreementType Stored Procedures
+GO
+CREATE or Alter PROCEDURE GetTypesOfAgreement
+AS
+BEGIN 
+	SELECT * FROM AgreementType
+END
+
+GO
+CREATE or ALTER PROCEDURE GetSalaryPerAgreement(@MountPerHour int)
+AS
+BEGIN 
+	SELECT * FROM AgreementType WHERE MountPerHour = @MountPerHour
+END
+
+-- Agreement Stored Procedures
+GO
+Create or ALTER PROCEDURE GetAllAgreementsByProjectAndEmployer
+AS
+BEGIN
+	Select *
+	From Project as P JOIN Agreement as A ON P.EmployerEmail = A.EmployerEmail 
+	AND P.ProjectName = A.ProjectName JOIN AgreementType as ATP ON A.ContractType = ATP.TypeAgreement
+
 END
 
 -- Data Insert
@@ -296,8 +323,13 @@ VALUES('leonel@ucr.ac.cr',
 )
 
 INSERT INTO AgreementType
-VALUES('Empleado fijo', 22)
+VALUES('Tiempo completo', 1000)
 
-INSERT INTO Agreement
-VALUES('mau@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Proyecto 1', '9999-12-31','Empleado fijo',22, '9999-12-31')
+INSERT INTO AgreementType
+VALUES('Medio tiempo', 500)
 
+INSERT INTO AgreementType
+VALUES('Servicios profesionales', 700)
+
+INSERT INTO AgreementType
+VALUES('Por horas', 10)

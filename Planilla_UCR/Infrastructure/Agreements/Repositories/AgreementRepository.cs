@@ -29,7 +29,7 @@ namespace Infrastructure.Agreements.Repositories
             await _dbContext.SaveEntitiesAsync();
         }
 
-        public async Task<Agreement>? GetContracteeByEmail(Agreement agreement)
+        public async Task<Agreement>? GetContractee(Agreement agreement)
         {
             IList<Agreement> agreementList = await _dbContext.Agreements.Where
                 (e => e.EmployeeEmail == agreement.EmployeeEmail && e.EmployerEmail == agreement.EmployerEmail

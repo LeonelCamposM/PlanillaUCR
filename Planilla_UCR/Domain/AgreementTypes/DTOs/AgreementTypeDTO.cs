@@ -10,8 +10,8 @@ namespace Domain.AgreementTypes.DTOs
 
         public AgreementTypeDTO(string TypeAgreement, int MountPerHour)
         {
-            this.TypeAgreement = TypeAgreement;
-            this.MountPerHour = MountPerHour;
+            TypeAgreement = TypeAgreement;
+            MountPerHour = MountPerHour;
             
         }
     }

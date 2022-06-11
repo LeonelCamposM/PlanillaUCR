@@ -15,13 +15,13 @@ namespace Domain.Agreements.Entities
 
         public Agreement(string employeeEmail, string employerEmail, string projectName, DateTime? contractStartDate, string contractType, int mountPerHour, DateTime? contractFinishDate)
         {
-            this.EmployeeEmail = employeeEmail;
-            this.EmployerEmail = employerEmail;
-            this.ProjectName = projectName;
-            this.ContractStartDate = contractStartDate;
-            this.ContractType = contractType;
-            this.MountPerHour = mountPerHour;
-            this.ContractFinishDate = contractFinishDate;
+            EmployeeEmail = employeeEmail;
+            EmployerEmail = employerEmail;
+            ProjectName = projectName;
+            ContractStartDate = contractStartDate;
+            ContractType = contractType;
+            MountPerHour = mountPerHour;
+            ContractFinishDate = contractFinishDate;
         }
     }
 }
