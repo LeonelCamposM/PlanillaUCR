@@ -76,7 +76,7 @@ else
 
             <RowTemplate>
                 <MudTd DataLabel="Nombre" >
-                    <MudLink Color="Color.Secondary" Underline="Underline.Always" Href="@($"/Projects/{@context.EmployerEmail}/{@context.ProjectName}/Configurations")">
+                    <MudLink Color="Color.Secondary" Underline="Underline.Always" Href="@($"/Projects/{@context.EmployerEmail}/{@context.ProjectName}")">
                         @context.ProjectName
                     </MudLink>
                 </MudTd>
@@ -140,7 +140,7 @@ else
 
     private void GoToConfigs()
     {
-        nav.NavigateTo($"/Projects/{employerEmail}/{projectName}/Configurations");
+        nav.NavigateTo($"/Projects/{employerEmail}/{projectName}");
     }
 
     private void PageChanged(int i)
