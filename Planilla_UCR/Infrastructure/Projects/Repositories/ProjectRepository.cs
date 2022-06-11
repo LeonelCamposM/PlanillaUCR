@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Data.SqlClient;
 
 namespace Infrastructure.Projects.Repositories
 {
@@ -67,21 +66,20 @@ namespace Infrastructure.Projects.Repositories
 
         public async Task<bool> ModifyProject(Project project, string newProjectName)
         {
-            var EmployerEmail = new SqlParameter("EmployerEmail", project.EmployerEmail);
-            var ProjectName = new SqlParameter("ProjectName", project.ProjectName);
-            var NewProjectName = new SqlParameter("NewProjectName", newProjectName);
-            var ProjectDescription = new SqlParameter("ProjectDescription", project.ProjectDescription);
-            var MaximumAmountForBenefits = new SqlParameter("MaximumAmountForBenefits", project.MaximumAmountForBenefits);
-            var MaximumBenefitAmount = new SqlParameter("MaximumBenefitAmount", project.MaximumBenefitAmount);
-            var PaymentInterval = new SqlParameter("PaymentInterval", project.PaymentInterval);
             var Transaction = new SqlParameter("Transaction", 0);
             Transaction.Direction = System.Data.ParameterDirection.Output;
+            System.FormattableString query = ($@"EXECUTE ModifyProject 
+                @ProjectName = {project.ProjectName},
+                @EmployerEmail = {project.EmployerEmail},
+                @NewProjectName = {newProjectName},
+                @NewProjectDescription = {project.ProjectDescription},
+                @NewMaximumAmountForBenefits = {project.MaximumAmountForBenefits},
+                @NewMaximumBenefitAmount = {project.MaximumBenefitAmount},
+                @NewPaymentInterval = {project.PaymentInterval},
+                @Transaction = {Transaction} OUT" );
 
-            var nameList = await _dbContext.Projects.FromSqlRaw("EXEC ModifyProject @EmployerEmail," +
-                "@ProjectName, @NewProjectName,@NewProjectDescription,@NewMaximumAmountForBenefits," +
-                "@NewMaximumBenefitAmount,@NewPaymentInterva @Transaction OUTPUT", EmployerEmail, ProjectName,
-                NewProjectName, ProjectDescription, MaximumAmountForBenefits, MaximumBenefitAmount,
-                PaymentInterval, Transaction).ToListAsync();
+            _dbContext.Database.ExecuteSqlInterpolated(query);
+            await _dbContext.SaveEntitiesAsync();
 
             if (Convert.ToInt32(Transaction.Value) == 1)
             {
