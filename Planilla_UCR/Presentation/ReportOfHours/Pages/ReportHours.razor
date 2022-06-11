@@ -1,125 +1,143 @@
-﻿@page "/Projects/ReportHours"
+﻿@page "/Projects/ReportHours/{EmployerEmail}/{ProjectName}/{EmployeeEmail}"
 @using Application.ReportOfHours
 @using Domain.ReportOfHours.Entities
-@inject IReportOfHoursService HoursReportService
-
-<h3>HoursReport</h3>
-@hoursReport.EmployeeEmail
-@hoursReport.EmployeeEmail
-
-
-
-
 @using Presentation.Shared.Models
 @using Presentation.Core.Components
+@using Application.Projects
+@using Domain.Projects.Entities
 @inject ISnackbar Snackbar
+@inject IReportOfHoursService HoursReportService
+@inject IProjectService ProjectService
 @inject NavigationManager nav
 
 @*Navigation footprint *@
 @{
     List<BreadcrumbItem> _items = new List<BreadcrumbItem>
     {
-        //new BreadcrumbItem("Proyectos", href: $"/Projects/{email}"),
-        //new BreadcrumbItem(@projectName, href: $"/Projects/Details/{email}/{projectName}"),
-        //new BreadcrumbItem("Nuevo Reporte", href: $"/Projects/ReportHours"),
+        new BreadcrumbItem("Proyectos", href: $"/Projects/{EmployeeEmail}"),
+        new BreadcrumbItem(@projectName, href: $"/Projects/Details/{EmployeeEmail}/{projectName}"),
+        new BreadcrumbItem("Nuevo Reporte", href: $"/Projects/ReportHours"),
     };
 }
 <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
 
-<MudGrid>
-    <MudItem xs="10" sm="12">
-        <MudPaper  Height="220px" Width="100%" Outlined="false" Class="border-none pa-4" Elevation="0">
-            <MudSpacer></MudSpacer>
-            <MudText Align="Align.Center" Typo="Typo.h6">Información del empleado</MudText>
-            <MudForm @ref="form">
-                    <MudGrid>
-                    @*Small fields *@
-                    <MudItem xs="2"></MudItem>
-                    <MudItem xs="4">
-                        <MudTextField @bind-Value="hoursReport.ProjectName" Label="Nombre" Variant="Variant.Outlined" Required="true" RequiredError="Campo requerido"></MudTextField>
-                    </MudItem>
 
-                    <MudItem xs="4">
-                        <MudTextField @bind-Value="hoursReport.ReportDate" Label="Nombre" Variant="Variant.Outlined" Required="true" RequiredError="Campo requerido"></MudTextField>
-                    </MudItem>
-                    <MudItem xs="2"></MudItem>
+@if(_loading) {
+    <MudPaper  Height="220px" Width="100%" Outlined="false" Class="border-none pa-4" Elevation="0">
+         <MudText Align="Align.Center" Typo="Typo.h6">
+              <MudProgressCircular Color="Color.Secondary" Style="height:70px;width:70px;" Indeterminate="true" />
+         </MudText>
+       
+    </MudPaper>
+}else{
+    @if (!_loading)
+        {
+            <MudGrid>
+                <MudItem xs="10" sm="12">
+                    <MudPaper  Height="220px" Width="100%" Outlined="false" Class="border-none pa-4" Elevation="0">
+                        <MudSpacer></MudSpacer>
+                        <MudText Align="Align.Center" Typo="Typo.h6">Reporte de horas</MudText>
+                        <MudForm @ref="form">
+                                <MudGrid>
+                                <MudItem xs="2"></MudItem>
+                                <MudItem xs="8">
+                                    <MudSelect @bind-Value="hoursReport.ProjectName" Label="Nombre de Proyecto" Variant="Variant.Outlined" Required="true"  RequiredError="El nombre de proyecto es necesario">
+                                        @foreach (var part in _elements)
+                                        {
+                                            <MudSelectItem T="string" Value=part.ProjectName></MudSelectItem>
 
-                    <MudItem xs="2"></MudItem>
-                    <MudItem xs="4">
-                        <MudTextField @bind-Value="hoursReport.ReportHours" Label="Primer Apellido" Variant="Variant.Outlined"></MudTextField>
-                    </MudItem>
+                                        }
+                                    </MudSelect>
+                                </MudItem>  
+                                <MudItem xs="2"></MudItem>
 
-                    @*Large fields *@
-                    @*<MudItem xs="2"></MudItem>
-                    <MudItem xs="8">
-                        <MudTextField @bind-Value="personInfo.Adress" Label="Dirección" Variant="Variant.Outlined"></MudTextField>
-                    </MudItem>
-                    <MudItem xs="2"></MudItem>
+                                <MudItem xs="2"></MudItem>
+                                 <MudItem xs="8">
+                                    <MudDatePicker Label="Fecha del reporte" @bind-Date="hoursReport.ReportDate" DateFormat="yyyy.MM.dd" Variant="Variant.Outlined" Required="true" RequiredError="La fecha de reporte es necesaria"/>
+                                </MudItem>
+                                <MudItem xs="2"></MudItem>
 
-                    <MudItem xs="2"></MudItem>
-                    <MudItem xs="8">
-                        <MudTextField @bind-Value="personInfo.BankAccount" Label="Cuenta Bancaria" Variant="Variant.Outlined" Required="true" RequiredError="Campo requerido"></MudTextField>
-                    
-                        <br />
-                        <MudDivider />
-                    </MudItem>
-                    <MudItem xs="2"></MudItem>*@
+                                 <MudItem xs="2"></MudItem>
+                                <MudItem xs="8">
+                                    <MudNumericField @bind-Value="hoursReport.ReportHours" Label="Horas trabajadas" Required="true" Variant="Variant.Outlined" RequiredError="El número de horas es necesario"></MudNumericField>
+                                </MudItem>
+                                 <MudItem xs="2"></MudItem>
 
-                    @*Create buton *@
-                    <MudItem xs="2"></MudItem>
-                    <MudItem xs="8" >
-                    
-                        <MudButton Disabled="@snackHandler._saving" OnClick="SaveReportInfo" Variant="Variant.Filled" Color="Color.Secondary">
-                            @if (snackHandler._saving)
-                            {
-                                <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true"/>
-                                <MudText Class="ms-2">Procesando</MudText>
-                            }
-                            else
-                            {
-                                <MudText>Registrar</MudText>
-                            }
-                        </MudButton>
-                        <MudButton Disabled="true"> </MudButton>
+                                @*Create buton *@
+                                <MudItem xs="2"></MudItem>
+                                <MudItem xs="8" >
+                                <MudDivider />
+                                <br>
+                                    <MudButton Disabled="@snackHandler._saving" OnClick="SaveReportInfo" Variant="Variant.Filled" Color="Color.Secondary">
+                                        @if (snackHandler._saving)
+                                        {
+                                            <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true"/>
+                                            <MudText Class="ms-2">Procesando</MudText>
+                                        }
+                                        else
+                                        {
+                                            <MudText>Reportar</MudText>
+                                        }
+                                    </MudButton>
+                                    <MudButton Disabled="true"> </MudButton>
 
-                        @*Clear buton *@
-                        <MudButton OnClick="CleanForm" Variant="Variant.Filled" Color="Color.Transparent">
-                                <MudText>Limpiar</MudText>
-                        </MudButton>
+                                    @*Clear buton *@
+                                    <MudButton OnClick="CleanForm" Variant="Variant.Filled" Color="Color.Transparent">
+                                            <MudText>Restablecer</MudText>
+                                    </MudButton>
                         
-                    </MudItem>
-                    <MudItem xs="2"></MudItem>
-                    
-                </MudGrid>
-            </MudForm>
-        </MudPaper>
-    </MudItem>
-</MudGrid>
+                                </MudItem>
+                                <MudItem xs="2"></MudItem>
+                            </MudGrid>
+                        </MudForm>
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
+        }
+    }
 
 @code {
     SnackHandler snackHandler = new SnackHandler();
     MudForm form;
+    private IEnumerable<Project> _elements;
+    private bool _loading = true;
+    private bool empty = true;
 
-    //[Parameter]
-    //public string EmployerEmail { set; get; }
-    //[Parameter]
-    //public string projectName { set; get; }
-    //[Parameter]
-    //public string EmployeeEmail { set; get; }
+    [Parameter]
+    public string EmployerEmail { set; get; }
+    [Parameter]
+    public string projectName { set; get; }
+    [Parameter]
+    public string EmployeeEmail { set; get; }
 
-    // @page "/Projects/ReportHours/{EmployerEmail}/{ProjectName}/{EmployeeEmail}"
     public float hours { get; set; } = 5.4f;
-    public DateTime date1 { get; set; }
-    HoursReport hoursReport = new HoursReport("leonel@ucr.ac.cr","Proyecto 1","mau@ucr.ac.cr",null, 0);
+    HoursReport hoursReport = new HoursReport("","","",null, 0);
+    DateTime? startDate;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _elements = await ProjectService.GetEmployerProyects(EmployerEmail);
+        if (_elements.Length() == 0)
+        {
+            empty = true;
+        }
+        else
+        {
+            empty = false;
+        }
+        _loading = false;
+        hoursReport.ReportDate = DateTime.Now;
+        hoursReport.ProjectName = projectName;
+        hoursReport.EmployerEmail = EmployerEmail;
+        hoursReport.EmployeeEmail = EmployeeEmail;
+    }
 
     async Task SaveReportInfo()
     {
         snackHandler._saving = true;
-        //await form.Validate();
-        if (true)
+        await form.Validate();
+        if (form.IsValid)
         {
-            date1 = new DateTime(2016, 1, 1, 8, 47, 0);
-            hoursReport.ReportDate = date1;
             await HoursReportService.CreateReportAsync(hoursReport);
         }
         snackHandler._saving = false;
@@ -145,14 +163,9 @@
 
     void CleanForm()
     {
-    //    hoursReport.Name = "";
-    //    hoursReport.Email = "";
-    //    hoursReport.LastName1 = "";
-    //    hoursReport.LastName2 = "";
-    //    hoursReport.Adress = "";
-    //    hoursReport.BankAccount = "";
-    //    hoursReport.PhoneNumber = "";
-    //    hoursReport.Ssn = 0;
+        hoursReport.ReportDate = DateTime.Now;
+        hoursReport.ProjectName = projectName;
+        hoursReport.ReportHours = 0;
     }
 
 }
