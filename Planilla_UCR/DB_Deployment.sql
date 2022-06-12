@@ -86,6 +86,34 @@ BEGIN
     SELECT * FROM Subscription WHERE TypeSubscription=0 and IsEnabled=1
 END
 
+GO
+CREATE OR ALTER PROCEDURE ModifySubscription(
+	@EmployerEmail varchar(255),
+	@ProjectName varchar(255),
+	@SubscriptionName varchar(255),
+	@NewSubscriptionName varchar(255),
+	@ProviderName varchar(255),
+	@SubscriptionDescription varchar(600),
+	@Cost float,
+	@TypeSubscription int,
+	@IsEnabled int,
+	@Transaction int output
+) AS
+BEGIN
+	IF ((@NewSubscriptionName in (SELECT SubscriptionName FROM Subscription WHERE EmployerEmail = @EmployerEmail AND ProjectName = @ProjectName)) AND (@SubscriptionName <> @NewSubscriptionName))
+	BEGIN 
+		SET @Transaction = 0;
+	END
+	ELSE
+		BEGIN
+			SET @Transaction = 1;
+
+			UPDATE Subscription
+			SET SubscriptionName = @NewSubscriptionName, SubscriptionDescription = @SubscriptionDescription,Cost = @Cost, ProviderName = @ProviderName 
+			WHERE EmployerEmail= @EmployerEmail AND ProjectName = @ProjectName AND SubscriptionName = @SubscriptionName;
+		END
+END
+
 -- Project Stored Procedures
 GO 
 CREATE PROCEDURE GetEmployerByEmail(@email VARCHAR(255))
@@ -110,6 +138,29 @@ BEGIN
     SELECT * FROM Person AS P WHERE P.Email = @email
 END
 
+
+GO
+CREATE PROCEDURE UpdatePerson(
+	@EmailPerson varchar(255),
+	@NewName varchar(255),
+	@NewLastName1 varchar(255),
+	@NewLastName2 varchar(255),
+	@NewSSN int,
+	@NewBankAccount varchar(255),
+	@NewAdress varchar(255),
+	@NewPhoneNumber varchar(255)
+)
+AS
+BEGIN
+	UPDATE Person 
+	SET Name=@NewName, LastName1=@NewLastName1, LastName2=@NewLastName2, 
+	SSN=@NewSSN, BankAccount=@NewBankAccount, 
+	Adress=@NewAdress, PhoneNumber=@NewPhoneNumber
+	WHERE Email=@EmailPerson
+END
+
+
+
 -- Employer Stored Procedures
 GO
 CREATE PROCEDURE GetInfoEmployer(@EmailEmployer varchar(255))
@@ -122,10 +173,12 @@ END
 -- Employee Stored Procedures
 GO
 CREATE PROCEDURE [dbo].[GetAllEmployees]
+@projectName VARCHAR(255)
 AS
 BEGIN
-	SELECT Employee.Email, Person.Name, Person.LastName1, Person.LastName2, Person.SSN, Person.BankAccount, Person.Adress, Person.PhoneNumber
-	FROM Employee JOIN  Person ON Employee.Email = Person.Email
+	SELECT P.Email, P.Name, P.LastName1, P.LastName2, P.SSN, P.BankAccount, P.Adress, P.PhoneNumber
+	FROM Employee JOIN  Person AS P ON Employee.Email = P.Email left JOIN Agreement as A ON A.EmployeeEmail = Employee.Email
+	Where A.ProjectName IS NULL OR A.ProjectName != @projectName
 END
 
 GO
@@ -160,6 +213,7 @@ BEGIN
 END
 
 -- Data Insert
+GO
 INSERT INTO Person
 VALUES('jeremy@ucr.ac.cr',
 'Jeremy',
