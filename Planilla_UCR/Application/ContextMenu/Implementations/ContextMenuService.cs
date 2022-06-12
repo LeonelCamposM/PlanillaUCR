@@ -31,11 +31,6 @@ namespace Application.ContextMenu.Implementations
             return showProjectsMenu;
         }
 
-        public void UnsetOnChange(Action action)
-        {
-            OnChange -= action;
-        }
-
         public void SetOnChange(Action action)
         {
             OnChange += action;
