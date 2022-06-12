@@ -17,6 +17,8 @@ using Application.Authorization;
 using Application.Authorization.Implementations;
 using Application.Email;
 using Application.Email.Implementations;
+using Application.ContextMenu;
+using Application.ContextMenu.Implementations;
 
 namespace Application
 {
@@ -34,6 +36,7 @@ namespace Application
             services.AddTransient<IAuthenticationService, AuthenticationService>();
             services.AddTransient<IAuthorizationServices, AuthorizationService>();
             services.AddTransient<IEmailServices, EmailServices>();
+            services.AddScoped<IContextMenuService, ContextMenuService>();
             return services;
         }
     }
