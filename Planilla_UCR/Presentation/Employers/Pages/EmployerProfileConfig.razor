@@ -150,7 +150,7 @@
     protected override async Task OnInitializedAsync()
     {
         personInfo.Email = employerEmail;
-        personInfo = await EmployerService.GetInfoEmployer(personInfo);
+        personInfo = await PersonService.GetInfoPerson(personInfo);
         oldName = personInfo.Name;
         oldLastName1 = personInfo.LastName1;
         oldLastName2 = personInfo.LastName2;

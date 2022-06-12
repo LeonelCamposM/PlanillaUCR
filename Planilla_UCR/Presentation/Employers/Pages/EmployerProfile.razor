@@ -98,7 +98,7 @@
     protected override async Task OnInitializedAsync()
     {
         personInfo.Email = employerEmail;
-        personInfo = await EmployerService.GetInfoEmployer(personInfo);
+        personInfo = await PersonService.GetInfoPerson(personInfo);
         if (personInfo != null)
         {
             _loading = false;
