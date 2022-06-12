@@ -12,7 +12,7 @@
     {
         new BreadcrumbItem("Inicio", href: ""),
         new BreadcrumbItem("Proyectos", href: $"/Projects/{employerEmail}"),
-        new BreadcrumbItem($"{projectName}", href: $"/Projects/Details/{employerEmail}/{projectName}"),
+        new BreadcrumbItem($"{projectName}", href: $"/Projects/{employerEmail}/{projectName}/Configurations"),
         new BreadcrumbItem("Deducciones voluntarias", href: $"/Projects/{employerEmail}/{projectName}/Deductions"),
         new BreadcrumbItem($"{subscriptionName}", href: null, disabled: true)
     };
@@ -132,12 +132,12 @@ else
     protected override async Task OnInitializedAsync()
     {
         subscription = await SubscriptionService.GetSubscription(employerEmail, projectName, subscriptionName);
-        newName = subscription.SubscriptionName;
-        tempCost = subscription.Cost;
-        providerName =subscription.ProviderName;
-        sDescription = subscription.SubscriptionDescription;
         if (subscription != null)
         {
+            newName = subscription.SubscriptionName;
+            tempCost = subscription.Cost;
+            providerName =subscription.ProviderName;
+            sDescription = subscription.SubscriptionDescription;
             _loading = false;
         }
     }
@@ -148,16 +148,15 @@ else
         await form.Validate();
         if (form.IsValid)
         {
-            snackHandler._saving = false;
             subscription.Cost = (double)tempCost;
             subscription.ProviderName = providerName;
             subscription.SubscriptionDescription = sDescription;
-            bool isModified = await SubscriptionService.ModifySubscription(subscription, newName);
+            bool isModified = SubscriptionService.ModifySubscription(subscription, newName);
             if (isModified)
             {
                 ShowSnackNotification("Deducción " + subscription.SubscriptionName + " modificada", Severity.Success);
                 subscription = await SubscriptionService.GetSubscription(employerEmail, projectName, newName);
-                subscriptionName = newName;
+                subscriptionName = subscription.SubscriptionName;
                 DisableForm();
             }
             else
