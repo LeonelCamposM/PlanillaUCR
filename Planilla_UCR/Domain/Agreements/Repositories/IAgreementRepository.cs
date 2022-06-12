@@ -8,7 +8,7 @@ namespace Domain.Agreements.Repositories
     public interface IAgreementRepository
     {
         Task CreateAgreementAsync(Agreement agreement);
-        Task<Agreement>? GetContracteeByEmail(Agreement agreement);
+        Task<Agreement>? GetContractee(Agreement agreement);
 
     }
 }

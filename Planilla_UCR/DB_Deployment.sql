@@ -95,6 +95,7 @@ BEGIN
 END
 
 GO
+
 CREATE PROCEDURE ProjectNameCheck(@ProjectName VARCHAR(255))
 AS
 BEGIN
