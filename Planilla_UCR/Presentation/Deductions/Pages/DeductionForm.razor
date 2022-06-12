@@ -14,7 +14,7 @@
         new BreadcrumbItem("Proyectos", href: $"/Projects/{employerEmail}"),
         new BreadcrumbItem($"{projectName}", href: $"/Projects/Details/{employerEmail}/{projectName}"),
         new BreadcrumbItem("Deducciones voluntarias", href: $"/Projects/{employerEmail}/{projectName}/Deductions"),
-        new BreadcrumbItem("Nueva deducción", href: "newdeduction")
+        new BreadcrumbItem("Nueva deducción", href: null, disabled: true)
     };
 }
 <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>

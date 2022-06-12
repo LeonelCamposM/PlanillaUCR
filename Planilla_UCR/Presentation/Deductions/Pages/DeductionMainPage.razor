@@ -14,7 +14,7 @@
         new BreadcrumbItem("Inicio", href: ""),
         new BreadcrumbItem("Proyectos", href: $"/Projects/{employerEmail}"),
         new BreadcrumbItem($"{projectName}", href: $"/Projects/Details/{employerEmail}/{projectName}"),
-        new BreadcrumbItem("Deducciones voluntarias", href: $"/Projects/{employerEmail}/{projectName}/Deductions"),
+        new BreadcrumbItem("Deducciones voluntarias", href: null, disabled: true),
     };
 }
 
@@ -65,7 +65,7 @@ else
                 </HeaderContent>
                 <RowTemplate>
                     <MudTd DataLabel="Nombre">
-                        <MudLink Color="Color.Secondary" Href="@($"/Projects/{employerEmail}/{projectName}/Deductions/{context.SubscriptionName}")">
+                        <MudLink Color="Color.Secondary" Underline="Underline.Always" Href="@($"/Projects/{employerEmail}/{projectName}/Deductions/{context.SubscriptionName}")">
                             @context.SubscriptionName
                         </MudLink>
                     </MudTd>
