@@ -11,8 +11,8 @@ namespace Domain.AgreementTypes.Entities
 
         public AgreementType(string TypeAgreement, int MountPerHour)
         {
-            TypeAgreement = TypeAgreement;
-            MountPerHour = MountPerHour;
+            this.TypeAgreement = TypeAgreement;
+            this.MountPerHour = MountPerHour;
 
         }
     }

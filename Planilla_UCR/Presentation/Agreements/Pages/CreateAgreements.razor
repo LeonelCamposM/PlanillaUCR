@@ -111,7 +111,7 @@
                             </MudButton>
                     @*Clear buton*@
                     <MudButton Disabled = "true"> </MudButton>
-                    <MudButton Disabled = "true" OnClick="CleanForm" Variant="Variant.Filled" Color="Color.Error">
+                    <MudButton OnClick="CleanForm" Variant="Variant.Filled" Color="Color.Transparent">
                         <MudText>Limpiar</MudText>
                     </MudButton>
                    
@@ -237,7 +237,7 @@
         bool isValid = true;
         IEnumerable<Employee> employeeList = await EmployeeService.GetEmployeeByEmail(agreementObject.EmployeeEmail);
         Agreement myAgreement = new Agreement("", "", "", null, "", 0, null);
-        myAgreement = await AgreementService.GetContracteeByEmail(agreementObject);
+        myAgreement = await AgreementService.GetContractee(agreementObject);
         if (myAgreement != null)
         {
             isValid=false;

@@ -15,13 +15,13 @@ namespace Domain.Agreements.DTOs
 
         public AgreementDTO(string employeeEmail, string employerEmail, string projectName, DateTime? contractStartDate, string contractType, int mountPerHour, DateTime? contractFinishDate)
         {
-            EmployeeEmail = employeeEmail;
-            EmployerEmail = employerEmail;
-            ProjectName = projectName;
-            ContractStartDate = contractStartDate;
-            ContractType = contractType;
-            MountPerHour = mountPerHour;
-            ContractFinishDate = contractFinishDate;
+            this.EmployeeEmail = employeeEmail;
+            this.EmployerEmail = employerEmail;
+            this.ProjectName = projectName;
+            this.ContractStartDate = contractStartDate;
+            this.ContractType = contractType;
+            this.MountPerHour = mountPerHour;
+            this.ContractFinishDate = contractFinishDate;
         }
     }
 }

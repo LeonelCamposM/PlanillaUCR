@@ -321,5 +321,3 @@ Values('Servicios profesionales', 700)
 
 Insert into AgreementType
 Values('Por horas', 10)
-
-delete from Agreement
