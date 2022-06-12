@@ -2,9 +2,15 @@
 @using Domain.Projects.Entities
 @using Application.Projects
 @using Presentation.Core.Components
+@using Presentation.Projects.Models
+@using Application.ContextMenu
+
+@inject NavigationManager nav
 @using Presentation.Authentication
 
 @inject IProjectService ProjectService
+@inject IContextMenuService ContextMenuService
+
 @inject NavigationManager nav
 
 @{
@@ -99,8 +105,8 @@ else
     
 }
 
-
 @code {
+
     private bool _empty = true;
     private bool _loading = true;
     public string searchString = "";
@@ -109,12 +115,10 @@ else
     
     [Parameter] public string employerEmail { get; set; }
     [Parameter] public string projectName { get; set; }
-    [CascadingParameter] protected EventCallback<string> setEmail { get; set; }
-
 
     protected override async Task OnInitializedAsync()
     {
-        await setEmail.InvokeAsync(employerEmail);
+        ContextMenuService.SetProjectsContext(false, "");
         elements = await ProjectService.GetEmployerProyects(employerEmail);
         _loading = false;
         if (elements.Length() > 0){

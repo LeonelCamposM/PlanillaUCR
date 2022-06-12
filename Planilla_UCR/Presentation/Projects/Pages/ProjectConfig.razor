@@ -5,10 +5,12 @@
 @using Presentation.Projects.Models
 @using Presentation.Core.Components
 @using System.ComponentModel.DataAnnotations
+@using Application.ContextMenu
 
 @inject IProjectService ProjectService
 @inject NavigationManager nav
 @inject ISnackbar Snackbar
+@inject IContextMenuService ContextMenuService
 
 
 @{
@@ -130,6 +132,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        ContextMenuService.SetProjectsContext(true, projectName);
         projectObject = await ProjectService.GetProject(employerEmail, projectName);
         tittle = "Modificar " + projectName;
     }
