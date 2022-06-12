@@ -105,12 +105,16 @@
         <MudField Variant="Variant.Text"><MudIcon Icon="@Icons.Filled.ContactPhone" Color="@Color.Secondary" /> Teléfono: @personInfo.PhoneNumber</MudField>
         </MudItem> 
 
-        <MudButton Disabled="true"> </MudButton>
-        <MudItem xs="8">
-            <MudButton OnClick="GoToProjects" Variant="Variant.Filled" Color="Color.Transparent">
-            <MudText>Borrar</MudText>
-        </MudButton>
-        </MudItem> 
+        <AuthorizeView Roles="Employer">
+            <Authorized> 
+                <MudButton Disabled="true"> </MudButton>
+                <MudItem xs="8">
+                    <MudButton OnClick="GoToProjects" Variant="Variant.Filled" Color="Color.Transparent">
+                    <MudText>Borrar</MudText>
+                </MudButton>
+                </MudItem> 
+            </Authorized>
+        </AuthorizeView>
         </MudItem>
 
     </MudGrid>
