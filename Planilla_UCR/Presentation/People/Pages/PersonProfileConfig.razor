@@ -1,4 +1,4 @@
-﻿@page "/Employer_Profile/{employerEmail}/Configurations"
+﻿@page "/Profile/{userEmail}/Configurations"
 @using Domain.Authentication.DTOs
 @using Domain.Employers.Entities
 @using Domain.Employers.DTOs
@@ -32,9 +32,9 @@
           
         List<BreadcrumbItem> _items = new List<BreadcrumbItem>
         {
-            new BreadcrumbItem("Proyectos", href: $"Projects/{employerEmail}"),
-            new BreadcrumbItem("Mi perfil", href: $"Employer_Profile/{employerEmail}"),
-            new BreadcrumbItem("Configuraciones", href: $"Employer_Profile/{employerEmail}/Configurations")
+            new BreadcrumbItem("Proyectos", href: $"Projects/{userEmail}"),
+            new BreadcrumbItem("Mi perfil", href: $"Profile/{userEmail}"),
+            new BreadcrumbItem("Configuraciones", href: $"Profile/{userEmail}/Configurations")
         };
 
     <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
@@ -136,7 +136,7 @@
 @code {
     private bool _loading = true;
     Person personInfo = new Person("", "", "", "", Int32.Parse("0"), "", "", "");
-    [Parameter] public string employerEmail { get; set; }
+    [Parameter] public string userEmail { get; set; }
     SnackHandler snackHandler = new SnackHandler();
     MudForm form;
     private string oldName = "";
@@ -149,7 +149,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        personInfo.Email = employerEmail;
+        personInfo.Email = userEmail;
         personInfo = await PersonService.GetInfoPerson(personInfo);
         oldName = personInfo.Name;
         oldLastName1 = personInfo.LastName1;
@@ -171,7 +171,7 @@
         if (form.IsValid && ValidateSsn(personInfo) && ValidateUpdate(personInfo)){
             await PersonService.UpdatePerson(personInfo);
             ShowSnackNotification("Cuenta para "+personInfo.Name+" modificada", Severity.Success);
-            nav.NavigateTo($"/Employer_Profile/{employerEmail}");
+            nav.NavigateTo($"/Profile/{userEmail}");
            
         }
         snackHandler._saving = false;
@@ -232,6 +232,6 @@
 
     private void GoToEmployerProfileConfig()
     {
-        nav.NavigateTo($"Employer_Profile/{employerEmail}/Configurations");
+        nav.NavigateTo($"Profile/{userEmail}/Configurations");
     }
 }
