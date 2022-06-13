@@ -384,9 +384,12 @@ Insert into AgreementType
 Values('Servicios profesionales', 700)
 
 INSERT INTO ReportOfHours
-VALUES('leonel@ucr.ac.cr', 'Proyecto 1','mau@ucr.ac.cr', '9999-12-31',22.2)
+VALUES('leonel@ucr.ac.cr', 'Proyecto 1','employer@a', '9999-12-31',22.2)
 
 INSERT INTO ReportOfHours
 VALUES('leonel@ucr.ac.cr', 'Proyecto 2','mau@ucr.ac.cr', '9999-12-31',22.2)
 Insert into AgreementType
 Values('Por horas', 10)
+
+select *
+from ReportOfHours
