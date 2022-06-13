@@ -70,7 +70,6 @@
                     <HeaderContent>
                         <MudTh>Nombre</MudTh>
                         <MudTh>Descripción</MudTh>
-                        <MudTh>Ajustes</MudTh>
                     </HeaderContent>
 
                     <RowTemplate Context="row">
@@ -82,10 +81,6 @@
 
                         <MudTd DataLabel="Descripción">@row.ProjectDescription</MudTd>
             
-                        <MudTd>
-                            <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Primary" OnClick="GoToConfigs"/>
-                            <MudSpacer></MudSpacer>
-                        </MudTd>
                     </RowTemplate>
 
                     <PagerContent>
