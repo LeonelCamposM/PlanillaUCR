@@ -113,7 +113,7 @@
                            
                          <MudButton Disabled="true"> </MudButton>
                         @*Clear buton *@
-                        <MudButton OnClick="GoToEmployerProfileConfig" Variant="Variant.Filled" Color="Color.Transparent">
+                        <MudButton OnClick="GoToProfile" Variant="Variant.Filled" Color="Color.Transparent">
                                 <MudText>Cancelar</MudText>
                         </MudButton>
 
@@ -229,8 +229,8 @@
         personInfo.Ssn = 0;
     }
 
-    private void GoToEmployerProfileConfig()
+    private void GoToProfile()
     {
-        nav.NavigateTo($"Profile/{userEmail}/Configurations");
+        nav.NavigateTo($"Profile/{userEmail}");
     }
 }
