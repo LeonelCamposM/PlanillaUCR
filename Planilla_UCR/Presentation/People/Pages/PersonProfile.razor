@@ -1,20 +1,22 @@
 ﻿@page "/Profile/{userEmail}"
-@using Application.Employers
-@using Application.People
 @using Domain.Employers.Entities
 @using Domain.Employers.DTOs
 @using Domain.People.Entities
-@using Presentation.Core.Components
 @using Domain.Authentication.DTOs
+@using Domain.Authentication
+@using Domain.Projects.Entities
 @using Application.Authentication
-@using  Domain.Authentication
+@using Application.Employers
+@using Application.People
 @using Application.Authorization;
 @using Application.Authorization.Implementations;
+@using Application.Projects
+@using Presentation.Core.Components
 @inject NavigationManager nav
 @inject IPersonService PersonService
 @inject IEmployerService EmployerService
 @inject IAuthenticationService AuthenticationService
-
+@inject IProjectService ProjectService
 
 <AuthorizeView>
     <Authorized> 
@@ -76,7 +78,7 @@
                 </MudItem>
                
                 <MudItem xs="4">
-                    <MudIconButton  Icon="@Icons.Material.Filled.Settings" Color="Color.Primary" OnClick="GoToEmployerProfileConfig"/>
+                    <MudIconButton  Icon="@Icons.Material.Filled.Settings" Color="Color.Primary" OnClick="GoToProfileConfig"/>
                 </MudItem>
                 
 
@@ -109,13 +111,33 @@
             <Authorized> 
                 <MudButton Disabled="true"> </MudButton>
                 <MudItem xs="8">
-                    <MudButton OnClick="GoToProjects" Variant="Variant.Filled" Color="Color.Transparent">
+                    <MudButton OnClick="OpenDialog" Variant="Variant.Filled" Color="Color.Transparent">
                     <MudText>Borrar</MudText>
                 </MudButton>
                 </MudItem> 
             </Authorized>
         </AuthorizeView>
         </MudItem>
+
+        <MudDialog @bind-IsVisible="visible" Options="dialogOptions">
+            <TitleContent>
+                <MudText Typo="Typo.h6">
+                    <MudIcon Icon="@Icons.Material.Filled.Delete" Color="@Color.Primary" Class="mr-2"/> ¿Está seguro de que desea eliminar su cuenta? Sus proyectos asociados quedaran inactivos: 
+                </MudText>
+            </TitleContent>
+            <DialogContent>
+                <MudItem xs="12" Class="d-flex justify-center align-center">
+                    <MudText>P1</MudText>
+         
+
+                </MudItem>
+            </DialogContent>
+            <DialogActions>
+                  <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="GoToProjects" Class="px-10">Aceptar</MudButton>
+                  <MudButton Variant="Variant.Filled" Color="Color.Transparent" OnClick="CloseDialog" Class="px-10">Cancelar</MudButton>
+            </DialogActions>
+        </MudDialog>
+
 
     </MudGrid>
     </MudPaper>
@@ -130,9 +152,20 @@
 
 @code {
     private bool _loading = true;
+    private bool _empty = true;
     Person personInfo = new Person("", "", "", "", Int32.Parse("0"), "", "", "");
     [Parameter] public string userEmail { get; set; }  
-  
+    public string confirmationCodeEmail { get; set; }
+    private bool visible;
+    private bool open;
+    
+    private void OpenDialog() => visible = true;
+
+    void CloseDialog() => visible = false;
+
+    private DialogOptions dialogOptions = new() { FullWidth = true };
+
+
     protected override async Task OnInitializedAsync()
     {
         personInfo.Email = userEmail;
@@ -148,8 +181,11 @@
         nav.NavigateTo($"Projects/{userEmail}");
     }
 
-    private void GoToEmployerProfileConfig()
+    private void GoToProfileConfig()
     {
         nav.NavigateTo($"/Profile/{userEmail}/Configurations");
     }
+
+
+
 }
