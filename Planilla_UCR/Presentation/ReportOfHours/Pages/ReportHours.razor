@@ -16,7 +16,7 @@
     {
         new BreadcrumbItem("Proyectos", href: $"/Projects/{EmployeeEmail}"),
         new BreadcrumbItem(@projectName, href: $"/Projects/Details/{EmployeeEmail}/{projectName}"),
-        new BreadcrumbItem("Nuevo Reporte", href: $"/Projects/ReportHours"),
+        new BreadcrumbItem("Nuevo Reporte", href: null, disabled: true),
     };
 }
 <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
