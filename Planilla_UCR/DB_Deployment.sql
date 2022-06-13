@@ -81,6 +81,19 @@ CREATE TABLE ReportOfHours(
 	FOREIGN KEY(EmployeeEmail) REFERENCES Employee(Email)
 );
 
+CREATE TABLE Subscribes(
+	EmployeeEmail varchar(255) NOT NULL,
+	EmployerEmail varchar(255) NOT NULL,
+	ProjectName varchar(255) NOT NULL,
+	SubscriptionName varchar(255) NOT NULL,
+	Cost float NOT NULL,
+	StartDate date NOT NULL,
+	FinishDate date,
+	PRIMARY KEY(EmployeeEmail,EmployerEmail,ProjectName),
+	FOREIGN KEY(EmployerEmail, ProjectName, SubscriptionName) REFERENCES Subscription(EmployerEmail, ProjectName, SubscriptionName) ON UPDATE CASCADE,
+	FOREIGN KEY(EmployeeEmail) REFERENCES Employee(Email)
+);
+
 -- Suscription Stored Procedures
 GO
 CREATE PROCEDURE GetAllBenefits
@@ -123,6 +136,31 @@ BEGIN
 			SET SubscriptionName = @NewSubscriptionName, SubscriptionDescription = @SubscriptionDescription,Cost = @Cost, ProviderName = @ProviderName 
 			WHERE EmployerEmail= @EmployerEmail AND ProjectName = @ProjectName AND SubscriptionName = @SubscriptionName;
 		END
+END
+
+GO
+CREATE OR ALTER PROCEDURE DeleteSubscription(
+	@EmployerEmail varchar(255),
+	@ProjectName varchar(255),
+	@SubscriptionName varchar(255)
+) AS
+BEGIN
+	UPDATE Subscription
+	SET IsEnabled = 0
+	WHERE EmployerEmail= @EmployerEmail AND ProjectName = @ProjectName AND SubscriptionName = @SubscriptionName;
+END
+
+-- Subscribe Stored Procedures
+GO
+CREATE OR ALTER PROCEDURE GetEmployeesBySubscription(
+	@EmployerEmail varchar(255),
+	@ProjectName varchar(255),
+	@SubscriptionName varchar(255))
+AS
+BEGIN
+	SELECT EmployeeEmail 
+	FROM Subscribes 
+	WHERE EmployerEmail = @EmployerEmail AND ProjectName = @ProjectName AND SubscriptionName = @SubscriptionName
 END
 
 -- Project Stored Procedures
