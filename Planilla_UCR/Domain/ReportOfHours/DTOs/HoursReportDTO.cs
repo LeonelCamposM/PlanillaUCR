@@ -9,7 +9,8 @@ namespace Domain.ReportOfHours.DTOs
         public String EmployeeEmail { get; set; }
         public DateTime ReportDate { get; set; }
 
-        public HoursReportDTO(String employerEmail, String projectName, String employeeEmail, DateTime reportDate, int id, String bankAccount)
+        public HoursReportDTO(String employerEmail, String projectName, String employeeEmail,
+            DateTime reportDate, int id, String bankAccount)
         {
             EmployerEmail = employerEmail;
             ProjectName = projectName;

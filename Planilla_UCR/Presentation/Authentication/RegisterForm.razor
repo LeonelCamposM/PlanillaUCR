@@ -178,7 +178,7 @@
 
     private string CreateConfirmationCode()
     {
-        int confirmationCode = random.Next(1); 
+        int confirmationCode = random.Next(100000,999999);
         string confirmationCodeString = confirmationCode.ToString();
         return confirmationCodeString;
     }

@@ -10,7 +10,8 @@ namespace Domain.ReportOfHours.Entities
         public DateTime? ReportDate { get; set; }
         public float ReportHours { get; set; }
 
-        public HoursReport(String employerEmail, String projectName, String employeeEmail, DateTime? reportDate, float reportedHours)
+        public HoursReport(String employerEmail, String projectName, String employeeEmail,
+            DateTime? reportDate, float reportedHours)
         {
             EmployerEmail = employerEmail;
             ProjectName = projectName;

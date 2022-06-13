@@ -101,7 +101,7 @@
     MudForm form;
     private IEnumerable<Project> _elements;
     private bool _loading = true;
-    private bool empty = true;
+    private bool _empty = true;
 
     [Parameter]
     public string EmployerEmail { set; get; }
@@ -119,11 +119,11 @@
         _elements = await ProjectService.GetEmployerProyects(EmployerEmail);
         if (_elements.Length() == 0)
         {
-            empty = true;
+            _empty = true;
         }
         else
         {
-            empty = false;
+            _empty = false;
         }
         _loading = false;
         hoursReport.ReportDate = DateTime.Now;
