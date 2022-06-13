@@ -27,8 +27,8 @@ CREATE TABLE Employer(
 CREATE TABLE Project(
 	EmployerEmail varchar(255) NOT NULL,
 	ProjectName varchar(255) NOT NULL,
-	ProjectDescription varchar(255),
-	MaximumAmountForBenefits int, 
+	ProjectDescription varchar(600),
+	MaximumAmountForBenefits float, 
 	MaximumBenefitAmount int,
 	PaymentInterval varchar(255),
 	PRIMARY KEY(EmployerEmail, ProjectName),
@@ -45,15 +45,16 @@ CREATE TABLE Agreement(
 	EmployeeEmail varchar(255) NOT NULL,
 	EmployerEmail varchar(255) NOT NULL,
 	ProjectName varchar(255) NOT NULL,
-	ContractDate date NOT NULL,
+	ContractStartDate date NOT NULL,
 	ContractType varchar(255) NOT NULL,
 	MountPerHour int NOT NULL,
-	Duration date NOT NULL,
-	PRIMARY KEY(EmployeeEmail,EmployerEmail,ProjectName,ContractDate),
+	ContractFinishDate date NOT NULL,
+	PRIMARY KEY(EmployeeEmail,EmployerEmail,ProjectName,ContractStartDate),
 	FOREIGN KEY(EmployeeEmail) REFERENCES Employee(Email),
 	FOREIGN KEY(EmployerEmail, ProjectName) REFERENCES Project(EmployerEmail, ProjectName),
 	FOREIGN KEY(ContractType, MountPerHour) REFERENCES AgreementType(TypeAgreement, MountPerHour)
 );
+
 
 CREATE TABLE Subscription
 (
@@ -133,6 +134,7 @@ BEGIN
 END
 
 GO
+
 CREATE PROCEDURE ProjectNameCheck(@ProjectName VARCHAR(255))
 AS
 BEGIN
@@ -146,6 +148,29 @@ AS
 BEGIN
     SELECT * FROM Person AS P WHERE P.Email = @email
 END
+
+
+GO
+CREATE PROCEDURE UpdatePerson(
+	@EmailPerson varchar(255),
+	@NewName varchar(255),
+	@NewLastName1 varchar(255),
+	@NewLastName2 varchar(255),
+	@NewSSN int,
+	@NewBankAccount varchar(255),
+	@NewAdress varchar(255),
+	@NewPhoneNumber varchar(255)
+)
+AS
+BEGIN
+	UPDATE Person 
+	SET Name=@NewName, LastName1=@NewLastName1, LastName2=@NewLastName2, 
+	SSN=@NewSSN, BankAccount=@NewBankAccount, 
+	Adress=@NewAdress, PhoneNumber=@NewPhoneNumber
+	WHERE Email=@EmailPerson
+END
+
+
 
 -- Employer Stored Procedures
 GO
@@ -185,7 +210,21 @@ BEGIN
 END
 
 GO
+CREATE or ALTER PROCEDURE GetSalaryPerAgreement(@MountPerHour int)
+AS
+BEGIN 
+	SELECT * FROM AgreementType WHERE MountPerHour = @MountPerHour
+END
+
+GO
+CREATE PROCEDURE GetContracteeByEmail(@ContracteeEmail varchar(255))
+AS
+BEGIN 
+	SELECT * FROM Agreement WHERE EmployeeEmail = @ContracteeEmail
+END
+
 -- Data Insert
+GO
 INSERT INTO Person
 VALUES('jeremy@ucr.ac.cr',
 'Jeremy',
@@ -336,15 +375,19 @@ VALUES('leonel@ucr.ac.cr',
 1,
 1
 )
+Insert into AgreementType
+Values('Tiempo completo', 1000)
 
-INSERT INTO AgreementType
-VALUES('Empleado fijo', 22)
+Insert into AgreementType
+Values('Medio tiempo', 500)
 
-INSERT INTO Agreement
-VALUES('mau@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Proyecto 1', '9999-12-31','Empleado fijo',22, '9999-12-31')
+Insert into AgreementType
+Values('Servicios profesionales', 700)
 
 INSERT INTO ReportOfHours
 VALUES('leonel@ucr.ac.cr', 'Proyecto 1','mau@ucr.ac.cr', '9999-12-31',22.2)
 
 INSERT INTO ReportOfHours
 VALUES('leonel@ucr.ac.cr', 'Proyecto 2','mau@ucr.ac.cr', '9999-12-31',22.2)
+Insert into AgreementType
+Values('Por horas', 10)
