@@ -54,10 +54,6 @@
             }
             else
             {
-                <MudToolBar DisableGutters="true" Class="gap-4">
-                    <MudSpacer></MudSpacer>
-                    <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Primary" OnClick="GoToConfigs"/>
-                </MudToolBar>
 
                 <MudTable @ref="mudTable" Items="@elements" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_empty" LoadingProgressColor="Color.Primary" Filter="new Func<Project,bool>(FilterFunc1)">  
 
