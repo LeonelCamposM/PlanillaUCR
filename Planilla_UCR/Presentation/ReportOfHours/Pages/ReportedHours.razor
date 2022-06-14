@@ -28,7 +28,7 @@
         {
                 <MudTable @ref="@_table" Items="@_elements" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" Filter="new Func<HoursReport,bool>(FilterFunc1)">
                     <ToolBarContent>
-                            <MudButton> Horas reportadas </MudButton>
+                            <MudText Align="Align.Center" Typo="Typo.h6">Horas reportadas</MudText>
                             <MudSpacer />
                             <MudTextField @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
                     </ToolBarContent> 
@@ -40,7 +40,7 @@
 
                     <RowTemplate>
                          <MudTd DataLabel="Nombre proyecto">@context.ProjectName</MudTd>
-                         <MudTd DataLabel="Fecha">@context.ReportDate</MudTd>
+                         <MudTd DataLabel="Fecha">@context.ReportDate.Value.Date.Day/@context.ReportDate.Value.Date.Month/@context.ReportDate.Value.Date.Year</MudTd>
                          <MudTd DataLabel="Horas">@context.ReportHours</MudTd>
                     </RowTemplate>
                 <PagerContent>
@@ -75,6 +75,7 @@
     protected override async Task OnInitializedAsync()
     {
         _elements = await HoursReportService.GetReportsAsync(email);
+        _elements = _elements.OrderByDescending (report => report.ReportDate);
         if (_elements.Length() == 0)
         {
             empty = true;
