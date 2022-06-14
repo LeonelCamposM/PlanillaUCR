@@ -7,9 +7,11 @@
 @using Presentation.Projects.Models
 @using System.Globalization
 @using System.ComponentModel.DataAnnotations
+@using Application.ContextMenu
 
 @inject IEmployerService EmployerService
 @inject IProjectService ProjectService
+@inject IContextMenuService ContextMenuService
 @inject NavigationManager nav
 @inject ISnackbar Snackbar
 
@@ -165,6 +167,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        ContextMenuService.SetProjectsContext(true,projectName);
         projectInfo = await ProjectService.GetProject(employerEmail,projectName);
         newName = projectInfo.ProjectName;
 
