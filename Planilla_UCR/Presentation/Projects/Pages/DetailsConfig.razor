@@ -13,15 +13,15 @@
 @inject NavigationManager nav
 @inject ISnackbar Snackbar
 
-
-@{List<BreadcrumbItem> _items = new List<BreadcrumbItem>
+@{ 
+    List<BreadcrumbItem> _items = new List<BreadcrumbItem>
     {
         new BreadcrumbItem("Inicio", href: ""),
         new BreadcrumbItem("Proyectos", href: $"/Projects/{employerEmail}"),
-        new BreadcrumbItem($"{projectName}",  href: null, disabled: true),
+        new BreadcrumbItem($"{projectName}", href: $"/Projects/{employerEmail}/{projectName}"),
+        new BreadcrumbItem("Configuraciones",  href: null, disabled: true)
     };
 }
-
 
 @if (_loading)
 {
@@ -33,15 +33,17 @@
 }
 else
 {
-    <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
+
+
+    
     <MudToolBar DisableGutters="true" Class="gap-4">
         <MudSpacer></MudSpacer>
         @if(_disabled)
         {
-            <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Secondary" OnClick="EnableForm"/>
+            <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Primary" OnClick="EnableForm"/>
         }else
         {
-            <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Secondary" OnClick="DisableForm"/>
+            <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Primary" OnClick="DisableForm"/>
         }
         
     </MudToolBar>
@@ -90,7 +92,7 @@ else
                         <MudItem xs="2"> </MudItem>
                         <MudItem xs="4">
                             <MudNumericField Immediate="true" Label="Monto máximo para beneficios" Format="N2" Culture="@cultureCR"
-                            ReadOnly="@_disabled" Variant="Variant.Outlined" @bind-Value="_maximumAmountForBenefits" Adornment="Adornment.Start" 
+                            ReadOnly="@_disabled" Variant="Variant.Outlined" @bind-Value="maximumAmountForBenefits" Adornment="Adornment.Start" 
                             AdornmentText="@cultureCR.NumberFormat.CurrencySymbol" Required="false" RequiredError="Campo no requerido"/>
                         </MudItem>
 
@@ -125,7 +127,7 @@ else
                                 <MudButton Disabled="true"> </MudButton>
 
                                 <MudButton OnClick="CleanForm" Variant="Variant.Filled" Color="Color.Transparent">
-                                    <MudText>Cancelar</MudText>
+                                    <MudText>Limpiar</MudText>
                                 </MudButton>
                             </MudItem>
                         }
@@ -142,7 +144,7 @@ else
     private string newName = "";
     public string detailsTittle { get; set; }
     public string configTittle { get; set; }
-    private double? _maximumAmountForBenefits;
+    private double? maximumAmountForBenefits;
     Project projectInfo = new Project("","","",0.0,0,"");
     MudForm form;
     SnackHandler snackHandler = new SnackHandler();
@@ -156,6 +158,7 @@ else
     {
         projectInfo = await ProjectService.GetProject(employerEmail,projectName);
         newName = projectInfo.ProjectName;
+        maximumAmountForBenefits = projectInfo.MaximumAmountForBenefits;
         detailsTittle = "Detalles de " + projectInfo.ProjectName + " ";
         configTittle = "Modificar " + projectInfo.ProjectName + " ";
         if (projectInfo != null)
@@ -169,10 +172,11 @@ else
         snackHandler._saving = true;
 
         await form.Validate();
-        if (form.IsValid /*&& await (ValidateInfo(projectInfo))*/)
+        if (form.IsValid)
         {
             snackHandler._saving = false;
-            bool modified = await ProjectService.ModifyProject(projectInfo, newName);
+            projectInfo.MaximumAmountForBenefits = (double)maximumAmountForBenefits;
+            bool modified = ProjectService.ModifyProject(projectInfo, newName);
             if (modified)
             {
                 ShowSnackNotification(projectInfo.ProjectName + " modificado exitosamente", Severity.Success);
@@ -183,52 +187,11 @@ else
             else
             {
                 newName = projectInfo.ProjectName;
+                ShowSnackNotification(projectInfo.ProjectName + " no fue modificado", Severity.Error);
             }
-
 
         }
         snackHandler._saving = false;
-    }
-    async Task<bool> ValidateInfo(Project projectInfo)
-    {
-        bool name = true;
-        if (projectInfo.ProjectName != newName)
-        {
-            name = await (ValidateName(projectInfo));
-        }
-        bool email = await (ValidateEmail(projectInfo));
-        return name && email;
-   }
-
-
-    async Task<bool> ValidateEmail(Project project)
-    {
-        bool valid = true;
-        Employer emailChecked = await EmployerService.GetEmployerAsync(project.EmployerEmail);
-        if(emailChecked == null)
-        {
-            valid = false;
-            ShowSnackNotification("El email no pertenece a un empleador", Severity.Error);
-        }   
-        return valid;
-    }
-
-    async Task<bool> ValidateName(Project project)
-    {
-        bool valid = true;
-        IEnumerable<Project> nameCecked = await ProjectService.GetEmployerProyects(project.EmployerEmail);
-
-        if (nameCecked.Length() != 0)
-        {
-            foreach (Project element in nameCecked){
-                if (element.ProjectName == project.ProjectName)
-                {
-                    valid=false;
-                    ShowSnackNotification("El nombre de proyecto ya está siendo usado", Severity.Error);
-                }
-            }
-        }
-        return valid;
     }
 
     public class LimitsValidationForm
@@ -267,7 +230,7 @@ else
         projectInfo.EmployerEmail = "";
         projectInfo.ProjectDescription = "";
         projectInfo.MaximumBenefitAmount= 0;
-        projectInfo.MaximumAmountForBenefits = 0;
+        projectInfo.MaximumAmountForBenefits = 0.0;
         projectInfo.PaymentInterval = "";
     }
 
