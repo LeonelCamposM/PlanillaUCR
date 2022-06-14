@@ -10,36 +10,11 @@
             <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
                 <ul class="nav flex-column">
                     <li class="nav-item px-3">
-                        <NavLink class="nav-link" href=@("/") Match="NavLinkMatch.All">
-                            <MudIconButton Icon="@Icons.Filled.Home" Color="@Color.Secondary" Class="mr-2"/>
-                            <span aria-hidden="true"></span> Inicio
-                        </NavLink>
-                    </li>
-
-                     <li class="nav-item px-3">   
-                        <NavLink class="nav-link" Match="NavLinkMatch.All">
-                            <MudIconButton Icon="@Icons.Filled.CreditScore" Color="@Color.Secondary" Class="mr-2"/>
-                            <span  aria-hidden="true"></span> Pagos
-                            <MudSpacer></MudSpacer>
-                        </NavLink>
-                     </li>
-
-                      <li class="nav-item px-3">   
-                        <NavLink class="nav-link" Match="NavLinkMatch.All">
-                            <MudIconButton Icon="@Icons.Filled.Article" Color="@Color.Secondary" Class="mr-2"/>
-                            <span  aria-hidden="true"></span> Informes
-                            <MudSpacer></MudSpacer>
-                        </NavLink>
-                     </li>
-
-                    <li class="nav-item px-3">
                         <NavLink class="nav-link" href=@($"Projects/{email}") Match="NavLinkMatch.All">
                              <MudIconButton Icon="@Icons.Filled.BusinessCenter" Color="@Color.Secondary" Class="mr-2"/>
                             <span  aria-hidden="true"></span> Proyectos
                         </NavLink>
                     </li>
-
-                    
                 </ul>
             </div>
         }
@@ -49,48 +24,36 @@
             <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
                 <ul class="nav flex-column">
                     <li class="nav-item px-3">
-                        <NavLink class="nav-link" href=@("/") Match="NavLinkMatch.All">
-                            <MudIconButton Icon="@Icons.Filled.Home" Color="@Color.Secondary" Class="mr-2"/>
-                            <span aria-hidden="true"></span> Inicio
-                        </NavLink>
-                    </li>
-
-                     <li class="nav-item px-3">   
-                        <NavLink class="nav-link" Match="NavLinkMatch.All">
-                            <MudIconButton Icon="@Icons.Filled.CreditScore" Color="@Color.Secondary" Class="mr-2"/>
-                            <span  aria-hidden="true"></span> Pagos
-                            <MudSpacer></MudSpacer>
-                        </NavLink>
-                     </li>
-
-                      <li class="nav-item px-3">   
-                        <NavLink class="nav-link" Match="NavLinkMatch.All">
-                            <MudIconButton Icon="@Icons.Filled.Article" Color="@Color.Secondary" Class="mr-2"/>
-                            <span  aria-hidden="true"></span> Informes
-                            <MudSpacer></MudSpacer>
-                        </NavLink>
-                     </li>
-
-                    <li class="nav-item px-3">
                         <NavLink class="nav-link" href=@($"Projects/{email}") Match="NavLinkMatch.All">
                              <MudIconButton Icon="@Icons.Filled.BusinessCenter" Color="@Color.Secondary" Class="mr-2"/>
                             <span  aria-hidden="true"></span> Proyectos
                         </NavLink>
                     </li>
 
-            
-                    @if (_isExpanded)
+                     @if (!ContextMenuService.GetShowProjectsSubMenu())
                     {
                         <li class="nav-item px-3">   
-                        <NavLink class="nav-link" Match="NavLinkMatch.All">
-                            <MudIconButton Icon="@Icons.Filled.CardTravel" Color="@Color.Secondary" Class="mr-2"/>
-                            <span  aria-hidden="true"></span> @projectName
-                            <MudSpacer></MudSpacer>
-                            <MudIconButton Size="Size.Medium"  @onclick="()=>_isExpanded = !_isExpanded" Icon="@Icons.Material.Filled.ArrowDropUp" Color="Color.Secondary"></MudIconButton>
-                        </NavLink>
+                            <NavLink class="nav-link" Match="NavLinkMatch.All">
+                                <MudIconButton Icon="@Icons.Filled.CardTravel" Color="@Color.Secondary" Class="mr-2"/>
+                                <span  aria-hidden="true"></span> @projectName
+                                <MudSpacer></MudSpacer>
+                                <MudIconButton Size="Size.Medium" OnClick="ToggleProjectsSubMenu" Icon="@Icons.Material.Filled.ArrowDropUp" Color="Color.Secondary"></MudIconButton>
+                            </NavLink>
                         </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item px-3">   
+                            <NavLink class="nav-link" Match="NavLinkMatch.All">
+                                <MudIconButton Icon="@Icons.Filled.CardTravel" Color="@Color.Secondary" Class="mr-2"/>
+                                <span  aria-hidden="true"></span> @projectName
+                                <MudSpacer></MudSpacer>
+                                <MudIconButton Size="Size.Medium" OnClick="ToggleProjectsSubMenu" Icon="@Icons.Material.Filled.ArrowDropDown" Color="Color.Secondary"></MudIconButton>
+                            </NavLink>
+                        </li>
+
                         <li class="nav-item px-3">
-                        <TabNavLink Icon="@Icons.Material.Filled.Assignment" href="@($"Projects/{email}/{projectName}/Configurations")" text="Detalles"></TabNavLink>
+                            <TabNavLink Icon="@Icons.Material.Filled.Assignment" href="@($"Projects/{email}/{projectName}/Configurations")" text="Detalles"></TabNavLink>
                         </li>
 
                         <li class="nav-item px-3">  
@@ -104,20 +67,17 @@
                         <li class="nav-item px-3">
                             <TabNavLink  Icon="@Icons.Material.Filled.CardGiftcard" href="@($"/Projects/{email}/{projectName}/Benefits")" text="Beneficios"></TabNavLink>
                         </li>
- 
-                    }
-                    else
-                    {
-                        <li class="nav-item px-3">   
-                        <NavLink class="nav-link" Match="NavLinkMatch.All">
-                            <MudIconButton Icon="@Icons.Filled.CardTravel" Color="@Color.Secondary" Class="mr-2"/>
-                            <span  aria-hidden="true"></span> @projectName
-                            <MudSpacer></MudSpacer>
-                            <MudIconButton @onclick="()=>_isExpanded = !_isExpanded"Size="Size.Medium" Icon="@Icons.Material.Filled.ArrowDropDown" Color="Color.Secondary"></MudIconButton>
-                        </NavLink>
+
+                        @*
+                        <li class="nav-item px-3">
+                            <TabNavLink  Icon="@Icons.Filled.CreditScore" href="" text="Pagos"></TabNavLink>
                         </li>
-                
+
+                        <li class="nav-item px-3">
+                            <TabNavLink  Icon="@Icons.Filled.Article" href="" text="Informes"></TabNavLink>
+                        </li>*@
                     }
+
                 </ul>
             </div>
         }
@@ -133,20 +93,6 @@
             @if (!ContextMenuService.GetShowProjectsMenu())
             { 
                 <li class="nav-item px-3">
-                    <NavLink class="nav-link" href=@("/") Match="NavLinkMatch.All">
-                    <MudIconButton Icon="@Icons.Filled.Home" Color="@Color.Secondary" Class="mr-2"/>
-                    <span aria-hidden="true"></span> Inicio
-                    </NavLink>
-                </li>
-
-                <li class="nav-item px-3">
-                    <NavLink class="nav-link" href=@($"/Reported_Hours/{email}") Match="NavLinkMatch.All">
-                    <MudIconButton Icon="@Icons.Filled.MoreTime" Color="@Color.Secondary" Class="mr-2"/>
-                    <span aria-hidden="true"></span> Reportes
-                    </NavLink>                
-                </li>
-
-                <li class="nav-item px-3">
                     <NavLink class="nav-link" href=@($"Projects/{email}") Match="NavLinkMatch.All">
                     <MudIconButton Icon="@Icons.Filled.BusinessCenter" Color="@Color.Secondary" Class="mr-2"/>
                     <span  aria-hidden="true"></span> Proyectos
@@ -157,36 +103,21 @@
             {
                 string projectName = ContextMenuService.GetProjectsContext();
                 <li class="nav-item px-3">
-                    <NavLink class="nav-link" href=@("/") Match="NavLinkMatch.All">
-                    <MudIconButton Icon="@Icons.Filled.Home" Color="@Color.Secondary" Class="mr-2"/>
-                    <span aria-hidden="true"></span> Inicio
-                    </NavLink>
-                </li>
-
-                <li class="nav-item px-3">
-                    <NavLink class="nav-link" href=@($"/Reported_Hours/{email}") Match="NavLinkMatch.All">
-                    <MudIconButton Icon="@Icons.Filled.MoreTime" Color="@Color.Secondary" Class="mr-2"/>
-                    <span aria-hidden="true"></span> Reportes
-                    </NavLink>                
-                </li>
-
-                <li class="nav-item px-3">
                     <NavLink class="nav-link" href=@($"Projects/{email}") Match="NavLinkMatch.All">
                     <MudIconButton Icon="@Icons.Filled.BusinessCenter" Color="@Color.Secondary" Class="mr-2"/>
                     <span  aria-hidden="true"></span> Proyectos
                     </NavLink>
                 </li>
 
-               
-            
-                @if (_isExpanded)
+                
+                @if (!ContextMenuService.GetShowProjectsSubMenu())
                 {
                     <li class="nav-item px-3">   
                         <NavLink class="nav-link" Match="NavLinkMatch.All">
                         <MudIconButton Icon="@Icons.Filled.CardTravel" Color="@Color.Secondary" Class="mr-2"/>
                         <span  aria-hidden="true"></span> @projectName
                         <MudSpacer></MudSpacer>
-                        <MudIconButton Size="Size.Medium"  @onclick="()=>_isExpanded = !_isExpanded" Icon="@Icons.Material.Filled.ArrowDropUp" Color="Color.Secondary"></MudIconButton>
+                        <MudIconButton Size="Size.Medium" OnClick="ToggleProjectsSubMenu" Icon="@Icons.Material.Filled.ArrowDropUp" Color="Color.Secondary"></MudIconButton>
                         </NavLink>
                     </li>
                 }
@@ -197,8 +128,12 @@
                         <MudIconButton Icon="@Icons.Filled.CardTravel" Color="@Color.Secondary" Class="mr-2"/>
                         <span  aria-hidden="true"></span> @projectName
                         <MudSpacer></MudSpacer>
-                        <MudIconButton @onclick="()=>_isExpanded = !_isExpanded"Size="Size.Medium" Icon="@Icons.Material.Filled.ArrowDropDown" Color="Color.Secondary"></MudIconButton>
+                        <MudIconButton Size="Size.Medium" OnClick="ToggleProjectsSubMenu" Icon="@Icons.Material.Filled.ArrowDropDown" Color="Color.Secondary"></MudIconButton>
                         </NavLink>
+                    </li>
+
+                    <li class="nav-item px-3">
+                        <TabNavLink  Icon="@Icons.Filled.MoreTime" href="@($"/Reported_Hours/{email}")" text="Registro"></TabNavLink>
                     </li>
                 }
             }
@@ -211,7 +146,6 @@
 
 @code {
     private bool collapseNavMenu = true;
-    bool _isExpanded = true;
 
     [Parameter]
     public string email { get; set; }
@@ -226,5 +160,10 @@
     protected override async Task OnInitializedAsync()
     {
         ContextMenuService.SetOnChange(StateHasChanged);
+    }
+
+    private void ToggleProjectsSubMenu()
+    {
+        ContextMenuService.SetProjectsContext(ContextMenuService.GetShowProjectsMenu(), !ContextMenuService.GetShowProjectsSubMenu(), ContextMenuService.GetProjectsContext());
     }
 }
