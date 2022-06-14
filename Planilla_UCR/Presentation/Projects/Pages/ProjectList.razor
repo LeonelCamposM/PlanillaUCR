@@ -16,7 +16,7 @@
 @{
     List<BreadcrumbItem> _items = new List<BreadcrumbItem>
     {
-        new BreadcrumbItem("Inicio", href: $"/{employerEmail}"),
+        new BreadcrumbItem("Inicio", href: ""),
         new BreadcrumbItem("Proyectos",  href: null, disabled: true),
 
     };
@@ -75,7 +75,7 @@
 
                     <RowTemplate Context="row">
                         <MudTd DataLabel="Nombre" >
-                            <MudLink Color="Color.Primary" Underline="Underline.Always" Href="@($"/Projects/{@row.EmployerEmail}/{@row.ProjectName}/Configurations")">
+                            <MudLink Color="Color.Primary" Underline="Underline.Always" Href="@($"/Projects/{@row.EmployerEmail}/{@row.ProjectName}")">
                                 @row.ProjectName
                             </MudLink>
                         </MudTd>
@@ -153,7 +153,7 @@
 
     private void GoToConfigs()
     {
-        nav.NavigateTo($"/Projects/{employerEmail}/{projectName}/Configurations");
+        nav.NavigateTo($"/Projects/{employerEmail}/{projectName}");
     }
 
     private void PageChanged(int i)
