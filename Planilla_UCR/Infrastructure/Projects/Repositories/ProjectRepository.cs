@@ -64,7 +64,7 @@ namespace Infrastructure.Projects.Repositories
             return projectsResult;
         }
 
-        public async Task<bool> ModifyProject(Project project, string newProjectName)
+        public bool ModifyProject(Project project, string newProjectName)
         {
             var Transaction = new SqlParameter("Transaction", 0);
             Transaction.Direction = System.Data.ParameterDirection.Output;
@@ -79,8 +79,6 @@ namespace Infrastructure.Projects.Repositories
                 @Transaction = {Transaction} OUT" );
 
             _dbContext.Database.ExecuteSqlInterpolated(query);
-            await _dbContext.SaveEntitiesAsync();
-
             if (Convert.ToInt32(Transaction.Value) == 1)
             {
                 return true;
