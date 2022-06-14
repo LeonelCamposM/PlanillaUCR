@@ -212,6 +212,18 @@ BEGIN
 	SELECT * FROM Agreement WHERE EmployeeEmail = @ContracteeEmail
 END
 
+GO
+Create or ALTER PROCEDURE GetAllAgreementsByProjectAndEmployer(@Project varchar(255), @EmployerEmail varchar(255))
+AS
+BEGIN
+	SELECT *
+	FROM Project AS P JOIN Agreement AS A ON P.EmployerEmail = A.EmployerEmail 
+	AND P.ProjectName = A.ProjectName JOIN AgreementType AS ATP ON A.ContractType = ATP.TypeAgreement
+	WHERE A.ProjectName = @Project AND A.EmployerEmail = @EmployerEmail
+END
+
+exec GetAllAgreementsByProjectAndEmployer @Project = 'Proyecto 1', @EmployerEmail = 'jeremy@ucr.ac.cr'
+
 -- Data Insert
 GO
 INSERT INTO Person
@@ -364,6 +376,12 @@ VALUES('leonel@ucr.ac.cr',
 1,
 1
 )
+
+
+Insert into Agreement
+Values('mau@ucr.ac.cr', 'jeremy@ucr.ac.cr', 'Proyecto 1', '20220602','Tiempo completo', 1000,'20220620')
+
+
 Insert into AgreementType
 Values('Tiempo completo', 1000)
 
@@ -375,3 +393,4 @@ Values('Servicios profesionales', 700)
 
 Insert into AgreementType
 Values('Por horas', 10)
+

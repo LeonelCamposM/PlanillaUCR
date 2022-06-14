@@ -1,0 +1,190 @@
+﻿@page "/Projects/{employerEmail}/{projectName}/Agreements/See"
+
+@using Domain.Projects.DTOs
+@using Domain.Projects.Entities
+@using Application.Projects
+@using Presentation.Projects.Models
+@using Presentation.Core.Components
+@using System.ComponentModel.DataAnnotations
+
+
+
+@using Presentation.Core.Components
+@using System.ComponentModel.DataAnnotations
+@using Domain.Projects.Entities
+@using System.Globalization
+
+@using Domain.Agreements.DTOs
+@using Application.Agreements
+@using Domain.Agreements.Entities
+@using Application.People
+@using Domain.People.Entities
+@using Domain.Employees.Entities
+@using Application.Employees
+@using Application.Employers
+@using Domain.Employers.Entities
+@using Domain.Employers.DTOs
+@using Application.AgreementTypes
+@using Domain.AgreementTypes.Entities
+@using Domain.AgreementTypes.DTOs
+@using Domain.Projects.DTOs
+@using Application.Projects
+
+
+@inject IProjectService ProjectService
+@inject ISnackbar Snackbar
+@inject NavigationManager nav
+
+
+@inject IAgreementService AgreementService
+@inject IAgreementTypeService AgreementTypeService
+@inject IPersonService PersonService
+@inject IEmployeeService EmployeeService
+@inject IEmployerService EmployerService
+
+
+@*From here *@
+
+@using Application.Employees
+@using Domain.People.Entities
+
+
+@if(_loading) 
+{
+    <MudPaper  Height="220px" Width="100%" Outlined="false" Class="border-none pa-4" Elevation="0">
+         <MudText Align="Align.Center" Typo="Typo.h6">
+              <MudProgressCircular Color="Color.Secondary" Style="height:70px;width:70px;" Indeterminate="true" />
+         </MudText>
+    </MudPaper>
+}
+else
+{
+    @if (!_loading)
+    {
+        List <BreadcrumbItem> _items = new List<BreadcrumbItem>
+        {
+            new BreadcrumbItem("Inicio", href: ""),
+            new BreadcrumbItem("Proyectos", href: $"/Projects/{employerEmail}"),
+        };
+        <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
+        <MudPaper Height="60px" Width="100%" Outlined="false" Class="border-none" Elevation="0"> 
+        </MudPaper>
+
+        if(!empty)
+        {
+                <MudTable @ref="@_table" Items="@_elements" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" Filter="new Func<Agreement,bool>(FilterFunc1)">
+                        <HeaderContent>
+                            <MudTh>Email del empleado</MudTh>
+                            <MudTh>Email del empleador</MudTh>
+                            <MudTh>Nombre proyecto</MudTh>
+                            <MudTh>Contrato</MudTh>
+                            <MudTh>Intervalo de pago</MudTh>
+                        </HeaderContent>
+
+                        <RowTemplate>
+                            <MudTd DataLabel="Email del empleado">@context.EmployeeEmail</MudTd>
+                           @* <MudTd DataLabel="Nombre">@context.Name @context.LastName1 @context.LastName2</MudTd>
+                            <MudTd DataLabel="Cedula">@context.Ssn</MudTd>*@
+                             <MudTd DataLabel="Contrato">
+                                <MudSpacer></MudSpacer>
+                                    <MudButton Variant="Variant.Filled" @onclick="@(e => GoToFireTheEmployee(@context.EmployeeEmail))" Color="Color.Transparent">
+                                    <MudText>
+                                    Terminar
+                                    </MudText> 
+                                </MudButton>
+                            </MudTd>
+                            </RowTemplate>
+                        <PagerContent>
+                            <MudPagination SelectedChanged="PageChanged" Count="@((_table.GetFilteredItemsCount() + _table.RowsPerPage - 1) / _table.RowsPerPage)" Color="Color.Secondary" Class="pa-4"/>
+                        </PagerContent>
+                    </MudTable>
+                     <br>
+
+
+        }
+        else
+        {
+            @*<HiredEmployeesError email="@email" projectName="@projectName" SendTableState="SendConmuteSignal"></HiredEmployeesError>*@
+        }
+    }
+}
+
+@code {
+    private bool _loading = true;
+    private bool empty = true;
+    string mySearchString = "";
+    private IEnumerable<Agreement> _elements = new List<Agreement>();
+    private MudTable<Agreement> _table;
+
+    @*Check this *@
+    public string tab1 { get; set; } = "Contratar empleados";
+    public string tab2 { get; set; } = "Empleados contratados";
+
+    [Parameter]
+    public string projectName { get; set; }
+
+    [Parameter]
+    public string employerEmail { get; set; }
+
+    [Parameter]
+    public EventCallback<string> SendTableState { get; set; }
+
+    Agreement myAgreement = new Agreement("", "", "", null, "", 0, null);
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        _elements = await AgreementService.GetAllAgreementsByProjectAndEmployer(myAgreement);
+        if (_elements.Length() == 0)
+        {
+            empty = true;
+        }
+        else
+        {
+            empty = false;
+        }
+        _loading = false;
+    }
+
+    private void GoToFireTheEmployee(string email)
+    {
+       nav.NavigateTo($"/Agreements/{email}");
+    }
+
+    private void GoToViewError()
+    {
+        //nav.NavigateTo($"/View_Project_Employees_Error/{email}/{projectName}");
+    }
+
+    private void GoToProjectDetails()
+    {
+        //nav.NavigateTo($"/Projects/Details/{email}/{projectName}");
+    }
+
+    private void PageChanged(int i)
+    {
+        _table.NavigateTo(i - 1);
+    }
+
+    private bool FilterFunc1(Agreement element) => FilterFunc(element, mySearchString);
+
+    private bool FilterFunc(Agreement element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+            // Check next line of code.
+        if (element.EmployerEmail.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+
+    private async Task SendConmuteSignal()
+    {
+        await SendTableState.InvokeAsync("");
+    }
+
+    private void GoToCreateEmployee()
+    {
+        //nav.NavigateTo($"/Create_Employee/{email}/{projectName}");
+    }
+}
