@@ -10,6 +10,7 @@
 
 @inject IProjectService ProjectService
 @inject IEmployerService EmployerService
+@inject NavigationManager nav
 @inject ISnackbar Snackbar
 
 @{List<BreadcrumbItem> _items = new List<BreadcrumbItem>
@@ -60,7 +61,7 @@
                 <MudItem xs="2"> </MudItem>
                 <MudItem xs="4">
              
-                    <MudNumericField Immediate="true" Label="Monto máximo para beneficios" Format="N2" Culture="@cultureCR" Variant="Variant.Outlined" @bind-Value="_maximumAmountForBenefits" 
+                    <MudNumericField Immediate="true" Label="Monto máximo para beneficios" Min="0" Format="N2" Culture="@cultureCR" Variant="Variant.Outlined" @bind-Value="maximumAmountForBenefits" 
                     Adornment="Adornment.Start" AdornmentText="@cultureCR.NumberFormat.CurrencySymbol" Required="false" RequiredError="Campo no requerido"/>
                 </MudItem>
 
@@ -94,7 +95,7 @@
                     <MudButton Disabled="true"> </MudButton>
 
                     <MudButton OnClick="CleanForm" Variant="Variant.Filled" Color="Color.Transparent">
-                        <MudText>Volver</MudText>
+                        <MudText>Limpiar</MudText>
                     </MudButton>
                 </MudItem>
                 
@@ -106,7 +107,7 @@
 </MudGrid>
 
 @code{
-    private double? _maximumAmountForBenefits;
+    private double? maximumAmountForBenefits;
     Project projectInfo = new Project("","","",0.0,0,"");
     SnackHandler snackHandler = new SnackHandler();
     LimitsValidationForm limits = new LimitsValidationForm();
@@ -120,7 +121,7 @@
     async Task SaveProject()
     {
         projectInfo.EmployerEmail = employerEmail;
-        projectInfo.MaximumAmountForBenefits = Convert.ToDouble(_maximumAmountForBenefits);
+        projectInfo.MaximumAmountForBenefits = Convert.ToDouble(maximumAmountForBenefits);
         Project projectToAdd = projectInfo;
         snackHandler._saving = true;
 
@@ -131,9 +132,10 @@
             await ProjectService.CreateProjectAsync(projectToAdd);
             snackHandler._saving = false;
             ShowSnackNotification(projectInfo.ProjectName + " creado exitosamente", Severity.Success);
-            
+
         }
         snackHandler._saving = false;
+        GoToMain();
     }
 
     async Task<bool> ValidateInfo(Project projectInfo)
@@ -196,7 +198,8 @@
         projectInfo.EmployerEmail = "";
         projectInfo.ProjectDescription = "";
         projectInfo.MaximumBenefitAmount= 0;
-        projectInfo.MaximumAmountForBenefits = 0;
+        projectInfo.MaximumAmountForBenefits = 0.0;
+        maximumAmountForBenefits = 0.0;
         projectInfo.PaymentInterval = "";
     }
 
@@ -212,6 +215,11 @@
 
         [StringLength(600, ErrorMessage = "La descripción es muy grande")]
         public string description { get; set; }
+    }
+
+    private void GoToMain()
+    {
+        nav.NavigateTo($"/Projects/{employerEmail}");
     }
 }
     
