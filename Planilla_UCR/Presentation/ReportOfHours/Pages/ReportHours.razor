@@ -143,7 +143,8 @@
     {
         snackHandler._saving = true;
         await form.Validate();
-        if (form.IsValid)
+        bool hasKey = await validateKey();
+        if (form.IsValid && ValidateHours() && !hasKey)
         {
             await HoursReportService.CreateReportAsync(hoursReport);
             ShowSnackNotification("Reporte de horas creado",Severity.Success);
@@ -174,4 +175,24 @@
         hoursReport.ReportHours = 0;
     }
 
+    bool ValidateHours()
+    {
+        bool valid = true; 
+        if (hoursReport.ReportHours == 0 || hoursReport.ReportHours < 0)
+        {
+            ShowSnackNotification("Número de horas incorrecto", Severity.Error);
+            valid = false;
+        }
+        return valid;
+    }
+
+    async Task<bool> validateKey()
+    {
+        bool hasKey = await HoursReportService.HasReportAsync(hoursReport);
+        if (hasKey)
+        {
+            ShowSnackNotification("Reporte de horas repetido",Severity.Error);
+        }
+        return hasKey;
+    }
 }

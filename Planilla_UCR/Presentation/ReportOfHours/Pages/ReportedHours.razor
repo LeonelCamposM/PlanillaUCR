@@ -74,7 +74,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _elements = await HoursReportService.GetReportsAsync(email);
+        _elements = await HoursReportService.GetAllReportsAsync(email);
         _elements = _elements.OrderByDescending (report => report.ReportDate);
         if (_elements.Length() == 0)
         {

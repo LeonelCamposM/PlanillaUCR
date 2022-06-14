@@ -7,6 +7,7 @@ namespace Domain.ReportOfHours.Repositories
     public interface IHoursReportRepository
     {
         Task CreateReportAsync(HoursReport report);
-        Task<IEnumerable<HoursReport>> GetReportsAsync(string email);
+        Task<IEnumerable<HoursReport>> GetAllReportsAsync(string email);
+        Task<bool> HasReportAsync(HoursReport report);
     }
 }

@@ -24,11 +24,25 @@ namespace Infrastructure.ReportOfHours.Repositories
             await _dbContext.SaveEntitiesAsync();
         }
 
-        public async Task<IEnumerable<HoursReport>> GetReportsAsync(string email)
+        public async Task<bool> HasReportAsync(HoursReport report)
         {
-            IEnumerable<HoursReport> subscriptionResult = await _dbContext.HoursReport.Where
+            bool hasReport = true;
+            IEnumerable<HoursReport> reports = await _dbContext.HoursReport.Where
+               (e => e.EmployeeEmail == report.EmployeeEmail && e.EmployerEmail == 
+                     report.EmployerEmail && e.ReportDate == report.ReportDate && 
+                     e.ProjectName == report.ProjectName).ToListAsync();
+            if(reports.Length() == 0)
+            {
+                hasReport = false;
+            }
+            return hasReport;
+        }
+
+        public async Task<IEnumerable<HoursReport>> GetAllReportsAsync(string email)
+        {
+            IEnumerable<HoursReport> reports = await _dbContext.HoursReport.Where
                (e => e.EmployeeEmail == email).ToListAsync();
-            return subscriptionResult;
+            return reports;
         }
     }
 }

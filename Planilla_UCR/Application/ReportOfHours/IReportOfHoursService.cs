@@ -7,6 +7,7 @@ namespace Application.ReportOfHours
     public interface IReportOfHoursService
     {
         Task CreateReportAsync(HoursReport report);
-        Task<IEnumerable<HoursReport>> GetReportsAsync(string email);
+        Task<IEnumerable<HoursReport>> GetAllReportsAsync(string email);
+        Task<bool> HasReportAsync(HoursReport report);
     }
 }

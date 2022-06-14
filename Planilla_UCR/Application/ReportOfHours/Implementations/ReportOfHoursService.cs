@@ -19,9 +19,14 @@ namespace Application.ReportOfHours.Implementations
             await _reportRepository.CreateReportAsync(report);
         }
 
-        public async Task<IEnumerable<HoursReport>> GetReportsAsync(string email)
+        public async Task<IEnumerable<HoursReport>> GetAllReportsAsync(string email)
         {
-            return await _reportRepository.GetReportsAsync(email);
+            return await _reportRepository.GetAllReportsAsync(email);
+        }
+
+        public Task<bool> HasReportAsync(HoursReport report)
+        {
+            return _reportRepository.HasReportAsync(report);
         }
     }
 }
