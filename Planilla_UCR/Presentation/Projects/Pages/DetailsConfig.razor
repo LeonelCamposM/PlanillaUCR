@@ -18,8 +18,7 @@
     {
         new BreadcrumbItem("Inicio", href: ""),
         new BreadcrumbItem("Proyectos", href: $"/Projects/{employerEmail}"),
-        new BreadcrumbItem($"{projectName}", href: $"/Projects/{employerEmail}/{projectName}"),
-        new BreadcrumbItem("Configuraciones",  href: null, disabled: true)
+        new BreadcrumbItem($"{projectName}", href: null, disabled: true)
     };
 }
 
@@ -33,7 +32,7 @@
 }
 else
 {
-
+    <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
 
     
     <MudToolBar DisableGutters="true" Class="gap-4">
@@ -41,7 +40,8 @@ else
         @if(_disabled)
         {
             <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Primary" OnClick="EnableForm"/>
-        }else
+        }
+        else
         {
             <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Primary" OnClick="DisableForm"/>
         }
@@ -53,10 +53,11 @@ else
             <MudPaper  Height="250px" Width="100%" Outlined="false" Class="border-none pa-4" Elevation="0">
                 @if (_disabled)
                 {
-                    <MudText Align="Align.Center" Typo="Typo.h6">@detailsTittle</MudText>
-                }else
+                    <MudText Align="Align.Center" Typo="Typo.h6">Detalles del proyecto</MudText>
+                }
+                else
                 {
-                    <MudText Align="Align.Center" Typo="Typo.h6">@configTittle</MudText>
+                    <MudText Align="Align.Center" Typo="Typo.h6">Configuraciones del proyecto</MudText>
                 }
                 <MudForm @ref="form">
                     <MudGrid>
@@ -71,7 +72,7 @@ else
 
                         <MudItem xs="2"> </MudItem>
                         <MudItem xs="8">
-                            <MudTextField Label="Descripción del Proyecto" Variant="Variant.Outlined" ReadOnly="@_disabled"
+                            <MudTextField Label="Descripción del Proyecto" Lines="6" Variant="Variant.Outlined" ReadOnly="@_disabled"
                             @bind-Value="projectInfo.ProjectDescription"  For="@(() => limits.description )"
                             ></MudTextField>
                         </MudItem>
@@ -126,8 +127,8 @@ else
                                 </MudButton>
                                 <MudButton Disabled="true"> </MudButton>
 
-                                <MudButton OnClick="CleanForm" Variant="Variant.Filled" Color="Color.Transparent">
-                                    <MudText>Limpiar</MudText>
+                                <MudButton OnClick="Cancel" Variant="Variant.Filled" Color="Color.Transparent">
+                                    <MudText>Cancelar</MudText>
                                 </MudButton>
                             </MudItem>
                         }
@@ -142,9 +143,17 @@ else
     private bool _loading = true;
     private bool _disabled = true;
     private string newName = "";
-    public string detailsTittle { get; set; }
-    public string configTittle { get; set; }
-    private double? maximumAmountForBenefits;
+    private string detailsTittle { get; set; }
+    private string configTittle { get; set; }
+
+    private string oldEmployerEmail = "";
+    private string oldProjectName = "";
+    private string oldProjectDescription = "";
+    private double? maximumAmountForBenefits = 0.0;
+    private int oldMaximumBenefitAmount = 0;
+    private string oldPaymentInterval = "";
+
+
     Project projectInfo = new Project("","","",0.0,0,"");
     MudForm form;
     SnackHandler snackHandler = new SnackHandler();
@@ -158,9 +167,14 @@ else
     {
         projectInfo = await ProjectService.GetProject(employerEmail,projectName);
         newName = projectInfo.ProjectName;
+
+        oldEmployerEmail = projectInfo.EmployerEmail;
+        oldProjectName = projectInfo.ProjectName;
+        oldProjectDescription = projectInfo.ProjectDescription;
         maximumAmountForBenefits = projectInfo.MaximumAmountForBenefits;
-        detailsTittle = "Detalles de " + projectInfo.ProjectName + " ";
-        configTittle = "Modificar " + projectInfo.ProjectName + " ";
+        oldMaximumBenefitAmount = projectInfo.MaximumBenefitAmount;
+        oldPaymentInterval = projectInfo.PaymentInterval;
+
         if (projectInfo != null)
         {
             _loading = false;
@@ -179,13 +193,14 @@ else
             bool modified = ProjectService.ModifyProject(projectInfo, newName);
             if (modified)
             {
-                ShowSnackNotification(projectInfo.ProjectName + " modificado exitosamente", Severity.Success);
                 projectInfo = await ProjectService.GetProject(employerEmail, newName);
                 projectName = newName;
+                ShowSnackNotification(projectInfo.ProjectName + " modificado exitosamente", Severity.Success);
                 DisableForm();
             } 
             else
             {
+                modified = false;
                 newName = projectInfo.ProjectName;
                 ShowSnackNotification(projectInfo.ProjectName + " no fue modificado", Severity.Error);
             }
@@ -224,19 +239,16 @@ else
         });
     }
 
-    void CleanForm()
+    async Task  Cancel()
     {
-        projectInfo.ProjectName = "";
-        projectInfo.EmployerEmail = "";
-        projectInfo.ProjectDescription = "";
-        projectInfo.MaximumBenefitAmount= 0;
-        projectInfo.MaximumAmountForBenefits = 0.0;
-        projectInfo.PaymentInterval = "";
-    }
-
-    private void GoToMain()
-    {
-        nav.NavigateTo($"/Projects/{employerEmail}/{projectName}");
+        projectInfo.EmployerEmail = oldEmployerEmail;
+        projectInfo.ProjectName = oldProjectName;
+        projectInfo.ProjectDescription = oldProjectDescription;
+        projectInfo.MaximumAmountForBenefits = (double)maximumAmountForBenefits;
+        projectInfo.MaximumBenefitAmount = oldMaximumBenefitAmount;
+        projectInfo.PaymentInterval = oldPaymentInterval;
+        projectInfo = await ProjectService.GetProject(employerEmail,projectName);
+        nav.NavigateTo($"/Projects/{employerEmail}");
     }
 
     private void EnableForm()
