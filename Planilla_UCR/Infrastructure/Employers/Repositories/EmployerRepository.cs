@@ -1,13 +1,13 @@
 ﻿using Domain.Core.Repositories;
 using Domain.Employers.Entities;
 using Domain.Employers.Repositories;
+using Domain.People.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
-
-
+using Microsoft.Data.SqlClient;
 
 namespace Infrastructure.Employers.Repositories
 {
@@ -37,6 +37,6 @@ namespace Infrastructure.Employers.Repositories
                 employer = employerResult.First();
             }
             return employer;
-        }
+        } 
     }
 }

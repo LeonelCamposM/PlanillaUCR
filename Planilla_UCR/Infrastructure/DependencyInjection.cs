@@ -11,6 +11,13 @@ using Infrastructure.Employers.Repositories;
 using Domain.Employers.Repositories;
 using Infrastructure.Projects.Repositories;
 using Domain.Projects.Repositories;
+//  using Domain.Accounts.Repositories;
+using Infrastructure.Agreements;
+using Infrastructure.Agreements.Repositories;
+using Domain.Agreements.Repositories;
+using Infrastructure.AgreementTypes;
+using Infrastructure.AgreementTypes.Repositories;
+using Domain.AgreementTypes.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Infrastructure.Employers;
@@ -21,6 +28,9 @@ using Domain.Authentication.Repositories;
 using Infrastructure.Authentication.Repositories;
 using Domain.Authorization.Repositories;
 using Infrastructure.Authorization.Repositories;
+using Domain.ReportOfHours.Repositories;
+using Infrastructure.ReportOfHours.Repositories;
+using Infrastructure.ReportOfHours;
 
 namespace Infrastructure
 {
@@ -50,6 +60,15 @@ namespace Infrastructure
                .AddEntityFrameworkStores<AccountsDbContext>();
             services.AddScoped<IAuthenticationRepository, AuthenticationRepository>();
             services.AddScoped<IAuthorizationRepository, AuthorizationRepository>();
+
+            services.AddDbContext<HoursReportDbContext>(options => options.UseSqlServer(connectionString));
+            services.AddScoped<IHoursReportRepository, HoursReportRepository>();
+
+            services.AddDbContext<AgreementDbContext>(options => options.UseSqlServer(connectionString));
+            services.AddScoped<IAgreementRepository, AgreementRepository>();
+
+            services.AddDbContext<AgreementTypeDbContext>(options => options.UseSqlServer(connectionString));
+            services.AddScoped<IAgreementTypeRepository, AgreementTypeRepository>();
             return services;
         }
     }

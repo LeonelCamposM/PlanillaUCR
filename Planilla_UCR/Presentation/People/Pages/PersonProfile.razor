@@ -1,0 +1,155 @@
+﻿@page "/Profile/{userEmail}"
+@using Application.Employers
+@using Application.People
+@using Domain.Employers.Entities
+@using Domain.Employers.DTOs
+@using Domain.People.Entities
+@using Presentation.Core.Components
+@using Domain.Authentication.DTOs
+@using Application.Authentication
+@using  Domain.Authentication
+@using Application.Authorization;
+@using Application.Authorization.Implementations;
+@inject NavigationManager nav
+@inject IPersonService PersonService
+@inject IEmployerService EmployerService
+@inject IAuthenticationService AuthenticationService
+
+
+<AuthorizeView>
+    <Authorized> 
+        <MudText>Esta autenticado</MudText>
+    </Authorized>
+    <NotAuthorized>
+        <MudText>No esta autenticado</MudText>
+    </NotAuthorized>
+</AuthorizeView>
+
+<AuthorizeView Roles="Employer">
+    <Authorized> 
+        <MudText>Es Employer</MudText>
+    </Authorized>
+    <NotAuthorized>
+        <MudText>No es employer </MudText>
+    </NotAuthorized>
+</AuthorizeView>
+
+<AuthorizeView Roles="Employee">
+    <Authorized> 
+        <MudText>Es employee</MudText>
+    </Authorized>
+    <NotAuthorized>
+        <MudText>No es employee </MudText>
+    </NotAuthorized>
+</AuthorizeView>
+
+
+@if(_loading) {
+
+    <MudPaper  Height="220px" Width="100%" Outlined="false" Class="border-none pa-4" Elevation="0">
+         <MudText Align="Align.Center" Typo="Typo.h6">
+              <MudProgressCircular Color="Color.Secondary" Style="height:70px;width:70px;" Indeterminate="true" />
+         </MudText>
+       
+    </MudPaper>
+}else{
+    @if (!_loading)
+    {
+          
+        List<BreadcrumbItem> _items = new List<BreadcrumbItem>
+        {
+            new BreadcrumbItem("Proyectos", href: $"Projects/{userEmail}"),
+            new BreadcrumbItem("Mi perfil", href: $"Profile/{userEmail}")
+        };
+
+        <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
+
+    <MudPaper  Height="220px" Width="100%" Outlined="false" Class="border-none pa-4" Elevation="0">
+        <MudGrid>
+            <MudItem xs="12" Class="d-flex justify-center align-center">
+                <MudItem xs="2">
+                </MudItem>
+                <MudItem xs="2">
+                </MudItem>
+                <MudItem xs="4">
+                     <MudText Align="Align.Center" Typo="Typo.h6" GutterBottom="true">Mi perfil</MudText>
+                </MudItem>
+               
+                <MudItem xs="4">
+                    <MudIconButton  Icon="@Icons.Material.Filled.Settings" Color="Color.Primary" OnClick="GoToEmployerProfileConfig"/>
+                </MudItem>
+                
+
+            </MudItem>
+            
+        </MudGrid>
+    <MudGrid>
+        <MudItem xs="4"></MudItem>
+        <MudItem xs="6">
+        <MudItem xs="8">
+        <MudField Variant="Variant.Text"> <MudIcon Icon="@Icons.Filled.Email" Color="@Color.Primary" /> Email: @personInfo.Email</MudField>
+        </MudItem>
+        <MudItem xs="8">
+        <MudField Variant="Variant.Text"><MudIcon Icon="@Icons.Filled.Person" Color="@Color.Primary" /> Nombre: @personInfo.Name @personInfo.LastName1 @personInfo.LastName2</MudField>
+        </MudItem>
+        <MudItem xs="8">
+        <MudField Variant="Variant.Text"><MudIcon Icon="@Icons.Filled.Photo" Color="@Color.Primary" /> Cédula: @personInfo.Ssn </MudField>
+        </MudItem>
+            <MudItem xs="8">
+        <MudField Variant="Variant.Text"><MudIcon Icon="@Icons.Filled.CreditCard" Color="@Color.Primary" />  Cuenta bancaria: @personInfo.BankAccount</MudField>
+        </MudItem>
+        <MudItem xs="8">
+        <MudField Variant="Variant.Text"><MudIcon Icon="@Icons.Filled.LocationOn" Color="@Color.Primary" /> Dirección: @personInfo.Adress</MudField>
+        </MudItem>
+        <MudItem xs="8">
+        <MudField Variant="Variant.Text"><MudIcon Icon="@Icons.Filled.ContactPhone" Color="@Color.Primary" /> Teléfono: @personInfo.PhoneNumber</MudField>
+        </MudItem> 
+
+        <AuthorizeView Roles="Employer">
+            <Authorized> 
+                <MudButton Disabled="true"> </MudButton>
+                <MudItem xs="8">
+                    <MudButton OnClick="GoToProjects" Variant="Variant.Filled" Color="Color.Transparent">
+                    <MudText>Borrar</MudText>
+                </MudButton>
+                </MudItem> 
+            </Authorized>
+        </AuthorizeView>
+        </MudItem>
+
+    </MudGrid>
+    </MudPaper>
+
+    }
+    else
+    {
+        <MudText Align="Align.Center" Typo="Typo.h4"> Email incorrecto</MudText>
+    }
+}
+
+
+@code {
+    private bool _loading = true;
+    Person personInfo = new Person("", "", "", "", Int32.Parse("0"), "", "", "");
+    [Parameter] public string userEmail { get; set; }  
+  
+    protected override async Task OnInitializedAsync()
+    {
+        personInfo.Email = userEmail;
+        personInfo = await PersonService.GetInfoPerson(personInfo);
+        if (personInfo != null)
+        {
+            _loading = false;
+        }
+    }
+
+    private void GoToProjects()
+    {
+        nav.NavigateTo($"Projects/{userEmail}");
+    }
+
+    private void GoToEmployerProfileConfig()
+    {
+        nav.NavigateTo($"/Profile/{userEmail}/Configurations");
+    }
+}

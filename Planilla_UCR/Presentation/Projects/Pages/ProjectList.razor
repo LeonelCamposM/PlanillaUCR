@@ -2,9 +2,15 @@
 @using Domain.Projects.Entities
 @using Application.Projects
 @using Presentation.Core.Components
+@using Presentation.Projects.Models
+@using Application.ContextMenu
+
+@inject NavigationManager nav
 @using Presentation.Authentication
 
 @inject IProjectService ProjectService
+@inject IContextMenuService ContextMenuService
+
 @inject NavigationManager nav
 
 @{
@@ -16,91 +22,100 @@
     };
 }
 
-<AuthorizeView>
-    <Authorized> 
-        <MudText>Esta autenticado. Bienvenido @context.User.Identity.Name</MudText>
+<AuthorizeView Roles="Employer">
+    <Authorized>
+       @if (_loading)
+        {
+                <MudPaper  Height="220px" Width="100%" Outlined="false" Class="border-none pa-4" Elevation="0">
+                    <MudText Align="Align.Center" Typo="Typo.h6">
+                        <MudProgressCircular Color="Color.Primary" Style="height:70px;width:70px;" Indeterminate="true" />
+                    </MudText>
+            </MudPaper>
+        }
+        else
+        {
+            <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
+            @if (_empty)
+            {
+                <MudText Typo="Typo.h6" Align="Align.Center">No hay proyectos asociados al empleador
+                </MudText>
+                <br>
+                <MudToolBar DisableGutters="true" Class="gap-4">
+                    <MudButton></MudButton>
+                    <MudSpacer></MudSpacer>
+                    <MudButton Variant="Variant.Filled" OnClick="GoToCreate" Color="Color.Primary">
+                        <MudText> 
+                            Crear nuevo Proyecto
+                        </MudText> 
+                    </MudButton>
+                    <MudSpacer></MudSpacer>
+                    <MudButton></MudButton>
+                </MudToolBar>
+            }
+            else
+            {
+                <MudToolBar DisableGutters="true" Class="gap-4">
+                    <MudSpacer></MudSpacer>
+                    <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Primary" OnClick="GoToConfigs"/>
+                </MudToolBar>
+
+                <MudTable @ref="mudTable" Items="@elements" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_empty" LoadingProgressColor="Color.Primary" Filter="new Func<Project,bool>(FilterFunc1)">  
+
+                    <ToolBarContent>
+                        <MudText Align="Align.Center" Typo="Typo.h6">Lista de proyectos</MudText>
+                        <MudSpacer></MudSpacer>
+                        <MudTextField @bind-Value="searchString" Placeholder="Buscar Proyecto" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                    </ToolBarContent>
+
+                    <HeaderContent>
+                        <MudTh>Nombre</MudTh>
+                        <MudTh>Descripción</MudTh>
+                        <MudTh>Ajustes</MudTh>
+                    </HeaderContent>
+
+                    <RowTemplate Context="row">
+                        <MudTd DataLabel="Nombre" >
+                            <MudLink Color="Color.Primary" Underline="Underline.Always" Href="@($"/Projects/{@row.EmployerEmail}/{@row.ProjectName}/Configurations")">
+                                @row.ProjectName
+                            </MudLink>
+                        </MudTd>
+
+                        <MudTd DataLabel="Descripción">@row.ProjectDescription</MudTd>
+            
+                        <MudTd>
+                            <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Primary" OnClick="GoToConfigs"/>
+                            <MudSpacer></MudSpacer>
+                        </MudTd>
+                    </RowTemplate>
+
+                    <PagerContent>
+                            <MudPagination SelectedChanged="PageChanged" Count="@((mudTable.GetFilteredItemsCount() + mudTable.RowsPerPage - 1) / mudTable.RowsPerPage)" Color="Color.Primary" Class="pa-4"/>
+                    </PagerContent>
+                </MudTable>
+                <br>
+                <MudButton Variant="Variant.Filled" OnClick="GoToCreate" Color="Color.Primary">Crear Proyecto</MudButton>
+            }    
+    
+        }
     </Authorized>
     <NotAuthorized>
-        <MudText>No esta autenticado</MudText>
     </NotAuthorized>
 </AuthorizeView>
 
-@if (_loading)
-{
-     <MudPaper  Height="220px" Width="100%" Outlined="false" Class="border-none pa-4" Elevation="0">
-         <MudText Align="Align.Center" Typo="Typo.h6">
-              <MudProgressCircular Color="Color.Secondary" Style="height:70px;width:70px;" Indeterminate="true" />
-         </MudText>
-    </MudPaper>
-}
-else
-{
-    <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
-    @if (_empty)
-    {
-        <MudText Typo="Typo.h6" Align="Align.Center">No hay proyectos asociados al empleador
-        </MudText>
-        <br>
-        <MudToolBar DisableGutters="true" Class="gap-4">
-            <MudButton></MudButton>
-            <MudSpacer></MudSpacer>
-            <MudButton Variant="Variant.Filled" OnClick="GoToCreate" Color="Color.Secondary">
-                <MudText> 
-                    Crear nuevo Proyecto
-                </MudText> 
-            </MudButton>
-            <MudSpacer></MudSpacer>
-            <MudButton></MudButton>
-        </MudToolBar>
-    }
-    else
-    {
-        <MudToolBar DisableGutters="true" Class="gap-4">
-            <MudSpacer></MudSpacer>
-            <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Secondary" OnClick="GoToConfigs"/>
-        </MudToolBar>
 
-        <MudTable @ref="mudTable" Items="@elements" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_empty" LoadingProgressColor="Color.Info" Filter="new Func<Project,bool>(FilterFunc1)">  
-
-            <ToolBarContent>
-                <MudText Align="Align.Center" Typo="Typo.h6">Lista de proyectos</MudText>
-                <MudSpacer></MudSpacer>
-                <MudTextField @bind-Value="searchString" Placeholder="Buscar Proyecto" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-            </ToolBarContent>
-
-            <HeaderContent>
-                <MudTh>Nombre</MudTh>
-                <MudTh>Descripción</MudTh>
-                <MudTh>Ajustes</MudTh>
-            </HeaderContent>
-
-            <RowTemplate>
-                <MudTd DataLabel="Nombre" >
-                    <MudLink Color="Color.Secondary" Underline="Underline.Always" Href="@($"/Projects/{@context.EmployerEmail}/{@context.ProjectName}")">
-                        @context.ProjectName
-                    </MudLink>
-                </MudTd>
-
-                <MudTd DataLabel="Descripción">@context.ProjectDescription</MudTd>
-            
-                <MudTd>
-                    <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Secondary" OnClick="GoToConfigs"/>
-                    <MudSpacer></MudSpacer>
-                </MudTd>
-            </RowTemplate>
-
-            <PagerContent>
-                    <MudPagination SelectedChanged="PageChanged" Count="@((mudTable.GetFilteredItemsCount() + mudTable.RowsPerPage - 1) / mudTable.RowsPerPage)" Color="Color.Secondary" Class="pa-4"/>
-            </PagerContent>
-        </MudTable>
-        <br>
-        <MudButton Variant="Variant.Filled" OnClick="GoToCreate" Color="Color.Secondary">Crear Proyecto</MudButton>
-    }    
-    
-}
-
+<AuthorizeView Roles="Employee">
+    <Authorized>
+       Página de proyectos del empleado
+       @{
+           ContextMenuService.SetProjectsContext(true, "Proyecto Inexistente");
+       }
+    </Authorized>
+    <NotAuthorized>
+    </NotAuthorized>
+</AuthorizeView>
 
 @code {
+
     private bool _empty = true;
     private bool _loading = true;
     public string searchString = "";
@@ -109,12 +124,10 @@ else
     
     [Parameter] public string employerEmail { get; set; }
     [Parameter] public string projectName { get; set; }
-    [CascadingParameter] protected EventCallback<string> setEmail { get; set; }
-
 
     protected override async Task OnInitializedAsync()
     {
-        await setEmail.InvokeAsync(employerEmail);
+        ContextMenuService.SetProjectsContext(false, "");
         elements = await ProjectService.GetEmployerProyects(employerEmail);
         _loading = false;
         if (elements.Length() > 0){
@@ -140,7 +153,7 @@ else
 
     private void GoToConfigs()
     {
-        nav.NavigateTo($"/Projects/{employerEmail}/{projectName}");
+        nav.NavigateTo($"/Projects/{employerEmail}/{projectName}/Configurations");
     }
 
     private void PageChanged(int i)
