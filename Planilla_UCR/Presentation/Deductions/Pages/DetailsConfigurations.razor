@@ -42,7 +42,6 @@ else
         
     </MudToolBar>
     <MudGrid>
-        @*Text fields *@
         <MudItem xs="12" sm="12">
             <MudPaper  Height="250px" Width="100%" Outlined="false" Class="border-none pa-4" Elevation="0">
                 @if (_disabled)
@@ -100,8 +99,7 @@ else
                         }
                     </MudButton>
                     <MudButton Disabled="true"> </MudButton>
-                    @*Clear buton *@
-                    <MudButton OnClick="CleanForm" Variant="Variant.Filled" Color="Color.Transparent">
+                    <MudButton OnClick="GoToMain" Variant="Variant.Filled" Color="Color.Transparent">
                             <MudText>Cancelar</MudText>
                     </MudButton>
                 </MudItem>
@@ -163,7 +161,6 @@ else
             subscriptionName = newName;
             DisableForm();
         }
-
         snackHandler._saving = false;
     }
 
@@ -195,13 +192,6 @@ else
                 return Task.CompletedTask;
             };
         });
-    }
-
-    void CleanForm()
-    {
-        subscription.SubscriptionDescription = "";
-        subscription.ProviderName= "";
-        subscription.Cost = 0.0;
     }
 
     private void GoToMain()

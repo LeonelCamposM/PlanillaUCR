@@ -98,7 +98,8 @@ else
     {
         elements = await SubscriptionService.GetDeductionsByProject(employerEmail, projectName);
         _loading = false;
-        if (elements.Length() > 0){
+        if (elements.Length() > 0)
+        {
             _empty = false;
         }
     }
