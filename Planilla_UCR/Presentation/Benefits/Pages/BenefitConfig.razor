@@ -137,8 +137,12 @@ else
 
     private void DeleteBenefits()
     {
-        //Servicio de borrado.
-        Snackbar.Add("Deducciones borradas", Severity.Success);
+        foreach (Subscription toDelete in selectedItems1)
+        {
+            SubscriptionService.DeleteSubscription(toDelete);
+        }
+        Snackbar.Add("Beneficios borrados", Severity.Success);
+        GoToMain();
     }
 
     private bool FilterFunc1(Subscription element) => FilterFunc(element, searchString1);

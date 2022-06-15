@@ -51,7 +51,7 @@ else
     }
     else
     {
-        <MudTable @ref="mudTable" Items="@Elements" RowsPerPage="4" MultiSelection="true" @bind-SelectedItems="selectedItems1" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="Color.Info" Filter="new Func<Subscription,bool>(FilterFunc1)">
+        <MudTable @ref="mudTable" Items="@_elements" RowsPerPage="4" MultiSelection="true" @bind-SelectedItems="selectedItems1" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="Color.Info" Filter="new Func<Subscription,bool>(FilterFunc1)">
             <ToolBarContent>
                 <MudText Align="Align.Center" Typo="Typo.h6">Lista de deducciones voluntarias</MudText>
                 <MudSpacer />
@@ -109,7 +109,7 @@ else
     private bool _loading = true;
     private bool _empty = true;
     private HashSet<Subscription> selectedItems1 = new HashSet<Subscription>();
-    private IEnumerable<Subscription> Elements;
+    private IEnumerable<Subscription> _elements;
     private MudTable<Subscription> mudTable;
     public string searchString1 = "";
     public string project { get; set; }
@@ -130,9 +130,9 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        Elements = await SubscriptionService.GetDeductionsByProject(employerEmail, projectName);
+        _elements = await SubscriptionService.GetDeductionsByProject(employerEmail, projectName);
         _loading = false;
-        if (Elements.Length() > 0)
+        if (_elements.Length() > 0)
         {
             _empty = false;
         }
@@ -140,8 +140,12 @@ else
 
     private void DeleteDeductions()
     {
-        //Servicio de desactivar
+        foreach (Subscription toDelete in selectedItems1)
+        {
+            SubscriptionService.DeleteSubscription(toDelete);
+        }
         Snackbar.Add("Deducciones borradas", Severity.Success);
+        GoToMain();
     }
 
     private bool FilterFunc1(Subscription element) => FilterFunc(element, searchString1);

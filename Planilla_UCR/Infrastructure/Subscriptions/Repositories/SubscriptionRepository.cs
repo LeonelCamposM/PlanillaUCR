@@ -75,5 +75,13 @@ namespace Infrastructure.Subscriptions.Repositories
                 @TypeSubscription = {subscription.TypeSubscription}, @IsEnabled = {subscription.IsEnabled}");
             _dbContext.Database.ExecuteSqlInterpolated(query);
         }
+
+        public void DeleteSubscription(Subscription subscription) 
+        {
+            System.FormattableString query = ($@"EXECUTE DeleteSubscription 
+                @EmployerEmail = {subscription.EmployerEmail}, @ProjectName = {subscription.ProjectName},
+                @SubscriptionName = {subscription.SubscriptionName}");
+            _dbContext.Database.ExecuteSqlInterpolated(query);
+        }
     }
 }

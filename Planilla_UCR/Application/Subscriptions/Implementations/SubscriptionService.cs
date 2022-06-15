@@ -46,5 +46,10 @@ namespace Application.Subscriptions.Implementations
         {
             _subscriptionRepository.ModifySubscription(subscription, newName);
         }
+
+        public void DeleteSubscription(Subscription subscription) 
+        { 
+            _subscriptionRepository.DeleteSubscription(subscription);
+        }
     }
 }
