@@ -120,22 +120,12 @@ CREATE OR ALTER PROCEDURE ModifySubscription(
 	@SubscriptionDescription varchar(600),
 	@Cost float,
 	@TypeSubscription int,
-	@IsEnabled int,
-	@Transaction int output
+	@IsEnabled int
 ) AS
 BEGIN
-	IF ((@NewSubscriptionName in (SELECT SubscriptionName FROM Subscription WHERE EmployerEmail = @EmployerEmail AND ProjectName = @ProjectName)) AND (@SubscriptionName <> @NewSubscriptionName))
-	BEGIN 
-		SET @Transaction = 0;
-	END
-	ELSE
-		BEGIN
-			SET @Transaction = 1;
-
-			UPDATE Subscription
-			SET SubscriptionName = @NewSubscriptionName, SubscriptionDescription = @SubscriptionDescription,Cost = @Cost, ProviderName = @ProviderName 
-			WHERE EmployerEmail= @EmployerEmail AND ProjectName = @ProjectName AND SubscriptionName = @SubscriptionName;
-		END
+	UPDATE Subscription
+	SET SubscriptionName = @NewSubscriptionName, SubscriptionDescription = @SubscriptionDescription,Cost = @Cost, ProviderName = @ProviderName 
+	WHERE EmployerEmail= @EmployerEmail AND ProjectName = @ProjectName AND SubscriptionName = @SubscriptionName;
 END
 
 GO

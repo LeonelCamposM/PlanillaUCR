@@ -1,11 +1,14 @@
 ﻿@page "/Projects/{employerEmail}/{projectName}/Deductions/Configurations"
 @using Application.Subscriptions
 @using Domain.Subscriptions.Entities
+@using Application.Subscribes
+@using Domain.Subscribes.Entities
 @using Presentation.Core.Components
 @using Presentation.Deductions.Components
 @using System.Globalization
 @inject ISnackbar Snackbar
 @inject ISubscriptionService SubscriptionService
+@inject ISubscribeService SubscribeService
 @inject NavigationManager nav
 
 @{List<BreadcrumbItem> _items = new List<BreadcrumbItem>

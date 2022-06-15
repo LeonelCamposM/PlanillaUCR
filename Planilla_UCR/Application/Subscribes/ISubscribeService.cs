@@ -1,6 +1,7 @@
 ﻿using Domain.Subscribes.Entities;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+
 namespace Application.Subscribes
 {
     public interface ISubscribeService

@@ -146,27 +146,38 @@ else
     {
         snackHandler._saving = true;
         await form.Validate();
-        if (form.IsValid)
+        bool valid = true;
+        if (subscription.SubscriptionName != newName) 
+        { 
+            valid = await ValidName(); 
+        }
+        if (form.IsValid && valid)
         {
+            snackHandler._saving = false;
             subscription.Cost = (double)tempCost;
             subscription.ProviderName = providerName;
             subscription.SubscriptionDescription = sDescription;
-            bool isModified = SubscriptionService.ModifySubscription(subscription, newName);
-            if (isModified)
-            {
-                ShowSnackNotification("Deducción " + subscription.SubscriptionName + " modificada", Severity.Success);
-                subscription = await SubscriptionService.GetSubscription(employerEmail, projectName, newName);
-                subscriptionName = subscription.SubscriptionName;
-                DisableForm();
-            }
-            else
-            {
-                ShowSnackNotification("El nombre de la deducción " + newName + " ya está en uso", Severity.Error);
-                newName = subscription.SubscriptionName;
-            }
+            SubscriptionService.ModifySubscription(subscription, newName);
+            ShowSnackNotification("Deducción voluntaria " + subscription.SubscriptionName + " modificada", Severity.Success);
+            subscription.SubscriptionName = newName;
+            subscriptionName = newName;
+            DisableForm();
         }
 
         snackHandler._saving = false;
+    }
+
+    async Task<bool> ValidName()
+    {
+        bool valid = true;
+        Subscription tempSubscription = await SubscriptionService.GetSubscription(employerEmail, projectName, newName);
+        if (tempSubscription != null)
+        {
+            valid = false;
+            ShowSnackNotification("El nombre del beneficio " + newName + " ya está en uso", Severity.Error);
+            DisableForm();
+        }
+        return valid;
     }
 
     void ShowSnackNotification(string message, Severity severity)
