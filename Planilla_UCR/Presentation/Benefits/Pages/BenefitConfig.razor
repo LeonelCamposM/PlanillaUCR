@@ -51,7 +51,7 @@ else
     }
     else
     {
-        <MudTable @ref="mudTable" Items="@_elements" RowsPerPage="6" MultiSelection="true" @bind-SelectedItems="_selectedItems1" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="Color.Info" Filter="new Func<Subscription,bool>(FilterFunc1)">
+        <MudTable @ref="_mudTable" Items="@_elements" RowsPerPage="6" MultiSelection="true" @bind-SelectedItems="_selectedItems1" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="Color.Info" Filter="new Func<Subscription,bool>(FilterFunc1)">
             <ToolBarContent>
                 <MudText Align="Align.Center" Typo="Typo.h6">Lista de beneficios </MudText>
                 <MudSpacer />
@@ -75,7 +75,7 @@ else
                 <MudTd colspan="5">Seleccionar todo</MudTd>
             </FooterContent>
             <PagerContent>
-                <MudPagination SelectedChanged="PageChanged" Count="@((mudTable.GetFilteredItemsCount() + mudTable.RowsPerPage - 1) / mudTable.RowsPerPage)" Color="Color.Primary" Class="pa-4"/>
+                <MudPagination SelectedChanged="PageChanged" Count="@((_mudTable.GetFilteredItemsCount() + _mudTable.RowsPerPage - 1) / _mudTable.RowsPerPage)" Color="Color.Primary" Class="pa-4"/>
             </PagerContent>
         </MudTable>
         <br>
@@ -88,7 +88,7 @@ else
                     <MudIcon Icon="@Icons.Material.Filled.Delete" Color="@Color.Primary" Class="mr-2"/> ¿Está seguro de borrar estos beneficios?</MudText>
             </TitleContent>
             <DialogContent>
-                <MudTable @ref="mudTable" Items="@_selectedItems1" FixedHeader="@fixed_header" FixedFooter="@fixed_footer" Height="@(fixed_header || fixed_footer ?"300px":"")">
+                <MudTable @ref="_mudTable" Items="@_selectedItems1" FixedHeader="@fixed_header" FixedFooter="@fixed_footer" Height="@(fixed_header || fixed_footer ?"300px":"")">
                     <HeaderContent>
                     <MudTh>Nombre</MudTh>
                     </HeaderContent>
@@ -109,7 +109,7 @@ else
                     <MudIcon Icon="@Icons.Material.Filled.Delete" Color="@Color.Primary" Class="mr-2"/> Lista de empleados afectados por la operación:</MudText>
             </TitleContent>
             <DialogContent>
-                <MudTable @ref="table" Items="@_employees" FixedHeader="@fixed_header" FixedFooter="@fixed_footer" Height="@(fixed_header || fixed_footer ?"300px":"")">
+                <MudTable @ref="_table" Items="@_employees" FixedHeader="@fixed_header" FixedFooter="@fixed_footer" Height="@(fixed_header || fixed_footer ?"300px":"")">
                     <HeaderContent>
                     <MudTh>Deducción voluntaria</MudTh>
                     <MudTh>Email</MudTh>
@@ -133,8 +133,8 @@ else
     private HashSet<Subscription> _selectedItems1 = new HashSet<Subscription>();
     private IEnumerable<Subscription> _elements;
     private IList<Subscribe> _employees = new List<Subscribe>();
-    private MudTable<Subscription> mudTable;
-    private MudTable<Subscribe> table;
+    private MudTable<Subscription> _mudTable;
+    private MudTable<Subscribe> _table;
     public string searchString1 = "";
     public string project { get; set; }
     public CultureInfo cultureCR = CultureInfo.GetCultureInfo("es-CR");
@@ -204,7 +204,7 @@ else
 
     private void PageChanged(int i)
     {
-        mudTable.NavigateTo(i - 1);
+        _mudTable.NavigateTo(i - 1);
     }
 
     private void GoToMain()

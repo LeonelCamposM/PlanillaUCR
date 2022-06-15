@@ -18,7 +18,6 @@
     };
 }
 
-
 @if (_loading)
 {
     <MudPaper  Height="220px" Width="100%" Outlined="false" Class="border-none pa-4" Elevation="0">
@@ -35,7 +34,8 @@ else
         @if(_disabled)
         {
             <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Primary" OnClick="EnableForm"/>
-        }else
+        }
+        else
         {
             <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Primary" OnClick="DisableForm"/>
         }
@@ -47,7 +47,8 @@ else
                 @if (_disabled)
                 {
                     <MudText Align="Align.Center" Typo="Typo.h6">Detalles de la deducción voluntaria</MudText>
-                }else
+                }
+                else
                 {
                     <MudText Align="Align.Center" Typo="Typo.h6">Modificar deducción voluntaria</MudText>
                 }
@@ -57,7 +58,7 @@ else
                 <MudItem xs="2">
                 </MudItem>
                 <MudItem xs="8">
-                    <MudTextField @bind-Value="newName" MaxLength="255" Label="Nombre" Variant="Variant.Outlined" ReadOnly = "@_disabled" Required="true" RequiredError="Campo requerido"></MudTextField>
+                    <MudTextField @bind-Value="_newName" MaxLength="255" Label="Nombre" Variant="Variant.Outlined" ReadOnly = "@_disabled" Required="true" RequiredError="Campo requerido"></MudTextField>
                 </MudItem>
                 <MudItem xs="2">
                 </MudItem>
@@ -65,12 +66,12 @@ else
                 <MudItem xs="2"></MudItem>
 
                 <MudItem xs="4">
-                    <MudNumericField Immediate="true" Label="Costo" Format="N2" Culture="@cultureCR" Variant="Variant.Outlined" @bind-Value="tempCost" 
+                    <MudNumericField Immediate="true" Label="Costo" Format="N2" Culture="@cultureCR" Variant="Variant.Outlined" @bind-Value="_tempCost" 
                     Adornment="Adornment.Start" AdornmentText="@cultureCR.NumberFormat.CurrencySymbol" ReadOnly = "@_disabled" Required="true" RequiredError="Campo requerido" Min = "0.0"/>
                 </MudItem>
 
                 <MudItem xs="4">
-                    <MudTextField @bind-Value="providerName"  MaxLength="255" Label="Organización" Variant="Variant.Outlined" ReadOnly = "@_disabled" Required="true" RequiredError="Campo requerido"></MudTextField>
+                    <MudTextField @bind-Value="_providerName"  MaxLength="255" Label="Organización" Variant="Variant.Outlined" ReadOnly = "@_disabled" Required="true" RequiredError="Campo requerido"></MudTextField>
                 </MudItem>
 
                 <MudItem xs="2"></MudItem>  
@@ -78,7 +79,7 @@ else
                 <MudItem xs="2"></MudItem>  
 
                 <MudItem xs="8">
-                    <MudTextField @bind-Value="sDescription" MaxLength="600" Label="Descripcion" Lines="6" Variant="Variant.Outlined" ReadOnly = "@_disabled" Required="true" RequiredError="Campo requerido"></MudTextField>
+                    <MudTextField @bind-Value="_sDescription" MaxLength="600" Label="Descripcion" Lines="6" Variant="Variant.Outlined" ReadOnly = "@_disabled" Required="true" RequiredError="Campo requerido"></MudTextField>
                 </MudItem>
 
                 <MudItem xs="2"></MudItem>  
@@ -114,10 +115,10 @@ else
 @code {
     private bool _loading = true;
     private bool _disabled = true;
-    private string newName = "";
-    private double? tempCost;
-    private string providerName = "";
-    private string sDescription = "";
+    private string _newName = "";
+    private double? _tempCost;
+    private string _providerName = "";
+    private string _sDescription = "";
     public Subscription subscription = new Subscription("", "", "", "", "", 0.0, 0, 1);
     MudForm form;
     SnackHandler snackHandler = new SnackHandler();
@@ -132,10 +133,10 @@ else
         subscription = await SubscriptionService.GetSubscription(employerEmail, projectName, subscriptionName);
         if (subscription != null)
         {
-            newName = subscription.SubscriptionName;
-            tempCost = subscription.Cost;
-            providerName =subscription.ProviderName;
-            sDescription = subscription.SubscriptionDescription;
+            _newName = subscription.SubscriptionName;
+            _tempCost = subscription.Cost;
+            _providerName =subscription.ProviderName;
+            _sDescription = subscription.SubscriptionDescription;
             _loading = false;
         }
     }
@@ -145,20 +146,20 @@ else
         snackHandler._saving = true;
         await form.Validate();
         bool valid = true;
-        if (subscription.SubscriptionName != newName) 
+        if (subscription.SubscriptionName != _newName) 
         { 
             valid = await ValidName(); 
         }
         if (form.IsValid && valid)
         {
             snackHandler._saving = false;
-            subscription.Cost = (double)tempCost;
-            subscription.ProviderName = providerName;
-            subscription.SubscriptionDescription = sDescription;
-            SubscriptionService.ModifySubscription(subscription, newName);
+            subscription.Cost = (double)_tempCost;
+            subscription.ProviderName = _providerName;
+            subscription.SubscriptionDescription = _sDescription;
+            SubscriptionService.ModifySubscription(subscription, _newName);
             ShowSnackNotification("Deducción voluntaria " + subscription.SubscriptionName + " modificada", Severity.Success);
-            subscription.SubscriptionName = newName;
-            subscriptionName = newName;
+            subscription.SubscriptionName = _newName;
+            subscriptionName = _newName;
             DisableForm();
         }
         snackHandler._saving = false;
@@ -167,11 +168,11 @@ else
     async Task<bool> ValidName()
     {
         bool valid = true;
-        Subscription tempSubscription = await SubscriptionService.GetSubscription(employerEmail, projectName, newName);
+        Subscription tempSubscription = await SubscriptionService.GetSubscription(employerEmail, projectName, _newName);
         if (tempSubscription != null)
         {
             valid = false;
-            ShowSnackNotification("El nombre del beneficio " + newName + " ya está en uso", Severity.Error);
+            ShowSnackNotification("El nombre del beneficio " + _newName + " ya está en uso", Severity.Error);
             DisableForm();
         }
         return valid;
@@ -202,18 +203,18 @@ else
     private void EnableForm()
     {
         _disabled = false;
-        newName = subscription.SubscriptionName;
-        tempCost = subscription.Cost;
-        providerName = subscription.ProviderName;
-        sDescription = subscription.SubscriptionDescription;
+        _newName = subscription.SubscriptionName;
+        _tempCost = subscription.Cost;
+        _providerName = subscription.ProviderName;
+        _sDescription = subscription.SubscriptionDescription;
     }
 
     private void DisableForm()
     {
         _disabled = true;
-        newName = subscription.SubscriptionName;
-        tempCost = subscription.Cost;
-        providerName = subscription.ProviderName;
-        sDescription = subscription.SubscriptionDescription;
+        _newName = subscription.SubscriptionName;
+        _tempCost = subscription.Cost;
+        _providerName = subscription.ProviderName;
+        _sDescription = subscription.SubscriptionDescription;
     }
 }

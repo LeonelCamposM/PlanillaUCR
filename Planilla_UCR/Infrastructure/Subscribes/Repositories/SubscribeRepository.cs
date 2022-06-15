@@ -22,7 +22,8 @@ namespace Infrastructure.Subscribes.Repositories
 
         public async Task<IEnumerable<Subscribe>> GetEmployeesBySubscription(string employerEmail, string projectName, string subscriptionName)
         {
-            return await _dbContext.Subscribes.FromSqlRaw("EXEC GetEmployeesBySubscription @EmployerEmail, @ProjectName, @SubscriptionName;",
+            return await _dbContext.Subscribes.FromSqlRaw("EXEC GetEmployeesBySubscription @EmployerEmail," +
+                " @ProjectName, @SubscriptionName;",
                 new SqlParameter("EmployerEmail", employerEmail),
                 new SqlParameter("ProjectName", projectName),
                 new SqlParameter("SubscriptionName", subscriptionName)).ToListAsync();

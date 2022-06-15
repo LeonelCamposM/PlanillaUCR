@@ -51,7 +51,7 @@ else
     }
     else
     {
-        <MudTable @ref="mudTable" Items="@_elements" RowsPerPage="4" MultiSelection="true" @bind-SelectedItems="_selectedItems1" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="Color.Info" Filter="new Func<Subscription,bool>(FilterFunc1)">
+        <MudTable @ref="_mudTable" Items="@_elements" RowsPerPage="4" MultiSelection="true" @bind-SelectedItems="_selectedItems1" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="Color.Info" Filter="new Func<Subscription,bool>(FilterFunc1)">
             <ToolBarContent>
                 <MudText Align="Align.Center" Typo="Typo.h6">Lista de deducciones voluntarias</MudText>
                 <MudSpacer />
@@ -75,20 +75,20 @@ else
                 <MudTd colspan="5">Seleccionar todo</MudTd>
             </FooterContent>
             <PagerContent>
-                <MudPagination SelectedChanged="PageChanged" Count="@((mudTable.GetFilteredItemsCount() + mudTable.RowsPerPage - 1) / mudTable.RowsPerPage)" Color="Color.Primary" Class="pa-4"/>
+                <MudPagination SelectedChanged="PageChanged" Count="@((_mudTable.GetFilteredItemsCount() + _mudTable.RowsPerPage - 1) / _mudTable.RowsPerPage)" Color="Color.Primary" Class="pa-4"/>
             </PagerContent>
         </MudTable>
         <br>
         <MudToolBar DisableGutters="true" Class="gap-4">
             <MudButton Variant="Variant.Filled" OnClick="OpenDialog" Color="Color.Error">Borrar</MudButton>
         </MudToolBar>
-        <MudDialog @bind-IsVisible="visible" Options="dialogOptions">
+        <MudDialog @bind-IsVisible="_visible" Options="dialogOptions">
             <TitleContent>
                 <MudText Typo="Typo.h6">
                     <MudIcon Icon="@Icons.Material.Filled.Delete" Color="@Color.Primary" Class="mr-2"/> ¿Está seguro de borrar estas deducciones voluntarias?</MudText>
             </TitleContent>
             <DialogContent>
-                <MudTable @ref="mudTable" Items="@_selectedItems1" FixedHeader="@fixed_header" FixedFooter="@fixed_footer" Height="@(fixed_header || fixed_footer ?"300px":"")">
+                <MudTable @ref="_mudTable" Items="@_selectedItems1" FixedHeader="@fixed_header" FixedFooter="@fixed_footer" Height="@(fixed_header || fixed_footer ?"300px":"")">
                     <HeaderContent>
                     <MudTh>Nombre</MudTh>
                     </HeaderContent>
@@ -103,13 +103,13 @@ else
             </DialogActions>
         </MudDialog>
 
-        <MudDialog @bind-IsVisible="visibleEmployees" Options="dialogOptionsEmployees">
+        <MudDialog @bind-IsVisible="_visibleEmployees" Options="dialogOptionsEmployees">
             <TitleContent>
                 <MudText Typo="Typo.h6">
                     <MudIcon Icon="@Icons.Material.Filled.Delete" Color="@Color.Primary" Class="mr-2"/> Lista de empleados afectados por la operación:</MudText>
             </TitleContent>
             <DialogContent>
-                <MudTable @ref="table" Items="@_employees" FixedHeader="@fixed_header" FixedFooter="@fixed_footer" Height="@(fixed_header || fixed_footer ?"300px":"")">
+                <MudTable @ref="_table" Items="@_employees" FixedHeader="@fixed_header" FixedFooter="@fixed_footer" Height="@(fixed_header || fixed_footer ?"300px":"")">
                     <HeaderContent>
                     <MudTh>Deducción voluntaria</MudTh>
                     <MudTh>Email</MudTh>
@@ -133,8 +133,8 @@ else
     private HashSet<Subscription> _selectedItems1 = new HashSet<Subscription>();
     private IEnumerable<Subscription> _elements;
     private IList<Subscribe> _employees = new List<Subscribe>();
-    private MudTable<Subscription> mudTable;
-    private MudTable<Subscribe> table;
+    private MudTable<Subscription> _mudTable;
+    private MudTable<Subscribe> _table;
     public string searchString1 = "";
     public string project { get; set; }
     public CultureInfo cultureCR = CultureInfo.GetCultureInfo("es-CR");
@@ -142,16 +142,16 @@ else
     [Parameter] public string employerEmail { get; set; }
     [Parameter] public string projectName { get; set; }
 
-    private bool visible;
-    private bool open;
-    private void OpenDialog() => visible = true;
-    void CloseDialog() => visible = false;
+    private bool _visible;
+    private bool _open;
+    private void OpenDialog() => _visible = true;
+    void CloseDialog() => _visible = false;
     private DialogOptions dialogOptions = new() { FullWidth = true };
 
-    private bool visibleEmployees;
-    private bool openEmployees;
-    private void OpenDialogEmployee() => visibleEmployees = true;
-    void CloseDialogEmployees() => visibleEmployees = false;
+    private bool _visibleEmployees;
+    private bool _openEmployees;
+    private void OpenDialogEmployee() => _visibleEmployees = true;
+    void CloseDialogEmployees() => _visibleEmployees = false;
     private DialogOptions dialogOptionsEmployees = new() { FullWidth = true };
 
     bool fixed_header = true;
@@ -203,7 +203,7 @@ else
 
     private void PageChanged(int i)
     {
-        mudTable.NavigateTo(i - 1);
+        _mudTable.NavigateTo(i - 1);
     }
 
     private void GoToMain()
