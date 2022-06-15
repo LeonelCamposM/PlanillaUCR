@@ -3,8 +3,11 @@
 @using Application.Employees
 @using Application.ReportOfHours
 @using Domain.ReportOfHours.Entities
+@using Application.ContextMenu
+
 @inject NavigationManager nav
 @inject IReportOfHoursService HoursReportService
+@inject IContextMenuService ContextMenuService
 
 @page "/Reported_Hours/{email}"
 @if(_loading) {
@@ -19,6 +22,8 @@
     {
         List<BreadcrumbItem> _items = new List<BreadcrumbItem>
         {
+            new BreadcrumbItem("Proyectos", href: null, disabled: true),
+            new BreadcrumbItem(@projectName, href: null, disabled: true),
             new BreadcrumbItem("Horas reportadas", href: null, disabled: true)
         }; 
         <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
@@ -71,9 +76,11 @@
 
     [Parameter]
     public string email { get; set; }
+    public string projectName { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
+        projectName = ContextMenuService.GetProjectsContext();
         _elements = await HoursReportService.GetAllReportsAsync(email);
         _elements = _elements.OrderByDescending (report => report.ReportDate);
         if (_elements.Length() == 0)
@@ -98,7 +105,7 @@
     {
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
-        if (element.ProjectName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        if (element.ProjectName.Contains(projectName, StringComparison.OrdinalIgnoreCase))
         return true;
         return false;
     }
