@@ -187,7 +187,10 @@ else
         {
             OpenDialogEmployee();
         }
-        GoToMain();
+        else
+        {
+            GoToMain();
+        }
     }
 
     private bool FilterFunc1(Subscription element) => FilterFunc(element, searchString1);

@@ -102,7 +102,6 @@ BEGIN
     SELECT * FROM Subscription WHERE TypeSubscription=1 and IsEnabled=1
 END
 
-
 GO 
 CREATE PROCEDURE GetAllDeductions
 AS
@@ -418,29 +417,21 @@ INSERT INTO ReportOfHours
 VALUES('leonel@ucr.ac.cr', 'Proyecto 2','mau@ucr.ac.cr', '9999-12-31',22.2)
 Insert into AgreementType
 Values('Por horas', 10)
-/*
+
 INSERT INTO Subscribes (EmployerEmail, ProjectName, SubscriptionName, EmployeeEmail, Cost, StartDate)
 VALUES('leonel@ucr.ac.cr',
 'Proyecto 1',
-'Pr',
+'Ayudemos a los niños',
 'mau@ucr.ac.cr',
 25000,
 '2012-07-15'
 )
 
-INSERT INTO Person
-VALUES('mau1@ucr.ac.cr',
-'Mauricio',
-'Palma',
-'Vitra',
-8857655,
-'CR4024220012',
-'San José, Costa Rica',
-'677774'
+INSERT INTO Subscribes (EmployerEmail, ProjectName, SubscriptionName, EmployeeEmail, Cost, StartDate)
+VALUES('leonel@ucr.ac.cr',
+'Proyecto 1',
+'Piscina',
+'mau@ucr.ac.cr',
+25000,
+'2012-07-15'
 )
-
-INSERT INTO Employee
-VALUES('mau1@ucr.ac.cr')
-
-select * from Subscribes
-*/
