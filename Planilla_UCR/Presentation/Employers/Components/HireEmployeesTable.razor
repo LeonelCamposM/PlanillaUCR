@@ -92,6 +92,7 @@
     protected override async Task OnInitializedAsync()
     {
         _elements = await PersonService.GetAllEmployees(projectName);
+        IEnumerable<Person> hiredEmployees = await PersonService.GetProjectEmployees(projectName);
         if (_elements.Length() == 0)
         {
             empty = true;
@@ -99,7 +100,14 @@
         else
         {
             empty = false;
+            foreach (var item in hiredEmployees)
+            {
+                _elements = _elements.Where(e => e.Email != item.Email);
+            }
         }
+
+
+
         _loading = false;
     }
 
