@@ -66,7 +66,7 @@ else
                     </MudLink>
                 </MudTd>
                 <MudTd DataLabel="Descripción">@context.ProviderName</MudTd>
-                <MudTd DataLabel="Costo"> @cultureCR.NumberFormat.CurrencySymbol @costFormat(context.Cost) </MudTd>
+                <MudTd DataLabel="Costo"> @cultureCR.NumberFormat.CurrencySymbol @CostFormat(context.Cost) </MudTd>
             </RowTemplate>
             <FooterContent>
                 <MudTd colspan="5">Seleccionar todo</MudTd>
@@ -75,14 +75,30 @@ else
                 <MudPagination SelectedChanged="PageChanged" Count="@((mudTable.GetFilteredItemsCount() + mudTable.RowsPerPage - 1) / mudTable.RowsPerPage)" Color="Color.Primary" Class="pa-4"/>
             </PagerContent>
         </MudTable>
-        <MudText Inline="true">Beneficios seleccionados: @(selectedItems1==null ? "" : string.Join(", ", selectedItems1.OrderBy(x=>x.SubscriptionName).Select(x=>x.SubscriptionName)))</MudText>
         <br>
-        <br>
-        <br>
-        <MudDivider />
         <MudToolBar DisableGutters="true" Class="gap-4">
-            <MudButton Variant="Variant.Filled" OnClick="DeleteBenefits" Color="Color.Error">Borrar</MudButton>
+            <MudButton Variant="Variant.Filled" OnClick="OpenDialog" Color="Color.Error">Borrar</MudButton>
         </MudToolBar>
+        <MudDialog @bind-IsVisible="visible" Options="dialogOptions">
+            <TitleContent>
+                <MudText Typo="Typo.h6">
+                    <MudIcon Icon="@Icons.Material.Filled.Delete" Color="@Color.Primary" Class="mr-2"/> ¿Está seguro de borrar estos beneficios?</MudText>
+            </TitleContent>
+            <DialogContent>
+                <MudTable @ref="mudTable" Items="@selectedItems1" FixedHeader="@fixed_header" FixedFooter="@fixed_footer" Height="@(fixed_header || fixed_footer ?"300px":"")">
+                    <HeaderContent>
+                    <MudTh>Nombre</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="Nombre"> @context.SubscriptionName </MudTd>
+                    </RowTemplate>
+                </MudTable>
+            </DialogContent>
+            <DialogActions>
+                  <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="DeleteBenefits" Class="px-10">Aceptar</MudButton>
+                  <MudButton Variant="Variant.Filled" Color="Color.Transparent" OnClick="CloseDialog" Class="px-10">Cancelar</MudButton>
+            </DialogActions>
+        </MudDialog>
     }
 }
 
@@ -99,6 +115,16 @@ else
     [Parameter] public string employerEmail { get; set; }
     [Parameter] public string projectName { get; set; }
 
+    private bool visible;
+    private bool open;
+    public string benefitListString;
+    private void OpenDialog() => visible = true;
+    void CloseDialog() => visible = false;
+    private DialogOptions dialogOptions = new() { FullWidth = true };
+
+    bool fixed_header = true;
+    bool fixed_footer = false;
+
     protected override async Task OnInitializedAsync()
     {
         _elements = await SubscriptionService.GetBenefitsByProject(employerEmail, projectName);
@@ -111,18 +137,8 @@ else
 
     private void DeleteBenefits()
     {
-        string message = "¿Desea borrar los beneficios seleccionados?";
-        Snackbar.Add(message, Severity.Warning, config =>
-        {
-            config.Action = "Confirmar";
-            config.RequireInteraction = true;
-            config.ShowCloseIcon = false;
-            config.Onclick = snackbar =>
-            {
-                DeleteBenefitsUpdate();
-                return Task.CompletedTask;
-            };
-        });
+        //Servicio de borrado.
+        Snackbar.Add("Deducciones borradas", Severity.Success);
     }
 
     private bool FilterFunc1(Subscription element) => FilterFunc(element, searchString1);
@@ -134,12 +150,6 @@ else
         if (element.SubscriptionName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
         return false;
-    }
-
-    private void DeleteBenefitsUpdate()
-    {
-        Snackbar.Add("Beneficios borrados", Severity.Success);
-        StateHasChanged();
     }
 
     private void PageChanged(int i)
@@ -157,7 +167,7 @@ else
         nav.NavigateTo($"/Projects/{employerEmail}/{projectName}/Deductions/New");
     }
 
-    private string costFormat(double cost)
+    private string CostFormat(double cost)
     {
         string costo = string.Format("{0:N}", cost);
         return costo;
