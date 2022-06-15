@@ -7,6 +7,7 @@
 
 @inject IAuthenticationService AuthenticationService
 @inject IContextMenuService ContextMenuService
+@inject IAuthorizationServices AuthorizationService
 @inject NavigationManager nav
 
 @page "/"
@@ -30,9 +31,11 @@
 @code{
     public string email { get; set; }
     public bool authorized { get; set; } = false;
-
+     //AccountDTO accountData = new AccountDTO("jeremy@ucr.ac.cr","Prueba01!");
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        //await AuthenticationService.RegisterRequestAsync(accountData);
+        //await AuthorizationService.AssignRole(accountData.Email, "Employee");
         if (firstRender && authorized)
         {
              ContextMenuService.SetProjectsContext(false, false, "");

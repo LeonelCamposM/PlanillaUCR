@@ -258,13 +258,13 @@ VALUES('mau@ucr.ac.cr',
 )
 
 INSERT INTO Employer
-VALUES('jeremy@ucr.ac.cr')
-
-INSERT INTO Employer
 VALUES('leonel@ucr.ac.cr')
 
 INSERT INTO Employee
 VALUES('mau@ucr.ac.cr')
+
+INSERT INTO Employee
+VALUES('jeremy@ucr.ac.cr')
 
 INSERT INTO Project
 VALUES('leonel@ucr.ac.cr',
@@ -308,15 +308,6 @@ VALUES('leonel@ucr.ac.cr',
 'Emprendimiento de perfumes',
 20000,
 5,
-'Mensual'
-)
-
-INSERT INTO Project
-VALUES('jeremy@ucr.ac.cr',
-'Proyecto 1',
-'Emprendimiento de panadería',
-30000,
-20,
 'Mensual'
 )
 
@@ -374,6 +365,7 @@ VALUES('leonel@ucr.ac.cr',
 1,
 1
 )
+
 Insert into AgreementType
 Values('Tiempo completo', 1000)
 
@@ -383,17 +375,24 @@ Values('Medio tiempo', 500)
 Insert into AgreementType
 Values('Servicios profesionales', 700)
 
-INSERT INTO ReportOfHours
-VALUES('leonel@ucr.ac.cr', 'Proyecto 1','employer@a', '9999-12-31',22.2)
-
-INSERT INTO ReportOfHours
-VALUES('leonel@ucr.ac.cr', 'Proyecto 2','mau@ucr.ac.cr', '9999-12-31',22.2)
-
 Insert into AgreementType
 Values('Por horas', 10)
 
-select *
-from Agreement
+INSERT INTO Agreement
+VALUES('jeremy@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Proyecto 1','9999-12-31','Por horas', 10, '9999-12-31')
 
 INSERT INTO Agreement
-VALUES('employer@a', 'leonel@ucr.ac.cr', 'Proyecto 2','9999-12-31','Por horas', 10, '9999-12-31')
+VALUES('jeremy@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Proyecto 2','9999-12-31','Por horas', 10, '9999-12-31')
+
+
+INSERT INTO ReportOfHours
+VALUES('leonel@ucr.ac.cr', 'Proyecto 1','jeremy@ucr.ac.cr', '2022-6-15',4)
+
+INSERT INTO ReportOfHours
+VALUES('leonel@ucr.ac.cr', 'Proyecto 1','jeremy@ucr.ac.cr', '2022-5-15',5)
+
+INSERT INTO ReportOfHours
+VALUES('leonel@ucr.ac.cr', 'Proyecto 2','jeremy@ucr.ac.cr', '2022-6-15',8)
+
+INSERT INTO ReportOfHours
+VALUES('leonel@ucr.ac.cr', 'Proyecto 2','jeremy@ucr.ac.cr', '2022-5-15',8)
