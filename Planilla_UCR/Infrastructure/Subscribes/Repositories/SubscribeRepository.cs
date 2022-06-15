@@ -22,10 +22,10 @@ namespace Infrastructure.Subscribes.Repositories
 
         public async Task<IEnumerable<Subscribe>> GetEmployeesBySubscription(string employerEmail, string projectName, string subscriptionName)
         {
-            IList<Subscribe> employees = await _dbContext.Subscribes.Where
-                (e => e.EmployerEmail == employerEmail && e.SubscriptionName == subscriptionName
-                && e.ProjectName == projectName).ToListAsync();
-            return employees;
+            return await _dbContext.Subscribes.FromSqlRaw("EXEC GetEmployeesBySubscription @EmployerEmail, @ProjectName, @SubscriptionName;",
+                new SqlParameter("EmployerEmail", employerEmail),
+                new SqlParameter("ProjectName", projectName),
+                new SqlParameter("SubscriptionName", subscriptionName)).ToListAsync();
         }
 
         public async Task CreateSubscribeAsync(Subscribe subscription)

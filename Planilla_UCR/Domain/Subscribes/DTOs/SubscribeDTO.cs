@@ -10,7 +10,7 @@ namespace Domain.Subscribes.DTOs
         public String SubscriptionName { get; set; }
         public double Cost { get; set; }
         public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
+        public DateTime? EndDate { get; set; }
 
         public SubscribeDTO(String employeeEmail, String employerEmail,
             String projectName,String subscriptionName,
@@ -23,6 +23,19 @@ namespace Domain.Subscribes.DTOs
             Cost = cost;
             StartDate = startDate;
             EndDate = endDate;
+        }
+
+        public SubscribeDTO(String employeeEmail, String employerEmail,
+            String projectName, String subscriptionName,
+            double cost, DateTime startDate)
+        {
+            EmployeeEmail = employeeEmail;
+            EmployerEmail = employerEmail;
+            ProjectName = projectName;
+            SubscriptionName = subscriptionName;
+            Cost = cost;
+            StartDate = startDate;
+            EndDate = null;
         }
     }
 }

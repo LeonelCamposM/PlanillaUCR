@@ -12,12 +12,12 @@ namespace Infrastructure.Subscribes.EntityMappings
 
             builder.HasKey(p => new { p.EmployeeEmail, p.EmployerEmail, p.ProjectName, p.SubscriptionName});
 
+            builder.Property(p => p.Cost)
+                 .IsRequired();
+
             builder.Property(p => p.StartDate);
 
             builder.Property(p => p.EndDate);
-
-            builder.Property(p => p.Cost)
-                 .IsRequired();
         }
     }
 }

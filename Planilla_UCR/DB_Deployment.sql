@@ -88,8 +88,8 @@ CREATE TABLE Subscribes(
 	SubscriptionName varchar(255) NOT NULL,
 	Cost float NOT NULL,
 	StartDate date NOT NULL,
-	FinishDate date,
-	PRIMARY KEY(EmployeeEmail,EmployerEmail,ProjectName),
+	EndDate date,
+	PRIMARY KEY(EmployeeEmail,EmployerEmail,ProjectName, SubscriptionName),
 	FOREIGN KEY(EmployerEmail, ProjectName, SubscriptionName) REFERENCES Subscription(EmployerEmail, ProjectName, SubscriptionName) ON UPDATE CASCADE,
 	FOREIGN KEY(EmployeeEmail) REFERENCES Employee(Email)
 );
@@ -148,7 +148,7 @@ CREATE OR ALTER PROCEDURE GetEmployeesBySubscription(
 	@SubscriptionName varchar(255))
 AS
 BEGIN
-	SELECT EmployeeEmail 
+	SELECT * 
 	FROM Subscribes 
 	WHERE EmployerEmail = @EmployerEmail AND ProjectName = @ProjectName AND SubscriptionName = @SubscriptionName
 END
@@ -418,3 +418,29 @@ INSERT INTO ReportOfHours
 VALUES('leonel@ucr.ac.cr', 'Proyecto 2','mau@ucr.ac.cr', '9999-12-31',22.2)
 Insert into AgreementType
 Values('Por horas', 10)
+/*
+INSERT INTO Subscribes (EmployerEmail, ProjectName, SubscriptionName, EmployeeEmail, Cost, StartDate)
+VALUES('leonel@ucr.ac.cr',
+'Proyecto 1',
+'Pr',
+'mau@ucr.ac.cr',
+25000,
+'2012-07-15'
+)
+
+INSERT INTO Person
+VALUES('mau1@ucr.ac.cr',
+'Mauricio',
+'Palma',
+'Vitra',
+8857655,
+'CR4024220012',
+'San José, Costa Rica',
+'677774'
+)
+
+INSERT INTO Employee
+VALUES('mau1@ucr.ac.cr')
+
+select * from Subscribes
+*/
