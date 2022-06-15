@@ -20,9 +20,9 @@
 @{
     List<BreadcrumbItem> _items = new List<BreadcrumbItem>
     {
-        new BreadcrumbItem("Proyectos", href: null, disabled: true),
-        new BreadcrumbItem(@hoursReport.ProjectName, href: null, disabled: true),
-        new BreadcrumbItem("Horas reportadas", href: $"/Reported_Hours/{EmployeeEmail}"),
+        new BreadcrumbItem("Proyectos", href: $"/Projects/{EmployeeEmail}"),
+        new BreadcrumbItem(hoursReport.ProjectName, href: $"/Projects/{EmployeeEmail}/{ hoursReport.ProjectName}/Configurations"),
+        new BreadcrumbItem("Reporte de horas", $"/ReportHours/{EmployerEmail}/{EmployeeEmail}"),
         new BreadcrumbItem("Nuevo Reporte", href: null, disabled: true),
     };
 }

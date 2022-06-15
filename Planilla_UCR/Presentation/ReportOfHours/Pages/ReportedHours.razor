@@ -22,9 +22,9 @@
     {
         List<BreadcrumbItem> _items = new List<BreadcrumbItem>
         {
-            new BreadcrumbItem("Proyectos", href: null, disabled: true),
-            new BreadcrumbItem(@projectName, href: null, disabled: true),
-            new BreadcrumbItem("Horas reportadas", href: null, disabled: true)
+            new BreadcrumbItem("Proyectos", href: $"/Projects/{email}"),
+             new BreadcrumbItem(@projectName, href: $"/Projects/{email}/{ projectName}/Configurations"),
+            new BreadcrumbItem("Histórico de horas", href: null, disabled: true)
         }; 
         <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
         <MudPaper Height="60px" Width="100%" Outlined="false" Class="border-none" Elevation="0"> 
@@ -52,12 +52,6 @@
                     <MudPagination SelectedChanged="PageChanged" Count="@((_table.GetFilteredItemsCount() + _table.RowsPerPage - 1) / _table.RowsPerPage)" Color="Color.Primary" Class="pa-4"/>
                 </PagerContent>
                 </MudTable>
-                 <br>
-                <MudButton Variant="Variant.Filled" OnClick="GoToReportHours" Color="Color.Primary">
-                    <MudText>
-                    Reportar Horas
-                    </MudText> 
-                </MudButton>
         }else
         {
            
@@ -82,6 +76,7 @@
     {
         projectName = ContextMenuService.GetProjectsContext();
         _elements = await HoursReportService.GetAllReportsAsync(email);
+        _elements = _elements.Where(e => e.ProjectName == projectName);
         _elements = _elements.OrderByDescending (report => report.ReportDate);
         if (_elements.Length() == 0)
         {
@@ -105,7 +100,7 @@
     {
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
-        if (element.ProjectName.Contains(projectName, StringComparison.OrdinalIgnoreCase))
+        if (element.ReportDate.ToString().Contains(searchString1, StringComparison.OrdinalIgnoreCase))
         return true;
         return false;
     }
