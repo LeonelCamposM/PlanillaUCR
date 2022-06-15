@@ -36,7 +36,7 @@
             </MudItem>
             <MudItem xs="4">
                 <MudNumericField Immediate="true" Label="Costo" Format="N2" Culture="@cultureCR" Variant="Variant.Outlined" @bind-Value="_cost" 
-                    Adornment="Adornment.Start" AdornmentText="@cultureCR.NumberFormat.CurrencySymbol" Required="true" RequiredError="Campo requerido"/>
+                    Adornment="Adornment.Start" AdornmentText="@cultureCR.NumberFormat.CurrencySymbol" Required="true" RequiredError="Campo requerido" Min = "0.0"/>
             </MudItem>
 
             <MudItem xs="4">
