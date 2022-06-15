@@ -96,14 +96,14 @@ CREATE TABLE Subscribes(
 
 -- Suscription Stored Procedures
 GO
-CREATE PROCEDURE GetAllBenefits
+ CREATE OR ALTER PROCEDURE GetAllBenefits
 AS
 BEGIN
     SELECT * FROM Subscription WHERE TypeSubscription=1 and IsEnabled=1
 END
 
 GO 
-CREATE PROCEDURE GetAllDeductions
+CREATE OR ALTER PROCEDURE GetAllDeductions
 AS
 BEGIN
     SELECT * FROM Subscription WHERE TypeSubscription=0 and IsEnabled=1
@@ -154,7 +154,7 @@ END
 
 -- Project Stored Procedures
 GO 
-CREATE PROCEDURE GetEmployerByEmail(@email VARCHAR(255))
+CREATE OR ALTER PROCEDURE GetEmployerByEmail(@email VARCHAR(255))
 AS
 BEGIN
     SELECT * FROM Employer WHERE Employer.Email = @email
@@ -162,7 +162,7 @@ END
 
 GO
 
-CREATE PROCEDURE ProjectNameCheck(@ProjectName VARCHAR(255))
+CREATE OR ALTER PROCEDURE ProjectNameCheck(@ProjectName VARCHAR(255))
 AS
 BEGIN
     SELECT * FROM Project WHERE Project.ProjectName = @ProjectName
@@ -170,7 +170,7 @@ END
 
 -- People Stored Procedures
 GO
-CREATE PROCEDURE GetPersonByEmail(@email varchar(255))
+CREATE OR ALTER PROCEDURE GetPersonByEmail(@email varchar(255))
 AS
 BEGIN
     SELECT * FROM Person AS P WHERE P.Email = @email
@@ -178,7 +178,7 @@ END
 
 
 GO
-CREATE PROCEDURE UpdatePerson(
+CREATE OR ALTER PROCEDURE UpdatePerson(
 	@EmailPerson varchar(255),
 	@NewName varchar(255),
 	@NewLastName1 varchar(255),
@@ -199,7 +199,7 @@ END
 
 
 GO
-CREATE PROCEDURE GetInfoPerson(@EmailPerson varchar(255))
+CREATE OR ALTER PROCEDURE GetInfoPerson(@EmailPerson varchar(255))
 AS
 BEGIN
 	SELECT Person.Email, Person.Name, Person.LastName1, Person.LastName2, Person.SSN, Person.BankAccount, Person.Adress, Person.PhoneNumber
@@ -209,7 +209,7 @@ END
 
 -- Employee Stored Procedures
 GO
-alter PROCEDURE [dbo].[GetAllEmployees]
+CREATE OR ALTER PROCEDURE [dbo].[GetAllEmployees]
 @projectName VARCHAR(255)
 AS
 BEGIN
@@ -223,7 +223,7 @@ select *
 from Agreement
 
 GO
-CREATE PROCEDURE [dbo].[GetProjectEmployees]
+CREATE OR ALTER PROCEDURE [dbo].[GetProjectEmployees]
 @projectName VARCHAR(255)
 AS
 BEGIN
@@ -233,21 +233,21 @@ BEGIN
 END
 
 GO
-CREATE PROCEDURE GetEmployeeByEmail(@email varchar(255))
+CREATE OR ALTER PROCEDURE GetEmployeeByEmail(@email varchar(255))
 AS
 BEGIN
     SELECT * FROM Employee AS E WHERE E.Email = @email
 END
 
 GO
-CREATE or ALTER PROCEDURE GetSalaryPerAgreement(@MountPerHour int)
+CREATE OR ALTER PROCEDURE GetSalaryPerAgreement(@MountPerHour int)
 AS
 BEGIN 
 	SELECT * FROM AgreementType WHERE MountPerHour = @MountPerHour
 END
 
 GO
-CREATE PROCEDURE GetContracteeByEmail(@ContracteeEmail varchar(255))
+CREATE OR ALTER PROCEDURE GetContracteeByEmail(@ContracteeEmail varchar(255))
 AS
 BEGIN 
 	SELECT * FROM Agreement WHERE EmployeeEmail = @ContracteeEmail
