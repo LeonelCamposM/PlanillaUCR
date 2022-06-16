@@ -169,17 +169,16 @@ else
     {
         ContextMenuService.SetProjectsContext(true,true,projectName);
         projectInfo = await ProjectService.GetProject(employerEmail,projectName);
-        newName = projectInfo.ProjectName;
-
-        oldEmployerEmail = projectInfo.EmployerEmail;
-        oldProjectName = projectInfo.ProjectName;
-        oldProjectDescription = projectInfo.ProjectDescription;
-        maximumAmountForBenefits = projectInfo.MaximumAmountForBenefits;
-        oldMaximumBenefitAmount = projectInfo.MaximumBenefitAmount;
-        oldPaymentInterval = projectInfo.PaymentInterval;
 
         if (projectInfo != null)
         {
+            newName = projectInfo.ProjectName;
+            oldEmployerEmail = projectInfo.EmployerEmail;
+            oldProjectName = projectInfo.ProjectName;
+            oldProjectDescription = projectInfo.ProjectDescription;
+            maximumAmountForBenefits = projectInfo.MaximumAmountForBenefits;
+            oldMaximumBenefitAmount = projectInfo.MaximumBenefitAmount;
+            oldPaymentInterval = projectInfo.PaymentInterval;
             _loading = false;
         }
     }
@@ -189,29 +188,36 @@ else
         snackHandler._saving = true;
 
         await form.Validate();
-        if (form.IsValid)
+        bool valid = true;
+        if (projectInfo.ProjectName != newName) 
+        { 
+            valid = await ValidName(); 
+        }
+        if (form.IsValid && valid)
         {
             snackHandler._saving = false;
             projectInfo.MaximumAmountForBenefits = (double)maximumAmountForBenefits;
-            bool modified = ProjectService.ModifyProject(projectInfo, newName);
-            if (modified)
-            {
-                projectInfo = await ProjectService.GetProject(employerEmail, newName);
-                projectName = newName;
-                ShowSnackNotification(projectInfo.ProjectName + " modificado exitosamente", Severity.Success);
-                DisableForm();
-            } 
-            else
-            {
-                modified = false;
-                newName = projectInfo.ProjectName;
-                ShowSnackNotification(projectInfo.ProjectName + " no fue modificado", Severity.Error);
-            }
+            ProjectService.ModifyProject(projectInfo, newName);
+            projectInfo.ProjectName = newName;
+            projectName = newName;
+            ShowSnackNotification(projectInfo.ProjectName + " modificado exitosamente", Severity.Success);
+            DisableForm();
 
         }
         snackHandler._saving = false;
     }
-
+    async Task<bool> ValidName()
+    {
+        bool valid = true;
+        Project tempProject = await ProjectService.GetProject(employerEmail, newName);
+        if (tempProject != null)
+        {
+            valid = false;
+            ShowSnackNotification("El nombre del proyecto " + newName + " ya está en uso", Severity.Error);
+            DisableForm();
+        }
+        return valid;
+    }
     public class LimitsValidationForm
     {
         [StringLength(250, ErrorMessage = "El nombre del proyecto es muy grande")]
