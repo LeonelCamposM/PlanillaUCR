@@ -167,7 +167,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        ContextMenuService.SetProjectsContext(true,false,projectName);
+        ContextMenuService.SetProjectsContext(true,true,projectName);
         projectInfo = await ProjectService.GetProject(employerEmail,projectName);
         newName = projectInfo.ProjectName;
 
