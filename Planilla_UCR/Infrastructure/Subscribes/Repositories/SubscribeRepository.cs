@@ -3,7 +3,6 @@ using Domain.Subscribes.Entities;
 using Domain.Subscribes.Repositories;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -33,6 +32,22 @@ namespace Infrastructure.Subscribes.Repositories
         {
             _dbContext.Subscribes.Add(subscription);
             await _dbContext.SaveEntitiesAsync();
+        }
+
+        public async Task<IEnumerable<Subscribe>> GetBenefitsByEmployee(string employeeEmail, string projectName)
+        {
+            return await _dbContext.Subscribes.FromSqlRaw("EXEC GetEmployeeBenefits @EmployeeEmail," +
+               " @ProjectName;",
+               new SqlParameter("EmployeeEmail", employeeEmail),
+               new SqlParameter("ProjectName", projectName)).ToListAsync();
+        }
+
+        public async Task<IEnumerable<Subscribe>> GetDeductionsByEmployee(string employeeEmail, string projectName)
+        {
+            return await _dbContext.Subscribes.FromSqlRaw("EXEC GetEmployeeDeductions @EmployeeEmail," +
+               " @ProjectName;",
+               new SqlParameter("EmployeeEmail", employeeEmail),
+               new SqlParameter("ProjectName", projectName)).ToListAsync();
         }
     }
 }

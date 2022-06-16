@@ -1,0 +1,116 @@
+﻿@using Application.Subscriptions
+@using Domain.Subscriptions.Entities
+@inject NavigationManager nav
+@inject ISubscriptionService SubscriptionService
+
+@if(_loading) {
+    <MudPaper  Height="220px" Width="100%" Outlined="false" Class="border-none pa-4" Elevation="0">
+         <MudText Align="Align.Center" Typo="Typo.h6">
+              <MudProgressCircular Color="Color.Secondary" Style="height:70px;width:70px;" Indeterminate="true" />
+         </MudText>
+    </MudPaper>
+}else{
+    @if (!_loading)
+    {
+        List<BreadcrumbItem> _items = new List<BreadcrumbItem>
+        {
+            new BreadcrumbItem("Proyectos", href: $"/Projects/{employeeEmail}"),
+            new BreadcrumbItem(@projectName, href: $"/Projects/Details/{employeeEmail}/{projectName}"),
+            new BreadcrumbItem("Beneficios",  href: null, disabled: true)
+        }; 
+        <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
+        <MudPaper Height="60px" Width="100%" Outlined="false" Class="border-none" Elevation="0"> 
+        </MudPaper>
+
+        if(_empty)
+        {
+               <MudText> No existen beneficios para este proyecto </MudText>
+        }else
+        {
+            <MudTable @ref="_mudTable" Items="@_elements" RowsPerPage="4" MultiSelection="true" @bind-SelectedItems="_selectedItems1" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="Color.Info" Filter="new Func<Subscription,bool>(FilterFunc1)">
+                    <ToolBarContent>
+                            <MudButton Color="Color.Tertiary"> Beneficios disponibles</MudButton>
+                            <MudButton OnClick="SendConmuteSignal"> Mis beneficios </MudButton>
+                            <MudSpacer />
+                            <MudTextField @bind-Value="_searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                    </ToolBarContent> 
+                        <HeaderContent>
+                            <MudTh>Proyecto</MudTh>
+                            <MudTh>Beneficio</MudTh>
+                        </HeaderContent>
+
+                        <RowTemplate>
+                            <MudTd DataLabel="Proyecto">@context.ProjectName</MudTd>
+                            <MudTd DataLabel="Beneficio">@context.SubscriptionName</MudTd>
+                        </RowTemplate>
+
+                        <FooterContent>
+                            <MudTd colspan="5">Seleccionar todo</MudTd>
+                        </FooterContent>
+                        <PagerContent>
+                            <MudPagination SelectedChanged="PageChanged" Count="@((_mudTable.GetFilteredItemsCount() + _mudTable.RowsPerPage - 1) / _mudTable.RowsPerPage)" Color="Color.Primary" Class="pa-4"/>
+                        </PagerContent>
+                    </MudTable>
+                     <br>
+                    <MudButton Variant="Variant.Filled" OnClick="Desubscribe" Color="Color.Primary">
+                        <MudText>
+                            Suscribirse
+                        </MudText> 
+                    </MudButton>
+        }
+    }
+}
+
+@code {
+    private bool _hidePosition;
+    private bool _loading = true;
+    private bool _empty = true;
+    private string _searchString1 = "";
+    private IEnumerable<Subscription> _elements = new List<Subscription>();
+    private HashSet<Subscription> _selectedItems1 = new HashSet<Subscription>();
+    private MudTable<Subscription> _mudTable;
+
+    [Parameter]
+    public string projectName { get; set; }
+    [Parameter]
+    public string employeeEmail { get; set; }
+    [Parameter]
+    public EventCallback<string> SendTableState { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        _elements = await SubscriptionService.GetBenefitsByEmployee(employeeEmail, projectName);
+        if (_elements.Length() > 0)
+        {
+            _empty = false;
+        }
+        _loading = false;
+    }
+
+    private void PageChanged(int i)
+    {
+        _mudTable.NavigateTo(i - 1);
+    }
+
+    private bool FilterFunc1(Subscription element) => FilterFunc(element, _searchString1);
+
+    private bool FilterFunc(Subscription element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.ProjectName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+
+    private async Task SendConmuteSignal()
+    {
+        await SendTableState.InvokeAsync("");
+    }
+
+    private void Desubscribe()
+    {
+         
+    }
+}
