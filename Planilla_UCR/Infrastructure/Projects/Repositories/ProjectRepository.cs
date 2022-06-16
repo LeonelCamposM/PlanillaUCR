@@ -64,10 +64,8 @@ namespace Infrastructure.Projects.Repositories
             return projectsResult;
         }
 
-        public bool ModifyProject(Project project, string newProjectName)
+        public void ModifyProject(Project project, string newProjectName)
         {
-            var Transaction = new SqlParameter("Transaction", 0);
-            Transaction.Direction = System.Data.ParameterDirection.Output;
             System.FormattableString query = ($@"EXECUTE ModifyProject 
                 @ProjectName = {project.ProjectName},
                 @EmployerEmail = {project.EmployerEmail},
@@ -75,18 +73,10 @@ namespace Infrastructure.Projects.Repositories
                 @NewProjectDescription = {project.ProjectDescription},
                 @NewMaximumAmountForBenefits = {project.MaximumAmountForBenefits},
                 @NewMaximumBenefitAmount = {project.MaximumBenefitAmount},
-                @NewPaymentInterval = {project.PaymentInterval},
-                @Transaction = {Transaction} OUT" );
+                @NewPaymentInterval = {project.PaymentInterval}");
 
             _dbContext.Database.ExecuteSqlInterpolated(query);
-            if (Convert.ToInt32(Transaction.Value) == 1)
-            {
-                return true;
-            }
-            else 
-            { 
-                return false;
-            }
+
         }
     }
 }
