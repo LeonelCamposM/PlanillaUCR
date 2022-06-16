@@ -9,9 +9,7 @@
 
 
 
-@using Presentation.Core.Components
-@using System.ComponentModel.DataAnnotations
-@using Domain.Projects.Entities
+
 @using System.Globalization
 
 @using Domain.Agreements.DTOs
@@ -27,8 +25,7 @@
 @using Application.AgreementTypes
 @using Domain.AgreementTypes.Entities
 @using Domain.AgreementTypes.DTOs
-@using Domain.Projects.DTOs
-@using Application.Projects
+
 
 
 @inject IProjectService ProjectService
@@ -45,8 +42,6 @@
 
 @*From here *@
 
-@using Application.Employees
-@using Domain.People.Entities
 
 
 @if(_loading) 
@@ -72,19 +67,28 @@ else
 
         if(!empty)
         {
-                <MudTable @ref="@_table" Items="@_elements" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" Filter="new Func<Agreement,bool>(FilterFunc1)">
+                <MudTable @ref="@_table" Items="@_myJoin" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" Filter="new Func<JoinedTables,bool>(FilterFunc1)">
                         <HeaderContent>
                             <MudTh>Email del empleado</MudTh>
                             <MudTh>Email del empleador</MudTh>
                             <MudTh>Nombre proyecto</MudTh>
-                            <MudTh>Contrato</MudTh>
+                            <MudTh>Tipo de contrato </MudTh>
                             <MudTh>Intervalo de pago</MudTh>
+                            <MudTh>Fecha de inicio de contrato</MudTh>
+                            <MudTh>Fecha de finalización de contrato</MudTh>
+                            <MudTh>Salario por hora</MudTh>
                         </HeaderContent>
 
                         <RowTemplate>
                             <MudTd DataLabel="Email del empleado">@context.EmployeeEmail</MudTd>
-                           @* <MudTd DataLabel="Nombre">@context.Name @context.LastName1 @context.LastName2</MudTd>
-                            <MudTd DataLabel="Cedula">@context.Ssn</MudTd>*@
+                            <MudTd DataLabel="Email del empleador">@context.EmployerEmail</MudTd>
+                            <MudTd DataLabel="Nombre proyecto">@context.ProjectName</MudTd>
+                            <MudTd DataLabel="Tipo de contrato">@context.ContractType</MudTd>
+                            <MudTd DataLabel="Intervalo de pago">@context.PaymentInterval</MudTd>
+                            <MudTd DataLabel="Fecha de inicio de contrato">@context.ContractStartDate</MudTd>
+                            <MudTd DataLabel="Fecha de finalización de contrato">@context.ContractFinishDate</MudTd>
+                            <MudTd DataLabel="Salario por hora">@context.MountPerHour</MudTd>
+
                              <MudTd DataLabel="Contrato">
                                 <MudSpacer></MudSpacer>
                                     <MudButton Variant="Variant.Filled" @onclick="@(e => GoToFireTheEmployee(@context.EmployeeEmail))" Color="Color.Transparent">
@@ -102,10 +106,6 @@ else
 
 
         }
-        else
-        {
-            @*<HiredEmployeesError email="@email" projectName="@projectName" SendTableState="SendConmuteSignal"></HiredEmployeesError>*@
-        }
     }
 }
 
@@ -114,7 +114,7 @@ else
     private bool empty = true;
     string mySearchString = "";
     private IEnumerable<Agreement> _elements = new List<Agreement>();
-    private MudTable<Agreement> _table;
+    private MudTable<JoinedTables> _table;
 
     @*Check this *@
     public string tab1 { get; set; } = "Contratar empleados";
@@ -132,23 +132,71 @@ else
     Agreement myAgreement = new Agreement("", "", "", null, "", 0, null);
 
 
-    private IList<Project> _projects = new List<Project>();
-    private IList<Agreement> _agreements = new List<Agreement>();
-    private IList<AgreementType> _agreementType = new List<AgreementType>();
+    private IEnumerable<Project> _projects = new List<Project>();
+    private IEnumerable<Agreement> _agreements = new List<Agreement>();
+    private IEnumerable<AgreementType> _agreementType = new List<AgreementType>();
+
+
+    public class JoinedTables
+    {
+
+        public string EmployerEmail {get;set; }
+        public string ProjectName {get;set; }
+        public string PaymentInterval {get;set; }
+        public string EmployeeEmail {get;set; }
+        public string ContractType {get;set; }
+        public DateTime? ContractStartDate {get;set; }
+        public DateTime? ContractFinishDate {get;set; }
+        public int MountPerHour {get;set; }
+    }
+
+    private IList<JoinedTables> _myJoin = new List<JoinedTables>();
 
     protected override async Task OnInitializedAsync()
     {
-        /*
-        _elements = await AgreementService.GetAllAgreementsByProjectAndEmployer(myAgreement);
-        if (_elements.Length() == 0)
+        _projects = await ProjectService.GetEmployerProyects(employerEmail);
+        _agreements = await AgreementService.GetAllAgreementsByProjectAndEmployer(projectName, employerEmail);
+        _agreementType = await AgreementTypeService.GetAllAgreementTypes();
+
+
+        var _myJoin2 = from P in _projects
+                       join A in _agreements on P.ProjectName equals A.ProjectName
+                       join ATP in _agreementType on A.ContractType equals ATP.TypeAgreement
+                       select new
+                       {
+                           EmployerEmail = P.EmployerEmail,
+                           ProjectName = P.ProjectName,
+                           PaymentInterval = P.PaymentInterval,
+                           EmployeeEmail = A.EmployeeEmail,
+                           ContractType = A.ContractType,
+                           ContractStartDate = A.ContractStartDate,
+                           ContractFinishDate = A.ContractFinishDate,
+                           MountPerHour = ATP.MountPerHour,
+                       };
+
+        _myJoin = _myJoin2.Select(x => new JoinedTables
             {
-        empty = true;
+                EmployerEmail = x.EmployerEmail,
+                ProjectName = x.ProjectName,
+                PaymentInterval = x.PaymentInterval,
+                EmployeeEmail = x.EmployeeEmail,
+                ContractType = x.ContractType,
+                ContractStartDate = x.ContractStartDate,
+                ContractFinishDate = x.ContractFinishDate,
+                MountPerHour = x.MountPerHour
+            }).ToList();
+
+
+
+        if (_myJoin.Length() == 0)
+        {
+            empty = true;
         }
         else
-            {
+        {
             empty = false;
         }
-        _loading = false;*/
+        _loading = false;
 
 
     }
@@ -173,9 +221,9 @@ else
         _table.NavigateTo(i - 1);
     }
 
-    private bool FilterFunc1(Agreement element) => FilterFunc(element, mySearchString);
+    private bool FilterFunc1(JoinedTables element) => FilterFunc(element, mySearchString);
 
-    private bool FilterFunc(Agreement element, string searchString)
+    private bool FilterFunc(JoinedTables element, string searchString)
     {
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
@@ -194,4 +242,22 @@ else
     {
         //nav.NavigateTo($"/Create_Employee/{email}/{projectName}");
     }
+
+    void ShowSnackNotification(string message, Severity severity)
+    {
+        Snackbar.Configuration.SnackbarVariant = Variant.Filled;
+        Snackbar.Configuration.PreventDuplicates = false;
+        Snackbar.Configuration.MaxDisplayedSnackbars = 10;
+        Snackbar.Configuration.NewestOnTop = true;
+        Snackbar.Add($"{message}", severity, config =>
+        {
+            config.RequireInteraction = false;
+            config.ShowCloseIcon = true;
+            config.Onclick = snackbar =>
+            {
+                return Task.CompletedTask;
+            };
+        });
+    }
+
 }

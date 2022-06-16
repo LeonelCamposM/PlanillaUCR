@@ -12,5 +12,5 @@ namespace Application.AgreementTypes
         Task<IEnumerable<AgreementType>>? GetTypesOfAgreement();
         Task<IEnumerable<AgreementType>>? CheckSalaryPerAgreement(int mountPerHour);
         Task<IEnumerable<AgreementType>>? GetAllAgreementTypes();
-
+    }
 }

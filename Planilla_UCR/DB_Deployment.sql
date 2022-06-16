@@ -232,7 +232,6 @@ BEGIN
 	FROM AgreementType AS ATP
 END
 
-
 -- Data Insert
 GO
 INSERT INTO Person
