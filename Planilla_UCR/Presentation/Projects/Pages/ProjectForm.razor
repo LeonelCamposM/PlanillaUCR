@@ -61,7 +61,7 @@
                 <MudItem xs="2"> </MudItem>
                 <MudItem xs="4">
              
-                    <MudNumericField Immediate="true" Label="Monto máximo para beneficios" Min="0" Format="N2" Culture="@cultureCR" Variant="Variant.Outlined" @bind-Value="maximumAmountForBenefits" 
+                    <MudNumericField Immediate="true" Label="Monto máximo para beneficios" Min="0" Format="N2" Culture="@cultureCR" Variant="Variant.Outlined" @bind-Value="_maximumAmountForBenefits" 
                     Adornment="Adornment.Start" AdornmentText="@cultureCR.NumberFormat.CurrencySymbol" Required="false" RequiredError="Campo no requerido"/>
                 </MudItem>
 
@@ -107,7 +107,7 @@
 </MudGrid>
 
 @code{
-    private double? maximumAmountForBenefits;
+    private double? _maximumAmountForBenefits;
     Project projectInfo = new Project("","","",0.0,0,"");
     SnackHandler snackHandler = new SnackHandler();
     LimitsValidationForm limits = new LimitsValidationForm();
@@ -121,7 +121,7 @@
     async Task SaveProject()
     {
         projectInfo.EmployerEmail = employerEmail;
-        projectInfo.MaximumAmountForBenefits = Convert.ToDouble(maximumAmountForBenefits);
+        projectInfo.MaximumAmountForBenefits = Convert.ToDouble(_maximumAmountForBenefits);
         Project projectToAdd = projectInfo;
         snackHandler._saving = true;
 
@@ -199,7 +199,7 @@
         projectInfo.ProjectDescription = "";
         projectInfo.MaximumBenefitAmount= 0;
         projectInfo.MaximumAmountForBenefits = 0.0;
-        maximumAmountForBenefits = 0.0;
+        _maximumAmountForBenefits = 0.0;
         projectInfo.PaymentInterval = "";
     }
 

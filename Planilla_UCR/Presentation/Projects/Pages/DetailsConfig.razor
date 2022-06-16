@@ -67,7 +67,7 @@ else
                         <MudItem xs="8">
                             <MudTextField Label="Nombre del Proyecto" Class="mt-3" Variant="Variant.Outlined" ReadOnly="@_disabled"  
                             Required="true" RequiredError="Ingrese un nombre para su proyecto" 
-                            @bind-Value="newName" For="@(() => limits.projectName)">
+                            @bind-Value="_newName" For="@(() => limits.projectName)">
                             </MudTextField>
                         </MudItem>
                         <MudItem xs="2"> </MudItem>
@@ -95,7 +95,7 @@ else
                         <MudItem xs="2"> </MudItem>
                         <MudItem xs="4">
                             <MudNumericField Immediate="true" Label="Monto máximo para beneficios" Format="N2" Culture="@cultureCR"
-                            ReadOnly="@_disabled" Variant="Variant.Outlined" @bind-Value="maximumAmountForBenefits" Adornment="Adornment.Start" 
+                            ReadOnly="@_disabled" Variant="Variant.Outlined" @bind-Value="_maximumAmountForBenefits" Adornment="Adornment.Start" 
                             AdornmentText="@cultureCR.NumberFormat.CurrencySymbol" Required="false" RequiredError="Campo no requerido"/>
                         </MudItem>
 
@@ -144,16 +144,14 @@ else
 @code {
     private bool _loading = true;
     private bool _disabled = true;
-    private string newName = "";
-    private string detailsTittle { get; set; }
-    private string configTittle { get; set; }
+    private string _newName = "";
 
-    private string oldEmployerEmail = "";
-    private string oldProjectName = "";
-    private string oldProjectDescription = "";
-    private double? maximumAmountForBenefits = 0.0;
-    private int oldMaximumBenefitAmount = 0;
-    private string oldPaymentInterval = "";
+    private string _oldEmployerEmail = "";
+    private string _oldProjectName = "";
+    private string _oldProjectDescription = "";
+    private double? _maximumAmountForBenefits = 0.0;
+    private int _oldMaximumBenefitAmount = 0;
+    private string _oldPaymentInterval = "";
 
 
     Project projectInfo = new Project("","","",0.0,0,"");
@@ -172,13 +170,13 @@ else
 
         if (projectInfo != null)
         {
-            newName = projectInfo.ProjectName;
-            oldEmployerEmail = projectInfo.EmployerEmail;
-            oldProjectName = projectInfo.ProjectName;
-            oldProjectDescription = projectInfo.ProjectDescription;
-            maximumAmountForBenefits = projectInfo.MaximumAmountForBenefits;
-            oldMaximumBenefitAmount = projectInfo.MaximumBenefitAmount;
-            oldPaymentInterval = projectInfo.PaymentInterval;
+            _newName = projectInfo.ProjectName;
+            _oldEmployerEmail = projectInfo.EmployerEmail;
+            _oldProjectName = projectInfo.ProjectName;
+            _oldProjectDescription = projectInfo.ProjectDescription;
+            _maximumAmountForBenefits = projectInfo.MaximumAmountForBenefits;
+            _oldMaximumBenefitAmount = projectInfo.MaximumBenefitAmount;
+            _oldPaymentInterval = projectInfo.PaymentInterval;
             _loading = false;
         }
     }
@@ -189,17 +187,17 @@ else
 
         await form.Validate();
         bool valid = true;
-        if (projectInfo.ProjectName != newName) 
+        if (projectInfo.ProjectName != _newName) 
         { 
             valid = await ValidName(); 
         }
         if (form.IsValid && valid)
         {
             snackHandler._saving = false;
-            projectInfo.MaximumAmountForBenefits = (double)maximumAmountForBenefits;
-            ProjectService.ModifyProject(projectInfo, newName);
-            projectInfo.ProjectName = newName;
-            projectName = newName;
+            projectInfo.MaximumAmountForBenefits = (double)_maximumAmountForBenefits;
+            ProjectService.ModifyProject(projectInfo, _newName);
+            projectInfo.ProjectName = _newName;
+            projectName = _newName;
             ShowSnackNotification(projectInfo.ProjectName + " modificado exitosamente", Severity.Success);
             DisableForm();
 
@@ -209,11 +207,11 @@ else
     async Task<bool> ValidName()
     {
         bool valid = true;
-        Project tempProject = await ProjectService.GetProject(employerEmail, newName);
+        Project tempProject = await ProjectService.GetProject(employerEmail, _newName);
         if (tempProject != null)
         {
             valid = false;
-            ShowSnackNotification("El nombre del proyecto " + newName + " ya está en uso", Severity.Error);
+            ShowSnackNotification("El nombre del proyecto " + _newName + " ya está en uso", Severity.Error);
             DisableForm();
         }
         return valid;
@@ -250,12 +248,12 @@ else
 
     async Task  Cancel()
     {
-        projectInfo.EmployerEmail = oldEmployerEmail;
-        projectInfo.ProjectName = oldProjectName;
-        projectInfo.ProjectDescription = oldProjectDescription;
-        projectInfo.MaximumAmountForBenefits = (double)maximumAmountForBenefits;
-        projectInfo.MaximumBenefitAmount = oldMaximumBenefitAmount;
-        projectInfo.PaymentInterval = oldPaymentInterval;
+        projectInfo.EmployerEmail = _oldEmployerEmail;
+        projectInfo.ProjectName = _oldProjectName;
+        projectInfo.ProjectDescription = _oldProjectDescription;
+        projectInfo.MaximumAmountForBenefits = (double)_maximumAmountForBenefits;
+        projectInfo.MaximumBenefitAmount = _oldMaximumBenefitAmount;
+        projectInfo.PaymentInterval = _oldPaymentInterval;
         projectInfo = await ProjectService.GetProject(employerEmail,projectName);
         nav.NavigateTo($"/Projects/{employerEmail}");
     }
@@ -263,12 +261,12 @@ else
     private void EnableForm()
     {
         _disabled = false;
-        newName = projectInfo.ProjectName;
+        _newName = projectInfo.ProjectName;
     }
 
     private void DisableForm()
     {
         _disabled = true;
-        newName = projectInfo.ProjectName;
+        _newName = projectInfo.ProjectName;
     }
 }
