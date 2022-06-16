@@ -1,4 +1,4 @@
-﻿@page "/Projects/{EmployerEmail}"
+﻿@page "/Projects/{personEmail}"
 @using Domain.Projects.Entities
 @using Domain.Agreements.Entities
 @using Application.Projects
@@ -38,7 +38,7 @@
         else
         {
             <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
-            @if (_empty)
+            @if (_emptyProject)
             {
                 <MudText Typo="Typo.h6" Align="Align.Center">No hay proyectos asociados al empleador
                 </MudText>
@@ -58,7 +58,7 @@
             else
             {
 
-                <MudTable @ref="mudTable" Items="@projectElements" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_empty" LoadingProgressColor="Color.Primary" Filter="new Func<Project,bool>(FilterFunc1)">  
+                <MudTable @ref="mudTable" Items="@projectElements" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_emptyProject" LoadingProgressColor="Color.Primary" Filter="new Func<Project,bool>(FilterFuncProject)">  
 
                     <ToolBarContent>
                         <MudText Align="Align.Center" Typo="Typo.h6">Lista de proyectos</MudText>
@@ -110,29 +110,54 @@
 
 @code {
 
-    private bool _empty = true;
+    private bool _emptyProject = true;
+    private bool _emptyAgreement = true;
     private bool _loading = true;
     public string searchString = "";
     private MudTable<Project> mudTable;
     private IEnumerable<Project> projectElements;
+    private IEnumerable<Project> list;
     private IEnumerable<Agreement> agreementElements;
-    
-    [Parameter] public string employerEmail { get; set; }
+
+    [Parameter] public string personEmail { get; set; }
     [Parameter] public string projectName { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         ContextMenuService.SetProjectsContext(true ,false, "");
-        projectElements = await ProjectService.GetEmployerProyects(employerEmail);
+        projectElements = await ProjectService.GetEmployerProyects(personEmail);
+        agreementElements = await AgreementService.GetEmployeeProjects(personEmail);
         _loading = false;
         if (projectElements.Length() > 0){
-            _empty = false;
+            _emptyProject = false;
+        }
+        if (agreementElements.Length() > 0){
+            _emptyAgreement = false;
+            FindProject();
         }
     }
-    
-    private bool FilterFunc1(Project element) => FilterFunc(element, searchString);
 
-    private bool FilterFunc(Project element, string searchString)
+    private async Task FindProject()
+    {
+        foreach (Agreement element in agreementElements) {
+            list = await ProjectService.GetAllNameProjects(element.ProjectName);
+        }
+    }
+
+    private bool FilterFuncProject(Project element) => FilterFuncP(element, searchString);
+
+    private bool FilterFuncP(Project element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.ProjectName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+
+      private bool FilterFuncAgreement(Agreement element) => FilterFuncA(element, searchString);
+
+    private bool FilterFuncA(Agreement element, string searchString)
     {
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
@@ -143,12 +168,12 @@
 
     private void GoToCreate()
     {
-        nav.NavigateTo($"/Create_Project/{employerEmail}");
+        nav.NavigateTo($"/Create_Project/{personEmail}");
     }
 
     private void GoToConfigs()
     {
-        nav.NavigateTo($"/Projects/{employerEmail}/{projectName}");
+        nav.NavigateTo($"/Projects/{personEmail}/{projectName}");
     }
 
     private void PageChanged(int i)
