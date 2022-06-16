@@ -39,9 +39,9 @@ namespace Application.Projects.Implementations
             return await _projectRepository.GetEmployerProyects(email);
         }
 
-        public bool ModifyProject(Project project, string newProjectName)
+        public void ModifyProject(Project project, string newProjectName)
         {
-            return _projectRepository.ModifyProject(project, newProjectName);
+             _projectRepository.ModifyProject(project, newProjectName);
         }
     }
 }
