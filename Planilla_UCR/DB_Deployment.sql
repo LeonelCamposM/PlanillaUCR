@@ -81,17 +81,29 @@ CREATE TABLE ReportOfHours(
 	FOREIGN KEY(EmployeeEmail) REFERENCES Employee(Email)
 );
 
+CREATE TABLE Subscribes(
+	EmployeeEmail varchar(255) NOT NULL,
+	EmployerEmail varchar(255) NOT NULL,
+	ProjectName varchar(255) NOT NULL,
+	SubscriptionName varchar(255) NOT NULL,
+	Cost float NOT NULL,
+	StartDate date NOT NULL,
+	EndDate date,
+	PRIMARY KEY(EmployeeEmail,EmployerEmail,ProjectName, SubscriptionName),
+	FOREIGN KEY(EmployerEmail, ProjectName, SubscriptionName) REFERENCES Subscription(EmployerEmail, ProjectName, SubscriptionName) ON UPDATE CASCADE,
+	FOREIGN KEY(EmployeeEmail) REFERENCES Employee(Email)
+);
+
 -- Suscription Stored Procedures
 GO
-CREATE PROCEDURE GetAllBenefits
+ CREATE OR ALTER PROCEDURE GetAllBenefits
 AS
 BEGIN
     SELECT * FROM Subscription WHERE TypeSubscription=1 and IsEnabled=1
 END
 
-
 GO 
-CREATE PROCEDURE GetAllDeductions
+CREATE OR ALTER PROCEDURE GetAllDeductions
 AS
 BEGIN
     SELECT * FROM Subscription WHERE TypeSubscription=0 and IsEnabled=1
@@ -107,27 +119,42 @@ CREATE OR ALTER PROCEDURE ModifySubscription(
 	@SubscriptionDescription varchar(600),
 	@Cost float,
 	@TypeSubscription int,
-	@IsEnabled int,
-	@Transaction int output
+	@IsEnabled int
 ) AS
 BEGIN
-	IF ((@NewSubscriptionName in (SELECT SubscriptionName FROM Subscription WHERE EmployerEmail = @EmployerEmail AND ProjectName = @ProjectName)) AND (@SubscriptionName <> @NewSubscriptionName))
-	BEGIN 
-		SET @Transaction = 0;
-	END
-	ELSE
-		BEGIN
-			SET @Transaction = 1;
+	UPDATE Subscription
+	SET SubscriptionName = @NewSubscriptionName, SubscriptionDescription = @SubscriptionDescription,Cost = @Cost, ProviderName = @ProviderName 
+	WHERE EmployerEmail= @EmployerEmail AND ProjectName = @ProjectName AND SubscriptionName = @SubscriptionName;
+END
 
-			UPDATE Subscription
-			SET SubscriptionName = @NewSubscriptionName, SubscriptionDescription = @SubscriptionDescription,Cost = @Cost, ProviderName = @ProviderName 
-			WHERE EmployerEmail= @EmployerEmail AND ProjectName = @ProjectName AND SubscriptionName = @SubscriptionName;
-		END
+GO
+CREATE OR ALTER PROCEDURE DeleteSubscription(
+	@EmployerEmail varchar(255),
+	@ProjectName varchar(255),
+	@SubscriptionName varchar(255)
+) AS
+BEGIN
+	UPDATE Subscription
+	SET IsEnabled = 0
+	WHERE EmployerEmail= @EmployerEmail AND ProjectName = @ProjectName AND SubscriptionName = @SubscriptionName;
+END
+
+-- Subscribe Stored Procedures
+GO
+CREATE OR ALTER PROCEDURE GetEmployeesBySubscription(
+	@EmployerEmail varchar(255),
+	@ProjectName varchar(255),
+	@SubscriptionName varchar(255))
+AS
+BEGIN
+	SELECT * 
+	FROM Subscribes 
+	WHERE EmployerEmail = @EmployerEmail AND ProjectName = @ProjectName AND SubscriptionName = @SubscriptionName
 END
 
 -- Project Stored Procedures
 GO 
-CREATE PROCEDURE GetEmployerByEmail(@email VARCHAR(255))
+CREATE OR ALTER PROCEDURE GetEmployerByEmail(@email VARCHAR(255))
 AS
 BEGIN
     SELECT * FROM Employer WHERE Employer.Email = @email
@@ -135,7 +162,7 @@ END
 
 GO
 
-CREATE PROCEDURE ProjectNameCheck(@ProjectName VARCHAR(255))
+CREATE OR ALTER PROCEDURE ProjectNameCheck(@ProjectName VARCHAR(255))
 AS
 BEGIN
     SELECT * FROM Project WHERE Project.ProjectName = @ProjectName
@@ -172,7 +199,7 @@ END
 
 -- People Stored Procedures
 GO
-CREATE PROCEDURE GetPersonByEmail(@email varchar(255))
+CREATE OR ALTER PROCEDURE GetPersonByEmail(@email varchar(255))
 AS
 BEGIN
     SELECT * FROM Person AS P WHERE P.Email = @email
@@ -180,7 +207,7 @@ END
 
 
 GO
-CREATE PROCEDURE UpdatePerson(
+CREATE OR ALTER PROCEDURE UpdatePerson(
 	@EmailPerson varchar(255),
 	@NewName varchar(255),
 	@NewLastName1 varchar(255),
@@ -201,7 +228,7 @@ END
 
 
 GO
-CREATE PROCEDURE GetInfoPerson(@EmailPerson varchar(255))
+CREATE OR ALTER PROCEDURE GetInfoPerson(@EmailPerson varchar(255))
 AS
 BEGIN
 	SELECT Person.Email, Person.Name, Person.LastName1, Person.LastName2, Person.SSN, Person.BankAccount, Person.Adress, Person.PhoneNumber
@@ -211,17 +238,21 @@ END
 
 -- Employee Stored Procedures
 GO
-CREATE PROCEDURE [dbo].[GetAllEmployees]
+CREATE OR ALTER PROCEDURE [dbo].[GetAllEmployees]
 @projectName VARCHAR(255)
 AS
 BEGIN
 	SELECT P.Email, P.Name, P.LastName1, P.LastName2, P.SSN, P.BankAccount, P.Adress, P.PhoneNumber
 	FROM Employee JOIN  Person AS P ON Employee.Email = P.Email left JOIN Agreement as A ON A.EmployeeEmail = Employee.Email
 	Where A.ProjectName IS NULL OR A.ProjectName != @projectName
+	Group by P.Email, P.Name, P.LastName1, P.LastName2, P.SSN, P.BankAccount, P.Adress, P.PhoneNumber
 END
 
+select *
+from Agreement
+
 GO
-CREATE PROCEDURE [dbo].[GetProjectEmployees]
+CREATE OR ALTER PROCEDURE [dbo].[GetProjectEmployees]
 @projectName VARCHAR(255)
 AS
 BEGIN
@@ -231,21 +262,21 @@ BEGIN
 END
 
 GO
-CREATE PROCEDURE GetEmployeeByEmail(@email varchar(255))
+CREATE OR ALTER PROCEDURE GetEmployeeByEmail(@email varchar(255))
 AS
 BEGIN
     SELECT * FROM Employee AS E WHERE E.Email = @email
 END
 
 GO
-CREATE or ALTER PROCEDURE GetSalaryPerAgreement(@MountPerHour int)
+CREATE OR ALTER PROCEDURE GetSalaryPerAgreement(@MountPerHour int)
 AS
 BEGIN 
 	SELECT * FROM AgreementType WHERE MountPerHour = @MountPerHour
 END
 
 GO
-CREATE PROCEDURE GetContracteeByEmail(@ContracteeEmail varchar(255))
+CREATE OR ALTER PROCEDURE GetContracteeByEmail(@ContracteeEmail varchar(255))
 AS
 BEGIN 
 	SELECT * FROM Agreement WHERE EmployeeEmail = @ContracteeEmail
@@ -287,13 +318,13 @@ VALUES('mau@ucr.ac.cr',
 )
 
 INSERT INTO Employer
-VALUES('jeremy@ucr.ac.cr')
-
-INSERT INTO Employer
 VALUES('leonel@ucr.ac.cr')
 
 INSERT INTO Employee
 VALUES('mau@ucr.ac.cr')
+
+INSERT INTO Employee
+VALUES('jeremy@ucr.ac.cr')
 
 INSERT INTO Project
 VALUES('leonel@ucr.ac.cr',
@@ -337,15 +368,6 @@ VALUES('leonel@ucr.ac.cr',
 'Emprendimiento de perfumes',
 20000,
 5,
-'Mensual'
-)
-
-INSERT INTO Project
-VALUES('jeremy@ucr.ac.cr',
-'Proyecto 1',
-'Emprendimiento de panadería',
-30000,
-20,
 'Mensual'
 )
 
@@ -403,6 +425,7 @@ VALUES('leonel@ucr.ac.cr',
 1,
 1
 )
+
 Insert into AgreementType
 Values('Tiempo completo', 1000)
 
@@ -412,10 +435,42 @@ Values('Medio tiempo', 500)
 Insert into AgreementType
 Values('Servicios profesionales', 700)
 
-INSERT INTO ReportOfHours
-VALUES('leonel@ucr.ac.cr', 'Proyecto 1','mau@ucr.ac.cr', '9999-12-31',22.2)
-
-INSERT INTO ReportOfHours
-VALUES('leonel@ucr.ac.cr', 'Proyecto 2','mau@ucr.ac.cr', '9999-12-31',22.2)
 Insert into AgreementType
 Values('Por horas', 10)
+
+INSERT INTO Agreement
+VALUES('jeremy@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Proyecto 1','9999-12-31','Por horas', 10, '9999-12-31')
+
+INSERT INTO Agreement
+VALUES('jeremy@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Proyecto 2','9999-12-31','Por horas', 10, '9999-12-31')
+
+
+INSERT INTO ReportOfHours
+VALUES('leonel@ucr.ac.cr', 'Proyecto 1','jeremy@ucr.ac.cr', '2022-6-15',4)
+
+INSERT INTO ReportOfHours
+VALUES('leonel@ucr.ac.cr', 'Proyecto 1','jeremy@ucr.ac.cr', '2022-5-15',5)
+
+INSERT INTO ReportOfHours
+VALUES('leonel@ucr.ac.cr', 'Proyecto 2','jeremy@ucr.ac.cr', '2022-6-15',8)
+
+INSERT INTO ReportOfHours
+VALUES('leonel@ucr.ac.cr', 'Proyecto 2','jeremy@ucr.ac.cr', '2022-5-15',8)
+
+INSERT INTO Subscribes (EmployerEmail, ProjectName, SubscriptionName, EmployeeEmail, Cost, StartDate)
+VALUES('leonel@ucr.ac.cr',
+'Proyecto 1',
+'Ayudemos a los niños',
+'jeremy@ucr.ac.cr',
+25000,
+'2012-07-15'
+)
+
+INSERT INTO Subscribes (EmployerEmail, ProjectName, SubscriptionName, EmployeeEmail, Cost, StartDate)
+VALUES('leonel@ucr.ac.cr',
+'Proyecto 1',
+'Piscina',
+'jeremy@ucr.ac.cr',
+25000,
+'2012-07-15'
+)
