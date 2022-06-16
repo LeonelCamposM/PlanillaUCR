@@ -131,19 +131,26 @@ else
 
     Agreement myAgreement = new Agreement("", "", "", null, "", 0, null);
 
+
+    private IList<Project> _projects = new List<Project>();
+    private IList<Agreement> _agreements = new List<Agreement>();
+    private IList<AgreementType> _agreementType = new List<AgreementType>();
+
     protected override async Task OnInitializedAsync()
     {
-
+        /*
         _elements = await AgreementService.GetAllAgreementsByProjectAndEmployer(myAgreement);
         if (_elements.Length() == 0)
-        {
-            empty = true;
+            {
+        empty = true;
         }
         else
-        {
+            {
             empty = false;
         }
-        _loading = false;
+        _loading = false;*/
+
+
     }
 
     private void GoToFireTheEmployee(string email)

@@ -46,9 +46,9 @@ namespace Infrastructure.Agreements.Repositories
         public async Task<IEnumerable<Agreement?>> GetAllAgreementsByProjectAndEmployer(Agreement agreement) 
         {
             // TODO check this. Try out just @ProjectName and @EmployerName respectively
-            SqlParameter ProjectName = new SqlParameter("@Project", agreement.ProjectName); 
-            SqlParameter EmployeeerEmail = new SqlParameter("@EmployerEmail", agreement.EmployerEmail);
-            var agreementList = await _dbContext.Agreements.FromSqlRaw("EXEC GetAllAgreementsByProjectAndEmployer {0}, {1}", ProjectName, EmployeeerEmail).ToListAsync();
+            string a = "Proyecto 1";
+            var agreementList = await _dbContext.Agreements.FromSqlRaw("EXEC GetAllAgreementsByProjectAndEmployer @Project", 
+                new SqlParameter("Project", a)).ToListAsync();
             return agreementList;
 
         }

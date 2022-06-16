@@ -198,8 +198,9 @@ BEGIN
     SELECT * FROM Employee AS E WHERE E.Email = @email
 END
 
+-- Agreements stored procedures
 GO
-CREATE or ALTER PROCEDURE GetSalaryPerAgreement(@MountPerHour int)
+CREATE or ALTER PROCEDURE CheckSalaryPerAgreement(@MountPerHour int)
 AS
 BEGIN 
 	SELECT * FROM AgreementType WHERE MountPerHour = @MountPerHour
@@ -212,17 +213,25 @@ BEGIN
 	SELECT * FROM Agreement WHERE EmployeeEmail = @ContracteeEmail
 END
 
+
 GO
-Create or ALTER PROCEDURE GetAllAgreementsByProjectAndEmployer(@Project varchar(255), @EmployerEmail varchar(255))
+CREATE OR ALTER PROCEDURE GetAllAgreementsByProjectAndEmployer(@Project varchar(255), @EmployerEmail varchar(255))
 AS
 BEGIN
 	SELECT *
-	FROM Project AS P JOIN Agreement AS A ON P.EmployerEmail = A.EmployerEmail 
-	AND P.ProjectName = A.ProjectName JOIN AgreementType AS ATP ON A.ContractType = ATP.TypeAgreement
+	FROM Agreement as A
 	WHERE A.ProjectName = @Project AND A.EmployerEmail = @EmployerEmail
 END
 
-exec GetAllAgreementsByProjectAndEmployer @Project = 'Proyecto 1', @EmployerEmail = 'jeremy@ucr.ac.cr'
+
+GO
+CREATE OR ALTER PROCEDURE GetAllAgreementTypes
+AS
+BEGIN
+	SELECT *
+	FROM AgreementType AS ATP
+END
+
 
 -- Data Insert
 GO
