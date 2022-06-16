@@ -3,7 +3,7 @@ GO
 USE DB_Planilla
 
 -- Tables
-Create Table Person(
+CREATE TABLE Person(
 	Email varchar(255) NOT NULL primary key,
 	Name varchar(255) NOT NULL,
 	LastName1 varchar(255),
@@ -51,9 +51,10 @@ CREATE TABLE Agreement(
 	ContractFinishDate date NOT NULL,
 	PRIMARY KEY(EmployeeEmail,EmployerEmail,ProjectName,ContractStartDate),
 	FOREIGN KEY(EmployeeEmail) REFERENCES Employee(Email),
-	FOREIGN KEY(EmployerEmail, ProjectName) REFERENCES Project(EmployerEmail, ProjectName),
+	FOREIGN KEY(EmployerEmail, ProjectName) REFERENCES Project(EmployerEmail, ProjectName) ON UPDATE CASCADE,
 	FOREIGN KEY(ContractType, MountPerHour) REFERENCES AgreementType(TypeAgreement, MountPerHour)
 );
+
 
 
 CREATE TABLE Subscription
@@ -67,7 +68,7 @@ CREATE TABLE Subscription
 	TypeSubscription int NOT NULL,
 	IsEnabled int NOT NULL,
 	PRIMARY KEY(EmployerEmail, ProjectName, SubscriptionName),
-	FOREIGN KEY(EmployerEmail, ProjectName) REFERENCES Project(EmployerEmail, ProjectName)
+	FOREIGN KEY(EmployerEmail, ProjectName) REFERENCES Project(EmployerEmail, ProjectName) ON UPDATE CASCADE
 );
 
 CREATE TABLE ReportOfHours(
@@ -77,7 +78,7 @@ CREATE TABLE ReportOfHours(
 	ReportDate date NOT NULL,
 	ReportHours float NOT NULL,
 	PRIMARY KEY(EmployerEmail, ProjectName, EmployeeEmail, ReportDate),
-	FOREIGN KEY(EmployerEmail, ProjectName) REFERENCES Project(EmployerEmail, ProjectName),
+	FOREIGN KEY(EmployerEmail, ProjectName) REFERENCES Project(EmployerEmail, ProjectName) ON UPDATE CASCADE,
 	FOREIGN KEY(EmployeeEmail) REFERENCES Employee(Email)
 );
 
@@ -177,23 +178,17 @@ CREATE OR ALTER PROCEDURE ModifyProject(
 	@NewProjectDescription varchar(600),
 	@NewMaximumAmountForBenefits float,
 	@NewMaximumBenefitAmount int,
-	@NewPaymentInterval varchar(255),
-	@Transaction int output
+	@NewPaymentInterval varchar(255)
 ) AS
 BEGIN
 	IF ((@NewProjectName in (SELECT ProjectName FROM Project WHERE EmployerEmail = @EmployerEmail)) AND (@ProjectName <> @NewProjectName))
 	BEGIN 
-		SET @Transaction = 0;
-	END
-	ELSE
-		BEGIN
-			SET @Transaction = 1;
 
-			UPDATE Project
-			SET ProjectName = @NewProjectName, ProjectDescription = @NewProjectDescription, MaximumAmountForBenefits = @NewMaximumAmountForBenefits, 
-				MaximumBenefitAmount = @NewMaximumBenefitAmount,PaymentInterval = @NewPaymentInterval
-			WHERE EmployerEmail= @EmployerEmail AND ProjectName = @ProjectName;
-		END
+		UPDATE Project
+		SET ProjectName = @NewProjectName, ProjectDescription = @NewProjectDescription, MaximumAmountForBenefits = @NewMaximumAmountForBenefits, 
+			MaximumBenefitAmount = @NewMaximumBenefitAmount,PaymentInterval = @NewPaymentInterval
+		WHERE EmployerEmail= @EmployerEmail AND ProjectName = @ProjectName;
+	END
 END
 
 
