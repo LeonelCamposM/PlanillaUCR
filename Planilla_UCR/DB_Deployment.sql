@@ -11,7 +11,8 @@ Create Table Person(
 	SSN int NOT NULL,
 	BankAccount varchar(255) NOT NULL,
 	Adress varchar(255),
-	PhoneNumber varchar(255)
+	PhoneNumber varchar(255),
+	isEnable int NOT NULL
 );
 
 CREATE TABLE Employee(
@@ -173,7 +174,7 @@ GO
 CREATE OR ALTER PROCEDURE GetPersonByEmail(@email varchar(255))
 AS
 BEGIN
-    SELECT * FROM Person AS P WHERE P.Email = @email
+    SELECT * FROM Person AS P WHERE P.Email = @email AND isEnable=1
 END
 
 
@@ -194,7 +195,7 @@ BEGIN
 	SET Name=@NewName, LastName1=@NewLastName1, LastName2=@NewLastName2, 
 	SSN=@NewSSN, BankAccount=@NewBankAccount, 
 	Adress=@NewAdress, PhoneNumber=@NewPhoneNumber
-	WHERE Email=@EmailPerson
+	WHERE Email=@EmailPerson AND isEnable=1
 END
 
 
@@ -203,7 +204,34 @@ CREATE OR ALTER PROCEDURE GetInfoPerson(@EmailPerson varchar(255))
 AS
 BEGIN
 	SELECT Person.Email, Person.Name, Person.LastName1, Person.LastName2, Person.SSN, Person.BankAccount, Person.Adress, Person.PhoneNumber
-	FROM  Person WHERE Person.Email = @EmailPerson
+	FROM  Person WHERE Person.Email = @EmailPerson AND isEnable=1
+END
+
+
+
+--Employer Stored Procedures
+
+GO
+CREATE OR ALTER PROCEDURE DeleteEmployer(
+	@EmployerEmail varchar(255)
+) AS
+BEGIN
+	UPDATE Person
+	SET IsEnabled = 0
+	WHERE Person.Email = @EmployerEmail;
+
+	--UPDATE Project 
+	--SET IsEnabled = 0
+	--WHERE Project.EmployerEmail = @EmployerEmail;
+
+	--UPDATE Agreement 
+	--SET IsEnabled = 0
+	--WHERE Agreement.EmployerEmail = @EmployerEmail;
+
+	--UPDATE Subscription 
+	--SET IsEnabled = 0
+	--WHERE Subscription.EmployerEmail = @EmployerEmail;
+
 END
 
 
@@ -263,7 +291,8 @@ VALUES('jeremy@ucr.ac.cr',
 5454454,
 '40234020012',
 'San José, Costa Rica',
-'62571204'
+'62571204',
+1
 )
 
 INSERT INTO Person
@@ -274,7 +303,8 @@ VALUES('leonel@ucr.ac.cr',
 242342,
 'CR40324350012',
 'San José, Costa Rica',
-'83355316'
+'83355316',
+1
 )
 
 INSERT INTO Person
@@ -285,7 +315,8 @@ VALUES('mau@ucr.ac.cr',
 8857655,
 'CR4024220012',
 'San José, Costa Rica',
-'677774'
+'677774',
+1
 )
 
 INSERT INTO Employer
