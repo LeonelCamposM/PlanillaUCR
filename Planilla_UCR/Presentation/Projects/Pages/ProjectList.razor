@@ -1,6 +1,8 @@
 ﻿@page "/Projects/{EmployerEmail}"
 @using Domain.Projects.Entities
+@using Domain.Agreements.Entities
 @using Application.Projects
+@using Application.Agreements
 @using Presentation.Core.Components
 @using Presentation.Projects.Models
 @using Application.ContextMenu
@@ -9,6 +11,7 @@
 @using Presentation.Authentication
 
 @inject IProjectService ProjectService
+@inject IAgreementService AgreementService
 @inject IContextMenuService ContextMenuService
 
 @inject NavigationManager nav
@@ -59,7 +62,7 @@
                     <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Primary" OnClick="GoToConfigs"/>
                 </MudToolBar>
 
-                <MudTable @ref="mudTable" Items="@elements" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_empty" LoadingProgressColor="Color.Primary" Filter="new Func<Project,bool>(FilterFunc1)">  
+                <MudTable @ref="mudTable" Items="@projectElements" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_empty" LoadingProgressColor="Color.Primary" Filter="new Func<Project,bool>(FilterFunc1)">  
 
                     <ToolBarContent>
                         <MudText Align="Align.Center" Typo="Typo.h6">Lista de proyectos</MudText>
@@ -120,7 +123,8 @@
     private bool _loading = true;
     public string searchString = "";
     private MudTable<Project> mudTable;
-    private IEnumerable<Project> elements;
+    private IEnumerable<Project> projectElements;
+    private IEnumerable<Agreement> agreementElements;
     
     [Parameter] public string employerEmail { get; set; }
     [Parameter] public string projectName { get; set; }
@@ -128,9 +132,9 @@
     protected override async Task OnInitializedAsync()
     {
         ContextMenuService.SetProjectsContext(false, "");
-        elements = await ProjectService.GetEmployerProyects(employerEmail);
+        projectElements = await ProjectService.GetEmployerProyects(employerEmail);
         _loading = false;
-        if (elements.Length() > 0){
+        if (projectElements.Length() > 0){
             _empty = false;
         }
     }
