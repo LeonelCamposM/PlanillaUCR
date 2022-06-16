@@ -1,11 +1,12 @@
 ﻿using Domain.Core.Repositories;
 using Domain.Projects.Repositories;
 using Domain.Projects.Entities;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Data.SqlClient;
 
 namespace Infrastructure.Projects.Repositories
 {
@@ -61,6 +62,31 @@ namespace Infrastructure.Projects.Repositories
             IList<Project> projectsResult = await _dbContext.Projects.Where
                 (e => e.EmployerEmail == email).ToListAsync();
             return projectsResult;
+        }
+
+        public bool ModifyProject(Project project, string newProjectName)
+        {
+            var Transaction = new SqlParameter("Transaction", 0);
+            Transaction.Direction = System.Data.ParameterDirection.Output;
+            System.FormattableString query = ($@"EXECUTE ModifyProject 
+                @ProjectName = {project.ProjectName},
+                @EmployerEmail = {project.EmployerEmail},
+                @NewProjectName = {newProjectName},
+                @NewProjectDescription = {project.ProjectDescription},
+                @NewMaximumAmountForBenefits = {project.MaximumAmountForBenefits},
+                @NewMaximumBenefitAmount = {project.MaximumBenefitAmount},
+                @NewPaymentInterval = {project.PaymentInterval},
+                @Transaction = {Transaction} OUT" );
+
+            _dbContext.Database.ExecuteSqlInterpolated(query);
+            if (Convert.ToInt32(Transaction.Value) == 1)
+            {
+                return true;
+            }
+            else 
+            { 
+                return false;
+            }
         }
     }
 }

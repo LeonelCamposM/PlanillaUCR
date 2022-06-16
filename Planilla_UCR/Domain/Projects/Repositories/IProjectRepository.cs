@@ -11,5 +11,6 @@ namespace Domain.Projects.Repositories
         Task<IEnumerable<Project>> GetAllNameProjects(string name);
         Task<IEnumerable<Project>> GetEmployerProyects(string email);
         Task<Project> GetProject(string employerEmail, string projectName);
+        bool ModifyProject(Project project, string newProjectName);
     }
 }
