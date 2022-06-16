@@ -132,7 +132,7 @@ else
     private IEnumerable<Project> _projects = new List<Project>();
     private IEnumerable<Agreement> _agreements = new List<Agreement>();
     private IEnumerable<AgreementType> _agreementType = new List<AgreementType>();
-    private IList<JoinedTables> _myJoin = new List<JoinedTables>();
+    private IEnumerable<JoinedTables> _myJoin = new List<JoinedTables>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -140,44 +140,37 @@ else
         _projects = await ProjectService.GetEmployerProyects(employerEmail);
         _agreements = await AgreementService.GetAllAgreementsByProjectAndEmployer(projectName, employerEmail);
         _agreementType = await AgreementTypeService.GetAllAgreementTypes();
-
-        var _myJoinedTable = from P in _projects
-                        join A in _agreements on P.ProjectName equals A.ProjectName
-                        join ATP in _agreementType on A.ContractType equals ATP.TypeAgreement
-                        select new
-                        {
-                            EmployerEmail = P.EmployerEmail,
-                            ProjectName = P.ProjectName,
-                            PaymentInterval = P.PaymentInterval,
-                            EmployeeEmail = A.EmployeeEmail,
-                            ContractType = A.ContractType,
-                            ContractStartDate = A.ContractStartDate,
-                            ContractFinishDate = A.ContractFinishDate,
-                            MountPerHour = ATP.MountPerHour,
-                        };
-    
-        _myJoin = _myJoinedTable.Select(x => new JoinedTables
-            {
-                EmployerEmail = x.EmployerEmail,
-                ProjectName = x.ProjectName,
-                PaymentInterval = x.PaymentInterval,
-                EmployeeEmail = x.EmployeeEmail,
-                ContractType = x.ContractType,
-                ContractStartDate = (DateTime) x.ContractStartDate,
-                ContractFinishDate = (DateTime) x.ContractFinishDate,
-                MountPerHour = x.MountPerHour
-            }).ToList();
-
-        if (_myJoin.Length() == 0)
-        {
-            _empty = true;
-        }
+        populateJoinAttribute();
+        checkJoinLenght();
         _loading = false;
     }
 
 
+    private void populateJoinAttribute() 
+    { 
+        _myJoin = from P in _projects
+                  join A in _agreements on P.ProjectName equals A.ProjectName
+                  join ATP in _agreementType on A.ContractType equals ATP.TypeAgreement
+                  select new JoinedTables
+                    {
+                        EmployerEmail = P.EmployerEmail,
+                        ProjectName = P.ProjectName,
+                        PaymentInterval = P.PaymentInterval,
+                        EmployeeEmail = A.EmployeeEmail,
+                        ContractType = A.ContractType,
+                        ContractStartDate = (DateTime) A.ContractStartDate,
+                        ContractFinishDate = (DateTime) A.ContractFinishDate,
+                        MountPerHour = ATP.MountPerHour,
+                    };
+    }
 
-
+    private void checkJoinLenght()
+    {
+        if (_myJoin.Length() == 0)
+        {
+            _empty = true;
+        }
+    }
     private void GoToFireTheEmployee(string email)
     {
        nav.NavigateTo($"/Agreements/{email}");
