@@ -94,6 +94,45 @@ CREATE TABLE Subscribes(
 	FOREIGN KEY(EmployeeEmail) REFERENCES Employee(Email)
 );
 
+CREATE TABLE LegalDeduction(
+	DeductionName varchar(255) NOT NULL,
+	Cost float NOT NULL,
+	PRIMARY KEY(DeductionName),
+);
+
+CREATE TABLE Payment(
+	EmployeeEmail varchar(255) NOT NULL,
+	EmployerEmail varchar(255) NOT NULL,
+	ProjectName varchar(255) NOT NULL,
+	PayDate date NOT NULL,
+	PRIMARY KEY(EmployeeEmail,EmployerEmail,ProjectName, PayDate),
+	FOREIGN KEY(EmployerEmail, ProjectName) REFERENCES Project(EmployerEmail, ProjectName) ,
+	FOREIGN KEY(EmployeeEmail) REFERENCES Employee(Email)
+);
+
+CREATE TABLE Modifies(
+	EmployeeEmail varchar(255) NOT NULL,
+	EmployerEmail varchar(255) NOT NULL,
+	ProjectName varchar(255) NOT NULL,
+	PayDate date NOT NULL,
+	SubscriptionName varchar(255) NOT NULL,
+	PRIMARY KEY(EmployeeEmail,EmployerEmail,ProjectName, PayDate, SubscriptionName),
+	FOREIGN KEY(EmployeeEmail, EmployerEmail,ProjectName, PayDate) REFERENCES Payment(EmployeeEmail, EmployerEmail, ProjectName, PayDate),
+	FOREIGN KEY(EmployerEmail, ProjectName, SubscriptionName) REFERENCES Subscription(EmployerEmail, ProjectName, SubscriptionName)
+);
+
+
+CREATE TABLE Applies(
+	EmployeeEmail varchar(255) NOT NULL,
+	EmployerEmail varchar(255) NOT NULL,
+	ProjectName varchar(255) NOT NULL,
+	PayDate date NOT NULL,
+	DeductionName varchar(255) NOT NULL,
+	PRIMARY KEY(EmployeeEmail,EmployerEmail,ProjectName, PayDate, DeductionName),
+	FOREIGN KEY(EmployeeEmail, EmployerEmail,ProjectName, PayDate) REFERENCES Payment(EmployeeEmail, EmployerEmail, ProjectName, PayDate),
+	FOREIGN KEY(DeductionName) REFERENCES LegalDeduction(DeductionName)
+);
+
 -- Suscription Stored Procedures
 GO
  CREATE OR ALTER PROCEDURE GetAllBenefits
