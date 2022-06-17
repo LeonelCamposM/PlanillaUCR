@@ -158,7 +158,7 @@ GO
 CREATE OR ALTER PROCEDURE GetEmployerByEmail(@email VARCHAR(255))
 AS
 BEGIN
-    SELECT * FROM Employer WHERE Employer.Email = @email
+    SELECT * FROM Employer WHERE Employer.Email = @email 
 END
 
 GO
@@ -174,7 +174,7 @@ GO
 CREATE OR ALTER PROCEDURE GetPersonByEmail(@email varchar(255))
 AS
 BEGIN
-    SELECT * FROM Person AS P WHERE P.Email = @email
+    SELECT * FROM Person AS P WHERE P.Email = @email AND P.IsEnabled=1
 END
 
 GO
@@ -241,10 +241,10 @@ CREATE OR ALTER PROCEDURE [dbo].[GetAllEmployees]
 @projectName VARCHAR(255)
 AS
 BEGIN
-	SELECT P.Email, P.Name, P.LastName1, P.LastName2, P.SSN, P.BankAccount, P.Adress, P.PhoneNumber
+	SELECT P.Email, P.Name, P.LastName1, P.LastName2, P.SSN, P.BankAccount, P.Adress, P.PhoneNumber, P.IsEnabled
 	FROM Employee JOIN  Person AS P ON Employee.Email = P.Email left JOIN Agreement as A ON A.EmployeeEmail = Employee.Email
 	Where A.ProjectName IS NULL OR A.ProjectName != @projectName
-	Group by P.Email, P.Name, P.LastName1, P.LastName2, P.SSN, P.BankAccount, P.Adress, P.PhoneNumber
+	Group by P.Email, P.Name, P.LastName1, P.LastName2, P.SSN, P.BankAccount, P.Adress, P.PhoneNumber, P.IsEnabled
 END
 
 select *
@@ -255,7 +255,7 @@ CREATE OR ALTER PROCEDURE [dbo].[GetProjectEmployees]
 @projectName VARCHAR(255)
 AS
 BEGIN
-	SELECT P.Email, P.Name, P.LastName1, P.LastName2, P.SSN, P.BankAccount, P.Adress, P.PhoneNumber
+	SELECT P.Email, P.Name, P.LastName1, P.LastName2, P.SSN, P.BankAccount, P.Adress, P.PhoneNumber, P.IsEnabled
 	FROM Agreement as A JOIN  Person as P ON A.EmployeeEmail = P.Email
 	Where A.ProjectName = @projectName
 END
@@ -264,7 +264,7 @@ GO
 CREATE OR ALTER PROCEDURE GetEmployeeByEmail(@email varchar(255))
 AS
 BEGIN
-    SELECT * FROM Employee AS E WHERE E.Email = @email
+    SELECT * FROM Employee AS E WHERE E.Email = @email 
 END
 
 GO
