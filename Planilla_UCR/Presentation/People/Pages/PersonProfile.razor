@@ -174,7 +174,6 @@
     protected override async Task OnInitializedAsync()
     {
         personInfo.Email = userEmail;
-        //personInfo.IsEnabled = 1;
         personInfo = await PersonService.GetInfoPerson(personInfo);
         if (personInfo != null)
         {
