@@ -58,7 +58,7 @@
             else
             {
 
-                <MudTable @ref="mudTable" Items="@projectElements" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_emptyProject" LoadingProgressColor="Color.Primary" Filter="new Func<Project,bool>(FilterFuncProject)">  
+                <MudTable @ref="mudTable" Items="@projectElementsList" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_emptyProject" LoadingProgressColor="Color.Primary" Filter="new Func<Project,bool>(FilterFuncProject)">  
 
                     <ToolBarContent>
                         <MudText Align="Align.Center" Typo="Typo.h6">Lista de proyectos</MudText>
@@ -161,7 +161,7 @@
     private bool _emptyAgreement = true;
     private bool _loading = true;
     public string _searchString = "";
-    Project tempProject = new Project("", "", "", 0.0, 0, "");
+    Project tempProject = new Project("", "", "", 0.0, 0, "",1);
     private MudTable<Project> mudTable;
     private IEnumerable<Project> projectElements;
     private List<Project> projectElementsList = new List<Project>();
@@ -183,16 +183,30 @@
         }
         if (agreementElements.Length() > 0){
             _emptyAgreement = false;
-            await FindProject();
         }
+        await FindProject(personEmail);
     }
 
-    private async Task FindProject()
+    private async Task FindProject(string personEmail)
     {
-        foreach (Agreement element in agreementElements) {
-            tempProject  = await ProjectService.GetProject(element.ProjectName);
-            projectElementsList.Add(tempProject);
-            projectElementsList.Length();
+        if (!_emptyAgreement) 
+        {
+            foreach (Agreement element in agreementElements) 
+            {
+                tempProject  = await ProjectService.GetProject(element.ProjectName);
+                if (tempProject.IsEnabled == 1)
+                    projectElementsList.Add(tempProject);
+            }
+        }
+        if (!_emptyProject)
+        {
+            foreach (Project element in projectElements) 
+            {
+                tempProject  = await ProjectService.GetProject(element.ProjectName);
+                if (tempProject.IsEnabled == 1)
+                    projectElementsList.Add(tempProject);
+            }
+            
         }
     }
 
