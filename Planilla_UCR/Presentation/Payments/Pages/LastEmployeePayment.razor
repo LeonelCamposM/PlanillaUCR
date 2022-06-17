@@ -1,9 +1,19 @@
 ﻿@using Application.Payments
 @using Application.ContextMenu
 @using Domain.Payments.Entities
+@using Application.Agreements
+@using Domain.Agreements.Entities
+@using Application.Subscriptions
+@using Domain.Subscriptions.Entities
+@using Application.LegalDeductions
+@using Domain.LegalDeductions.Entities
+
 @inject IPaymentService PaymentService
 @inject IContextMenuService ContextMenuService
+@inject IAgreementService AgreementService
+@inject ILegalDeductionService LegalDeductionService
 @inject NavigationManager nav
+@inject ISubscriptionService SuscriptionService
 @page "/Last_Pay/{email}"
 
 @if(_loading) {
@@ -20,41 +30,86 @@
         {
             new BreadcrumbItem("Proyectos", href: $"/Projects/{email}"),
              new BreadcrumbItem(@projectName, href: $"/Projects/{email}/{ projectName}/Configurations"),
-            new BreadcrumbItem("Histórico de horas", href: null, disabled: true)
+            new BreadcrumbItem("Último pago", href: null, disabled: true)
         }; 
         <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
         <MudPaper Height="60px" Width="100%" Outlined="false" Class="border-none" Elevation="0"> 
         </MudPaper>
         if (!empty)
         {
-            <MudText Align="Align.Center" Typo="Typo.h6"> @lastPay.EmployeeEmail  </MudText>
-            <MudText Align="Align.Center" Typo="Typo.h6"> @lastPay.EmployerEmail  </MudText>
-            <MudText Align="Align.Center" Typo="Typo.h6">@lastPay.ProjectName  </MudText>
-            <MudText Align="Align.Center" Typo="Typo.h6"> @lastPay.PaymentDate  </MudText>
-                @*<MudTable @ref="@_table" Items="@_elements" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" Filter="new Func<Payment,bool>(FilterFunc1)">
+            <MudText Align="Align.Left" Typo="Typo.h6"> Información general  </MudText>
+            <MudText Align="Align.Left" Typo="Typo.body1">Empleador: @lastPay.EmployerEmail  </MudText>
+            <MudText Align="Align.Left" Typo="Typo.body1">Proyectos: @lastPay.ProjectName  </MudText>
+            <MudText Align="Align.Left" Typo="Typo.body1">Desde: @lastPay.StartDate.ToShortDateString() Hasta: @lastPay.EndDate.ToShortDateString()  </MudText>
+            <MudText Align="Align.Left" Typo="Typo.body1">Salario bruto: @lastPay.GrossSalary </MudText>
+
+            <br />
+            <MudText Align="Align.Left" Typo="Typo.h6"> Información de contrato:  </MudText>
+            <MudText Align="Align.Left" Typo="Typo.body1"> Tipo de contrato: @agreement.ContractType  </MudText>
+            <MudText Align="Align.Left" Typo="Typo.body1"> Monto por horas: @agreement.MountPerHour  </MudText>
+            <br />
+
+                <MudTable @ref="@_table" Items="@deductions" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" Filter="new Func<Subscription,bool>(FilterFunc1)">
                     <ToolBarContent>
-                            <MudText Align="Align.Center" Typo="Typo.h6">Último pago reportado</MudText>
+                            <MudText Align="Align.Center" Typo="Typo.h6">Deducciones aplicadas:</MudText>
                             <MudSpacer />
                             <MudTextField @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
                     </ToolBarContent> 
                     <HeaderContent>
-                        <MudTh>Empleado</MudTh>
-                        <MudTh>Empleador</MudTh>
-                        <MudTh>Proyecto</MudTh>
-                        <MudTh>Fecha</MudTh>
+                        <MudTh>Nombre</MudTh>
+                        <MudTh>Costo</MudTh>
                     </HeaderContent>
 
                     <RowTemplate>
-                         <MudTd DataLabel="Empleado">@context.EmployeeEmail</MudTd>
-                         <MudTd DataLabel="Empleador">@context.EmployerEmail</MudTd>
-                         <MudTd DataLabel="Proyecto">@context.ProjectName</MudTd>
-                         <MudTd DataLabel="Fecha">@context.PaymentDate.Day/@context.PaymentDate.Month/@context.PaymentDate.Year</MudTd>
-
+                         <MudTd DataLabel="Nombre">@context.SubscriptionName</MudTd>
+                         <MudTd DataLabel="Costo">@context.Cost</MudTd>
                     </RowTemplate>
                 <PagerContent>
                     <MudPagination SelectedChanged="PageChanged" Count="@((_table.GetFilteredItemsCount() + _table.RowsPerPage - 1) / _table.RowsPerPage)" Color="Color.Primary" Class="pa-4"/>
                 </PagerContent>
-                </MudTable>*@
+                </MudTable>
+                <br />
+
+                <MudTable @ref="@_table" Items="@benefits" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" Filter="new Func<Subscription,bool>(FilterFunc1)">
+                    <ToolBarContent>
+                            <MudText Align="Align.Center" Typo="Typo.h6">Beneficios aplicados:</MudText>
+                            <MudSpacer />
+                            <MudTextField @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                    </ToolBarContent> 
+                    <HeaderContent>
+                        <MudTh>Nombre</MudTh>
+                        <MudTh>Costo</MudTh>
+                    </HeaderContent>
+
+                    <RowTemplate>
+                         <MudTd DataLabel="Nombre">@context.SubscriptionName</MudTd>
+                         <MudTd DataLabel="Costo">@context.Cost</MudTd>
+                    </RowTemplate>
+                <PagerContent>
+                    <MudPagination SelectedChanged="PageChanged" Count="@((_table.GetFilteredItemsCount() + _table.RowsPerPage - 1) / _table.RowsPerPage)" Color="Color.Primary" Class="pa-4"/>
+                </PagerContent>
+                </MudTable>
+
+                 <br />
+                <MudTable @ref="@_table2" Items="@legalDeductions" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" Filter="new Func<LegalDeduction,bool>(FilterFunc2)">
+                    <ToolBarContent>
+                            <MudText Align="Align.Center" Typo="Typo.h6">Deducciones legales:</MudText>
+                            <MudSpacer />
+                            <MudTextField @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                    </ToolBarContent> 
+                    <HeaderContent>
+                        <MudTh>Nombre</MudTh>
+                        <MudTh>Costo</MudTh>
+                    </HeaderContent>
+
+                    <RowTemplate>
+                         <MudTd DataLabel="Nombre">@context.DeductionName</MudTd>
+                         <MudTd DataLabel="Costo">@context.Cost</MudTd>
+                    </RowTemplate>
+                <PagerContent>
+                    <MudPagination SelectedChanged="PageChanged" Count="@((_table.GetFilteredItemsCount() + _table.RowsPerPage - 1) / _table.RowsPerPage)" Color="Color.Primary" Class="pa-4"/>
+                </PagerContent>
+                </MudTable>
         }else
         {
            
@@ -67,9 +122,14 @@
     private bool _loading = true;
     private bool empty = true;
     string searchString1 = "";
-    private IEnumerable<Payment> _elements = new List<Payment>();
-    private MudTable<Payment> _table;
+    private IEnumerable<Subscription> deductions = new List<Subscription>();
+    private IEnumerable<Subscription> benefits = new List<Subscription>();
+    private IEnumerable<LegalDeduction> legalDeductions = new List<LegalDeduction>();
+
+    private MudTable<Subscription> _table;
+    private MudTable<LegalDeduction> _table2;
     Payment lastPay;
+    Agreement agreement;
 
     [Parameter]
     public string email { get; set; }
@@ -80,6 +140,11 @@
     {
         projectName = ContextMenuService.GetProjectsContext();
         lastPay = await PaymentService.GetEmployeeLastPayment(email, "leonel@ucr.ac.cr", projectName);
+        Agreement toSearchagreement = new Agreement(email, lastPay.EmployerEmail, projectName, null, "", 0, null);
+        agreement = await AgreementService.GetContractee(toSearchagreement);
+        deductions = await SuscriptionService.GetDeductionsByProject(lastPay.EmployerEmail, projectName);
+        benefits = await SuscriptionService.GetBenefitsByProject(lastPay.EmployerEmail, projectName);
+        legalDeductions = await LegalDeductionService.GetAllAsync();
         if (lastPay == null)
         {
             empty = true;
@@ -96,13 +161,23 @@
         _table.NavigateTo(i - 1);
     }
 
-    private bool FilterFunc1(Payment element) => FilterFunc(element, searchString1);
+    private bool FilterFunc1(Subscription element) => FilterFunc(element, searchString1);
+    private bool FilterFunc2(LegalDeduction element2) => FilterFunc2(element2, searchString1);
 
-    private bool FilterFunc(Payment element, string searchString)
+    private bool FilterFunc(Subscription element, string searchString)
     {
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
-        if (element.PaymentDate.ToString().Contains(searchString1, StringComparison.OrdinalIgnoreCase))
+        if (element.SubscriptionName.ToString().Contains(searchString1, StringComparison.OrdinalIgnoreCase))
+        return true;
+        return false;
+    }
+
+    private bool FilterFunc2(LegalDeduction element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.DeductionName.ToString().Contains(searchString1, StringComparison.OrdinalIgnoreCase))
         return true;
         return false;
     }

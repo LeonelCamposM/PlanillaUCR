@@ -104,8 +104,10 @@ CREATE TABLE Payment(
 	EmployeeEmail varchar(255) NOT NULL,
 	EmployerEmail varchar(255) NOT NULL,
 	ProjectName varchar(255) NOT NULL,
-	PaymentDate date NOT NULL,
-	PRIMARY KEY(EmployeeEmail,EmployerEmail,ProjectName, PaymentDate),
+	GrossSalary float NOT NULL, 
+	StartDate date NOT NULL,
+	EndDate date NOT NULL,
+	PRIMARY KEY(EmployeeEmail,EmployerEmail,ProjectName, StartDate, EndDate),
 	FOREIGN KEY(EmployerEmail, ProjectName) REFERENCES Project(EmployerEmail, ProjectName) ,
 	FOREIGN KEY(EmployeeEmail) REFERENCES Employee(Email)
 );
@@ -114,10 +116,11 @@ CREATE TABLE Modifies(
 	EmployeeEmail varchar(255) NOT NULL,
 	EmployerEmail varchar(255) NOT NULL,
 	ProjectName varchar(255) NOT NULL,
-	PaymentDate date NOT NULL,
+	StartDate date NOT NULL,
+	EndDate date NOT NULL,
 	SubscriptionName varchar(255) NOT NULL,
-	PRIMARY KEY(EmployeeEmail,EmployerEmail,ProjectName, PaymentDate, SubscriptionName),
-	FOREIGN KEY(EmployeeEmail, EmployerEmail,ProjectName, PaymentDate) REFERENCES Payment(EmployeeEmail, EmployerEmail, ProjectName, PaymentDate),
+	PRIMARY KEY(EmployeeEmail,EmployerEmail,ProjectName, StartDate, EndDate, SubscriptionName),
+	FOREIGN KEY(EmployeeEmail, EmployerEmail,ProjectName, StartDate, EndDate) REFERENCES Payment(EmployeeEmail, EmployerEmail, ProjectName, StartDate, EndDate),
 	FOREIGN KEY(EmployerEmail, ProjectName, SubscriptionName) REFERENCES Subscription(EmployerEmail, ProjectName, SubscriptionName)
 );
 
@@ -126,10 +129,11 @@ CREATE TABLE Applies(
 	EmployeeEmail varchar(255) NOT NULL,
 	EmployerEmail varchar(255) NOT NULL,
 	ProjectName varchar(255) NOT NULL,
-	PaymentDate date NOT NULL,
+	StartDate date NOT NULL,
+	EndDate date NOT NULL,
 	DeductionName varchar(255) NOT NULL,
-	PRIMARY KEY(EmployeeEmail,EmployerEmail,ProjectName, PaymentDate, DeductionName),
-	FOREIGN KEY(EmployeeEmail, EmployerEmail,ProjectName, PaymentDate) REFERENCES Payment(EmployeeEmail, EmployerEmail, ProjectName, PaymentDate),
+	PRIMARY KEY(EmployeeEmail,EmployerEmail,ProjectName, StartDate, EndDate, DeductionName),
+	FOREIGN KEY(EmployeeEmail, EmployerEmail,ProjectName, StartDate, EndDate) REFERENCES Payment(EmployeeEmail, EmployerEmail, ProjectName, StartDate, EndDate),
 	FOREIGN KEY(DeductionName) REFERENCES LegalDeduction(DeductionName)
 );
 
@@ -454,7 +458,6 @@ VALUES('jeremy@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Proyecto 1','9999-12-31','Por ho
 INSERT INTO Agreement
 VALUES('jeremy@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Proyecto 2','9999-12-31','Por horas', 10, '9999-12-31')
 
-
 INSERT INTO ReportOfHours
 VALUES('leonel@ucr.ac.cr', 'Proyecto 1','jeremy@ucr.ac.cr', '2022-6-15',4)
 
@@ -495,74 +498,74 @@ VALUES('Hacienda',
 48000.3
 )
 
-INSERT INTO Payment (EmployeeEmail,EmployerEmail, ProjectName, PaymentDate)
+INSERT INTO Payment (EmployeeEmail,EmployerEmail, ProjectName,GrossSalary, StartDate, EndDate)
 VALUES('jeremy@ucr.ac.cr',
 'leonel@ucr.ac.cr',
 'Proyecto 1',
+150000,
+'2022-06-16',
 '2022-06-16'
 )
 
-INSERT INTO Payment (EmployeeEmail,EmployerEmail, ProjectName, PaymentDate)
+INSERT INTO Payment (EmployeeEmail,EmployerEmail, ProjectName, GrossSalary, StartDate, EndDate)
 VALUES('jeremy@ucr.ac.cr',
 'leonel@ucr.ac.cr',
 'Proyecto 1',
+150000,
+'2022-05-16',
 '2022-05-16'
 )
 
-INSERT INTO Payment (EmployeeEmail,EmployerEmail, ProjectName, PaymentDate)
+INSERT INTO Payment (EmployeeEmail,EmployerEmail, ProjectName, GrossSalary,  StartDate, EndDate)
 VALUES('jeremy@ucr.ac.cr',
 'leonel@ucr.ac.cr',
 'Proyecto 1',
+ 350000,
+'2022-04-16',
 '2022-04-16'
 )
 
-INSERT INTO Payment (EmployeeEmail,EmployerEmail, ProjectName, PaymentDate)
+INSERT INTO Payment (EmployeeEmail,EmployerEmail, ProjectName, GrossSalary,  StartDate, EndDate)
 VALUES('jeremy@ucr.ac.cr',
 'leonel@ucr.ac.cr',
 'Proyecto 2',
+250000,
+'2022-06-16',
 '2022-06-16'
 )
 
-INSERT INTO Modifies(EmployeeEmail,EmployerEmail, ProjectName, PaymentDate, SubscriptionName)
+INSERT INTO Modifies(EmployeeEmail,EmployerEmail, ProjectName,  StartDate, EndDate, SubscriptionName)
 VALUES('jeremy@ucr.ac.cr',
 'leonel@ucr.ac.cr',
 'Proyecto 1',
+'2022-06-16',
 '2022-06-16',
 'Piscina'
 )
 
-INSERT INTO Modifies(EmployeeEmail,EmployerEmail, ProjectName, PaymentDate, SubscriptionName)
+INSERT INTO Modifies(EmployeeEmail,EmployerEmail, ProjectName,  StartDate, EndDate, SubscriptionName)
 VALUES('jeremy@ucr.ac.cr',
 'leonel@ucr.ac.cr',
 'Proyecto 1',
+'2022-06-16',
 '2022-06-16',
 'Ayudemos a los niños'
 )
 
-INSERT INTO Applies(EmployeeEmail,EmployerEmail, ProjectName, PaymentDate, DeductionName)
+INSERT INTO Applies(EmployeeEmail,EmployerEmail, ProjectName,  StartDate, EndDate, DeductionName)
 VALUES('jeremy@ucr.ac.cr',
 'leonel@ucr.ac.cr',
 'Proyecto 1',
+'2022-06-16',
 '2022-06-16',
 'CCSS'
 )
 
-INSERT INTO Applies(EmployeeEmail,EmployerEmail, ProjectName, PaymentDate, DeductionName)
+INSERT INTO Applies(EmployeeEmail,EmployerEmail, ProjectName,  StartDate, EndDate, DeductionName)
 VALUES('jeremy@ucr.ac.cr',
 'leonel@ucr.ac.cr',
 'Proyecto 1',
 '2022-06-16',
+'2022-06-16',
 'Hacienda'
 )
-
-select *
-from Subscribes
-
-select *
-from Payment
-
-select *
-from Modifies
-
-select *
-from Applies

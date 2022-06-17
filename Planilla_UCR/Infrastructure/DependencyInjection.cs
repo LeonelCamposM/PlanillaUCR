@@ -36,6 +36,9 @@ using Infrastructure.Subscribes.Repositories;
 using Infrastructure.Payments;
 using Infrastructure.Payments.Repositories;
 using Domain.Payments.Repositories;
+using Infrastructure.LegalDeductions;
+using Infrastructure.LegalDeductions.Repositories;
+using Domain.LegalDeductions.Repositories;
 
 namespace Infrastructure
 {
@@ -80,6 +83,9 @@ namespace Infrastructure
 
             services.AddDbContext<PaymentDbContext>(options => options.UseSqlServer(connectionString));
             services.AddScoped<IPaymentRepository, PaymentRepository>();
+
+            services.AddDbContext<LegalDeductionDbContext>(options => options.UseSqlServer(connectionString));
+            services.AddScoped<ILegalDeductionRepository, LegalDeductionRepository>();
             return services;
         }
     }

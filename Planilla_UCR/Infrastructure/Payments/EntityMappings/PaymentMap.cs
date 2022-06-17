@@ -10,7 +10,8 @@ namespace Infrastructure.Payments.EntityMappings
         {
             builder.ToTable("Payment");
 
-            builder.HasKey(p => new { p.EmployeeEmail, p.EmployerEmail, p.ProjectName, p.PaymentDate });
+            builder.HasKey(p => new { p.EmployeeEmail, p.EmployerEmail, p.ProjectName, p.StartDate, p.EndDate });
+            builder.Property(p => p.GrossSalary);
         }
     }
 }

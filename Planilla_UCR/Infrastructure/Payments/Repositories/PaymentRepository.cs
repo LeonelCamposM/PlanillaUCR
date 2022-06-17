@@ -23,7 +23,7 @@ namespace Infrastructure.Payments.Repositories
         public async Task<Payment?> GetEmployeeLastPayment(string employeeEmail, string employerEmail, string projectName)
         {
             IEnumerable<Payment> payments = await _dbContext.Payments.Where(e => e.EmployeeEmail == employeeEmail &&
-            e.EmployerEmail == employerEmail && e.ProjectName == projectName).OrderByDescending(pay => pay.PaymentDate).ToListAsync();
+            e.EmployerEmail == employerEmail && e.ProjectName == projectName).OrderByDescending(pay => pay.EndDate).ToListAsync();
             Payment lastPay = payments.FirstOrDefault();
             return lastPay;
         }
