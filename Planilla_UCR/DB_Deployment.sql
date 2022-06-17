@@ -112,7 +112,7 @@ CREATE TABLE Payment(
 	FOREIGN KEY(EmployeeEmail) REFERENCES Employee(Email)
 );
 
-CREATE TABLE Modifies(
+CREATE TABLE PaymentContainsSubscription(
 	EmployeeEmail varchar(255) NOT NULL,
 	EmployerEmail varchar(255) NOT NULL,
 	ProjectName varchar(255) NOT NULL,
@@ -534,7 +534,7 @@ VALUES('jeremy@ucr.ac.cr',
 '2022-06-16'
 )
 
-INSERT INTO Modifies(EmployeeEmail,EmployerEmail, ProjectName,  StartDate, EndDate, SubscriptionName)
+INSERT INTO PaymentContainsSubscription(EmployeeEmail,EmployerEmail, ProjectName,  StartDate, EndDate, SubscriptionName)
 VALUES('jeremy@ucr.ac.cr',
 'leonel@ucr.ac.cr',
 'Proyecto 1',
@@ -543,7 +543,7 @@ VALUES('jeremy@ucr.ac.cr',
 'Piscina'
 )
 
-INSERT INTO Modifies(EmployeeEmail,EmployerEmail, ProjectName,  StartDate, EndDate, SubscriptionName)
+INSERT INTO PaymentContainsSubscription(EmployeeEmail,EmployerEmail, ProjectName,  StartDate, EndDate, SubscriptionName)
 VALUES('jeremy@ucr.ac.cr',
 'leonel@ucr.ac.cr',
 'Proyecto 1',
@@ -569,3 +569,6 @@ VALUES('jeremy@ucr.ac.cr',
 '2022-06-16',
 'Hacienda'
 )
+
+select *
+from PaymentContainsSubscription

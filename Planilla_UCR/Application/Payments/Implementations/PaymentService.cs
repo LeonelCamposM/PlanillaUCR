@@ -18,5 +18,9 @@ namespace Application.Payments.Implementations
         {
             return _paymentRepository.GetEmployeeLastPayment(employeeEmail, employerEmail, projectName);
         }
+        public Task<IEnumerable<PaymentContainsSubscription>> GetPaymentSubscriptions(Payment payment)
+        {
+            return _paymentRepository.GetPaymentSubscriptions(payment);
+        }
     }
 }

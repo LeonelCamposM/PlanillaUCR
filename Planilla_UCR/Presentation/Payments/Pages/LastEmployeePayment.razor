@@ -110,12 +110,31 @@
                     <MudPagination SelectedChanged="PageChanged" Count="@((_table.GetFilteredItemsCount() + _table.RowsPerPage - 1) / _table.RowsPerPage)" Color="Color.Primary" Class="pa-4"/>
                 </PagerContent>
                 </MudTable>
+
+                 <br />
+                <MudTable @ref="@_table3" Items="@subscriptions" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" Filter="new Func<PaymentContainsSubscription,bool>(FilterFunc3)">
+                    <ToolBarContent>
+                            <MudText Align="Align.Center" Typo="Typo.h6">Suscripciones del pago: </MudText>
+                            <MudSpacer />
+                            <MudTextField @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                    </ToolBarContent> 
+                    <HeaderContent>
+                        <MudTh>Nombre</MudTh>
+                    </HeaderContent>
+
+                    <RowTemplate>
+                         <MudTd DataLabel="Nombre">@context.SubscriptionName</MudTd>
+                    </RowTemplate>
+                <PagerContent>
+                    <MudPagination SelectedChanged="PageChanged" Count="@((_table.GetFilteredItemsCount() + _table.RowsPerPage - 1) / _table.RowsPerPage)" Color="Color.Primary" Class="pa-4"/>
+                </PagerContent>
+                </MudTable>
         }else
         {
            
         }
     }
-}
+
 
 @code {
     private bool _hidePosition;
@@ -128,6 +147,10 @@
 
     private MudTable<Subscription> _table;
     private MudTable<LegalDeduction> _table2;
+
+    private MudTable<PaymentContainsSubscription> _table3;
+    private IEnumerable<PaymentContainsSubscription> subscriptions = new List<PaymentContainsSubscription>();
+
     Payment lastPay;
     Agreement agreement;
 
@@ -145,6 +168,9 @@
         deductions = await SuscriptionService.GetDeductionsByProject(lastPay.EmployerEmail, projectName);
         benefits = await SuscriptionService.GetBenefitsByProject(lastPay.EmployerEmail, projectName);
         legalDeductions = await LegalDeductionService.GetAllAsync();
+
+       subscriptions = await PaymentService.GetPaymentSubscriptions(lastPay);
+
         if (lastPay == null)
         {
             empty = true;
@@ -163,6 +189,7 @@
 
     private bool FilterFunc1(Subscription element) => FilterFunc(element, searchString1);
     private bool FilterFunc2(LegalDeduction element2) => FilterFunc2(element2, searchString1);
+    private bool FilterFunc3(PaymentContainsSubscription element3) => FilterFunc3(element3, searchString1);
 
     private bool FilterFunc(Subscription element, string searchString)
     {
@@ -181,4 +208,14 @@
         return true;
         return false;
     }
+
+    private bool FilterFunc3(PaymentContainsSubscription element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.SubscriptionName.ToString().Contains(searchString1, StringComparison.OrdinalIgnoreCase))
+        return true;
+        return false;
+    }
+}
 }

@@ -27,5 +27,13 @@ namespace Infrastructure.Payments.Repositories
             Payment lastPay = payments.FirstOrDefault();
             return lastPay;
         }
+
+        public async Task<IEnumerable<PaymentContainsSubscription>> GetPaymentSubscriptions(Payment payment)
+        {
+            IEnumerable<PaymentContainsSubscription> subscriptions = await _dbContext.PaymentContainsSubscriptions.Where(e => e.EmployeeEmail == payment.EmployeeEmail &&
+                                                                            e.EmployerEmail == payment.EmployerEmail && e.ProjectName == payment.ProjectName &&
+                                                                            e.StartDate == payment.StartDate && e.EndDate == payment.EndDate).ToListAsync();
+            return subscriptions;
+        }
     }
 }
