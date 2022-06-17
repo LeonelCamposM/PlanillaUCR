@@ -41,6 +41,18 @@ namespace Infrastructure.Projects.Repositories
             }
             return project;
         }
+        public async Task<Project> GetProject(string projectName)
+        {
+            IList<Project> projectResult = await _dbContext.Projects.Where
+                (e => e.ProjectName == projectName).ToListAsync();
+
+            Project project = null;
+            if (projectResult.Length() > 0)
+            {
+                project = projectResult.First();
+            }
+            return project;
+        }
 
         public async Task CreateProjectAsync(Project projectInfo)
         {
@@ -61,6 +73,13 @@ namespace Infrastructure.Projects.Repositories
         {
             IList<Project> projectsResult = await _dbContext.Projects.Where
                 (e => e.EmployerEmail == email).ToListAsync();
+            return projectsResult;
+        }
+
+        public async Task<IEnumerable<Project>> GetEmployeeProyects(string name)
+        {
+            IList<Project> projectsResult = await _dbContext.Projects.Where
+                (e => e.ProjectName == name).ToListAsync();
             return projectsResult;
         }
 
