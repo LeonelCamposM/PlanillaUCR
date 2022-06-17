@@ -1,5 +1,6 @@
 ﻿@using Application.Subscriptions
 @using Domain.Subscriptions.Entities
+@using Presentation.Benefits.Components
 @inject NavigationManager nav
 @inject ISubscriptionService SubscriptionService
 
@@ -24,7 +25,7 @@
 
         if(_empty)
         {
-               <MudText> No existen beneficios para este proyecto </MudText>
+              <AvailableBenefitsError employeeEmail="@employeeEmail" projectName="@projectName" SendTableState="SendConmuteSignal"></AvailableBenefitsError>
         }else
         {
             <MudTable @ref="_mudTable" Items="@_elements" RowsPerPage="4" MultiSelection="true" @bind-SelectedItems="_selectedItems1" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="Color.Info" Filter="new Func<Subscription,bool>(FilterFunc1)">
@@ -79,7 +80,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-
         _elements = await SubscriptionService.GetBenefitsByEmployee(employeeEmail, projectName);
         if (_elements.Length() > 0)
         {
