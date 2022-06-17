@@ -26,13 +26,14 @@ namespace Infrastructure.Projects.Repositories
             return await _dbContext.Projects.Select(t => new
             Project(t.EmployerEmail, t.ProjectName,
                 t.ProjectDescription, t.MaximumAmountForBenefits,
-                t.MaximumBenefitAmount, t.PaymentInterval)).ToListAsync();
+                t.MaximumBenefitAmount, t.PaymentInterval, t.IsEnabled)).ToListAsync();
         }
 
         public async Task<Project> GetProject(string employerEmail, string projectName)
         {
             IList<Project> projectResult = await _dbContext.Projects.Where
-                (e => e.EmployerEmail == employerEmail && e.ProjectName == projectName).ToListAsync();
+                (e => e.EmployerEmail == employerEmail && 
+                e.ProjectName == projectName && e.IsEnabled == 1).ToListAsync();
             
             Project project = null;
             if (projectResult.Length() > 0)
@@ -79,7 +80,7 @@ namespace Infrastructure.Projects.Repositories
         public async Task<IEnumerable<Project>> GetEmployeeProyects(string name)
         {
             IList<Project> projectsResult = await _dbContext.Projects.Where
-                (e => e.ProjectName == name).ToListAsync();
+                (e => e.ProjectName == name && e.IsEnabled == 1).ToListAsync();
             return projectsResult;
         }
 
