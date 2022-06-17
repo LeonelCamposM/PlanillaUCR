@@ -3,7 +3,7 @@ GO
 USE DB_Planilla
 
 -- Tables
-Create Table Person(
+CREATE TABLE Person(
 	Email varchar(255) NOT NULL primary key,
 	Name varchar(255) NOT NULL,
 	LastName1 varchar(255),
@@ -32,6 +32,7 @@ CREATE TABLE Project(
 	MaximumAmountForBenefits float, 
 	MaximumBenefitAmount int,
 	PaymentInterval varchar(255),
+	IsEnabled int NOT NULL,
 	PRIMARY KEY(EmployerEmail, ProjectName),
 	FOREIGN KEY(EmployerEmail) REFERENCES Employer(Email)
 );
@@ -52,6 +53,8 @@ CREATE TABLE Agreement(
 	ContractFinishDate date NOT NULL,
 	PRIMARY KEY(EmployeeEmail,EmployerEmail,ProjectName,ContractStartDate),
 	FOREIGN KEY(EmployeeEmail) REFERENCES Employee(Email),
+	FOREIGN KEY(EmployerEmail, ProjectName) REFERENCES Project(EmployerEmail, ProjectName) ON UPDATE CASCADE,
+	FOREIGN KEY(ContractType, MountPerHour) REFERENCES AgreementType(TypeAgreement, MountPerHour)
 	FOREIGN KEY(EmployerEmail, ProjectName) REFERENCES Project(EmployerEmail, ProjectName),
 	FOREIGN KEY(ContractType, MountPerHour) REFERENCES AgreementType(TypeAgreement, MountPerHour),
 	IsEnabled int NOT NULL,
@@ -69,7 +72,7 @@ CREATE TABLE Subscription
 	TypeSubscription int NOT NULL,
 	IsEnabled int NOT NULL,
 	PRIMARY KEY(EmployerEmail, ProjectName, SubscriptionName),
-	FOREIGN KEY(EmployerEmail, ProjectName) REFERENCES Project(EmployerEmail, ProjectName)
+	FOREIGN KEY(EmployerEmail, ProjectName) REFERENCES Project(EmployerEmail, ProjectName) ON UPDATE CASCADE
 );
 
 CREATE TABLE ReportOfHours(
@@ -79,7 +82,7 @@ CREATE TABLE ReportOfHours(
 	ReportDate date NOT NULL,
 	ReportHours float NOT NULL,
 	PRIMARY KEY(EmployerEmail, ProjectName, EmployeeEmail, ReportDate),
-	FOREIGN KEY(EmployerEmail, ProjectName) REFERENCES Project(EmployerEmail, ProjectName),
+	FOREIGN KEY(EmployerEmail, ProjectName) REFERENCES Project(EmployerEmail, ProjectName) ON UPDATE CASCADE,
 	FOREIGN KEY(EmployeeEmail) REFERENCES Employee(Email)
 );
 
@@ -167,8 +170,31 @@ GO
 CREATE OR ALTER PROCEDURE ProjectNameCheck(@ProjectName VARCHAR(255))
 AS
 BEGIN
-    SELECT * FROM Project WHERE Project.ProjectName = @ProjectName
+    SELECT * FROM Project WHERE Project.ProjectName = @ProjectName AND Project.IsEnabled = 1;
 END
+
+
+GO
+CREATE OR ALTER PROCEDURE ModifyProject(
+	@ProjectName varchar(255),
+	@EmployerEmail varchar(255),
+	@NewProjectName varchar(255),
+	@NewProjectDescription varchar(600),
+	@NewMaximumAmountForBenefits float,
+	@NewMaximumBenefitAmount int,
+	@NewPaymentInterval varchar(255)
+) AS
+BEGIN
+	IF ((@NewProjectName in (SELECT ProjectName FROM Project WHERE EmployerEmail = @EmployerEmail)) AND (@ProjectName <> @NewProjectName))
+	BEGIN 
+
+		UPDATE Project
+		SET ProjectName = @NewProjectName, ProjectDescription = @NewProjectDescription, MaximumAmountForBenefits = @NewMaximumAmountForBenefits, 
+			MaximumBenefitAmount = @NewMaximumBenefitAmount,PaymentInterval = @NewPaymentInterval
+		WHERE EmployerEmail= @EmployerEmail AND ProjectName = @ProjectName;
+	END
+END
+
 
 -- People Stored Procedures
 GO
@@ -363,7 +389,8 @@ VALUES('leonel@ucr.ac.cr',
 'Emprendimiento de chocolates',
 15000,
 10,
-'Quincenal'
+'Quincenal',
+1
 )
 
 INSERT INTO Project
@@ -372,7 +399,8 @@ VALUES('leonel@ucr.ac.cr',
 'Emprendimiento de galletas',
 20000,
 6,
-'Mensual'
+'Mensual',
+1
 )
 
 INSERT INTO Project
@@ -381,7 +409,8 @@ VALUES('leonel@ucr.ac.cr',
 'Emprendimiento de confites',
 22000,
 7,
-'Quincenal'
+'Quincenal',
+1
 )
 
 INSERT INTO Project
@@ -390,7 +419,8 @@ VALUES('leonel@ucr.ac.cr',
 'Emprendimiento de camisetas',
 40000,
 12,
-'Mensual'
+'Mensual',
+1
 )
 
 INSERT INTO Project
@@ -399,7 +429,8 @@ VALUES('leonel@ucr.ac.cr',
 'Emprendimiento de perfumes',
 20000,
 5,
-'Mensual'
+'Mensual',
+1
 )
 
 INSERT INTO Subscription
