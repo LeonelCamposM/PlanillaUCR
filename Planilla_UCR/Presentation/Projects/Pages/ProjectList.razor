@@ -191,7 +191,7 @@
     {
         foreach (Agreement element in agreementElements) {
             tempProject  = await ProjectService.GetProject(element.ProjectName);
-            projectElementsList.Append(tempProject);
+            projectElementsList.Add(tempProject);
             projectElementsList.Length();
         }
     }
