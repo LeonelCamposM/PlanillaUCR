@@ -188,7 +188,7 @@ BEGIN
 		UPDATE Project
 		SET ProjectName = @NewProjectName, ProjectDescription = @NewProjectDescription, MaximumAmountForBenefits = @NewMaximumAmountForBenefits, 
 			MaximumBenefitAmount = @NewMaximumBenefitAmount,PaymentInterval = @NewPaymentInterval
-		WHERE EmployerEmail= @EmployerEmail AND ProjectName = @ProjectName AND	IsEnabled = 1;
+		WHERE EmployerEmail= @EmployerEmail AND ProjectName = @ProjectName;
 	END
 END
 
