@@ -484,3 +484,71 @@ VALUES('leonel@ucr.ac.cr',
 25000,
 '2012-07-15'
 )
+
+INSERT INTO LegalDeduction (DeductionName, Cost)
+VALUES('CCSS',
+25000.3
+)
+
+INSERT INTO LegalDeduction (DeductionName, Cost)
+VALUES('Hacienda',
+48000.3
+)
+
+INSERT INTO Payment (EmployeeEmail,EmployerEmail, ProjectName, PayDate)
+VALUES('jeremy@ucr.ac.cr',
+'leonel@ucr.ac.cr',
+'Proyecto 1',
+'2022-06-16'
+)
+
+INSERT INTO Payment (EmployeeEmail,EmployerEmail, ProjectName, PayDate)
+VALUES('jeremy@ucr.ac.cr',
+'leonel@ucr.ac.cr',
+'Proyecto 2',
+'2022-06-16'
+)
+
+INSERT INTO Modifies(EmployeeEmail,EmployerEmail, ProjectName, PayDate, SubscriptionName)
+VALUES('jeremy@ucr.ac.cr',
+'leonel@ucr.ac.cr',
+'Proyecto 1',
+'2022-06-16',
+'Piscina'
+)
+
+INSERT INTO Modifies(EmployeeEmail,EmployerEmail, ProjectName, PayDate, SubscriptionName)
+VALUES('jeremy@ucr.ac.cr',
+'leonel@ucr.ac.cr',
+'Proyecto 1',
+'2022-06-16',
+'Ayudemos a los niños'
+)
+
+INSERT INTO Applies(EmployeeEmail,EmployerEmail, ProjectName, PayDate, DeductionName)
+VALUES('jeremy@ucr.ac.cr',
+'leonel@ucr.ac.cr',
+'Proyecto 1',
+'2022-06-16',
+'CCSS'
+)
+
+INSERT INTO Applies(EmployeeEmail,EmployerEmail, ProjectName, PayDate, DeductionName)
+VALUES('jeremy@ucr.ac.cr',
+'leonel@ucr.ac.cr',
+'Proyecto 1',
+'2022-06-16',
+'Hacienda'
+)
+
+select *
+from Subscribes
+
+select *
+from Payment
+
+select *
+from Modifies
+
+select *
+from Applies
