@@ -89,7 +89,7 @@ CREATE TABLE Subscribes(
 	Cost float NOT NULL,
 	StartDate date NOT NULL,
 	EndDate date,
-	PRIMARY KEY(EmployeeEmail,EmployerEmail,ProjectName, SubscriptionName),
+	PRIMARY KEY(EmployeeEmail,EmployerEmail,ProjectName, SubscriptionName, StartDate),
 	FOREIGN KEY(EmployerEmail, ProjectName, SubscriptionName) REFERENCES Subscription(EmployerEmail, ProjectName, SubscriptionName) ON UPDATE CASCADE,
 	FOREIGN KEY(EmployeeEmail) REFERENCES Employee(Email)
 );
@@ -479,13 +479,28 @@ VALUES('leonel@ucr.ac.cr',
 '2012-07-15'
 )
 
+/*INSERT INTO Person
+VALUES('sofia@ucr.ac.cr',
+'Sofia',
+'Castillo',
+'Campos',
+1233423341,
+'34124321',
+'San José, Costa Rica',
+'62571204'
+)
+
+INSERT INTO Employee
+VALUES('sofia@ucr.ac.cr')
+
+INSERT INTO Agreement
+VALUES('sofia@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Proyecto 1','9999-12-31','Por horas', 10, '9999-12-31')
+
 INSERT INTO Subscribes (EmployerEmail, ProjectName, SubscriptionName, EmployeeEmail, Cost, StartDate)
 VALUES('leonel@ucr.ac.cr',
 'Proyecto 1',
-'Piscina',
-'jeremy@ucr.ac.cr',
+'Gym',
+'sofia@ucr.ac.cr',
 25000,
 '2012-07-15'
-)
-
-DELETE FROM Subscribes WHERE EmployeeEmail = 'sofia@ucr.ac.cr'
+)*/

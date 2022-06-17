@@ -71,17 +71,15 @@ else
                 <MudTd DataLabel="Descripción">@context.ProviderName</MudTd>
                 <MudTd DataLabel="Costo"> @cultureCR.NumberFormat.CurrencySymbol @costFormat(context.Cost) </MudTd>
             </RowTemplate>
-            <FooterContent>
-                <MudTd colspan="5">Seleccionar todo</MudTd>
-            </FooterContent>
             <PagerContent>
                 <MudPagination SelectedChanged="PageChanged" Count="@((_mudTable.GetFilteredItemsCount() + _mudTable.RowsPerPage - 1) / _mudTable.RowsPerPage)" Color="Color.Primary" Class="pa-4"/>
             </PagerContent>
         </MudTable>
         <br>
         <MudToolBar DisableGutters="true" Class="gap-4">
-            <MudButton Variant="Variant.Filled" OnClick="OpenDialog" Color="Color.Error">Borrar</MudButton>
+            <MudButton Variant="Variant.Filled" OnClick="OpenDialog" Color="Color.Primary">Borrar</MudButton>
         </MudToolBar>
+
         <MudDialog @bind-IsVisible="_visible" Options="dialogOptions">
             <TitleContent>
                 <MudText Typo="Typo.h6">
