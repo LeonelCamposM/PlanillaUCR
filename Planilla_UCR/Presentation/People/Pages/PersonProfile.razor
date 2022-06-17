@@ -156,7 +156,7 @@
 @code {
     private bool _loading = true;
     private bool _empty = true;
-    Person personInfo = new Person("", "", "", "", Int32.Parse("0"), "", "", "");
+    Person personInfo = new Person("", "", "", "", Int32.Parse("0"), "", "", "",1);
     [Parameter] public string userEmail { get; set; }  
     public string confirmationCodeEmail { get; set; }
     private bool visible;
@@ -174,6 +174,7 @@
     protected override async Task OnInitializedAsync()
     {
         personInfo.Email = userEmail;
+        //personInfo.IsEnabled = 1;
         personInfo = await PersonService.GetInfoPerson(personInfo);
         if (personInfo != null)
         {

@@ -12,7 +12,7 @@ Create Table Person(
 	BankAccount varchar(255) NOT NULL,
 	Adress varchar(255),
 	PhoneNumber varchar(255),
-	isEnable int NOT NULL
+	IsEnabled int NOT NULL
 );
 
 CREATE TABLE Employee(
@@ -174,9 +174,8 @@ GO
 CREATE OR ALTER PROCEDURE GetPersonByEmail(@email varchar(255))
 AS
 BEGIN
-    SELECT * FROM Person AS P WHERE P.Email = @email AND isEnable=1
+    SELECT * FROM Person AS P WHERE P.Email = @email
 END
-
 
 GO
 CREATE OR ALTER PROCEDURE UpdatePerson(
@@ -195,7 +194,7 @@ BEGIN
 	SET Name=@NewName, LastName1=@NewLastName1, LastName2=@NewLastName2, 
 	SSN=@NewSSN, BankAccount=@NewBankAccount, 
 	Adress=@NewAdress, PhoneNumber=@NewPhoneNumber
-	WHERE Email=@EmailPerson AND isEnable=1
+	WHERE Email=@EmailPerson AND IsEnabled=1
 END
 
 
@@ -203,8 +202,9 @@ GO
 CREATE OR ALTER PROCEDURE GetInfoPerson(@EmailPerson varchar(255))
 AS
 BEGIN
-	SELECT Person.Email, Person.Name, Person.LastName1, Person.LastName2, Person.SSN, Person.BankAccount, Person.Adress, Person.PhoneNumber
-	FROM  Person WHERE Person.Email = @EmailPerson AND isEnable=1
+	SELECT Person.Email, Person.Name, Person.LastName1, Person.LastName2, Person.SSN, Person.BankAccount, 
+	Person.Adress, Person.PhoneNumber, Person.IsEnabled
+	FROM  Person WHERE Person.Email = @EmailPerson AND Person.IsEnabled=1
 END
 
 
@@ -319,14 +319,45 @@ VALUES('mau@ucr.ac.cr',
 1
 )
 
+INSERT INTO Person
+VALUES('nyazofeifa3003@gmail.com',
+'Nayeri',
+'Azofeifa',
+'Porras',
+118070615,
+'CR4024',
+'San José, Costa Rica',
+'89433965',
+1
+)
+
+INSERT INTO Person
+VALUES('nasheazofeifa3003@gmail.com',
+'Nasheri',
+'Azofeifa',
+'Porras',
+118070615,
+'CR4024',
+'San José, Costa Rica',
+'89433965',
+1
+)
+
+
 INSERT INTO Employer
 VALUES('leonel@ucr.ac.cr')
+
+INSERT INTO Employer
+VALUES('nyazofeifa3003@gmail.com')
 
 INSERT INTO Employee
 VALUES('mau@ucr.ac.cr')
 
 INSERT INTO Employee
 VALUES('jeremy@ucr.ac.cr')
+
+INSERT INTO Employee
+VALUES('nasheazofeifa3003@gmail.com')
 
 INSERT INTO Project
 VALUES('leonel@ucr.ac.cr',
