@@ -31,6 +31,7 @@ CREATE TABLE Project(
 	MaximumAmountForBenefits float, 
 	MaximumBenefitAmount int,
 	PaymentInterval varchar(255),
+	IsEnabled int NOT NULL,
 	PRIMARY KEY(EmployerEmail, ProjectName),
 	FOREIGN KEY(EmployerEmail) REFERENCES Employer(Email)
 );
@@ -166,7 +167,7 @@ GO
 CREATE OR ALTER PROCEDURE ProjectNameCheck(@ProjectName VARCHAR(255))
 AS
 BEGIN
-    SELECT * FROM Project WHERE Project.ProjectName = @ProjectName
+    SELECT * FROM Project WHERE Project.ProjectName = @ProjectName AND Project.IsEnabled = 1;
 END
 
 
@@ -187,7 +188,7 @@ BEGIN
 		UPDATE Project
 		SET ProjectName = @NewProjectName, ProjectDescription = @NewProjectDescription, MaximumAmountForBenefits = @NewMaximumAmountForBenefits, 
 			MaximumBenefitAmount = @NewMaximumBenefitAmount,PaymentInterval = @NewPaymentInterval
-		WHERE EmployerEmail= @EmployerEmail AND ProjectName = @ProjectName;
+		WHERE EmployerEmail= @EmployerEmail AND ProjectName = @ProjectName AND	IsEnabled = 1;
 	END
 END
 
@@ -327,7 +328,8 @@ VALUES('leonel@ucr.ac.cr',
 'Emprendimiento de chocolates',
 15000,
 10,
-'Quincenal'
+'Quincenal',
+1
 )
 
 INSERT INTO Project
@@ -336,7 +338,8 @@ VALUES('leonel@ucr.ac.cr',
 'Emprendimiento de galletas',
 20000,
 6,
-'Mensual'
+'Mensual',
+1
 )
 
 INSERT INTO Project
@@ -345,7 +348,8 @@ VALUES('leonel@ucr.ac.cr',
 'Emprendimiento de confites',
 22000,
 7,
-'Quincenal'
+'Quincenal',
+1
 )
 
 INSERT INTO Project
@@ -354,7 +358,8 @@ VALUES('leonel@ucr.ac.cr',
 'Emprendimiento de camisetas',
 40000,
 12,
-'Mensual'
+'Mensual',
+1
 )
 
 INSERT INTO Project
@@ -363,7 +368,8 @@ VALUES('leonel@ucr.ac.cr',
 'Emprendimiento de perfumes',
 20000,
 5,
-'Mensual'
+'Mensual',
+1
 )
 
 INSERT INTO Subscription
