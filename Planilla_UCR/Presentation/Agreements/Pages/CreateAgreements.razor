@@ -28,16 +28,18 @@
 @inject IEmployeeService EmployeeService
 @inject IEmployerService EmployerService
 @inject IProjectService ProjectService
-
+@inject NavigationManager nav
 
 @*Navigation footprint *@
 @{
     List<BreadcrumbItem> _items = new List<BreadcrumbItem>
     {
-        new BreadcrumbItem("Inicio", href: ""),
+        new BreadcrumbItem("Proyectos", href: $"/Projects/{EmployerEmail}"),
+        new BreadcrumbItem(@ProjectName, href: $"/Projects/Details/{EmployerEmail}/{ProjectName}"),
+        new BreadcrumbItem("Empleados", href: $"/View_Project_Employees/{EmployerEmail}/{ProjectName}"),
         new BreadcrumbItem("Contratos", href: $"/Projects/{EmployerEmail}/{ProjectName}/Agreements/New"),
     };
-} 
+}
 
  <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
 <MudGrid>
@@ -115,7 +117,14 @@
                     <MudButton OnClick="CleanForm" Variant="Variant.Filled" Color="Color.Transparent">
                         <MudText>Limpiar</MudText>
                     </MudButton>
-                   
+                    <MudButton Disabled = "true"></MudButton>
+                    <MudButton Disabled = "true"></MudButton>
+                    <MudButton Disabled = "true"></MudButton>
+                    <MudButton Disabled = "true"></MudButton>
+                    <MudButton Disabled = "true"></MudButton>
+                    <MudButton OnClick="GoToEmployeeList" Variant="Variant.Filled" Color="Color.Transparent">
+                        <MudText>Volver</MudText>
+                    </MudButton>
                 </MudGrid>
             </MudForm>
         </MudPaper>
@@ -294,6 +303,9 @@
 
     }
     
-
+    private void GoToEmployeeList()
+    {
+        nav.NavigateTo($"/View_Project_Employees/{EmployerEmail}/{ProjectName}");
+    }
 
 }

@@ -23,7 +23,6 @@
 @using Presentation.Agreements.Models
 
 
-
 @inject IProjectService ProjectService
 @inject ISnackbar Snackbar
 @inject IAgreementService AgreementService
@@ -32,9 +31,6 @@
 @inject IEmployeeService EmployeeService
 @inject IEmployerService EmployerService
 @inject NavigationManager nav
-
-
-
 
 
 @if(_loading) 
@@ -51,8 +47,10 @@ else
     {
         List <BreadcrumbItem> _items = new List<BreadcrumbItem>
         {
-            new BreadcrumbItem("Inicio", href: ""),
             new BreadcrumbItem("Proyectos", href: $"/Projects/{employerEmail}"),
+            new BreadcrumbItem(@projectName, href: $"/Projects/Details/{employerEmail}/{projectName}"),
+            new BreadcrumbItem("Empleados", href: $"/View_Project_Employees/{employerEmail}/{projectName}"),
+            new BreadcrumbItem("Contratos", href: $"/Projects/{employerEmail}/{projectName}/Agreements/New"),
         };
         <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
         <MudPaper Height="60px" Width="100%" Outlined="false" Class="border-none" Elevation="0"> 

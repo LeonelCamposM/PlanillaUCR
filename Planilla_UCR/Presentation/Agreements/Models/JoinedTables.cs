@@ -13,7 +13,15 @@ namespace Presentation.Agreements.Models
         public DateTime ContractFinishDate { get; set; }
         public int MountPerHour { get; set; }
 
-        public JoinedTables() { 
+        public JoinedTables() {
+            this.EmployerEmail = "";
+            this.ProjectName = "";
+            this.PaymentInterval = "";
+            this.EmployeeEmail = "";
+            this.ContractType = "";
+            this.ContractStartDate = DateTime.Now;
+            this.ContractFinishDate = DateTime.Now;
+            this.MountPerHour = 0;
         }
 
         public JoinedTables(string EmployerEmail, string ProjectName, string PaymentInterval, string EmployeeEmail, string ContractType, DateTime ContractStartDate, DateTime ContractFinishDate, int MountPerHour)
