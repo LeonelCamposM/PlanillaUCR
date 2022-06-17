@@ -53,9 +53,10 @@ CREATE TABLE Agreement(
 	PRIMARY KEY(EmployeeEmail,EmployerEmail,ProjectName,ContractStartDate),
 	FOREIGN KEY(EmployeeEmail) REFERENCES Employee(Email),
 	FOREIGN KEY(EmployerEmail, ProjectName) REFERENCES Project(EmployerEmail, ProjectName),
-	FOREIGN KEY(ContractType, MountPerHour) REFERENCES AgreementType(TypeAgreement, MountPerHour)
+	FOREIGN KEY(ContractType, MountPerHour) REFERENCES AgreementType(TypeAgreement, MountPerHour),
+	IsEnabled int NOT NULL,
+	Justification varchar(max)
 );
-
 
 CREATE TABLE Subscription
 (
@@ -247,9 +248,6 @@ BEGIN
 	Group by P.Email, P.Name, P.LastName1, P.LastName2, P.SSN, P.BankAccount, P.Adress, P.PhoneNumber, P.IsEnabled
 END
 
-select *
-from Agreement
-
 GO
 CREATE OR ALTER PROCEDURE [dbo].[GetProjectEmployees]
 @projectName VARCHAR(255)
@@ -278,7 +276,7 @@ GO
 CREATE OR ALTER PROCEDURE GetContracteeByEmail(@ContracteeEmail varchar(255))
 AS
 BEGIN 
-	SELECT * FROM Agreement WHERE EmployeeEmail = @ContracteeEmail
+	SELECT * FROM Agreement WHERE EmployeeEmail = @ContracteeEmail AND IsEnabled = 1
 END
 
 -- Data Insert
@@ -472,10 +470,10 @@ Insert into AgreementType
 Values('Por horas', 10)
 
 INSERT INTO Agreement
-VALUES('jeremy@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Proyecto 1','9999-12-31','Por horas', 10, '9999-12-31')
+VALUES('jeremy@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Proyecto 1','9999-12-31','Por horas', 10, '9999-12-31', 1, '')
 
 INSERT INTO Agreement
-VALUES('jeremy@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Proyecto 2','9999-12-31','Por horas', 10, '9999-12-31')
+VALUES('jeremy@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Proyecto 2','9999-12-31','Por horas', 10, '9999-12-31', 1, '')
 
 
 INSERT INTO ReportOfHours
