@@ -12,11 +12,17 @@
 @using Application.Authorization.Implementations;
 @using Application.Projects
 @using Presentation.Core.Components
+@using Presentation.Shared.Models
+@using System.Text.RegularExpressions
+@using System.ComponentModel.DataAnnotations
+
+
 @inject NavigationManager nav
 @inject IPersonService PersonService
 @inject IEmployerService EmployerService
 @inject IAuthenticationService AuthenticationService
 @inject IProjectService ProjectService
+@inject ISnackbar Snackbar
 
 <AuthorizeView>
     <Authorized> 
@@ -136,12 +142,10 @@
             </DialogContent>
 
             <DialogActions>
-                  <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="GoToProjects" Class="px-10">Aceptar</MudButton>
+                  <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="DeleteAccountEmployer" Class="px-10">Aceptar</MudButton>
                   <MudButton Variant="Variant.Filled" Color="Color.Transparent" OnClick="CloseDialog" Class="px-10">Cancelar</MudButton>
             </DialogActions>
         </MudDialog>
-
-
     </MudGrid>
     </MudPaper>
 
@@ -165,7 +169,7 @@
     private IEnumerable<Project> projectsList;
     bool fixed_header = true;
     bool fixed_footer = false;
-
+    SnackHandler snackHandler = new SnackHandler();
     private void OpenDialog() => visible = true;
     void CloseDialog() => visible = false;
     private DialogOptions dialogOptions = new() { FullWidth = true };
@@ -181,12 +185,16 @@
         }
     }
 
-
     async Task ProjectList(){
         projectsList = await ProjectService.GetEmployerProyects(userEmail);
         OpenDialog();
     }
 
+    private void DeleteAccountEmployer() 
+    {
+        EmployerService.DeleteEmployer(personInfo.Email);
+        ShowSnackNotification("Se ha eliminado la cuenta de "+personInfo.Name, Severity.Success);
+    }
 
     private void GoToProjects()
     {
@@ -198,5 +206,21 @@
         nav.NavigateTo($"/Profile/{userEmail}/Configurations");
     }
 
+    void ShowSnackNotification(string message, Severity severity)
+    {
+        Snackbar.Configuration.SnackbarVariant = Variant.Filled;
+        Snackbar.Configuration.PreventDuplicates = false;
+        Snackbar.Configuration.MaxDisplayedSnackbars = 10;
+        Snackbar.Configuration.NewestOnTop = true;
+        Snackbar.Add($"{message}", severity, config =>
+        {
+            config.RequireInteraction = false;
+            config.ShowCloseIcon = true;
+            config.Onclick = snackbar =>
+            {
+                return Task.CompletedTask;
+            };
+        });
+    }
 
 }
