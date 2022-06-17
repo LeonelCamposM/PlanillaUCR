@@ -92,14 +92,25 @@ else
                         <PagerContent>
                             <MudPagination SelectedChanged="PageChanged" Count="@((_table.GetFilteredItemsCount() + _table.RowsPerPage - 1) / _table.RowsPerPage)" Color="Color.Secondary" Class="pa-4"/>
                         </PagerContent>
-                    </MudTable>
-                    <br>
-                    <MudButton Variant="Variant.Filled" @onclick="GoToCreateAgreement" Color="Color.Primary">
-                        <MudText>
-                            Contratar
-                        </MudText> 
-                    </MudButton>
+            </MudTable>
+        } else 
+        {
+            <MudPaper Class="border-solid border-2 mud-border-primary pa-4" Elevation="0">
+                <MudText Typo="Typo.subtitle1">No existen empleados asociados al proyecto ¿Desea contratar a algún empleado? </MudText>
+            </MudPaper>    
         }
+        <br>
+        <MudButton Variant="Variant.Filled" @onclick="GoToCreateAgreement" Color="Color.Primary">
+            <MudText>
+                Contratar
+            </MudText> 
+        </MudButton>
+        <MudButton> </MudButton>
+        <MudButton Variant="Variant.Filled" @onclick="GoToEmployeeList" Color="Color.Transparent">
+            <MudText>
+                Volver
+            </MudText> 
+        </MudButton>
     }
 }
 
@@ -179,6 +190,11 @@ else
     private void GoToCreateAgreement()
     {
         nav.NavigateTo($"/Projects/{employerEmail}/{projectName}/Agreements/New");
+    }
+
+    private void GoToEmployeeList()
+    {
+        nav.NavigateTo($"/View_Project_Employees/{employerEmail}/{projectName}");
     }
 
 }
