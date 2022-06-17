@@ -282,7 +282,7 @@
     async Task<bool> validateProjectName()
     {
         bool isValid = true;
-        Project Project = new Project("","","",0,0,"");
+        Project Project = new Project("","","",0,0,"", 1);
         Project = await ProjectService.GetProject(agreementObject.EmployerEmail, agreementObject.ProjectName);
         if (Project == null)
         {
