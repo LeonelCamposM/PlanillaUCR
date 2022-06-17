@@ -118,7 +118,7 @@
             else
             {
 
-                <MudTable @ref="mudTable" Items="@projectElements" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_emptyAgreement" LoadingProgressColor="Color.Primary" Filter="new Func<Project,bool>(FilterFuncProject)">  
+                <MudTable @ref="mudTable" Items="@projectElementsList" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_emptyAgreement" LoadingProgressColor="Color.Primary" Filter="new Func<Project,bool>(FilterFuncProject)">  
 
                     <ToolBarContent>
                         <MudText Align="Align.Center" Typo="Typo.h6">Lista de proyectos</MudText>
@@ -161,8 +161,10 @@
     private bool _emptyAgreement = true;
     private bool _loading = true;
     public string _searchString = "";
+    Project tempProject = new Project("", "", "", 0.0, 0, "");
     private MudTable<Project> mudTable;
     private IEnumerable<Project> projectElements;
+    private List<Project> projectElementsList = new List<Project>();
     private IEnumerable<Agreement> agreementElements;
 
     [Parameter] public string personEmail { get; set; }
@@ -188,8 +190,9 @@
     private async Task FindProject()
     {
         foreach (Agreement element in agreementElements) {
-            projectElements  = await ProjectService.GetEmployeeProyects(element.ProjectName);
-            
+            tempProject  = await ProjectService.GetProject(element.ProjectName);
+            projectElementsList.Append(tempProject);
+            projectElementsList.Length();
         }
     }
 
