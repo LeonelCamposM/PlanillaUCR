@@ -59,6 +59,9 @@ else
         if(!_empty)
         {
                 <MudTable @ref="@_table" Items="@_myJoin" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" Filter="new Func<JoinedTables,bool>(FilterFunc1)" >
+                        <ToolBarContent>                
+                            <MudTextField @bind-Value="mySearchString" Immediate="true" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                        </ToolBarContent> 
                         <HeaderContent>
                             <MudTh>Email empleado</MudTh>
                             <MudTh>Email empleador</MudTh>
@@ -181,7 +184,7 @@ else
     {
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
-        if (element.EmployerEmail.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        if (element.EmployeeEmail.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
         return false;
     }
