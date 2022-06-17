@@ -1,0 +1,109 @@
+﻿@using Application.Payments
+@using Application.ContextMenu
+@using Domain.Payments.Entities
+@inject IPaymentService PaymentService
+@inject IContextMenuService ContextMenuService
+@inject NavigationManager nav
+@page "/Last_Pay/{email}"
+
+@if(_loading) {
+    <MudPaper  Height="220px" Width="100%" Outlined="false" Class="border-none pa-4" Elevation="0">
+         <MudText Align="Align.Center" Typo="Typo.h6">
+              <MudProgressCircular Color="Color.Primary" Style="height:70px;width:70px;" Indeterminate="true" />
+        </MudText>
+       
+    </MudPaper>
+}else{
+    @if (!_loading)
+    {
+        List<BreadcrumbItem> _items = new List<BreadcrumbItem>
+        {
+            new BreadcrumbItem("Proyectos", href: $"/Projects/{email}"),
+             new BreadcrumbItem(@projectName, href: $"/Projects/{email}/{ projectName}/Configurations"),
+            new BreadcrumbItem("Histórico de horas", href: null, disabled: true)
+        }; 
+        <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
+        <MudPaper Height="60px" Width="100%" Outlined="false" Class="border-none" Elevation="0"> 
+        </MudPaper>
+        if (!empty)
+        {
+            <MudText Align="Align.Center" Typo="Typo.h6"> @lastPay.EmployeeEmail  </MudText>
+            <MudText Align="Align.Center" Typo="Typo.h6"> @lastPay.EmployerEmail  </MudText>
+            <MudText Align="Align.Center" Typo="Typo.h6">@lastPay.ProjectName  </MudText>
+            <MudText Align="Align.Center" Typo="Typo.h6"> @lastPay.PaymentDate  </MudText>
+                @*<MudTable @ref="@_table" Items="@_elements" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" Filter="new Func<Payment,bool>(FilterFunc1)">
+                    <ToolBarContent>
+                            <MudText Align="Align.Center" Typo="Typo.h6">Último pago reportado</MudText>
+                            <MudSpacer />
+                            <MudTextField @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                    </ToolBarContent> 
+                    <HeaderContent>
+                        <MudTh>Empleado</MudTh>
+                        <MudTh>Empleador</MudTh>
+                        <MudTh>Proyecto</MudTh>
+                        <MudTh>Fecha</MudTh>
+                    </HeaderContent>
+
+                    <RowTemplate>
+                         <MudTd DataLabel="Empleado">@context.EmployeeEmail</MudTd>
+                         <MudTd DataLabel="Empleador">@context.EmployerEmail</MudTd>
+                         <MudTd DataLabel="Proyecto">@context.ProjectName</MudTd>
+                         <MudTd DataLabel="Fecha">@context.PaymentDate.Day/@context.PaymentDate.Month/@context.PaymentDate.Year</MudTd>
+
+                    </RowTemplate>
+                <PagerContent>
+                    <MudPagination SelectedChanged="PageChanged" Count="@((_table.GetFilteredItemsCount() + _table.RowsPerPage - 1) / _table.RowsPerPage)" Color="Color.Primary" Class="pa-4"/>
+                </PagerContent>
+                </MudTable>*@
+        }else
+        {
+           
+        }
+    }
+}
+
+@code {
+    private bool _hidePosition;
+    private bool _loading = true;
+    private bool empty = true;
+    string searchString1 = "";
+    private IEnumerable<Payment> _elements = new List<Payment>();
+    private MudTable<Payment> _table;
+    Payment lastPay;
+
+    [Parameter]
+    public string email { get; set; }
+
+    public string projectName { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        projectName = ContextMenuService.GetProjectsContext();
+        lastPay = await PaymentService.GetEmployeeLastPayment(email, "leonel@ucr.ac.cr", projectName);
+        if (lastPay == null)
+        {
+            empty = true;
+        }
+        else
+        {
+            empty = false;
+        }
+        _loading = false;
+    }
+
+    private void PageChanged(int i)
+    {
+        _table.NavigateTo(i - 1);
+    }
+
+    private bool FilterFunc1(Payment element) => FilterFunc(element, searchString1);
+
+    private bool FilterFunc(Payment element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.PaymentDate.ToString().Contains(searchString1, StringComparison.OrdinalIgnoreCase))
+        return true;
+        return false;
+    }
+}

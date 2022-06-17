@@ -104,8 +104,8 @@ CREATE TABLE Payment(
 	EmployeeEmail varchar(255) NOT NULL,
 	EmployerEmail varchar(255) NOT NULL,
 	ProjectName varchar(255) NOT NULL,
-	PayDate date NOT NULL,
-	PRIMARY KEY(EmployeeEmail,EmployerEmail,ProjectName, PayDate),
+	PaymentDate date NOT NULL,
+	PRIMARY KEY(EmployeeEmail,EmployerEmail,ProjectName, PaymentDate),
 	FOREIGN KEY(EmployerEmail, ProjectName) REFERENCES Project(EmployerEmail, ProjectName) ,
 	FOREIGN KEY(EmployeeEmail) REFERENCES Employee(Email)
 );
@@ -114,10 +114,10 @@ CREATE TABLE Modifies(
 	EmployeeEmail varchar(255) NOT NULL,
 	EmployerEmail varchar(255) NOT NULL,
 	ProjectName varchar(255) NOT NULL,
-	PayDate date NOT NULL,
+	PaymentDate date NOT NULL,
 	SubscriptionName varchar(255) NOT NULL,
-	PRIMARY KEY(EmployeeEmail,EmployerEmail,ProjectName, PayDate, SubscriptionName),
-	FOREIGN KEY(EmployeeEmail, EmployerEmail,ProjectName, PayDate) REFERENCES Payment(EmployeeEmail, EmployerEmail, ProjectName, PayDate),
+	PRIMARY KEY(EmployeeEmail,EmployerEmail,ProjectName, PaymentDate, SubscriptionName),
+	FOREIGN KEY(EmployeeEmail, EmployerEmail,ProjectName, PaymentDate) REFERENCES Payment(EmployeeEmail, EmployerEmail, ProjectName, PaymentDate),
 	FOREIGN KEY(EmployerEmail, ProjectName, SubscriptionName) REFERENCES Subscription(EmployerEmail, ProjectName, SubscriptionName)
 );
 
@@ -126,10 +126,10 @@ CREATE TABLE Applies(
 	EmployeeEmail varchar(255) NOT NULL,
 	EmployerEmail varchar(255) NOT NULL,
 	ProjectName varchar(255) NOT NULL,
-	PayDate date NOT NULL,
+	PaymentDate date NOT NULL,
 	DeductionName varchar(255) NOT NULL,
-	PRIMARY KEY(EmployeeEmail,EmployerEmail,ProjectName, PayDate, DeductionName),
-	FOREIGN KEY(EmployeeEmail, EmployerEmail,ProjectName, PayDate) REFERENCES Payment(EmployeeEmail, EmployerEmail, ProjectName, PayDate),
+	PRIMARY KEY(EmployeeEmail,EmployerEmail,ProjectName, PaymentDate, DeductionName),
+	FOREIGN KEY(EmployeeEmail, EmployerEmail,ProjectName, PaymentDate) REFERENCES Payment(EmployeeEmail, EmployerEmail, ProjectName, PaymentDate),
 	FOREIGN KEY(DeductionName) REFERENCES LegalDeduction(DeductionName)
 );
 
@@ -495,21 +495,35 @@ VALUES('Hacienda',
 48000.3
 )
 
-INSERT INTO Payment (EmployeeEmail,EmployerEmail, ProjectName, PayDate)
+INSERT INTO Payment (EmployeeEmail,EmployerEmail, ProjectName, PaymentDate)
 VALUES('jeremy@ucr.ac.cr',
 'leonel@ucr.ac.cr',
 'Proyecto 1',
 '2022-06-16'
 )
 
-INSERT INTO Payment (EmployeeEmail,EmployerEmail, ProjectName, PayDate)
+INSERT INTO Payment (EmployeeEmail,EmployerEmail, ProjectName, PaymentDate)
+VALUES('jeremy@ucr.ac.cr',
+'leonel@ucr.ac.cr',
+'Proyecto 1',
+'2022-05-16'
+)
+
+INSERT INTO Payment (EmployeeEmail,EmployerEmail, ProjectName, PaymentDate)
+VALUES('jeremy@ucr.ac.cr',
+'leonel@ucr.ac.cr',
+'Proyecto 1',
+'2022-04-16'
+)
+
+INSERT INTO Payment (EmployeeEmail,EmployerEmail, ProjectName, PaymentDate)
 VALUES('jeremy@ucr.ac.cr',
 'leonel@ucr.ac.cr',
 'Proyecto 2',
 '2022-06-16'
 )
 
-INSERT INTO Modifies(EmployeeEmail,EmployerEmail, ProjectName, PayDate, SubscriptionName)
+INSERT INTO Modifies(EmployeeEmail,EmployerEmail, ProjectName, PaymentDate, SubscriptionName)
 VALUES('jeremy@ucr.ac.cr',
 'leonel@ucr.ac.cr',
 'Proyecto 1',
@@ -517,7 +531,7 @@ VALUES('jeremy@ucr.ac.cr',
 'Piscina'
 )
 
-INSERT INTO Modifies(EmployeeEmail,EmployerEmail, ProjectName, PayDate, SubscriptionName)
+INSERT INTO Modifies(EmployeeEmail,EmployerEmail, ProjectName, PaymentDate, SubscriptionName)
 VALUES('jeremy@ucr.ac.cr',
 'leonel@ucr.ac.cr',
 'Proyecto 1',
@@ -525,7 +539,7 @@ VALUES('jeremy@ucr.ac.cr',
 'Ayudemos a los niños'
 )
 
-INSERT INTO Applies(EmployeeEmail,EmployerEmail, ProjectName, PayDate, DeductionName)
+INSERT INTO Applies(EmployeeEmail,EmployerEmail, ProjectName, PaymentDate, DeductionName)
 VALUES('jeremy@ucr.ac.cr',
 'leonel@ucr.ac.cr',
 'Proyecto 1',
@@ -533,7 +547,7 @@ VALUES('jeremy@ucr.ac.cr',
 'CCSS'
 )
 
-INSERT INTO Applies(EmployeeEmail,EmployerEmail, ProjectName, PayDate, DeductionName)
+INSERT INTO Applies(EmployeeEmail,EmployerEmail, ProjectName, PaymentDate, DeductionName)
 VALUES('jeremy@ucr.ac.cr',
 'leonel@ucr.ac.cr',
 'Proyecto 1',
