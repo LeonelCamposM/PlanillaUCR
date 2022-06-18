@@ -208,6 +208,27 @@ BEGIN
 	WHERE S.EmployeeEmail = @EmployeeEmail AND C.IsEnabled = 1 AND C.TypeSubscription = 0 AND  S.ProjectName =  @ProjectName
 END
 
+GO
+CREATE OR ALTER TRIGGER EndOfSubscribes
+ON Subscribes INSTEAD OF DELETE
+AS
+BEGIN
+	DECLARE @EndDate date
+	SELECT @EndDate = CONVERT(date, GETDATE())
+	
+	DECLARE @EmployeeEmail varchar(255)
+	DECLARE @EmployerEmail varchar(255)
+	DECLARE @ProjectName varchar(255)
+	DECLARE @SubscriptionName varchar(255)
+	DECLARE @StartDate varchar(255)
+	SELECT @EmployeeEmail = D.EmployeeEmail, @EmployerEmail = D.EmployerEmail, @ProjectName = D.ProjectName, @SubscriptionName = D.SubscriptionName, @StartDate =  D.StartDate
+	FROM deleted D
+
+	UPDATE Subscribes
+	SET EndDate = @EndDate
+	WHERE EmployeeEmail = @EmployeeEmail AND EmployerEmail = @EmployerEmail AND ProjectName = @ProjectName AND SubscriptionName = @SubscriptionName AND StartDate =  @StartDate
+END
+
 -- Project Stored Procedures
 GO 
 CREATE OR ALTER PROCEDURE GetEmployerByEmail(@email VARCHAR(255))
