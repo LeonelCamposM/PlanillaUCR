@@ -209,6 +209,70 @@ BEGIN
 END
 
 GO
+CREATE OR ALTER PROCEDURE AddNewSubscribes(
+	@EmployeeEmail varchar(255),
+	@EmployerEmail varchar(255),
+	@ProjectName varchar(255),
+	@SubscriptionName varchar(255),
+	@Cost float,
+	@StartDate date,
+	@TypeSubscription tinyint
+)
+AS
+BEGIN
+	IF @TypeSubscription = 0
+		BEGIN
+			INSERT INTO Subscribes (EmployeeEmail,EmployerEmail,ProjectName,SubscriptionName,Cost,StartDate)
+			VALUES (@EmployeeEmail, @EmployerEmail, @ProjectName, @SubscriptionName, @Cost, @StartDate)
+		END
+	ELSE
+		BEGIN
+			DECLARE @MAFB float
+			SELECT @MAFB = MaximumAmountForBenefits FROM Project WHERE EmployerEmail = @EmployerEmail AND ProjectName = @ProjectName
+			DECLARE @MBA int
+			SELECT @MBA = MaximumBenefitAmount FROM Project WHERE EmployerEmail = @EmployerEmail AND ProjectName = @ProjectName
+			DECLARE @EmployeeAmountForBenefitCount float
+			DECLARE @EmployeeBenefitAmountCount int
+			SELECT @EmployeeAmountForBenefitCount = ISNULL(SUM(S.Cost), 0) + @Cost, @EmployeeBenefitAmountCount = COUNT(S.SubscriptionName) + 1
+			FROM Subscribes S RIGHT JOIN Subscription C ON 
+				S.EmployerEmail = C.EmployerEmail AND
+				S.ProjectName = C.ProjectName AND
+				S.SubscriptionName = C.SubscriptionName
+			WHERE C.TypeSubscription = @TypeSubscription AND EmployeeEmail = @EmployeeEmail AND S.EndDate IS NULL
+		
+			IF(@MAFB = 0 AND @MBA = 0)
+				BEGIN
+					INSERT INTO Subscribes (EmployeeEmail,EmployerEmail,ProjectName,SubscriptionName,Cost,StartDate)
+					VALUES (@EmployeeEmail, @EmployerEmail, @ProjectName, @SubscriptionName, @Cost, @StartDate)
+				END
+			IF(@MAFB > 0 AND @MBA = 0)
+				BEGIN
+					IF (@EmployeeAmountForBenefitCount <= @MAFB)
+						BEGIN
+							INSERT INTO Subscribes (EmployeeEmail,EmployerEmail,ProjectName,SubscriptionName,Cost,StartDate)
+							VALUES (@EmployeeEmail, @EmployerEmail, @ProjectName, @SubscriptionName, @Cost, @StartDate)
+						END
+				END
+			IF(@MAFB = 0 AND @MBA > 0)
+				BEGIN
+					IF (@EmployeeBenefitAmountCount <= @MBA)
+						BEGIN
+							INSERT INTO Subscribes (EmployeeEmail,EmployerEmail,ProjectName,SubscriptionName,Cost,StartDate)
+							VALUES (@EmployeeEmail, @EmployerEmail, @ProjectName, @SubscriptionName, @Cost, @StartDate)
+						END
+				END
+			IF(@MAFB > 0 AND @MBA > 0)
+				BEGIN
+					IF (@EmployeeBenefitAmountCount <= @MBA AND @EmployeeAmountForBenefitCount <= @MAFB)
+						BEGIN
+							INSERT INTO Subscribes (EmployeeEmail,EmployerEmail,ProjectName,SubscriptionName,Cost,StartDate)
+							VALUES (@EmployeeEmail, @EmployerEmail, @ProjectName, @SubscriptionName, @Cost, @StartDate)
+						END
+				END
+		END
+END
+
+GO
 CREATE OR ALTER TRIGGER EndOfSubscribes
 ON Subscribes INSTEAD OF DELETE
 AS
