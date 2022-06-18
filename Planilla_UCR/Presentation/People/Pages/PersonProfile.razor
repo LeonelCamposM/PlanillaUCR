@@ -16,41 +16,12 @@
 @using System.Text.RegularExpressions
 @using System.ComponentModel.DataAnnotations
 
-
 @inject NavigationManager nav
 @inject IPersonService PersonService
 @inject IEmployerService EmployerService
 @inject IAuthenticationService AuthenticationService
 @inject IProjectService ProjectService
 @inject ISnackbar Snackbar
-
-<AuthorizeView>
-    <Authorized> 
-        <MudText>Esta autenticado</MudText>
-    </Authorized>
-    <NotAuthorized>
-        <MudText>No esta autenticado</MudText>
-    </NotAuthorized>
-</AuthorizeView>
-
-<AuthorizeView Roles="Employer">
-    <Authorized> 
-        <MudText>Es Employer</MudText>
-    </Authorized>
-    <NotAuthorized>
-        <MudText>No es employer </MudText>
-    </NotAuthorized>
-</AuthorizeView>
-
-<AuthorizeView Roles="Employee">
-    <Authorized> 
-        <MudText>Es employee</MudText>
-    </Authorized>
-    <NotAuthorized>
-        <MudText>No es employee </MudText>
-    </NotAuthorized>
-</AuthorizeView>
-
 
 @if(_loading) {
 
@@ -193,7 +164,9 @@
     private void DeleteAccountEmployer() 
     {
         EmployerService.DeleteEmployer(personInfo.Email);
+        AuthenticationService.DeleteAccount(personInfo.Email);
         ShowSnackNotification("Se ha eliminado la cuenta de "+personInfo.Name, Severity.Success);
+        AuthenticationService.SignOut();
     }
 
     private void GoToProjects()
@@ -222,5 +195,4 @@
             };
         });
     }
-
 }
