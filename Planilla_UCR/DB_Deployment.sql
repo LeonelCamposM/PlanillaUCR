@@ -293,6 +293,19 @@ BEGIN
 	WHERE EmployeeEmail = @EmployeeEmail AND EmployerEmail = @EmployerEmail AND ProjectName = @ProjectName AND SubscriptionName = @SubscriptionName AND StartDate =  @StartDate
 END
 
+GO
+CREATE OR ALTER PROCEDURE DeleteSubscribes(
+	@EmployeeEmail varchar(255),
+	@EmployerEmail varchar(255),
+	@ProjectName varchar(255),
+	@SubscriptionName varchar(255)
+)
+AS
+BEGIN
+	DELETE FROM Subscribes
+	WHERE EmployeeEmail = @EmployeeEmail AND EmployerEmail = @EmployerEmail AND ProjectName = @ProjectName AND SubscriptionName = @SubscriptionName 
+END
+
 -- Project Stored Procedures
 GO 
 CREATE OR ALTER PROCEDURE GetEmployerByEmail(@email VARCHAR(255))

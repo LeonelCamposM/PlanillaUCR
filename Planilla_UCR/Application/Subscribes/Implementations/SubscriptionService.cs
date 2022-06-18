@@ -14,9 +14,9 @@ namespace Application.Subscribes.Implementations
             _subscribeRepository = subscribeRepository;
         }
 
-        public async Task CreateSubscribeAsync(Subscribe subscription)
+        public void CreateSubscribe(Subscribe subscription, int typeSubscription)
         {
-            await _subscribeRepository.CreateSubscribeAsync(subscription);
+            _subscribeRepository.CreateSubscribe(subscription, typeSubscription);
         }
 
         public async Task<IEnumerable<Subscribe>> GetEmployeesBySubscription(string employerEmail, string projectName, string subscriptionName)
@@ -32,6 +32,10 @@ namespace Application.Subscribes.Implementations
         public async Task<IEnumerable<Subscribe>> GetBenefitsByEmployee(string employeeEmail, string projectName)
         {
             return await _subscribeRepository.GetBenefitsByEmployee(employeeEmail, projectName);
+        }
+        public void DeleteSubscribe(Subscribe subscription) 
+        { 
+            _subscribeRepository.DeleteSubscribe(subscription);
         }
     }
 }
