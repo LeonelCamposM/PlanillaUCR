@@ -137,6 +137,20 @@ BEGIN
 	UPDATE Subscription
 	SET IsEnabled = 0
 	WHERE EmployerEmail= @EmployerEmail AND ProjectName = @ProjectName AND SubscriptionName = @SubscriptionName;
+
+	DECLARE @EmployeeEmail varchar(255)
+	DECLARE @StartDate date
+	DECLARE cursor_Subscribes CURSOR FOR
+	SELECT EmployeeEmail, StartDate
+	FROM Subscribes WHERE EmployerEmail = @EmployerEmail AND ProjectName = @ProjectName AND SubscriptionName = @SubscriptionName
+	OPEN cursor_Subscribes
+		FETCH NEXT FROM cursor_Subscribes INTO @EmployeeEmail, @StartDate
+		WHILE @@FETCH_STATUS = 0 BEGIN
+			DELETE FROM Subscribes WHERE  EmployeeEmail = @EmployeeEmail AND EmployerEmail = @EmployerEmail AND ProjectName = @ProjectName AND SubscriptionName = @SubscriptionName AND StartDate = @StartDate
+			FETCH NEXT FROM cursor_Subscribes INTO @EmployeeEmail, @StartDate
+		END
+	CLOSE cursor_Subscribes
+	DEALLOCATE cursor_Subscribes
 END
 
 GO
