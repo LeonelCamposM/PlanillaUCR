@@ -34,5 +34,13 @@ namespace Infrastructure.Subscribes.Repositories
             _dbContext.Subscribes.Add(subscription);
             await _dbContext.SaveEntitiesAsync();
         }
+
+        public async Task<IEnumerable<Subscribe>> GetSubscriptionCostsByDate(Subscribe searchSubscription)
+        {
+            IEnumerable<Subscribe>  subscriptionCosts =  await _dbContext.Subscribes.Where( e => e.EmployerEmail == searchSubscription.EmployerEmail &&
+            e.ProjectName == searchSubscription.ProjectName &&
+            e.EmployeeEmail == searchSubscription.EmployeeEmail && ( (e.EndDate == null && e.StartDate <= searchSubscription.EndDate) || (searchSubscription.EndDate >= e.EndDate && e.EndDate >= searchSubscription.StartDate) )).ToListAsync();
+            return subscriptionCosts;
+        }
     }
-}
+} 

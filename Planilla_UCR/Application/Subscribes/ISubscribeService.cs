@@ -8,5 +8,6 @@ namespace Application.Subscribes
     {
         Task CreateSubscribeAsync(Subscribe subscription);
         Task<IEnumerable<Subscribe>> GetEmployeesBySubscription(string employerEmail, string projectName, string subscriptionName);
+        Task<IEnumerable<Subscribe>> GetSubscriptionCostsByDate(Subscribe searchSubscription);
     }
 }

@@ -7,11 +7,14 @@
 @using Domain.Subscriptions.Entities
 @using Application.LegalDeductions
 @using Domain.LegalDeductions.Entities
+@using Application.Subscribes
+@using Domain.Subscribes.Entities
 
 @inject IPaymentService PaymentService
 @inject IContextMenuService ContextMenuService
 @inject IAgreementService AgreementService
 @inject ILegalDeductionService LegalDeductionService
+@inject ISubscribeService SubscribeService
 @inject NavigationManager nav
 @inject ISubscriptionService SuscriptionService
 @page "/Last_Pay/{email}"
@@ -49,9 +52,9 @@
             <MudText Align="Align.Left" Typo="Typo.body1"> Monto por horas: @agreement.MountPerHour  </MudText>
             <br />
 
-                <MudTable @ref="@_table" Items="@deductions" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" Filter="new Func<Subscription,bool>(FilterFunc1)">
+                <MudTable @ref="@_table" Items="@deductions" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" Filter="new Func<Subscribe,bool>(FilterFunc1)">
                     <ToolBarContent>
-                            <MudText Align="Align.Center" Typo="Typo.h6">Deducciones aplicadas:</MudText>
+                            <MudText Align="Align.Center" Typo="Typo.h6">Deducciones aaaplicadas:</MudText>
                             <MudSpacer />
                             <MudTextField @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
                     </ToolBarContent> 
@@ -70,7 +73,7 @@
                 </MudTable>
                 <br />
 
-                <MudTable @ref="@_table" Items="@benefits" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" Filter="new Func<Subscription,bool>(FilterFunc1)">
+              @*  <MudTable @ref="@_table" Items="@benefits" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" Filter="new Func<Subscription,bool>(FilterFunc1)">
                     <ToolBarContent>
                             <MudText Align="Align.Center" Typo="Typo.h6">Beneficios aplicados:</MudText>
                             <MudSpacer />
@@ -88,9 +91,9 @@
                 <PagerContent>
                     <MudPagination SelectedChanged="PageChanged" Count="@((_table.GetFilteredItemsCount() + _table.RowsPerPage - 1) / _table.RowsPerPage)" Color="Color.Primary" Class="pa-4"/>
                 </PagerContent>
-                </MudTable>
+                </MudTable>*@
 
-                 <br />
+@*                 <br />
                 <MudTable @ref="@_table2" Items="@legalDeductions" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" Filter="new Func<LegalDeduction,bool>(FilterFunc2)">
                     <ToolBarContent>
                             <MudText Align="Align.Center" Typo="Typo.h6">Deducciones legales:</MudText>
@@ -110,7 +113,7 @@
                     <MudPagination SelectedChanged="PageChanged" Count="@((_table.GetFilteredItemsCount() + _table.RowsPerPage - 1) / _table.RowsPerPage)" Color="Color.Primary" Class="pa-4"/>
                 </PagerContent>
                 </MudTable>
-
+*@
                  <br />
                 <MudTable @ref="@_table3" Items="@subscriptions" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" Filter="new Func<PaymentContainsSubscription,bool>(FilterFunc3)">
                     <ToolBarContent>
@@ -136,16 +139,16 @@
     }
 
 
-@code {
+    @code {
     private bool _hidePosition;
     private bool _loading = true;
     private bool empty = true;
     string searchString1 = "";
-    private IEnumerable<Subscription> deductions = new List<Subscription>();
+    private IEnumerable<Subscribe> deductions = new List<Subscribe>();
     private IEnumerable<Subscription> benefits = new List<Subscription>();
     private IEnumerable<LegalDeduction> legalDeductions = new List<LegalDeduction>();
 
-    private MudTable<Subscription> _table;
+    private MudTable<Subscribe> _table;
     private MudTable<LegalDeduction> _table2;
 
     private MudTable<PaymentContainsSubscription> _table3;
@@ -165,11 +168,20 @@
         lastPay = await PaymentService.GetEmployeeLastPayment(email, "leonel@ucr.ac.cr", projectName);
         Agreement toSearchagreement = new Agreement(email, lastPay.EmployerEmail, projectName, null, "", 0, null);
         agreement = await AgreementService.GetContractee(toSearchagreement);
-        deductions = await SuscriptionService.GetDeductionsByProject(lastPay.EmployerEmail, projectName);
+        //deductions = await SuscriptionService.GetDeductionsByProject(lastPay.EmployerEmail, projectName);
         benefits = await SuscriptionService.GetBenefitsByProject(lastPay.EmployerEmail, projectName);
         legalDeductions = await LegalDeductionService.GetAllAsync();
 
-       subscriptions = await PaymentService.GetPaymentSubscriptions(lastPay);
+        subscriptions = await PaymentService.GetPaymentSubscriptions(lastPay);
+
+        Subscribe searchSubscribe= new Subscribe(email, lastPay.EmployerEmail, projectName, "", 0.0, lastPay.StartDate, lastPay.EndDate);
+        deductions = await SubscribeService.GetSubscriptionCostsByDate(searchSubscribe);
+
+        foreach (var item in subscriptions)
+        {
+            await  SuscriptionService.GetSubscription(lastPay.EmployerEmail, projectName, item.SubscriptionName);
+        }
+
 
         if (lastPay == null)
         {
@@ -187,11 +199,11 @@
         _table.NavigateTo(i - 1);
     }
 
-    private bool FilterFunc1(Subscription element) => FilterFunc(element, searchString1);
+    private bool FilterFunc1(Subscribe element) => FilterFunc(element, searchString1);
     private bool FilterFunc2(LegalDeduction element2) => FilterFunc2(element2, searchString1);
     private bool FilterFunc3(PaymentContainsSubscription element3) => FilterFunc3(element3, searchString1);
 
-    private bool FilterFunc(Subscription element, string searchString)
+    private bool FilterFunc(Subscribe element, string searchString)
     {
         if (string.IsNullOrWhiteSpace(searchString))
             return true;

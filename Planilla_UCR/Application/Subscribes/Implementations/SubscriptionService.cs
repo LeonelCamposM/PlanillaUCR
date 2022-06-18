@@ -23,5 +23,10 @@ namespace Application.Subscribes.Implementations
         {
             return await _subscribeRepository.GetEmployeesBySubscription(employerEmail, projectName, subscriptionName);
         }
+
+        public async Task<IEnumerable<Subscribe>> GetSubscriptionCostsByDate(Subscribe searchSubscription)
+        {
+            return await _subscribeRepository.GetSubscriptionCostsByDate(searchSubscription);
+        }
     }
 }
