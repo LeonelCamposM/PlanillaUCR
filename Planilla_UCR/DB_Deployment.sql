@@ -241,7 +241,6 @@ END
 
 -- Agreements stored procedures
 GO
-CREATE OR ALTER PROCEDURE GetSalaryPerAgreement(@MountPerHour int)
 CREATE or ALTER PROCEDURE CheckSalaryPerAgreement(@MountPerHour int)
 AS
 BEGIN 
