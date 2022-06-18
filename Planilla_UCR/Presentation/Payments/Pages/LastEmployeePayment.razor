@@ -176,6 +176,12 @@
             }
         }
 
+        foreach (var item in legalDeductions)
+        {
+          deductions.Add( new Subscription("", "", item.DeductionName, "", "", item.Cost,1,1));
+        }
+
+
 
         if (lastPay == null)
         {
