@@ -8,7 +8,6 @@ namespace Application.Agreements
     public interface IAgreementService
     {
         Task CreateAgreementAsync(Agreement agreement);
-
         Task<Agreement>? GetContractee(Agreement agreement);
         Task<IEnumerable<Agreement?>> GetAllAgreementsByProjectAndEmployer(string projectName, string employerEmail);
     }

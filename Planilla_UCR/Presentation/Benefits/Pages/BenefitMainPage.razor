@@ -4,24 +4,25 @@
 @using Presentation.Core.Components
 @using Presentation.Benefits.Components
 @using Presentation.Authentication
+@using System.Globalization
 @inject NavigationManager nav
 @inject ISubscriptionService SubscriptionService
 
 
 @{List<BreadcrumbItem> _items = new List<BreadcrumbItem>
-{
-    new BreadcrumbItem("Inicio", href: ""),
-    new BreadcrumbItem("Proyectos", href: $"/Projects/{employerEmail}"),
-    new BreadcrumbItem($"{projectName}", href: $"/Projects/Details/{employerEmail}/{projectName}"),
-    new BreadcrumbItem("Beneficios", href: $"/Projects/{employerEmail}/{projectName}/Benefits"),
-};
+    {
+        new BreadcrumbItem("Inicio", href: ""),
+        new BreadcrumbItem("Proyectos", href: $"/Projects/{employerEmail}"),
+        new BreadcrumbItem($"{projectName}", href: $"/Projects/{employerEmail}/{projectName}/Configurations"),
+        new BreadcrumbItem("Beneficios", href: null, disabled: true),
+    };
 }
 
 @if (_loading)
 {
     <MudPaper  Height="220px" Width="100%" Outlined="false" Class="border-none pa-4" Elevation="0">
          <MudText Align="Align.Center" Typo="Typo.h6">
-              <MudProgressCircular Color="Color.Secondary" Style="height:70px;width:70px;" Indeterminate="true" />
+              <MudProgressCircular Color="Color.Primary" Style="height:70px;width:70px;" Indeterminate="true" />
          </MudText>
     </MudPaper>
 }
@@ -36,7 +37,7 @@ else
             <MudToolBar DisableGutters="true" Class="gap-4">
                 <MudButton></MudButton>
                 <MudSpacer></MudSpacer>
-                <MudButton Variant="Variant.Filled" OnClick="GoToCreate" Color="Color.Secondary">
+                <MudButton Variant="Variant.Filled" OnClick="GoToCreate" Color="Color.Primary">
                     <MudText> 
                         Crear Beneficio
                     </MudText> 
@@ -49,9 +50,9 @@ else
         {
             <MudToolBar DisableGutters="true" Class="gap-4">
                 <MudSpacer></MudSpacer>
-                <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Secondary" OnClick="GoToConfigs"/>
+                <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Primary" OnClick="GoToConfigs"/>
             </MudToolBar>
-            <MudTable @ref="mudTable" Items="@Elements" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm"  Loading="@_empty" Filter="new Func<Subscription,bool>(FilterFunc1)">
+            <MudTable @ref="_mudTable" Items="@_elements" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm"  Loading="@_empty" Filter="new Func<Subscription,bool>(FilterFunc1)">
                 <ToolBarContent>
                     <MudText Align="Align.Center" Typo="Typo.h6">Lista de beneficios</MudText>
                     <MudSpacer />
@@ -64,39 +65,39 @@ else
                 </HeaderContent>
                 <RowTemplate>
                     <MudTd DataLabel="Nombre">
-                        <MudLink Color="Color.Secondary" Href="@($"/Projects/{employerEmail}/{projectName}/Benefits/{context.SubscriptionName}")">
+                        <MudLink Color="Color.Primary" Underline="Underline.Always" Href="@($"/Projects/{employerEmail}/{projectName}/Benefits/{context.SubscriptionName}")">
                             @context.SubscriptionName
                         </MudLink>
                     </MudTd>
                     <MudTd DataLabel="Descripción">@context.ProviderName</MudTd>
-                    <MudTd DataLabel="Costo">@context.Cost</MudTd>
+                    <MudTd DataLabel="Costo"> @cultureCR.NumberFormat.CurrencySymbol @costFormat(context.Cost)</MudTd>
                 </RowTemplate>
                 <PagerContent>
-                    <MudPagination SelectedChanged="PageChanged" Count="@((mudTable.GetFilteredItemsCount() + mudTable.RowsPerPage - 1) / mudTable.RowsPerPage)" Color="Color.Secondary" Class="pa-4"/>
+                    <MudPagination SelectedChanged="PageChanged" Count="@((_mudTable.GetFilteredItemsCount() + _mudTable.RowsPerPage - 1) / _mudTable.RowsPerPage)" Color="Color.Primary" Class="pa-4"/>
                 </PagerContent>
             </MudTable>
             <br>    
-            <MudButton Variant="Variant.Filled" OnClick="GoToCreate" Color="Color.Secondary">Crear Beneficio</MudButton>
+            <MudButton Variant="Variant.Filled" OnClick="GoToCreate" Color="Color.Primary">Crear Beneficio</MudButton>
         }
 }
 
 @code {
     private bool _empty = true;
-    private MudTable<Subscription> mudTable;
-    private List<string> clickedEvents = new();
-    private IEnumerable<Subscription> Elements;
+    private MudTable<Subscription> _mudTable;
+    private IEnumerable<Subscription> _elements;
     private bool _loading = true;
     public string searchString1 = "";
+    public CultureInfo cultureCR = CultureInfo.GetCultureInfo("es-CR");
 
     [Parameter] public string employerEmail { get; set; }
     [Parameter] public string projectName { get; set; }
 
-
     protected override async Task OnInitializedAsync()
     {
-        Elements = await SubscriptionService.GetBenefitsByProject(employerEmail, projectName);
+        _elements = await SubscriptionService.GetBenefitsByProject(employerEmail, projectName);
         _loading = false;
-        if (Elements.Length() > 0){
+        if (_elements.Length() > 0)
+        {
             _empty = false;   
         }
     }
@@ -113,7 +114,7 @@ else
 
     private void PageChanged(int i)
     {
-        mudTable.NavigateTo(i - 1);
+        _mudTable.NavigateTo(i - 1);
     }
 
     private bool FilterFunc1(Subscription element) => FilterFunc(element, searchString1);
@@ -125,5 +126,11 @@ else
         if (element.SubscriptionName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
         return false;
+    }
+    
+    private string costFormat(double cost)
+    {
+        string costo = string.Format("{0:N}", cost);
+        return costo;
     }
 }

@@ -7,7 +7,7 @@
 @if(_loading) {
     <MudPaper  Height="220px" Width="100%" Outlined="false" Class="border-none pa-4" Elevation="0">
          <MudText Align="Align.Center" Typo="Typo.h6">
-              <MudProgressCircular Color="Color.Secondary" Style="height:70px;width:70px;" Indeterminate="true" />
+              <MudProgressCircular Color="Color.Primary" Style="height:70px;width:70px;" Indeterminate="true" />
          </MudText>
        
     </MudPaper>
@@ -18,7 +18,7 @@
         {
             new BreadcrumbItem("Proyectos", href: $"/Projects/{email}"),
             new BreadcrumbItem(@projectName, href: $"/Projects/Details/{email}/{projectName}"),
-            new BreadcrumbItem("Empleados", href: $"/View_Project_Employees/{email}/{projectName}")
+            new BreadcrumbItem("Empleados", href: null, disabled: true)
         }; 
         <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
         <MudPaper Height="60px" Width="100%" Outlined="false" Class="border-none" Elevation="0"> 
@@ -53,7 +53,7 @@
                         </MudTd>
                     </RowTemplate>
                 <PagerContent>
-                    <MudPagination SelectedChanged="PageChanged" Count="@((_table.GetFilteredItemsCount() + _table.RowsPerPage - 1) / _table.RowsPerPage)" Color="Color.Secondary" Class="pa-4"/>
+                    <MudPagination SelectedChanged="PageChanged" Count="@((_table.GetFilteredItemsCount() + _table.RowsPerPage - 1) / _table.RowsPerPage)" Color="Color.Primary" Class="pa-4"/>
                 </PagerContent>
                 </MudTable>
                  <br>
@@ -92,6 +92,7 @@
     protected override async Task OnInitializedAsync()
     {
         _elements = await PersonService.GetAllEmployees(projectName);
+        IEnumerable<Person> hiredEmployees = await PersonService.GetProjectEmployees(projectName);
         if (_elements.Length() == 0)
         {
             empty = true;
@@ -99,7 +100,14 @@
         else
         {
             empty = false;
+            foreach (var item in hiredEmployees)
+            {
+                _elements = _elements.Where(e => e.Email != item.Email);
+            }
         }
+
+
+
         _loading = false;
     }
 

@@ -28,6 +28,12 @@ using Domain.Authentication.Repositories;
 using Infrastructure.Authentication.Repositories;
 using Domain.Authorization.Repositories;
 using Infrastructure.Authorization.Repositories;
+using Domain.ReportOfHours.Repositories;
+using Infrastructure.ReportOfHours.Repositories;
+using Infrastructure.ReportOfHours;
+using Domain.Subscribes.Repositories;
+using Infrastructure.Subscribes;
+using Infrastructure.Subscribes.Repositories;
 
 namespace Infrastructure
 {
@@ -45,6 +51,9 @@ namespace Infrastructure
             services.AddDbContext<SubscriptionDbContext>(options => options.UseSqlServer(connectionString));
             services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
 
+            services.AddDbContext<SubscribeDbContext>(options => options.UseSqlServer(connectionString));
+            services.AddScoped<ISubscribeRepository, SubscribeRepository>();
+
             services.AddDbContext<EmployerDbContext>(options => options.UseSqlServer(connectionString));
             services.AddScoped<IEmployerRepository, EmployerRepository>();
 
@@ -57,6 +66,9 @@ namespace Infrastructure
                .AddEntityFrameworkStores<AccountsDbContext>();
             services.AddScoped<IAuthenticationRepository, AuthenticationRepository>();
             services.AddScoped<IAuthorizationRepository, AuthorizationRepository>();
+
+            services.AddDbContext<HoursReportDbContext>(options => options.UseSqlServer(connectionString));
+            services.AddScoped<IHoursReportRepository, HoursReportRepository>();
 
             services.AddDbContext<AgreementDbContext>(options => options.UseSqlServer(connectionString));
             services.AddScoped<IAgreementRepository, AgreementRepository>();
