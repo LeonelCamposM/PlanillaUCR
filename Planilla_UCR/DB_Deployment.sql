@@ -232,8 +232,6 @@ BEGIN
 	FROM  Person WHERE Person.Email = @EmailPerson AND Person.IsEnabled=1
 END
 
-
-
 --Employer Stored Procedures
 
 GO
@@ -342,18 +340,6 @@ VALUES('mau@ucr.ac.cr',
 )
 
 INSERT INTO Person
-VALUES('nyazofeifa3003@gmail.com',
-'Nayeri',
-'Azofeifa',
-'Porras',
-118070615,
-'CR4024',
-'San José, Costa Rica',
-'89433965',
-1
-)
-
-INSERT INTO Person
 VALUES('nasheazofeifa3003@gmail.com',
 'Nasheri',
 'Azofeifa',
@@ -365,12 +351,8 @@ VALUES('nasheazofeifa3003@gmail.com',
 1
 )
 
-
 INSERT INTO Employer
 VALUES('leonel@ucr.ac.cr')
-
-INSERT INTO Employer
-VALUES('nyazofeifa3003@gmail.com')
 
 INSERT INTO Employee
 VALUES('mau@ucr.ac.cr')
