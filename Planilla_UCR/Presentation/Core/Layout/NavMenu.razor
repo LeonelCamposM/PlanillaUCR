@@ -54,7 +54,7 @@
                         </li>
 
                         <li class="nav-item px-3">
-                            <TabNavLink Icon="@Icons.Material.Filled.Assignment" href="@($"Projects/{email}/{projectName}/Configurations")" text="Detalles"></TabNavLink>
+                            <TabNavLink Icon="@Icons.Material.Filled.Assignment" href="@($"/Projects/{email}/{projectName}")" text="Detalles"></TabNavLink>
                         </li>
 
                         <li class="nav-item px-3">
@@ -169,8 +169,6 @@
 
     [Parameter]
     public string email { get; set; }
-
-    bool isExpanded { get; set; }
 
     private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
 

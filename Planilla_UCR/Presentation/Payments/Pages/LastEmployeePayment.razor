@@ -154,7 +154,7 @@
     {
         projectName = ContextMenuService.GetProjectsContext();
         lastPay = await PaymentService.GetEmployeeLastPayment(email, "leonel@ucr.ac.cr", projectName);
-        Agreement toSearchagreement = new Agreement(email, lastPay.EmployerEmail, projectName, null, "", 0, null);
+        Agreement toSearchagreement = new Agreement(email, lastPay.EmployerEmail, projectName, null, "", 0, null, 1, "");
 
         
 
