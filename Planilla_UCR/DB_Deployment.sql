@@ -54,8 +54,6 @@ CREATE TABLE Agreement(
 	PRIMARY KEY(EmployeeEmail,EmployerEmail,ProjectName,ContractStartDate),
 	FOREIGN KEY(EmployeeEmail) REFERENCES Employee(Email),
 	FOREIGN KEY(EmployerEmail, ProjectName) REFERENCES Project(EmployerEmail, ProjectName) ON UPDATE CASCADE,
-	FOREIGN KEY(ContractType, MountPerHour) REFERENCES AgreementType(TypeAgreement, MountPerHour)
-	FOREIGN KEY(EmployerEmail, ProjectName) REFERENCES Project(EmployerEmail, ProjectName),
 	FOREIGN KEY(ContractType, MountPerHour) REFERENCES AgreementType(TypeAgreement, MountPerHour),
 	IsEnabled int NOT NULL,
 	Justification varchar(max)

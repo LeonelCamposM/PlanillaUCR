@@ -55,7 +55,7 @@
                 </MudItem>
                
                 <MudItem xs="4">
-                    <MudIconButton  Icon="@Icons.Material.Filled.Settings" Color="Color.Primary" OnClick="GoToProfileConfig"/>
+                    <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Primary" OnClick="GoToProfileConfig"/>
                 </MudItem>
                
             </MudItem>
@@ -163,10 +163,11 @@
 
     private void DeleteAccountEmployer() 
     {
+        AuthenticationService.SignOut();
         EmployerService.DeleteEmployer(personInfo.Email);
         AuthenticationService.DeleteAccount(personInfo.Email);
         ShowSnackNotification("Se ha eliminado la cuenta de "+personInfo.Name, Severity.Success);
-        AuthenticationService.SignOut();
+        nav.NavigateTo($"/");
     }
 
     private void GoToProjects()
