@@ -163,11 +163,9 @@
 
     private void DeleteAccountEmployer() 
     {
-        AuthenticationService.SignOut();
         EmployerService.DeleteEmployer(personInfo.Email);
-        AuthenticationService.DeleteAccount(personInfo.Email);
         ShowSnackNotification("Se ha eliminado la cuenta de "+personInfo.Name, Severity.Success);
-        nav.NavigateTo($"/");
+        nav.NavigateTo($"/delete", true);
     }
 
     private void GoToProjects()

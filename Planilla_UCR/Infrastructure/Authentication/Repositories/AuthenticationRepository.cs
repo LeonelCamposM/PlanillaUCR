@@ -125,7 +125,7 @@ namespace Infrastructure.Authentication.Repositories
         public async Task DeleteAccount(string email)
         {
             var user = await _userManager.FindByNameAsync(email);
-            _userManager.DeleteAsync(user);
+            await _userManager.DeleteAsync(user);
         }
     }
 }

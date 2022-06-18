@@ -245,17 +245,17 @@ BEGIN
 	SET IsEnabled = 0
 	WHERE Person.Email = @EmployerEmail;
 
-	--UPDATE Project 
-	--SET IsEnabled = 0
-	--WHERE Project.EmployerEmail = @EmployerEmail;
+	UPDATE Project 
+	SET IsEnabled = 0
+	WHERE Project.EmployerEmail = @EmployerEmail;
 
-	--UPDATE Agreement 
-	--SET IsEnabled = 0
-	--WHERE Agreement.EmployerEmail = @EmployerEmail;
+	UPDATE Agreement 
+	SET IsEnabled = 0
+	WHERE Agreement.EmployerEmail = @EmployerEmail;
 
-	--UPDATE Subscription 
-	--SET IsEnabled = 0
-	--WHERE Subscription.EmployerEmail = @EmployerEmail;
+	UPDATE Subscription 
+	SET IsEnabled = 0
+	WHERE Subscription.EmployerEmail = @EmployerEmail;
 
 END
 
