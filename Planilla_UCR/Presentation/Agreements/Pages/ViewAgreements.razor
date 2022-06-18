@@ -27,9 +27,7 @@
 @inject ISnackbar Snackbar
 @inject IAgreementService AgreementService
 @inject IAgreementTypeService AgreementTypeService
-@inject IPersonService PersonService
 @inject IEmployeeService EmployeeService
-@inject IEmployerService EmployerService
 @inject NavigationManager nav
 
 
@@ -49,7 +47,6 @@ else
         {
             new BreadcrumbItem("Proyectos", href: $"/Projects/{employerEmail}"),
             new BreadcrumbItem(@projectName, href: $"/Projects/Details/{employerEmail}/{projectName}"),
-            new BreadcrumbItem("Empleados", href: $"/View_Project_Employees/{employerEmail}/{projectName}"),
             new BreadcrumbItem("Contratos", href: $"/Projects/{employerEmail}/{projectName}/Agreements/New"),
         };
         <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
@@ -62,27 +59,40 @@ else
                         <ToolBarContent>                
                             <MudTextField @bind-Value="mySearchString" Immediate="true" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
                         </ToolBarContent> 
+                        <ColGroup>
+                            <col style="width: 175px;" />
+                            <col />
+                            <col />
+                            <col />
+                            <col />
+                            <col />
+                            <col />
+                        </ColGroup>
                         <HeaderContent>
-                            <MudTh>Email empleado</MudTh>
-                            <MudTh>Email empleador</MudTh>
-                            <MudTh>Nombre proyecto</MudTh>
-                            <MudTh>Tipo contrato </MudTh>
-                            <MudTh>Intervalo pago</MudTh>
-                            <MudTh>Inicio contrato</MudTh>
-                            <MudTh>Fin contrato</MudTh>
-                            <MudTh>Salario</MudTh>
+                            <MudTh Style="text-align:justify-all">Nombre empleado</MudTh>
+                            <MudTh Style="text-align:justify-all">Email empleado</MudTh>
+                            <MudTh Style="text-align:justify-all">Tipo contrato </MudTh>
+                            <MudTh Style="text-align:justify-all">Intervalo pago</MudTh>
+                            <MudTh Style="text-align:justify-all">Inicio contrato</MudTh>
+                            <MudTh Style="text-align:justify-all">Fin contrato</MudTh>
+                            <MudTh Style="text-align:justify-all"> Salario</MudTh>
                         </HeaderContent>
 
                         <RowTemplate>
-                            <MudTd DataLabel="Email empleado">@context.EmployeeEmail</MudTd>
-                            <MudTd DataLabel="Email empleador">@context.EmployerEmail</MudTd>
-                            <MudTd DataLabel="Nombre proyecto">@context.ProjectName</MudTd>
-                            <MudTd DataLabel="Tipo contrato">@context.ContractType</MudTd>
-                            <MudTd DataLabel="Intervalo pago">@context.PaymentInterval</MudTd>
-                            <MudTd DataLabel="Inicio contrato">@context.ContractStartDate.ToShortDateString()</MudTd>
-                            <MudTd DataLabel="Fin contrato">@context.ContractFinishDate.ToShortDateString()</MudTd>
-                            <MudTd DataLabel="Salario">@context.MountPerHour</MudTd>
-
+                            <MudTd DataLabel="Nombre empleado" Style="text-align:justify-all">@context.Name @context.LastName1 @context.LastName2</MudTd>
+                            <MudTd DataLabel="Email empleado" Style="text-align:justify-all">@context.EmployeeEmail</MudTd>
+                            <MudTd DataLabel="Tipo contrato" Style="text-align:justify-all">@context.ContractType</MudTd>
+                            <MudTd DataLabel="Intervalo pago" Style="text-align:justify-all">@context.PaymentInterval</MudTd>
+                            <MudTd DataLabel="Inicio contrato" Style="text-align:justify-all">@context.ContractStartDate.ToShortDateString()</MudTd>
+                            <MudTd DataLabel="Fin contrato" Style="text-align:justify-all">@context.ContractFinishDate.ToShortDateString()</MudTd>
+                            
+                            @if (context.ContractType == "Por horas")
+                            {
+                                <MudTd DataLabel="Salario" Style="text-align:right" >₡@context.MountPerHour.00/H</MudTd>
+                            } else
+                            {
+                                <MudTd DataLabel="Salario" Style="text-align:right" >₡@context.MountPerHour.00</MudTd>
+                            }
                              <MudTd DataLabel="Terminar">
                                 <MudSpacer></MudSpacer>
                                     <MudButton Variant="Variant.Filled" @onclick="@(e => GoToFireTheEmployee(@context.EmployeeEmail))" Color="Color.Transparent">
@@ -129,6 +139,7 @@ else
     private IEnumerable<Project> _projects = new List<Project>();
     private IEnumerable<Agreement> _agreements = new List<Agreement>();
     private IEnumerable<AgreementType> _agreementType = new List<AgreementType>();
+    private IEnumerable<Person> _people = new List<Person>();
     private IEnumerable<JoinedTables> _myJoin = new List<JoinedTables>();
 
     protected override async Task OnInitializedAsync()
@@ -137,6 +148,7 @@ else
         _projects = await ProjectService.GetEmployerProyects(employerEmail);
         _agreements = await AgreementService.GetAllAgreementsByProjectAndEmployer(projectName, employerEmail);
         _agreementType = await AgreementTypeService.GetAllAgreementTypes();
+        _people = await EmployeeService.GetProjectEmployees(projectName);
         populateJoinAttribute();
         checkJoinLenght();
         _loading = false;
@@ -147,17 +159,19 @@ else
     { 
         _myJoin = from P in _projects
                   join A in _agreements on P.ProjectName equals A.ProjectName
+                  join Pe in _people on A.EmployeeEmail equals Pe.Email
                   join ATP in _agreementType on A.ContractType equals ATP.TypeAgreement
                   select new JoinedTables
                     {
-                        EmployerEmail = P.EmployerEmail,
-                        ProjectName = P.ProjectName,
                         PaymentInterval = P.PaymentInterval,
                         EmployeeEmail = A.EmployeeEmail,
                         ContractType = A.ContractType,
                         ContractStartDate = (DateTime) A.ContractStartDate,
                         ContractFinishDate = (DateTime) A.ContractFinishDate,
                         MountPerHour = ATP.MountPerHour,
+                        Name = Pe.Name,
+                        LastName1 = Pe.LastName1,
+                        LastName2 =  Pe.LastName2
                     };
     }
 
