@@ -75,15 +75,13 @@
                                 <MudTh>Nombre</MudTh>
                                 <MudTh>Pocentaje</MudTh>
                                 <MudTh>Monto</MudTh>
-                                <MudTh>Detalles</MudTh>
                             </HeaderContent>
                      
 
                             <RowTemplate>
                                     <MudTd DataLabel="Nombre">@context.DeductionName</MudTd>
-                                    <MudTd DataLabel="Pocentaje"> @(e => salaryCalculator.getTaxPercentage(context.DeductionName, a)) </MudTd>
-                                    <MudTd DataLabel="Monto"> @cultureCR.NumberFormat.CurrencySymbol @costFormat(context.Cost)</MudTd>
-                                    <MudTd DataLabel="Detalles"> Ejemplo</MudTd>
+                                    <MudTd DataLabel="Pocentaje"> @salaryCalculator.getTaxPercentage(context.DeductionName, lastPay.GrossSalary) % </MudTd>
+                                    <MudTd DataLabel="Monto"> @cultureCR.NumberFormat.CurrencySymbol @costFormat(salaryCalculator.getTaxAmount(context.DeductionName, lastPay.GrossSalary))</MudTd>
                             </RowTemplate>
                   </MudTable>
                 <br />
@@ -146,7 +144,6 @@
     string[] headings = { "Datos del funcionario", "Datos de contrato", "Detalles de pago"};
     IList<string> rows = new List<string>();
     public CultureInfo cultureCR = CultureInfo.GetCultureInfo("es-CR");
-    double a = 4445000;
     private bool _hidePosition;
     private bool _loading = true;
     private bool empty = true;
@@ -171,9 +168,10 @@
     {
         projectName = ContextMenuService.GetProjectsContext();
         lastPay = await PaymentService.GetEmployeeLastPayment(email, "leonel@ucr.ac.cr", projectName);
+        lastPay.GrossSalary = 4445000;
         Agreement toSearchagreement = new Agreement(email, lastPay.EmployerEmail, projectName, null, "", 0, null, 1, "");
 
-        
+
 
         agreement = await AgreementService.GetContractee(toSearchagreement);
         legalDeductions = await LegalDeductionService.GetAllAsync();
@@ -209,9 +207,27 @@
             empty = false;
         }
         _loading = false;
+
+        double netSalary = lastPay.GrossSalary;
+        foreach (var item in benefits)
+        {
+            netSalary += item.Cost;
+        }
+
+        foreach (var item in deductions)
+        {
+            netSalary -= item.Cost;
+        }
+
+        foreach (var item in legalDeductions)
+        {
+            netSalary -= salaryCalculator.getTaxAmount(item.DeductionName, lastPay.GrossSalary);
+        }
+
+
         rows.Add(@"Empleador: "+lastPay.EmployerEmail +"#"+"Tipo de contrato: "+agreement.ContractType+"#"+"Desde: "+lastPay.StartDate.ToShortDateString() +" Hasta: "+ lastPay.EndDate.ToShortDateString());
         rows.Add( @"Proyecto: "+lastPay.ProjectName +"#"+"Monto por horas: "+cultureCR.NumberFormat.CurrencySymbol+ costFormat(agreement.MountPerHour)+"#"+"Salario bruto: "+ cultureCR.NumberFormat.CurrencySymbol+ costFormat(lastPay.GrossSalary));
-        rows.Add( @" "+"#"+" "+"#"+"Salario neto: "+cultureCR.NumberFormat.CurrencySymbol+ costFormat(lastPay.GrossSalary));
+        rows.Add( @" "+"#"+" "+"#"+"Salario neto: "+cultureCR.NumberFormat.CurrencySymbol+ costFormat(netSalary));
     }
 
     private void PageChanged(int i)

@@ -46,13 +46,27 @@ namespace Presentation.Payments.Models
         public double getTaxPercentage(string taxName, double grossSalary)
         {
             double taxPercentage = 0;
-            if (taxName == "CSS")
+            if (taxName == "CCSS")
             {
                 taxPercentage = GetCSSTax();
             }
             else
             {
                 taxPercentage = GetRentTax(grossSalary);
+            }
+            return taxPercentage;
+        }
+
+        public double getTaxAmount(string taxName, double grossSalary)
+        {
+            double taxPercentage = 0;
+            if (taxName == "CCSS")
+            {
+                taxPercentage = grossSalary * (GetCSSTax()/ 100);
+            }
+            else
+            {
+                taxPercentage = grossSalary * (GetRentTax(grossSalary) / 100);
             }
             return taxPercentage;
         }
