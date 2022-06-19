@@ -181,14 +181,10 @@ CREATE OR ALTER PROCEDURE ModifyProject(
 	@NewPaymentInterval varchar(255)
 ) AS
 BEGIN
-	IF ((@NewProjectName in (SELECT ProjectName FROM Project WHERE EmployerEmail = @EmployerEmail)) AND (@ProjectName <> @NewProjectName))
-	BEGIN 
-
-		UPDATE Project
-		SET ProjectName = @NewProjectName, ProjectDescription = @NewProjectDescription, MaximumAmountForBenefits = @NewMaximumAmountForBenefits, 
-			MaximumBenefitAmount = @NewMaximumBenefitAmount,PaymentInterval = @NewPaymentInterval
-		WHERE EmployerEmail= @EmployerEmail AND ProjectName = @ProjectName;
-	END
+	UPDATE Project
+	SET ProjectName = @NewProjectName, ProjectDescription = @NewProjectDescription, MaximumAmountForBenefits = @NewMaximumAmountForBenefits, 
+		MaximumBenefitAmount = @NewMaximumBenefitAmount,PaymentInterval = @NewPaymentInterval
+	WHERE EmployerEmail= @EmployerEmail AND ProjectName = @ProjectName;
 END
 
 
