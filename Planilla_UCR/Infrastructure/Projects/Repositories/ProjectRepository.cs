@@ -98,5 +98,11 @@ namespace Infrastructure.Projects.Repositories
             _dbContext.Database.ExecuteSqlInterpolated(query);
 
         }
+
+        public void DisableProject(string projectName, string employerEmail)
+        {
+            System.FormattableString query = ($@"EXECUTE DisableProject @ProjectName = {projectName}, @EmployerEmail = {employerEmail}");
+            _dbContext.Database.ExecuteSqlInterpolated(query);
+        }
     }
 }

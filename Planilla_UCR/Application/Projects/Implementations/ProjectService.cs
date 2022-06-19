@@ -51,5 +51,10 @@ namespace Application.Projects.Implementations
         {
              _projectRepository.ModifyProject(project, newProjectName);
         }
+
+        public void DisableProject(string projectName, string employerEmail)
+        {
+            _projectRepository.DisableProject(projectName, employerEmail);
+        }
     }
 }
