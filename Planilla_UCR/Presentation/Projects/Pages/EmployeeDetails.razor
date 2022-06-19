@@ -123,7 +123,7 @@
     protected override async Task OnInitializedAsync()
     {
         ContextMenuService.SetProjectsContext(true,true,projectName);
-        agreementElements = await AgreementService.GetEmployeeProjects(personEmail);
+        agreementElements = await AgreementService.GetEmployeeAgreements(personEmail);
         
         _loading = false;
         if (agreementElements.Length() > 0){
