@@ -59,6 +59,8 @@ CREATE TABLE Agreement(
 	Justification varchar(max)
 );
 
+
+
 CREATE TABLE Subscription
 (
 	EmployerEmail varchar(255) NOT NULL,
@@ -183,14 +185,10 @@ CREATE OR ALTER PROCEDURE ModifyProject(
 	@NewPaymentInterval varchar(255)
 ) AS
 BEGIN
-	IF ((@NewProjectName in (SELECT ProjectName FROM Project WHERE EmployerEmail = @EmployerEmail)) AND (@ProjectName <> @NewProjectName))
-	BEGIN 
-
-		UPDATE Project
-		SET ProjectName = @NewProjectName, ProjectDescription = @NewProjectDescription, MaximumAmountForBenefits = @NewMaximumAmountForBenefits, 
-			MaximumBenefitAmount = @NewMaximumBenefitAmount,PaymentInterval = @NewPaymentInterval
-		WHERE EmployerEmail= @EmployerEmail AND ProjectName = @ProjectName;
-	END
+	UPDATE Project
+	SET ProjectName = @NewProjectName, ProjectDescription = @NewProjectDescription, MaximumAmountForBenefits = @NewMaximumAmountForBenefits, 
+		MaximumBenefitAmount = @NewMaximumBenefitAmount,PaymentInterval = @NewPaymentInterval
+	WHERE EmployerEmail= @EmployerEmail AND ProjectName = @ProjectName;
 END
 
 
@@ -299,6 +297,15 @@ CREATE OR ALTER PROCEDURE GetContracteeByEmail(@ContracteeEmail varchar(255))
 AS
 BEGIN 
 	SELECT * FROM Agreement WHERE EmployeeEmail = @ContracteeEmail AND IsEnabled = 1
+END
+
+--Agreement Stored procedure
+GO
+CREATE OR ALTER PROCEDURE GetAllAgreementTypes
+AS
+BEGIN
+	SELECT *
+	FROM AgreementType AS ATP
 END
 
 -- Data Insert
