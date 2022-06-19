@@ -238,9 +238,10 @@
     private double? _maximumAmountForBenefits = 0.0;
     private int _oldMaximumBenefitAmount = 0;
     private string _oldPaymentInterval = "";
+    private int _oldIsEnabled = 1;
 
 
-    Project projectInfo = new Project("","","",0.0,0,"");
+    Project projectInfo = new Project("","","",0.0,0,"",1);
     private IEnumerable<Agreement> agreementElements;
     MudForm form;
     SnackHandler snackHandler = new SnackHandler();
@@ -266,6 +267,7 @@
             _maximumAmountForBenefits = projectInfo.MaximumAmountForBenefits;
             _oldMaximumBenefitAmount = projectInfo.MaximumBenefitAmount;
             _oldPaymentInterval = projectInfo.PaymentInterval;
+            _oldIsEnabled = projectInfo.IsEnabled;
             _loading = false;
         }
     }
@@ -343,6 +345,7 @@
         projectInfo.MaximumAmountForBenefits = (double)_maximumAmountForBenefits;
         projectInfo.MaximumBenefitAmount = _oldMaximumBenefitAmount;
         projectInfo.PaymentInterval = _oldPaymentInterval;
+        projectInfo.IsEnabled = _oldIsEnabled;
         projectInfo = await ProjectService.GetProject(personEmail,projectName);
         nav.NavigateTo($"/Projects/{personEmail}");
     }

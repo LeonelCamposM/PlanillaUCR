@@ -37,7 +37,7 @@ namespace Infrastructure.People.Repositories
         {
             return await _dbContext.Persons.Select(t => new
             Person(t.Email, t.Name, t.LastName1, t.LastName2, t.Ssn,
-                t.BankAccount, t.Adress, t.PhoneNumber)).ToListAsync();
+                t.BankAccount, t.Adress, t.PhoneNumber, t.IsEnabled)).ToListAsync();
         }
 
         public async Task UpdatePerson(Person personInfo)
