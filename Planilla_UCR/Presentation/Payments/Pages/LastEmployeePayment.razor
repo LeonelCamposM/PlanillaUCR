@@ -9,6 +9,8 @@
 @using Domain.LegalDeductions.Entities
 @using Application.Subscribes
 @using Domain.Subscribes.Entities
+@using System.Globalization
+@using Presentation.Payments.Models
 
 @inject IPaymentService PaymentService
 @inject IContextMenuService ContextMenuService
@@ -53,7 +55,7 @@
                         @foreach (var row in rows)
                         {
                             <tr>
-                                @foreach (var x in row.Split(","))
+                                @foreach (var x in row.Split("#"))
                                 {
                                     <td>@x</td> 
                                 }
@@ -61,22 +63,51 @@
                         }
                     </tbody>
                 </MudSimpleTable>
-@*
-                <MudText Align="Align.Left" Typo="Typo.h6"> Información general  </MudText>
-                <MudText Align="Align.Left" Typo="Typo.body1">Empleador: @lastPay.EmployerEmail  </MudText>
-                <MudText Align="Align.Left" Typo="Typo.body1">Proyectos: @lastPay.ProjectName  </MudText>
-                <MudText Align="Align.Left" Typo="Typo.body1">Desde: @lastPay.StartDate.ToShortDateString() Hasta: @lastPay.EndDate.ToShortDateString()  </MudText>
-                <MudText Align="Align.Left" Typo="Typo.body1">Salario bruto: @lastPay.GrossSalary </MudText>*@
+                <br />
+                <br />
+                 <MudTable @ref="@_table2" Items="@legalDeductions" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" Filter="new Func<LegalDeduction,bool>(FilterFunc2)">
+                            <ToolBarContent>
+                                    <MudText Align="Align.Center" Typo="Typo.h6">Deducciones legales : </MudText>
+                                    <MudSpacer />
+                                    <MudTextField @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                            </ToolBarContent> 
+                            <HeaderContent>
+                                <MudTh>Nombre</MudTh>
+                                <MudTh>Pocentaje</MudTh>
+                                <MudTh>Monto</MudTh>
+                                <MudTh>Detalles</MudTh>
+                            </HeaderContent>
+                     
 
-               @* <br />
-                <MudText Align="Align.Left" Typo="Typo.h6"> Información de contrato:  </MudText>
-                <MudText Align="Align.Left" Typo="Typo.body1"> Tipo de contrato: @agreement.ContractType  </MudText>
-                <MudText Align="Align.Left" Typo="Typo.body1"> Monto por horas: @agreement.MountPerHour  </MudText>
-                <br />*@
+                            <RowTemplate>
+                                    <MudTd DataLabel="Nombre">@context.DeductionName</MudTd>
+                                    <MudTd DataLabel="Pocentaje"> @(e => salaryCalculator.getTaxPercentage(context.DeductionName, a)) </MudTd>
+                                    <MudTd DataLabel="Monto"> @cultureCR.NumberFormat.CurrencySymbol @costFormat(context.Cost)</MudTd>
+                                    <MudTd DataLabel="Detalles"> Ejemplo</MudTd>
+                            </RowTemplate>
+                  </MudTable>
                 <br />
                 <br />
                 <MudGrid>
-                    <MudItem xs="6">  
+                        <MudItem xs="6">  
+                        <MudTable @ref="@_table" Items="@deductions" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" Filter="new Func<Subscription,bool>(FilterFunc1)">
+                            <ToolBarContent>
+                                    <MudText Align="Align.Center" Typo="Typo.h6">Deducciones :</MudText>
+                                    <MudSpacer />
+                                    <MudTextField @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                            </ToolBarContent> 
+                            <HeaderContent>
+                                <MudTh>Nombre</MudTh>
+                                <MudTh>Costo</MudTh>
+                            </HeaderContent>
+
+                            <RowTemplate>
+                                    <MudTd DataLabel="Nombre">@context.SubscriptionName</MudTd>
+                                    <MudTd DataLabel="Costo">@cultureCR.NumberFormat.CurrencySymbol @costFormat(context.Cost)</MudTd>
+                            </RowTemplate>
+                        </MudTable>
+                         </MudItem>  
+                        <MudItem xs="6">  
                         <MudTable @ref="@_table" Items="@benefits" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" Filter="new Func<Subscription,bool>(FilterFunc1)">
                             <ToolBarContent>
                                     <MudText Align="Align.Center" Typo="Typo.h6">Beneficios : </MudText>
@@ -91,28 +122,12 @@
 
                             <RowTemplate>
                                     <MudTd DataLabel="Nombre">@context.SubscriptionName</MudTd>
-                                    <MudTd DataLabel="Costo"> + @context.Cost</MudTd>
+                                    <MudTd DataLabel="Costo">@cultureCR.NumberFormat.CurrencySymbol @costFormat(context.Cost)</MudTd>
                             </RowTemplate>
                         </MudTable>
                     </MudItem>
                     <MudSpacer></MudSpacer>
-                    <MudItem xs="6">  
-                        <MudTable @ref="@_table" Items="@deductions" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" Filter="new Func<Subscription,bool>(FilterFunc1)">
-                            <ToolBarContent>
-                                    <MudText Align="Align.Center" Typo="Typo.h6">Deducciones :</MudText>
-                                    <MudSpacer />
-                                    <MudTextField @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-                            </ToolBarContent> 
-                            <HeaderContent>
-                                <MudTh>Nombre</MudTh>
-                                <MudTh>Costo</MudTh>
-                            </HeaderContent>
-
-                            <RowTemplate>
-                                    <MudTd DataLabel="Nombre">@context.SubscriptionName</MudTd>
-                                    <MudTd DataLabel="Costo"> - @context.Cost</MudTd>
-                            </RowTemplate>
-                        </MudTable>
+                    <MudItem xs="6">
                     </MudItem>  
                 </MudGrid>
             }else
@@ -130,7 +145,8 @@
     private bool bordered = false;
     string[] headings = { "Datos del funcionario", "Datos de contrato", "Detalles de pago"};
     IList<string> rows = new List<string>();
-
+    public CultureInfo cultureCR = CultureInfo.GetCultureInfo("es-CR");
+    double a = 4445000;
     private bool _hidePosition;
     private bool _loading = true;
     private bool empty = true;
@@ -141,6 +157,7 @@
     private IList<Subscription> deductions = new List<Subscription>();
     private MudTable<Subscription> _table;
     private MudTable<LegalDeduction> _table2;
+    public SalaryCalculator salaryCalculator = new SalaryCalculator();
 
     Payment lastPay;
     Agreement agreement;
@@ -176,10 +193,10 @@
             }
         }
 
-        foreach (var item in legalDeductions)
-        {
-          deductions.Add( new Subscription("", "", item.DeductionName, "", "", item.Cost,1,1));
-        }
+        //foreach (var item in legalDeductions)
+        //{
+        //  deductions.Add( new Subscription("", "", item.DeductionName, "", "", item.Cost,1,1));
+        //}
 
 
 
@@ -192,9 +209,9 @@
             empty = false;
         }
         _loading = false;
-        rows.Add(@"Empleador: "+lastPay.EmployerEmail +","+"Tipo de contrato: "+agreement.ContractType+","+"Desde: "+lastPay.StartDate.ToShortDateString() +" Hasta: "+ lastPay.EndDate.ToShortDateString());
-        rows.Add( @"Proyecto: "+lastPay.ProjectName +","+"Monto por horas: "+agreement.MountPerHour+","+"Salario bruto: "+lastPay.GrossSalary);
-        rows.Add( @" "+","+" "+","+"Salario neto: "+lastPay.GrossSalary);
+        rows.Add(@"Empleador: "+lastPay.EmployerEmail +"#"+"Tipo de contrato: "+agreement.ContractType+"#"+"Desde: "+lastPay.StartDate.ToShortDateString() +" Hasta: "+ lastPay.EndDate.ToShortDateString());
+        rows.Add( @"Proyecto: "+lastPay.ProjectName +"#"+"Monto por horas: "+cultureCR.NumberFormat.CurrencySymbol+ costFormat(agreement.MountPerHour)+"#"+"Salario bruto: "+ cultureCR.NumberFormat.CurrencySymbol+ costFormat(lastPay.GrossSalary));
+        rows.Add( @" "+"#"+" "+"#"+"Salario neto: "+cultureCR.NumberFormat.CurrencySymbol+ costFormat(lastPay.GrossSalary));
     }
 
     private void PageChanged(int i)
@@ -211,6 +228,23 @@
         if (element.SubscriptionName.ToString().Contains(searchString1, StringComparison.OrdinalIgnoreCase))
         return true;
         return false;
+    }
+
+    private bool FilterFunc2(LegalDeduction element) => FilterFun3(element, searchString1);
+
+    private bool FilterFun3(LegalDeduction element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.DeductionName.ToString().Contains(searchString1, StringComparison.OrdinalIgnoreCase))
+        return true;
+        return false;
+    }
+
+    private string costFormat(double cost)
+    {
+        string costo = string.Format("{0:N}", cost);
+        return costo;
     }
 }
 
