@@ -256,7 +256,7 @@
     {
         ContextMenuService.SetProjectsContext(true,true,projectName);
         projectInfo = await ProjectService.GetProject(personEmail,projectName);
-        agreementElements = await AgreementService.GetEmployeeProjects(personEmail);
+        agreementElements = await AgreementService.GetEmployeeAgreements(personEmail);
 
         if (projectInfo != null)
         {
