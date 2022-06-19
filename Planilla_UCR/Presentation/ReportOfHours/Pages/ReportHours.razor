@@ -1,5 +1,6 @@
 ﻿@page "/ReportHours/{EmployerEmail}/{EmployeeEmail}"
 @using Application.ReportOfHours
+@using Domain.Payments.Entities
 @using Domain.ReportOfHours.Entities
 @using Presentation.Shared.Models
 @using Presentation.Core.Components
@@ -8,12 +9,15 @@
 @using Domain.Agreements.Entities
 @using Application.Agreements
 @using Application.ContextMenu
+@using Application.Payments
 
 @inject ISnackbar Snackbar
 @inject IReportOfHoursService HoursReportService
 @inject IProjectService ProjectService
 @inject IAgreementService AgreementService
 @inject IContextMenuService ContextMenuService
+@inject IPaymentService PaymentService
+
 @inject NavigationManager nav
 
 @*Navigation footprint *@
@@ -113,7 +117,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-         hoursReport.ProjectName = ContextMenuService.GetProjectsContext();
+        hoursReport.ProjectName = ContextMenuService.GetProjectsContext();
         _elements = await AgreementService.GetEmployeeProjects(EmployeeEmail);
         if (_elements.Length() == 0)
         {
@@ -135,7 +139,8 @@
         snackHandler._saving = true;
         await form.Validate();
         bool hasKey = await validateKey();
-        if (form.IsValid && ValidateHours() && !hasKey && ValidateDate())
+        bool validDate = await ValidateDate();
+        if (form.IsValid && ValidateHours() && !hasKey && validDate)
         {
             await HoursReportService.CreateReportAsync(hoursReport);
             ShowSnackNotification("Reporte de horas creado",Severity.Success);
@@ -187,19 +192,23 @@
         return hasKey;
     }
 
-    bool ValidateDate()
+    async Task<bool> ValidateDate()
     {
+        Payment lastPay = await PaymentService.GetEmployeeLastPayment(EmployeeEmail, ContextMenuService.GetEmployerEmailContext(), ContextMenuService.GetProjectsContext());
         bool valid = true; 
         if (hoursReport.ReportDate > DateTime.Now)
         {
             ShowSnackNotification("No es posible reportar horas a futuro", Severity.Error);
             valid = false;
         }
-        //if (hoursReport.ReportDate.Value.Day < DateTime.Now.Day) // last pay
-        //{
-        //    ShowSnackNotification("No es posible reportar horas antes del último pago", Severity.Error);
-        //    valid = false;
-        //}
+        if(lastPay != null)
+        {
+            if (hoursReport.ReportDate.Value.Date < lastPay.EndDate.Date)
+            {
+                ShowSnackNotification("No es posible reportar horas antes del último pago", Severity.Error);
+                valid = false;
+            }
+        }
         return valid;
     }
 }

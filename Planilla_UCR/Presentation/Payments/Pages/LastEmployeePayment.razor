@@ -69,7 +69,7 @@
                             <ToolBarContent>
                                     <MudText Align="Align.Center" Typo="Typo.h6">Deducciones legales : </MudText>
                                     <MudSpacer />
-                                    <MudTextField @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                                    <MudTextField @bind-Value="searchString2" Placeholder="Buscar" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
                             </ToolBarContent> 
                             <HeaderContent>
                                 <MudTh>Nombre</MudTh>
@@ -92,7 +92,7 @@
                             <ToolBarContent>
                                     <MudText Align="Align.Center" Typo="Typo.h6">Deducciones :</MudText>
                                     <MudSpacer />
-                                    <MudTextField @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                                    <MudTextField @bind-Value="searchString1" Placeholder="Buscar" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
                             </ToolBarContent> 
                             <HeaderContent>
                                 <MudTh>Nombre</MudTh>
@@ -106,11 +106,11 @@
                         </MudTable>
                          </MudItem>  
                         <MudItem xs="6">  
-                        <MudTable @ref="@_table" Items="@benefits" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" Filter="new Func<Subscription,bool>(FilterFunc1)">
+                        <MudTable @ref="@_table" Items="@benefits" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" Filter="new Func<Subscription,bool>(FilterFunc3)">
                             <ToolBarContent>
                                     <MudText Align="Align.Center" Typo="Typo.h6">Beneficios : </MudText>
                                     <MudSpacer />
-                                    <MudTextField @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                                    <MudTextField @bind-Value="searchString3" Placeholder="Buscar" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
                             </ToolBarContent> 
                             <HeaderContent>
                                 <MudTh>Nombre</MudTh>
@@ -150,6 +150,8 @@
     private bool _loading = true;
     private bool empty = true;
     string searchString1 = "";
+    string searchString2 = "";
+    string searchString3 = "";
     private IEnumerable<Subscription> subscriptions = new List<Subscription>();
     private IEnumerable<LegalDeduction> legalDeductions = new List<LegalDeduction>();
     private IList<Subscription> benefits = new List<Subscription>();
@@ -233,18 +235,29 @@
     {
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
-        if (element.SubscriptionName.ToString().Contains(searchString1, StringComparison.OrdinalIgnoreCase))
+        if (element.SubscriptionName.ToString().Contains(searchString, StringComparison.OrdinalIgnoreCase))
         return true;
         return false;
     }
 
-    private bool FilterFunc2(LegalDeduction element) => FilterFun3(element, searchString1);
+    private bool FilterFunc2(LegalDeduction element) => FilterFun3(element, searchString2);
 
     private bool FilterFun3(LegalDeduction element, string searchString)
     {
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
-        if (element.DeductionName.ToString().Contains(searchString1, StringComparison.OrdinalIgnoreCase))
+        if (element.DeductionName.ToString().Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        return true;
+        return false;
+    }
+
+    private bool FilterFunc3(Subscription element) => FilterFunc4(element, searchString3);
+
+    private bool FilterFunc4(Subscription element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.SubscriptionName.ToString().Contains(searchString, StringComparison.OrdinalIgnoreCase))
         return true;
         return false;
     }
