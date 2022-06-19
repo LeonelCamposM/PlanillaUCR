@@ -1,8 +1,11 @@
 ﻿@using Application.People
 @using Domain.People.Entities
 @using Application.Employees
+@using Application.ContextMenu
+
 @inject NavigationManager nav
 @inject IEmployeeService PersonService
+@inject IContextMenuService ContextService
 
 @if(_loading) {
     <MudPaper  Height="220px" Width="100%" Outlined="false" Class="border-none pa-4" Elevation="0">
@@ -118,7 +121,7 @@
 
     private void GoToContractEmployee(string email)
     {
-       nav.NavigateTo($"/Agreements/{email}");
+       nav.NavigateTo($"/Projects/{email}/Agreements/New");
     }
 
     private void PageChanged(int i)

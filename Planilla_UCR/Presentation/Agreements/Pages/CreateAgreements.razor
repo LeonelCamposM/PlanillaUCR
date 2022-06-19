@@ -1,4 +1,4 @@
-﻿@page "/Projects/{EmployerEmail}/{ProjectName}/Agreements/New"
+﻿@page "/Projects/{employeeEmail}/Agreements/New"
 @using Presentation.Core.Components
 @using System.ComponentModel.DataAnnotations
 @using Domain.Projects.Entities
@@ -19,6 +19,7 @@
 @using Domain.AgreementTypes.DTOs
 @using Domain.Projects.DTOs
 @using Application.Projects
+@using Application.ContextMenu
 
 
 @inject ISnackbar Snackbar
@@ -28,13 +29,14 @@
 @inject IEmployeeService EmployeeService
 @inject IEmployerService EmployerService
 @inject IProjectService ProjectService
+@inject IContextMenuService ContextService
 
 @*Navigation footprint *@
 @{
     List<BreadcrumbItem> _items = new List<BreadcrumbItem>
     {
         new BreadcrumbItem("Inicio", href: ""),
-        new BreadcrumbItem("Contratos", href: $"/Projects/{EmployerEmail}/{ProjectName}/Agreements/New"),
+        new BreadcrumbItem("Contratos", href: null)
     };
 } 
 
@@ -123,8 +125,9 @@
 </MudGrid>
 
 @code{
-    [Parameter] public string EmployerEmail { get; set; }
-    [Parameter] public string ProjectName { get; set; }
+    [Parameter] public string employeeEmail { get; set; }
+    public string projectName { get; set; }
+    public string employerEmail { get; set; }
 
     Agreement agreementObject = new Agreement("", "", "", null, "", 0, null, 1, "");
     AgreementType anAgreementType = new AgreementType("",0);
@@ -144,8 +147,9 @@
 
     protected override async Task OnInitializedAsync()
     {
-        agreementObject.EmployerEmail = EmployerEmail;
-        agreementObject.ProjectName = ProjectName;
+        agreementObject.EmployerEmail = ContextService.GetEmployerEmailContext();
+        agreementObject.ProjectName = ContextService.GetProjectsContext();
+        agreementObject.EmployeeEmail = employeeEmail;
         _isLoading = false;
     }
 
