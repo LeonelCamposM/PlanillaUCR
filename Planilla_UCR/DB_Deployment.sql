@@ -191,6 +191,17 @@ BEGIN
 	WHERE EmployerEmail= @EmployerEmail AND ProjectName = @ProjectName;
 END
 
+GO
+CREATE OR ALTER PROCEDURE DisableProject
+(
+	@ProjectName varchar(255),
+	@EmployerEmail varchar(255)
+) AS
+BEGIN
+	UPDATE Project
+	SET IsEnabled = 0
+	WHERE EmployerEmail= @EmployerEmail AND ProjectName = @ProjectName;
+END
 
 -- People Stored Procedures
 GO
