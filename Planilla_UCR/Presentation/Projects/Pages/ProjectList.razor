@@ -13,6 +13,7 @@
 @using Presentation.Authentication
 
 @inject NavigationManager nav
+@inject ISnackbar Snackbar
 
 @inject IPersonService PersonService
 @inject IProjectService ProjectService
@@ -20,7 +21,6 @@
 @inject IAgreementTypeService AgreementTypeService
 @inject IContextMenuService ContextMenuService
 
-@inject NavigationManager nav
 
 @{
     List<BreadcrumbItem> _items = new List<BreadcrumbItem>
@@ -73,22 +73,22 @@
                     </ToolBarContent>
 
                     <HeaderContent>
-                        <MudTh>Nombre</MudTh>
-                        <MudTh>Descripción</MudTh>
+                        <MudTh Style="text-align:justify-all">Nombre</MudTh>
+                        <MudTh Style="text-align:justify-all">Descripción</MudTh>
+                        <MudTh Style="text-align:justify-all">Borrar</MudTh>
                     </HeaderContent>
 
                     <RowTemplate Context="row">
-                        <MudTd DataLabel="Nombre" >
+                        <MudTd DataLabel="Nombre" Style="text-align:justify-all">
                             <MudLink Color="Color.Primary" Underline="Underline.Always" Href="@($"/Projects/{@row.EmployerEmail}/{@row.ProjectName}")">
                                 @row.ProjectName
                             </MudLink>
                         </MudTd>
 
-                        <MudTd DataLabel="Descripción">@row.ProjectDescription</MudTd>
+                        <MudTd DataLabel="Descripción" Style="text-align:justify-all">@row.ProjectDescription</MudTd>
 
-                        <MudTd>
-                            <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Secondary" OnClick="@(e => GoToDelete(@context.ProjectName))"/>
-                            <MudSpacer></MudSpacer>
+                        <MudTd Style="text-align:justify-all">
+                            <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Primary"  OnClick="@(e => GoToDisable(@row.ProjectName))"/>
                         </MudTd>
             
                     </RowTemplate>
@@ -99,6 +99,24 @@
                 </MudTable>
                 <br>
                 <MudButton Variant="Variant.Filled" OnClick="GoToCreate" Color="Color.Primary">Crear Proyecto</MudButton>
+
+                
+                <MudDialog @bind-IsVisible="_visible" Options="dialogOptions">
+                    <TitleContent>
+                        <MudText Typo="Typo.h6">
+                            <MudIcon Icon="@Icons.Material.Filled.Warning" Color="@Color.Primary" Class="mr-2"/> Este proyecto tiene empleados contratados, si confirma esta acción se procederá a terminar de forma temprana el contrato con todos sus empleados y la fecha de fin será el día de hoy. 
+                        </MudText>
+                    </TitleContent>
+                    <DialogContent>
+                        <MudItem xs="12" Class="d-flex justify-center align-center">
+                            <MudTextField @bind-Value="_agreementMessage" Label="contratos activos con los siguienetes empleados:" Lines= "6" Variant="Variant.Outlined" ReadOnly ="true"></MudTextField>
+                        </MudItem>
+                        </DialogContent>
+                    <DialogActions>
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ConfirmDisableProject" Class="px-10">Confirmar borrado de proyecto</MudButton>
+                        <MudButton Variant="Variant.Filled" Color="Color.Transparent" OnClick="CancelAction" Class="px-10">Cancelar</MudButton>
+                    </DialogActions>
+                </MudDialog>
             }    
     
         }
@@ -187,6 +205,8 @@
     private bool _loading = true;
     public string _searchString = "";
     private bool _isEmployer = true;
+    private bool _visible;
+    public string _agreementMessage = "";
 
 
     private MudTable<EmployeeList> _table;
@@ -203,15 +223,22 @@
     [Parameter] public string projectName { get; set; }
     public string employeeEmail { get; set; }
 
+    private void OpenDialog() => _visible = true;
+    void CloseDialog() => _visible = false;
+    private DialogOptions dialogOptions = new() { FullWidth = true };
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         ContextMenuService.SetProjectsContext(false ,false, "");
         if (firstRender)
         {
+            _people = await PersonService.GetAllPeopleAsync();
             if (_isEmployer) 
             {
                 _projectElements = await ProjectService.GetEmployerProyects(personEmail);
+                _agreements = await AgreementService.GetEmployerAgreements(personEmail);
                 _loading = false;
+
                 if (_projectElements.Length() > 0){
                     _emptyProject = false;
                 }
@@ -227,13 +254,12 @@
 
     }
     private async Task CreateProjectListForEmployee() {
-        _agreements = await AgreementService.GetEmployeeProjects(personEmail);
+        _agreements = await AgreementService.GetEmployeeAgreements(personEmail);
         _loading = false;
 
         if (_agreements.Length() > 0)
         {
             _agreementType = await AgreementTypeService.GetAllAgreementTypes();
-            _people = await PersonService.GetAllPeopleAsync();
             _projectElements = await ProjectService.GetAllProjectsAsync();
             _emptyAgreement = false;
             await CreateEmployeeList();
@@ -243,11 +269,11 @@
     }
     private async Task CreateEmployeeList()
     {
-       _joinTable = from A in _agreements
-                  join Pe in _people on A.EmployerEmail equals Pe.Email
-                  join ATP in _agreementType on A.ContractType equals ATP.TypeAgreement
-                  select new EmployeeList
-                  {
+        _joinTable = from A in _agreements
+                     join Pe in _people on A.EmployerEmail equals Pe.Email
+                     join ATP in _agreementType on A.ContractType equals ATP.TypeAgreement
+                     select new EmployeeList
+                    {
                         ProjectName = A.ProjectName,
                         EmployerName = Pe.Name,
                         EmployerLastName1 = Pe.LastName1,
@@ -258,7 +284,7 @@
                         ContractFinishDate = (DateTime) A.ContractFinishDate,
                         MountPerHour = ATP.MountPerHour
 
-                  };
+                    };
     }
 
     private bool FilterFuncEmployer(Project element) => FilterFuncR(element, _searchString);
@@ -282,7 +308,65 @@
             return true;
         return false;
     }
+    private void GoToDisable(string projectName)
+    {
+        this.projectName = projectName;
+        int amountOfAgreements = 0;
+        if (_agreements.Length() > 0)
+        {
+            _agreementMessage = "";
+            foreach (Agreement actualAgreement in _agreements)
+            {
+                if (actualAgreement.ProjectName == projectName && actualAgreement.ContractFinishDate > DateTime.Now)
+                {
+                    foreach (Person actualPerson in _people)
+                    {
+                        if (actualAgreement.EmployeeEmail == actualPerson.Email)
+                        {
+                            amountOfAgreements++;
+                            OpenDialog();
+                            _agreementMessage += "Nombre: " + actualPerson.Name + " " + actualPerson.LastName1 + " " + 
+                                        actualPerson.LastName2 + ". Email: " + actualAgreement.EmployeeEmail + " \n";
+                        }
+                    }
+                }
+            }
+            if (amountOfAgreements == 0)
+            {
+                ConfirmDisableProject();
+            }
+        }
+    }
+    private void ConfirmDisableProject()
+    {
 
+        // si tiene y confirma se desactivan y desactivo proyecto
+        ProjectService.DisableProject(this.projectName, this.personEmail);
+        ShowSnackNotification(this.projectName + " DESACTIVADO exitosamente", Severity.Success);
+        CloseDialog();
+    }
+
+    private void CancelAction() 
+    {
+        CloseDialog();
+    }
+
+    void ShowSnackNotification(string message, Severity severity)
+    {
+        Snackbar.Configuration.SnackbarVariant = Variant.Filled;
+        Snackbar.Configuration.PreventDuplicates = false;
+        Snackbar.Configuration.MaxDisplayedSnackbars = 10;
+        Snackbar.Configuration.NewestOnTop = true;
+        Snackbar.Add($"{message}", severity, config =>
+        {
+            config.RequireInteraction = false;
+            config.ShowCloseIcon = true;
+            config.Onclick = snackbar =>
+            {
+                return Task.CompletedTask;
+            };
+        });
+    }
     private void GoToCreate()
     {
         nav.NavigateTo($"/Create_Project/{personEmail}");
