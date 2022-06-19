@@ -277,6 +277,15 @@ BEGIN
 	SELECT * FROM Agreement WHERE EmployeeEmail = @ContracteeEmail
 END
 
+--Agreement Stored procedure
+GO
+CREATE OR ALTER PROCEDURE GetAllAgreementTypes
+AS
+BEGIN
+	SELECT *
+	FROM AgreementType AS ATP
+END
+
 -- Data Insert
 GO
 INSERT INTO Person
