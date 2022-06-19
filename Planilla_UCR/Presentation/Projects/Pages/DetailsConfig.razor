@@ -107,8 +107,6 @@ else
                         <MudItem xs="2"></MudItem>
                         <MudItem xs="2"></MudItem>
                         <MudItem xs="8">
-                            <br />
-                            <MudDivider />
                         </MudItem>
                         <MudItem xs="2"></MudItem>
                         <MudItem xs="2"></MudItem>
@@ -165,7 +163,6 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        ContextMenuService.SetProjectsContext(true,true,projectName);
         projectInfo = await ProjectService.GetProject(employerEmail,projectName);
 
         if (projectInfo != null)

@@ -1,5 +1,9 @@
 ﻿@using Application.ContextMenu
+@using Domain.Projects.Entities
 @using  Presentation.Core.Components
+@using Application.Projects
+
+@inject IProjectService ProjectService
 @inject IContextMenuService ContextMenuService
 @inject NavigationManager nav
 
@@ -36,7 +40,7 @@
                         <li class="nav-item px-3">   
                             <NavLink class="nav-link" Match="NavLinkMatch.All">
                                 <MudIconButton Icon="@Icons.Filled.CardTravel" Color="@Color.Secondary" Class="mr-2"/>
-                                <span  aria-hidden="true"></span> @projectName
+                                <span  aria-hidden="true"></span> <MudText>@projectName</MudText>
                                 <MudSpacer></MudSpacer>
                                 <MudIconButton Size="Size.Medium" OnClick="ToggleProjectsSubMenu" Icon="@Icons.Material.Filled.ArrowDropUp" Color="Color.Secondary"></MudIconButton>
                             </NavLink>
@@ -47,7 +51,7 @@
                         <li class="nav-item px-3">   
                             <NavLink class="nav-link" Match="NavLinkMatch.All">
                                 <MudIconButton Icon="@Icons.Filled.CardTravel" Color="@Color.Secondary" Class="mr-2"/>
-                                <span  aria-hidden="true"></span> @projectName
+                                <span  aria-hidden="true"></span> <MudText>@projectName</MudText>
                                 <MudSpacer></MudSpacer>
                                 <MudIconButton Size="Size.Medium" OnClick="ToggleProjectsSubMenu" Icon="@Icons.Material.Filled.ArrowDropDown" Color="Color.Secondary"></MudIconButton>
                             </NavLink>
@@ -98,12 +102,12 @@
                     <MudIconButton Icon="@Icons.Filled.BusinessCenter" Color="@Color.Secondary" Class="mr-2"/>
                     <span  aria-hidden="true"></span> Proyectos
                     </NavLink>
-                </li>
-            }
-            else
-            {
-                string projectName = ContextMenuService.GetProjectsContext();
-                <li class="nav-item px-3">
+                    </li>
+                }
+                else
+                {
+                    string projectName = ContextMenuService.GetProjectsContext();
+                    <li class="nav-item px-3">
                     <NavLink class="nav-link" href=@($"Projects/{email}") Match="NavLinkMatch.All">
                     <MudIconButton Icon="@Icons.Filled.BusinessCenter" Color="@Color.Secondary" Class="mr-2"/>
                     <span  aria-hidden="true"></span> Proyectos
@@ -116,7 +120,7 @@
                     <li class="nav-item px-3">   
                         <NavLink class="nav-link" Match="NavLinkMatch.All">
                         <MudIconButton Icon="@Icons.Filled.CardTravel" Color="@Color.Secondary" Class="mr-2"/>
-                        <span  aria-hidden="true"></span> @projectName
+                        <span  aria-hidden="true"></span> <MudText>@projectName</MudText>
                         <MudSpacer></MudSpacer>
                         <MudIconButton Size="Size.Medium" OnClick="ToggleProjectsSubMenu" Icon="@Icons.Material.Filled.ArrowDropUp" Color="Color.Secondary"></MudIconButton>
                         </NavLink>
@@ -127,7 +131,7 @@
                     <li class="nav-item px-3">   
                         <NavLink class="nav-link" Match="NavLinkMatch.All">
                         <MudIconButton Icon="@Icons.Filled.CardTravel" Color="@Color.Secondary" Class="mr-2"/>
-                        <span  aria-hidden="true"></span> @projectName
+                        <span  aria-hidden="true"></span> <MudText>@projectName</MudText>
                         <MudSpacer></MudSpacer>
                         <MudIconButton Size="Size.Medium" OnClick="ToggleProjectsSubMenu" Icon="@Icons.Material.Filled.ArrowDropDown" Color="Color.Secondary"></MudIconButton>
                         </NavLink>
@@ -137,7 +141,7 @@
                     </li>
 
                     <li class="nav-item px-3">
-                        <TabNavLink  Icon="@Icons.Filled.MoreTime" href="@($"/ReportHours/{"leonel@ucr.ac.cr"}/{email}")"  text="Reporte de horas"></TabNavLink>
+                        <TabNavLink  Icon="@Icons.Filled.MoreTime" href="@($"/ReportHours/{ContextMenuService.GetEmployerEmailContext()}/{email}")"  text="Reporte de horas"></TabNavLink>
                     </li>
 
                     <li class="nav-item px-3">
@@ -184,6 +188,6 @@
 
     private void ToggleProjectsSubMenu()
     {
-        ContextMenuService.SetProjectsContext(ContextMenuService.GetShowProjectsMenu(), !ContextMenuService.GetShowProjectsSubMenu(), ContextMenuService.GetProjectsContext());
+        ContextMenuService.SetProjectsContext(ContextMenuService.GetShowProjectsMenu(), !ContextMenuService.GetShowProjectsSubMenu(), ContextMenuService.GetProjectsContext(), ContextMenuService.GetEmployerEmailContext());
     }
 }
