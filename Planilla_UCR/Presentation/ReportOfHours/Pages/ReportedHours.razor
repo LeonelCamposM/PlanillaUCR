@@ -23,7 +23,7 @@
         List<BreadcrumbItem> _items = new List<BreadcrumbItem>
         {
             new BreadcrumbItem("Proyectos", href: $"/Projects/{email}"),
-             new BreadcrumbItem(@projectName, href: $"/Projects/{email}/{ projectName}/Configurations"),
+            new BreadcrumbItem(@projectName, href: $"/EmployeeProjects/{email}/{ projectName}"),
             new BreadcrumbItem("Histórico de horas", href: null, disabled: true)
         }; 
         <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
@@ -54,6 +54,9 @@
                 </MudTable>
         }else
         {
+            <MudText Align="Align.Center" Typo="Typo.h6">
+            No existen horas reportadas en este proyecto
+            </MudText>
            
         }
     }

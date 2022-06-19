@@ -34,7 +34,7 @@
             List<BreadcrumbItem> _items = new List<BreadcrumbItem>
             {
                 new BreadcrumbItem("Proyectos", href: $"/Projects/{email}"),
-                 new BreadcrumbItem(@projectName, href: $"/Projects/{email}/{ projectName}/Configurations"),
+                 new BreadcrumbItem(@projectName, href: $"/EmployeeProjects/{email}/{projectName}"),
                 new BreadcrumbItem("Último pago", href: null, disabled: true)
             }; 
             <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
@@ -130,7 +130,9 @@
                 </MudGrid>
             }else
             {
-           
+                <MudText Align="Align.Center" Typo="Typo.h6">
+                    No existen pagos para este proyecto
+                </MudText>
             }
         }
 }
@@ -167,36 +169,7 @@
     protected override async Task OnParametersSetAsync()
     {
         projectName = ContextMenuService.GetProjectsContext();
-        lastPay = await PaymentService.GetEmployeeLastPayment(email, "leonel@ucr.ac.cr", projectName);
-        lastPay.GrossSalary = 4445000;
-        Agreement toSearchagreement = new Agreement(email, lastPay.EmployerEmail, projectName, null, "", 0, null, 1, "");
-
-
-
-        agreement = await AgreementService.GetContractee(toSearchagreement);
-        legalDeductions = await LegalDeductionService.GetAllAsync();
-        Subscribe searchSubscribe= new Subscribe(email, lastPay.EmployerEmail, projectName, "", 0.0, lastPay.StartDate, lastPay.EndDate);
-        subscriptions = await SubscribeService.GetSubscriptionCostsByDate(searchSubscribe);
-
-        foreach (var item in subscriptions)
-        {
-            if(item.TypeSubscription == 1)
-            {
-                benefits.Add(item);
-
-            }
-            else
-            {
-                deductions.Add(item);
-            }
-        }
-
-        //foreach (var item in legalDeductions)
-        //{
-        //  deductions.Add( new Subscription("", "", item.DeductionName, "", "", item.Cost,1,1));
-        //}
-
-
+        lastPay = await PaymentService.GetEmployeeLastPayment(email, ContextMenuService.GetEmployerEmailContext(), projectName);
 
         if (lastPay == null)
         {
@@ -204,29 +177,48 @@
         }
         else
         {
+            Agreement toSearchagreement = new Agreement(email, lastPay.EmployerEmail, projectName, null, "", 0, null, 1, "");
+
+            agreement = await AgreementService.GetContractee(toSearchagreement);
+            legalDeductions = await LegalDeductionService.GetAllAsync();
+            Subscribe searchSubscribe= new Subscribe(email, lastPay.EmployerEmail, projectName, "", 0.0, lastPay.StartDate, lastPay.EndDate);
+            subscriptions = await SubscribeService.GetSubscriptionCostsByDate(searchSubscribe);
+
+            foreach (var item in subscriptions)
+            {
+                if(item.TypeSubscription == 1)
+                {
+                    benefits.Add(item);
+
+                }
+                else
+                {
+                    deductions.Add(item);
+                }
+            }
+
             empty = false;
+            double netSalary = lastPay.GrossSalary;
+            foreach (var item in benefits)
+            {
+                netSalary += item.Cost;
+            }
+
+            foreach (var item in deductions)
+            {
+                netSalary -= item.Cost;
+            }
+
+            foreach (var item in legalDeductions)
+            {
+                netSalary -= salaryCalculator.getTaxAmount(item.DeductionName, lastPay.GrossSalary);
+            }
+
+
+            rows.Add(@"Empleador: "+lastPay.EmployerEmail +"#"+"Tipo de contrato: "+agreement.ContractType+"#"+"Desde: "+lastPay.StartDate.ToShortDateString() +" Hasta: "+ lastPay.EndDate.ToShortDateString());
+            rows.Add( @"Proyecto: "+lastPay.ProjectName +"#"+" "+"#"+"Salario bruto: "+ cultureCR.NumberFormat.CurrencySymbol+ costFormat(lastPay.GrossSalary));
+            rows.Add( @" "+"#"+" "+"#"+"Salario neto: "+cultureCR.NumberFormat.CurrencySymbol+ costFormat(netSalary));
         }
-
-        double netSalary = lastPay.GrossSalary;
-        foreach (var item in benefits)
-        {
-            netSalary += item.Cost;
-        }
-
-        foreach (var item in deductions)
-        {
-            netSalary -= item.Cost;
-        }
-
-        foreach (var item in legalDeductions)
-        {
-            netSalary -= salaryCalculator.getTaxAmount(item.DeductionName, lastPay.GrossSalary);
-        }
-
-
-        rows.Add(@"Empleador: "+lastPay.EmployerEmail +"#"+"Tipo de contrato: "+agreement.ContractType+"#"+"Desde: "+lastPay.StartDate.ToShortDateString() +" Hasta: "+ lastPay.EndDate.ToShortDateString());
-        rows.Add( @"Proyecto: "+lastPay.ProjectName +"#"+"Monto por horas: "+cultureCR.NumberFormat.CurrencySymbol+ costFormat(agreement.MountPerHour)+"#"+"Salario bruto: "+ cultureCR.NumberFormat.CurrencySymbol+ costFormat(lastPay.GrossSalary));
-        rows.Add( @" "+"#"+" "+"#"+"Salario neto: "+cultureCR.NumberFormat.CurrencySymbol+ costFormat(netSalary));
         _loading = false;
     }
 
