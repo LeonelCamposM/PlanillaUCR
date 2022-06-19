@@ -164,7 +164,7 @@
 
     public string projectName { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
         projectName = ContextMenuService.GetProjectsContext();
         lastPay = await PaymentService.GetEmployeeLastPayment(email, "leonel@ucr.ac.cr", projectName);
@@ -206,7 +206,6 @@
         {
             empty = false;
         }
-        _loading = false;
 
         double netSalary = lastPay.GrossSalary;
         foreach (var item in benefits)
@@ -228,6 +227,7 @@
         rows.Add(@"Empleador: "+lastPay.EmployerEmail +"#"+"Tipo de contrato: "+agreement.ContractType+"#"+"Desde: "+lastPay.StartDate.ToShortDateString() +" Hasta: "+ lastPay.EndDate.ToShortDateString());
         rows.Add( @"Proyecto: "+lastPay.ProjectName +"#"+"Monto por horas: "+cultureCR.NumberFormat.CurrencySymbol+ costFormat(agreement.MountPerHour)+"#"+"Salario bruto: "+ cultureCR.NumberFormat.CurrencySymbol+ costFormat(lastPay.GrossSalary));
         rows.Add( @" "+"#"+" "+"#"+"Salario neto: "+cultureCR.NumberFormat.CurrencySymbol+ costFormat(netSalary));
+        _loading = false;
     }
 
     private void PageChanged(int i)

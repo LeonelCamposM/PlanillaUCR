@@ -134,7 +134,7 @@
 
                     <RowTemplate Context="row">
                         <MudTd DataLabel="Nombre" >
-                            <MudLink Color="Color.Primary" Underline="Underline.Always" Href="@($"/Projects/{employeeEmail}/{@row.EmployerEmail}/{@row.ProjectName}")">
+                            <MudLink Color="Color.Primary" Underline="Underline.Always" Href="@($"/EmployeeProjects/{employeeEmail}/{@row.ProjectName}")">
                                 @row.ProjectName
                             </MudLink>
                         </MudTd>

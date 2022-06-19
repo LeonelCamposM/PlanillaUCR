@@ -163,6 +163,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        ContextMenuService.SetProjectsContext(true,true,projectName, employerEmail);
         projectInfo = await ProjectService.GetProject(employerEmail,projectName);
 
         if (projectInfo != null)
