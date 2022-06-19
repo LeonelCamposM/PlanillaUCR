@@ -3,6 +3,7 @@
 @using Domain.Subscribes.Entities
 @using Application.Subscribes
 @using Presentation.Benefits.Components
+@using System.Globalization
 @inject ISnackbar Snackbar
 @inject NavigationManager nav
 @inject ISubscriptionService SubscriptionService
@@ -33,26 +34,34 @@
         }else
         {
             <MudTable @ref="_mudTable" Items="@_elements" RowsPerPage="4" MultiSelection="true" @bind-SelectedItems="_selectedItems1" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="Color.Info" Filter="new Func<Subscription,bool>(FilterFunc1)">
-                    <ToolBarContent>
-                            <MudButton Color="Color.Tertiary"> Beneficios disponibles</MudButton>
-                            <MudButton OnClick="SendConmuteSignal"> Mis beneficios </MudButton>
-                            <MudSpacer />
-                            <MudTextField @bind-Value="_searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-                    </ToolBarContent> 
-                        <HeaderContent>
-                            <MudTh>Beneficio</MudTh>
-                            <MudTh>Descripción</MudTh>
-                        </HeaderContent>
+                <ColGroup>
+                    <col />
+                    <col />
+                    <col style ="text-align:right" />
+                </ColGroup>    
+                <ToolBarContent>
+                        <MudButton Color="Color.Tertiary"> Beneficios disponibles</MudButton>
+                        <MudButton OnClick="SendConmuteSignal"> Mis beneficios </MudButton>
+                        <MudSpacer />
+                        <MudTextField @bind-Value="_searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                </ToolBarContent> 
 
-                        <RowTemplate>
-                            <MudTd DataLabel="Beneficio">@context.SubscriptionName</MudTd>
-                            <MudTd DataLabel="Descripción">@context.SubscriptionDescription</MudTd>
-                        </RowTemplate>
+                <HeaderContent>
+                    <MudTh>Beneficio</MudTh>
+                    <MudTh>Descripción</MudTh>
+                    <MudTh>Monto</MudTh>
+                </HeaderContent>
 
-                        <PagerContent>
-                            <MudPagination SelectedChanged="PageChanged" Count="@((_mudTable.GetFilteredItemsCount() + _mudTable.RowsPerPage - 1) / _mudTable.RowsPerPage)" Color="Color.Primary" Class="pa-4"/>
-                        </PagerContent>
-                    </MudTable>
+                <RowTemplate>
+                    <MudTd DataLabel="Beneficio">@context.SubscriptionName</MudTd>
+                    <MudTd DataLabel="Descripción">@context.SubscriptionDescription</MudTd>
+                    <MudTd DataLabel="Monto"> @cultureCR.NumberFormat.CurrencySymbol @costFormat(context.Cost)</MudTd>
+                </RowTemplate>
+
+                <PagerContent>
+                    <MudPagination SelectedChanged="PageChanged" Count="@((_mudTable.GetFilteredItemsCount() + _mudTable.RowsPerPage - 1) / _mudTable.RowsPerPage)" Color="Color.Primary" Class="pa-4"/>
+                </PagerContent>
+            </MudTable>
                      <br>
                     <MudButton Variant="Variant.Filled" OnClick="Subscribe" Color="Color.Primary">
                         <MudText>
@@ -72,6 +81,7 @@
     private HashSet<Subscription> _selectedItems1 = new HashSet<Subscription>();
     private MudTable<Subscription> _mudTable;
     private Subscribe subscribe = new Subscribe("", "", "", "", 0.0, DateTime.Now);
+    public CultureInfo cultureCR = CultureInfo.GetCultureInfo("es-CR");
 
     [Parameter]
     public string projectName { get; set; }
@@ -143,5 +153,11 @@
             }
         }
         await SendConmuteSignal();
+    }
+
+    private string costFormat(double cost)
+    {
+        string costo = string.Format("{0:N}", cost);
+        return costo;
     }
 }

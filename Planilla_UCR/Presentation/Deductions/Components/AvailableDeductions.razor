@@ -3,6 +3,7 @@
 @using Domain.Subscribes.Entities
 @using Application.Subscribes
 @using Presentation.Deductions.Components
+@using System.Globalization
 @inject ISnackbar Snackbar
 @inject NavigationManager nav
 @inject ISubscriptionService SubscriptionService
@@ -32,35 +33,61 @@
               <AvailableDeductionsError employeeEmail="@employeeEmail" projectName="@projectName" SendTableState="SendConmuteSignal"></AvailableDeductionsError>
         }else
         {
-            <MudTable @ref="_mudTable" Items="@_elements" RowsPerPage="4" MultiSelection="true" @bind-SelectedItems="_selectedItems1" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="Color.Info" Filter="new Func<Subscription,bool>(FilterFunc1)">
-                    <ToolBarContent>
-                            <MudButton Color="Color.Tertiary"> Deducciones voluntarias disponibles</MudButton>
-                            <MudButton OnClick="SendConmuteSignal"> Mis deducciones voluntarias </MudButton>
-                            <MudSpacer />
-                            <MudTextField @bind-Value="_searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-                    </ToolBarContent> 
-                        <HeaderContent>
-                            <MudTh>Deducción voluntaria</MudTh>
-                            <MudTh>Descripción</MudTh>
-                        </HeaderContent>
+            <MudTable @ref="_mudTable" Items="@_elements" RowsPerPage="4" MultiSelection="true" @bind-SelectedItems="_selectedItems1" Hover="true" Loading="@_loading" LoadingProgressColor="Color.Info" Filter="new Func<Subscription,bool>(FilterFunc1)">
+@*                <ColGroup>
+                    <col style="width: 33%;" />
+                    <col style="width: 33%;" />
+                    <col style="width: 33%;" />
+                </ColGroup>*@
+                <ToolBarContent>
+                        <MudButton Color="Color.Tertiary"> Deducciones voluntarias disponibles</MudButton>
+                        <MudButton OnClick="SendConmuteSignal"> Mis deducciones voluntarias </MudButton>
+                        <MudSpacer />
+                        <MudTextField @bind-Value="_searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                </ToolBarContent> 
+                    
+                <HeaderContent>
+                    <MudTh>Deducción voluntaria</MudTh>
+                    <MudTh>Descripción</MudTh>
+                    <MudTh>Monto sugerido</MudTh>
+                </HeaderContent>
 
-                        <RowTemplate>
-                            <MudTd DataLabel="Deducción voluntaria">@context.SubscriptionName</MudTd>
-                            <MudTd DataLabel="Descripción">@DescriptionFormat(context.SubscriptionDescription)
-                            </MudTd>
-                        </RowTemplate>
+                <RowTemplate>
+                    <MudTd DataLabel="Deducción voluntaria">@context.SubscriptionName</MudTd>
+                    <MudTd DataLabel="Descripción" Style="width: 33%;">@context.SubscriptionDescription</MudTd>
+                    <MudTd DataLabel="Monto sugerido" Style="text-align:right"> @cultureCR.NumberFormat.CurrencySymbol @costFormat(context.Cost)</MudTd>
+                </RowTemplate>
 
-                        <PagerContent>
-                            <MudPagination SelectedChanged="PageChanged" Count="@((_mudTable.GetFilteredItemsCount() + _mudTable.RowsPerPage - 1) / _mudTable.RowsPerPage)" Color="Color.Primary" Class="pa-4"/>
-                        </PagerContent>
-                    </MudTable>
-                     <br>
-                    <MudButton Variant="Variant.Filled" OnClick="Subscribe" Color="Color.Primary">
-                        <MudText>
-                            Suscribirse
-                        </MudText> 
-                    </MudButton>
+                <PagerContent>
+                    <MudPagination SelectedChanged="PageChanged" Count="@((_mudTable.GetFilteredItemsCount() + _mudTable.RowsPerPage - 1) / _mudTable.RowsPerPage)" Color="Color.Primary" Class="pa-4"/>
+                </PagerContent>
+            </MudTable>
+            <br>
+            <MudButton Variant="Variant.Filled" OnClick="OpenDialog" Color="Color.Primary">
+                <MudText>
+                    Suscribirse
+                </MudText> 
+            </MudButton>
         }
+
+        <MudDialog @bind-IsVisible="_visible" Options="dialogOptions">
+            <TitleContent>
+                <MudText Typo="Typo.h6">
+                    <MudIcon Icon="@Icons.Filled.AttachMoney" Color="@Color.Primary" Class="mr-2"/> Ingrese el monto a aportar</MudText>
+            </TitleContent>
+            <DialogContent>
+                @foreach (Subscription _element in _selectedItems1)
+                {
+                    <MudText>@_element.SubscriptionName</MudText>
+                    <MudNumericField Immediate="true" Label="Costo" Format="N2" Culture="@cultureCR" Variant="Variant.Outlined" @bind-Value=_element.Cost 
+                    Adornment="Adornment.Start" AdornmentText="@cultureCR.NumberFormat.CurrencySymbol" Required="true" RequiredError="Campo requerido" Min = "0.0" />
+                }
+            </DialogContent>
+            <DialogActions>
+                  <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Subscribe" Class="px-10">Aceptar</MudButton>
+                  <MudButton Variant="Variant.Filled" Color="Color.Transparent" OnClick="CloseDialog" Class="px-10">Cancelar</MudButton>
+            </DialogActions>
+        </MudDialog>
     }
 }
 
@@ -73,6 +100,7 @@
     private HashSet<Subscription> _selectedItems1 = new HashSet<Subscription>();
     private MudTable<Subscription> _mudTable;
     private Subscribe subscribe = new Subscribe("", "", "", "", 0.0, DateTime.Now);
+    public CultureInfo cultureCR = CultureInfo.GetCultureInfo("es-CR");
 
     [Parameter]
     public string projectName { get; set; }
@@ -80,6 +108,12 @@
     public string employeeEmail { get; set; }
     [Parameter]
     public EventCallback<string> SendTableState { get; set; }
+
+    private bool _visible;
+    private bool _open;
+    private void OpenDialog() => _visible = true;
+    void CloseDialog() => _visible = false;
+    private DialogOptions dialogOptions = new() { FullWidth = true };
 
     protected override async Task OnInitializedAsync()
     {
@@ -116,6 +150,7 @@
 
     private async Task Subscribe()
     {
+        CloseDialog();
         IEnumerable<Subscribe> _actualSubscriptions = await SubscribeService.GetDeductionsByEmployee(employeeEmail, projectName);
         foreach (Subscription subscription in _selectedItems1)
         {
@@ -155,5 +190,11 @@
 
         }
         return formattedDescription;
+    }
+
+    private string costFormat(double cost)
+    {
+        string costo = string.Format("{0:N}", cost);
+        return costo;
     }
 }
