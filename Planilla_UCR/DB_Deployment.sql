@@ -11,7 +11,8 @@ CREATE TABLE Person(
 	SSN int NOT NULL,
 	BankAccount varchar(255) NOT NULL,
 	Adress varchar(255),
-	PhoneNumber varchar(255)
+	PhoneNumber varchar(255),
+	IsEnabled int NOT NULL
 );
 
 CREATE TABLE Employee(
@@ -53,10 +54,10 @@ CREATE TABLE Agreement(
 	PRIMARY KEY(EmployeeEmail,EmployerEmail,ProjectName,ContractStartDate),
 	FOREIGN KEY(EmployeeEmail) REFERENCES Employee(Email),
 	FOREIGN KEY(EmployerEmail, ProjectName) REFERENCES Project(EmployerEmail, ProjectName) ON UPDATE CASCADE,
-	FOREIGN KEY(ContractType, MountPerHour) REFERENCES AgreementType(TypeAgreement, MountPerHour)
+	FOREIGN KEY(ContractType, MountPerHour) REFERENCES AgreementType(TypeAgreement, MountPerHour),
+	IsEnabled int NOT NULL,
+	Justification varchar(max)
 );
-
-
 
 CREATE TABLE Subscription
 (
@@ -159,7 +160,7 @@ GO
 CREATE OR ALTER PROCEDURE GetEmployerByEmail(@email VARCHAR(255))
 AS
 BEGIN
-    SELECT * FROM Employer WHERE Employer.Email = @email
+    SELECT * FROM Employer WHERE Employer.Email = @email 
 END
 
 GO
@@ -198,9 +199,8 @@ GO
 CREATE OR ALTER PROCEDURE GetPersonByEmail(@email varchar(255))
 AS
 BEGIN
-    SELECT * FROM Person AS P WHERE P.Email = @email
+    SELECT * FROM Person AS P WHERE P.Email = @email AND P.IsEnabled=1
 END
-
 
 GO
 CREATE OR ALTER PROCEDURE UpdatePerson(
@@ -219,7 +219,7 @@ BEGIN
 	SET Name=@NewName, LastName1=@NewLastName1, LastName2=@NewLastName2, 
 	SSN=@NewSSN, BankAccount=@NewBankAccount, 
 	Adress=@NewAdress, PhoneNumber=@NewPhoneNumber
-	WHERE Email=@EmailPerson
+	WHERE Email=@EmailPerson AND IsEnabled=1
 END
 
 
@@ -227,8 +227,34 @@ GO
 CREATE OR ALTER PROCEDURE GetInfoPerson(@EmailPerson varchar(255))
 AS
 BEGIN
-	SELECT Person.Email, Person.Name, Person.LastName1, Person.LastName2, Person.SSN, Person.BankAccount, Person.Adress, Person.PhoneNumber
-	FROM  Person WHERE Person.Email = @EmailPerson
+	SELECT Person.Email, Person.Name, Person.LastName1, Person.LastName2, Person.SSN, Person.BankAccount, 
+	Person.Adress, Person.PhoneNumber, Person.IsEnabled
+	FROM  Person WHERE Person.Email = @EmailPerson AND Person.IsEnabled=1
+END
+
+--Employer Stored Procedures
+
+GO
+CREATE OR ALTER PROCEDURE DeleteEmployer(
+	@EmployerEmail varchar(255)
+) AS
+BEGIN
+	UPDATE Person
+	SET IsEnabled = 0
+	WHERE Person.Email = @EmployerEmail;
+
+	UPDATE Project 
+	SET IsEnabled = 0
+	WHERE Project.EmployerEmail = @EmployerEmail;
+
+	UPDATE Agreement 
+	SET IsEnabled = 0
+	WHERE Agreement.EmployerEmail = @EmployerEmail;
+
+	UPDATE Subscription 
+	SET IsEnabled = 0
+	WHERE Subscription.EmployerEmail = @EmployerEmail;
+
 END
 
 
@@ -238,21 +264,18 @@ CREATE OR ALTER PROCEDURE [dbo].[GetAllEmployees]
 @projectName VARCHAR(255)
 AS
 BEGIN
-	SELECT P.Email, P.Name, P.LastName1, P.LastName2, P.SSN, P.BankAccount, P.Adress, P.PhoneNumber
+	SELECT P.Email, P.Name, P.LastName1, P.LastName2, P.SSN, P.BankAccount, P.Adress, P.PhoneNumber, P.IsEnabled
 	FROM Employee JOIN  Person AS P ON Employee.Email = P.Email left JOIN Agreement as A ON A.EmployeeEmail = Employee.Email
 	Where A.ProjectName IS NULL OR A.ProjectName != @projectName
-	Group by P.Email, P.Name, P.LastName1, P.LastName2, P.SSN, P.BankAccount, P.Adress, P.PhoneNumber
+	Group by P.Email, P.Name, P.LastName1, P.LastName2, P.SSN, P.BankAccount, P.Adress, P.PhoneNumber, P.IsEnabled
 END
-
-select *
-from Agreement
 
 GO
 CREATE OR ALTER PROCEDURE [dbo].[GetProjectEmployees]
 @projectName VARCHAR(255)
 AS
 BEGIN
-	SELECT P.Email, P.Name, P.LastName1, P.LastName2, P.SSN, P.BankAccount, P.Adress, P.PhoneNumber
+	SELECT P.Email, P.Name, P.LastName1, P.LastName2, P.SSN, P.BankAccount, P.Adress, P.PhoneNumber, P.IsEnabled
 	FROM Agreement as A JOIN  Person as P ON A.EmployeeEmail = P.Email
 	Where A.ProjectName = @projectName
 END
@@ -261,7 +284,7 @@ GO
 CREATE OR ALTER PROCEDURE GetEmployeeByEmail(@email varchar(255))
 AS
 BEGIN
-    SELECT * FROM Employee AS E WHERE E.Email = @email
+    SELECT * FROM Employee AS E WHERE E.Email = @email 
 END
 
 GO
@@ -275,7 +298,7 @@ GO
 CREATE OR ALTER PROCEDURE GetContracteeByEmail(@ContracteeEmail varchar(255))
 AS
 BEGIN 
-	SELECT * FROM Agreement WHERE EmployeeEmail = @ContracteeEmail
+	SELECT * FROM Agreement WHERE EmployeeEmail = @ContracteeEmail AND IsEnabled = 1
 END
 
 -- Data Insert
@@ -288,7 +311,8 @@ VALUES('jeremy@ucr.ac.cr',
 5454454,
 '40234020012',
 'San José, Costa Rica',
-'62571204'
+'62571204',
+1
 )
 
 INSERT INTO Person
@@ -299,7 +323,8 @@ VALUES('leonel@ucr.ac.cr',
 242342,
 'CR40324350012',
 'San José, Costa Rica',
-'83355316'
+'83355316',
+1
 )
 
 INSERT INTO Person
@@ -310,7 +335,20 @@ VALUES('mau@ucr.ac.cr',
 8857655,
 'CR4024220012',
 'San José, Costa Rica',
-'677774'
+'677774',
+1
+)
+
+INSERT INTO Person
+VALUES('nasheazofeifa3003@gmail.com',
+'Nasheri',
+'Azofeifa',
+'Porras',
+118070615,
+'CR4024',
+'San José, Costa Rica',
+'89433965',
+1
 )
 
 INSERT INTO Employer
@@ -321,6 +359,9 @@ VALUES('mau@ucr.ac.cr')
 
 INSERT INTO Employee
 VALUES('jeremy@ucr.ac.cr')
+
+INSERT INTO Employee
+VALUES('nasheazofeifa3003@gmail.com')
 
 INSERT INTO Project
 VALUES('leonel@ucr.ac.cr',
@@ -440,10 +481,10 @@ Insert into AgreementType
 Values('Por horas', 10)
 
 INSERT INTO Agreement
-VALUES('jeremy@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Proyecto 1','9999-12-31','Por horas', 10, '9999-12-31')
+VALUES('jeremy@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Proyecto 1','9999-12-31','Por horas', 10, '9999-12-31', 1, '')
 
 INSERT INTO Agreement
-VALUES('jeremy@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Proyecto 2','9999-12-31','Por horas', 10, '9999-12-31')
+VALUES('jeremy@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Proyecto 2','9999-12-31','Por horas', 10, '9999-12-31', 1, '')
 
 
 INSERT INTO ReportOfHours
