@@ -87,7 +87,7 @@ CREATE TABLE Subscribes(
 	ProjectName varchar(255) NOT NULL,
 	SubscriptionName varchar(255) NOT NULL,
 	Cost float NOT NULL,
-	StartDate date NOT NULL,
+	StartDate datetime NOT NULL,
 	EndDate date,
 	PRIMARY KEY(EmployeeEmail,EmployerEmail,ProjectName, SubscriptionName, StartDate),
 	FOREIGN KEY(EmployerEmail, ProjectName, SubscriptionName) REFERENCES Subscription(EmployerEmail, ProjectName, SubscriptionName) ON UPDATE CASCADE,
@@ -139,7 +139,7 @@ BEGIN
 	WHERE EmployerEmail= @EmployerEmail AND ProjectName = @ProjectName AND SubscriptionName = @SubscriptionName;
 
 	DECLARE @EmployeeEmail varchar(255)
-	DECLARE @StartDate date
+	DECLARE @StartDate datetime
 	DECLARE cursor_Subscribes CURSOR FOR
 	SELECT EmployeeEmail, StartDate
 	FROM Subscribes WHERE EmployerEmail = @EmployerEmail AND ProjectName = @ProjectName AND SubscriptionName = @SubscriptionName
@@ -193,7 +193,7 @@ BEGIN
 		S.EmployerEmail = C.EmployerEmail AND
 		S.ProjectName = C.ProjectName AND
 		S.SubscriptionName = C.SubscriptionName
-	WHERE S.EmployeeEmail = @EmployeeEmail AND C.IsEnabled = 1 AND C.TypeSubscription = 1 AND  S.ProjectName =  @ProjectName
+	WHERE S.EmployeeEmail = @EmployeeEmail AND C.IsEnabled = 1 AND C.TypeSubscription = 1 AND  S.ProjectName =  @ProjectName AND S.EndDate IS NULL
 END
 
 GO
@@ -205,7 +205,7 @@ BEGIN
 		S.EmployerEmail = C.EmployerEmail AND
 		S.ProjectName = C.ProjectName AND
 		S.SubscriptionName = C.SubscriptionName
-	WHERE S.EmployeeEmail = @EmployeeEmail AND C.IsEnabled = 1 AND C.TypeSubscription = 0 AND  S.ProjectName =  @ProjectName
+	WHERE S.EmployeeEmail = @EmployeeEmail AND C.IsEnabled = 1 AND C.TypeSubscription = 0 AND  S.ProjectName =  @ProjectName AND S.EndDate IS NULL
 END
 
 GO
@@ -215,13 +215,16 @@ CREATE OR ALTER PROCEDURE AddNewSubscribes(
 	@ProjectName varchar(255),
 	@SubscriptionName varchar(255),
 	@Cost float,
-	@StartDate date,
-	@TypeSubscription tinyint
+	@StartDate datetime,
+	@TypeSubscription tinyint,
+	@ErrorCode tinyint OUTPUT
 )
 AS
 BEGIN
+	SET @ErrorCode = 0
 	IF @TypeSubscription = 0
 		BEGIN
+			SET @ErrorCode = 1
 			INSERT INTO Subscribes (EmployeeEmail,EmployerEmail,ProjectName,SubscriptionName,Cost,StartDate)
 			VALUES (@EmployeeEmail, @EmployerEmail, @ProjectName, @SubscriptionName, @Cost, @StartDate)
 		END
@@ -242,6 +245,7 @@ BEGIN
 		
 			IF(@MAFB = 0 AND @MBA = 0)
 				BEGIN
+					SET @ErrorCode = 1
 					INSERT INTO Subscribes (EmployeeEmail,EmployerEmail,ProjectName,SubscriptionName,Cost,StartDate)
 					VALUES (@EmployeeEmail, @EmployerEmail, @ProjectName, @SubscriptionName, @Cost, @StartDate)
 				END
@@ -249,6 +253,7 @@ BEGIN
 				BEGIN
 					IF (@EmployeeAmountForBenefitCount <= @MAFB)
 						BEGIN
+							SET @ErrorCode = 1
 							INSERT INTO Subscribes (EmployeeEmail,EmployerEmail,ProjectName,SubscriptionName,Cost,StartDate)
 							VALUES (@EmployeeEmail, @EmployerEmail, @ProjectName, @SubscriptionName, @Cost, @StartDate)
 						END
@@ -257,6 +262,7 @@ BEGIN
 				BEGIN
 					IF (@EmployeeBenefitAmountCount <= @MBA)
 						BEGIN
+							SET @ErrorCode = 1
 							INSERT INTO Subscribes (EmployeeEmail,EmployerEmail,ProjectName,SubscriptionName,Cost,StartDate)
 							VALUES (@EmployeeEmail, @EmployerEmail, @ProjectName, @SubscriptionName, @Cost, @StartDate)
 						END
@@ -265,6 +271,7 @@ BEGIN
 				BEGIN
 					IF (@EmployeeBenefitAmountCount <= @MBA AND @EmployeeAmountForBenefitCount <= @MAFB)
 						BEGIN
+							SET @ErrorCode = 1
 							INSERT INTO Subscribes (EmployeeEmail,EmployerEmail,ProjectName,SubscriptionName,Cost,StartDate)
 							VALUES (@EmployeeEmail, @EmployerEmail, @ProjectName, @SubscriptionName, @Cost, @StartDate)
 						END
@@ -284,7 +291,7 @@ BEGIN
 	DECLARE @EmployerEmail varchar(255)
 	DECLARE @ProjectName varchar(255)
 	DECLARE @SubscriptionName varchar(255)
-	DECLARE @StartDate varchar(255)
+	DECLARE @StartDate datetime
 	SELECT @EmployeeEmail = D.EmployeeEmail, @EmployerEmail = D.EmployerEmail, @ProjectName = D.ProjectName, @SubscriptionName = D.SubscriptionName, @StartDate =  D.StartDate
 	FROM deleted D
 
@@ -455,8 +462,8 @@ INSERT INTO Project
 VALUES('leonel@ucr.ac.cr',
 'Proyecto 1',
 'Emprendimiento de chocolates',
-15000,
-10,
+150000,
+2,
 'Quincenal'
 )
 
@@ -591,7 +598,7 @@ VALUES('leonel@ucr.ac.cr',
 '2012-07-15'
 )
 
-/*INSERT INTO Person
+INSERT INTO Person
 VALUES('sofia@ucr.ac.cr',
 'Sofia',
 'Castillo',
@@ -608,6 +615,7 @@ VALUES('sofia@ucr.ac.cr')
 INSERT INTO Agreement
 VALUES('sofia@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Proyecto 1','9999-12-31','Por horas', 10, '9999-12-31')
 
+/*
 INSERT INTO Subscribes (EmployerEmail, ProjectName, SubscriptionName, EmployeeEmail, Cost, StartDate)
 VALUES('leonel@ucr.ac.cr',
 'Proyecto 1',

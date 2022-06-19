@@ -3,6 +3,7 @@
 @using Domain.Subscribes.Entities
 @using Application.Subscribes
 @using Presentation.Benefits.Components
+@inject ISnackbar Snackbar
 @inject NavigationManager nav
 @inject ISubscriptionService SubscriptionService
 @inject ISubscribeService SubscribeService
@@ -112,14 +113,35 @@
         await SendTableState.InvokeAsync("");
     }
 
-    private void Subscribe()
+    private async Task Subscribe()
     {
+        IEnumerable<Subscribe> _actualSubscriptions = await SubscribeService.GetBenefitsByEmployee(employeeEmail, projectName);
         foreach (Subscription subscription in _selectedItems1)
         {
-            subscribe.EmployerEmail = subscription.EmployerEmail;
-            subscribe.SubscriptionName = subscription.SubscriptionName;
-            subscribe.Cost = subscription.Cost;
-            SubscribeService.CreateSubscribe(subscribe, 1);
+            var _active = _actualSubscriptions.FirstOrDefault(e=>e.EmployeeEmail == employeeEmail &&
+                e.EmployerEmail == subscription.EmployerEmail && 
+                e.SubscriptionName == subscription.SubscriptionName &&
+                e.EndDate == null);
+            if (_active == null)
+            {
+                subscribe.EmployerEmail = subscription.EmployerEmail;
+                subscribe.SubscriptionName = subscription.SubscriptionName;
+                subscribe.Cost = subscription.Cost;
+                int error = SubscribeService.CreateSubscribe(subscribe, 1);
+                if (error == 1)
+                {
+                    Snackbar.Add("Suscripción realizada con éxito", Severity.Success);
+                }
+                else
+                {
+                    Snackbar.Add("No se pudo suscribir al beneficio porque incumple los límites impuestos en el proyecto", Severity.Warning);
+                }
+            }
+            else
+            {
+                Snackbar.Add("El beneficio ya está siendo usado", Severity.Warning);
+            }
         }
+        await SendConmuteSignal();
     }
 }

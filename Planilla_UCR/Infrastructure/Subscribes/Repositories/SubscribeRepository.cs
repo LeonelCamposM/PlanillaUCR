@@ -3,7 +3,9 @@ using Domain.Subscribes.Entities;
 using Domain.Subscribes.Repositories;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -19,14 +21,19 @@ namespace Infrastructure.Subscribes.Repositories
             _dbContext = unitOfWork;
         }
 
-        public void CreateSubscribe(Subscribe subscription, int typeSubscription)
+        public int CreateSubscribe(Subscribe subscription, int typeSubscription)
         {
+            SqlParameter errorCode = new SqlParameter();
+            errorCode.SqlDbType = SqlDbType.Int;
+            errorCode.ParameterName = "@ErrorCode";
+            errorCode.Direction = ParameterDirection.Output;
             System.FormattableString query = ($@"EXECUTE AddNewSubscribes
                 @EmployeeEmail = {subscription.EmployeeEmail}, @EmployerEmail = {subscription.EmployerEmail},
                 @ProjectName = {subscription.ProjectName}, @SubscriptionName = {subscription.SubscriptionName},
                 @Cost = {subscription.Cost}, @StartDate= {subscription.StartDate},
-                @TypeSubscription = {typeSubscription}");
+                @TypeSubscription = {typeSubscription}, @ErrorCode = {errorCode} OUT");
             _dbContext.Database.ExecuteSqlInterpolated(query);
+            return Convert.ToInt32(errorCode.Value);
         }
 
         public async Task<IEnumerable<Subscribe>> GetEmployeesBySubscription(string employerEmail, string projectName, string subscriptionName)

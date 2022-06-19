@@ -14,9 +14,9 @@ namespace Application.Subscribes.Implementations
             _subscribeRepository = subscribeRepository;
         }
 
-        public void CreateSubscribe(Subscribe subscription, int typeSubscription)
+        public int CreateSubscribe(Subscribe subscription, int typeSubscription)
         {
-            _subscribeRepository.CreateSubscribe(subscription, typeSubscription);
+            return _subscribeRepository.CreateSubscribe(subscription, typeSubscription);
         }
 
         public async Task<IEnumerable<Subscribe>> GetEmployeesBySubscription(string employerEmail, string projectName, string subscriptionName)

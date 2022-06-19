@@ -1,5 +1,7 @@
 ﻿@using Application.Subscribes
 @using Domain.Subscribes.Entities
+@using System
+@inject ISnackbar Snackbar
 @inject NavigationManager nav
 @inject ISubscribeService SubscribeService
 
@@ -41,7 +43,7 @@
 
                     <RowTemplate>
                         <MudTd DataLabel="Beneficio">@context.SubscriptionName</MudTd>
-                        <MudTd DataLabel="Fecha de Inicio">@context.StartDate</MudTd>
+                        <MudTd DataLabel="Fecha de Inicio">@context.StartDate.ToString("MM/dd/yyyy")</MudTd>
                     </RowTemplate>
 
                     <PagerContent>
@@ -49,7 +51,7 @@
                     </PagerContent>
             </MudTable>
                 <br>
-            <MudButton Variant="Variant.Filled" OnClick="Desubscribe" Color="Color.Primary">
+            <MudButton Variant="Variant.Filled" OnClick="Unsubscribe" Color="Color.Primary">
                 <MudText>
                     Desuscribirse
                 </MudText> 
@@ -105,8 +107,13 @@
         await SendTableState.InvokeAsync("");
     }
 
-    private void Desubscribe()
+    private async Task Unsubscribe()
     {
-         
+        foreach (Subscribe subscription in _selectedItems1)
+        {
+            SubscribeService.DeleteSubscribe(subscription);
+        }
+        Snackbar.Add("Suscripción finalizada con éxito", Severity.Success);
+        await SendConmuteSignal();
     }
 }
