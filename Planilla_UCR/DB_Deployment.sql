@@ -597,30 +597,3 @@ VALUES('leonel@ucr.ac.cr',
 25000,
 '2012-07-15'
 )
-
-INSERT INTO Person
-VALUES('sofia@ucr.ac.cr',
-'Sofia',
-'Castillo',
-'Campos',
-1233423341,
-'34124321',
-'San José, Costa Rica',
-'62571204'
-)
-
-INSERT INTO Employee
-VALUES('sofia@ucr.ac.cr')
-
-INSERT INTO Agreement
-VALUES('sofia@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Proyecto 1','9999-12-31','Por horas', 10, '9999-12-31')
-
-/*
-INSERT INTO Subscribes (EmployerEmail, ProjectName, SubscriptionName, EmployeeEmail, Cost, StartDate)
-VALUES('leonel@ucr.ac.cr',
-'Proyecto 1',
-'Gym',
-'sofia@ucr.ac.cr',
-25000,
-'2012-07-15'
-)*/
