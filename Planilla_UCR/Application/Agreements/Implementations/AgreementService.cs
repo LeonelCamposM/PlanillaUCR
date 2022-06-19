@@ -26,9 +26,14 @@ namespace Application.Agreements.Implementations
             return await _agreementRepository.GetContractee(agreement);
         }
 
-        public Task<IEnumerable<Agreement>> GetEmployeeProjects(string employeeEmail)
+        public Task<IEnumerable<Agreement>> GetEmployeeAgreements(string employeeEmail)
         {
-            return _agreementRepository.GetEmployeeProjects(employeeEmail);
+            return _agreementRepository.GetEmployeeAgreements(employeeEmail);
         }
+        public Task<IEnumerable<Agreement>> GetEmployerAgreements(string employerEmail)
+        {
+            return _agreementRepository.GetEmployerAgreements(employerEmail);
+        }
+
     }
 }

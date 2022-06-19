@@ -9,7 +9,8 @@ namespace Application.Agreements
     {
         Task CreateAgreementAsync(Agreement agreement);
         Task<Agreement>? GetContractee(Agreement agreement);
-        Task<IEnumerable<Agreement>> GetEmployeeProjects(string employeeEmail);
+        Task<IEnumerable<Agreement>> GetEmployeeAgreements(string employeeEmail);
+        Task<IEnumerable<Agreement>> GetEmployerAgreements(string employerEmail);
 
     }
 }
