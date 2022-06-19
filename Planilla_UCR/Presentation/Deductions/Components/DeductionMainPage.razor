@@ -60,7 +60,7 @@ else
                 <HeaderContent>
                     <MudTh>Nombre</MudTh>
                     <MudTh>Proveedor</MudTh>
-                    <MudTh>Costo</MudTh>
+                    <MudTh Style="text-align:right">Costo</MudTh>
                 </HeaderContent>
                 <RowTemplate>
                     <MudTd DataLabel="Nombre">
@@ -69,7 +69,7 @@ else
                         </MudLink>
                     </MudTd>
                     <MudTd DataLabel="Descripción">@context.ProviderName</MudTd>
-                    <MudTd DataLabel="Costo"> @cultureCR.NumberFormat.CurrencySymbol @costFormat(context.Cost)</MudTd>
+                    <MudTd DataLabel="Costo" Style="text-align:right"> @cultureCR.NumberFormat.CurrencySymbol @costFormat(context.Cost)</MudTd>
                 </RowTemplate>
                 <PagerContent>
                         <MudPagination SelectedChanged="PageChanged" Count="@((mudTable.GetFilteredItemsCount() + mudTable.RowsPerPage - 1) / mudTable.RowsPerPage)" Color="Color.Primary" Class="pa-4"/>

@@ -60,7 +60,7 @@ else
             <HeaderContent>
                 <MudTh>Nombre</MudTh>
                 <MudTh>Proveedor</MudTh>
-                <MudTh>Costo</MudTh>
+                <MudTh Style="text-align:right">Costo</MudTh>
             </HeaderContent>
             <RowTemplate>
                 <MudTd DataLabel="Nombre">
@@ -68,8 +68,8 @@ else
                         @context.SubscriptionName
                     </MudLink>
                 </MudTd>
-                <MudTd DataLabel="Descripción">@context.ProviderName</MudTd>
-                <MudTd DataLabel="Costo"> @cultureCR.NumberFormat.CurrencySymbol @costFormat(context.Cost) </MudTd>
+                <MudTd DataLabel="Proveedor">@context.ProviderName</MudTd>
+                <MudTd DataLabel="Costo" Style="text-align:right"> @cultureCR.NumberFormat.CurrencySymbol @costFormat(context.Cost) </MudTd>
             </RowTemplate>
             <PagerContent>
                 <MudPagination SelectedChanged="PageChanged" Count="@((_mudTable.GetFilteredItemsCount() + _mudTable.RowsPerPage - 1) / _mudTable.RowsPerPage)" Color="Color.Primary" Class="pa-4"/>
@@ -167,27 +167,35 @@ else
 
     private async Task DeleteDeductions()
     {
-        foreach (Subscription toDelete in _selectedItems1)
+        if (_selectedItems1.Length() > 0)
         {
-            IEnumerable<Subscribe> tempList = await SubscribeService.GetEmployeesBySubscription(employerEmail, projectName, toDelete.SubscriptionName);
-            if (tempList.Length() > 0)
+            foreach (Subscription toDelete in _selectedItems1)
             {
-                foreach (Subscribe toAppend in tempList)
+                IEnumerable<Subscribe> tempList = await SubscribeService.GetEmployeesBySubscription(employerEmail, projectName, toDelete.SubscriptionName);
+                if (tempList.Length() > 0)
                 {
-                    _employees.Add(toAppend);
+                    foreach (Subscribe toAppend in tempList)
+                    {
+                        _employees.Add(toAppend);
+                    }
                 }
+                SubscriptionService.DeleteSubscription(toDelete);
             }
-            SubscriptionService.DeleteSubscription(toDelete);
-        }
-        Snackbar.Add("Deducciones borradas", Severity.Success);
-        CloseDialog();
-        if (_employees.Length() > 0)
-        {
-            OpenDialogEmployee();
+            Snackbar.Add("Deducciones borradas", Severity.Success);
+            CloseDialog();
+            if (_employees.Length() > 0)
+            {
+                OpenDialogEmployee();
+            }
+            else
+            {
+                GoToMain();
+            }
         }
         else
         {
-            GoToMain();
+            Snackbar.Add("Por favor seleccione los elementos que desea borrar", Severity.Warning);
+            CloseDialog();
         }
     }
 

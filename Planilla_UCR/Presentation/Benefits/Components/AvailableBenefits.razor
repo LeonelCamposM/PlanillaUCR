@@ -34,11 +34,6 @@
         }else
         {
             <MudTable @ref="_mudTable" Items="@_elements" RowsPerPage="4" MultiSelection="true" @bind-SelectedItems="_selectedItems1" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="Color.Info" Filter="new Func<Subscription,bool>(FilterFunc1)">
-                <ColGroup>
-                    <col />
-                    <col />
-                    <col style ="text-align:right" />
-                </ColGroup>    
                 <ToolBarContent>
                         <MudButton Color="Color.Tertiary"> Beneficios disponibles</MudButton>
                         <MudButton OnClick="SendConmuteSignal"> Mis beneficios </MudButton>
@@ -49,13 +44,17 @@
                 <HeaderContent>
                     <MudTh>Beneficio</MudTh>
                     <MudTh>Descripción</MudTh>
-                    <MudTh>Monto</MudTh>
+                    <MudTh Style="text-align:right">Monto</MudTh>
                 </HeaderContent>
 
                 <RowTemplate>
                     <MudTd DataLabel="Beneficio">@context.SubscriptionName</MudTd>
-                    <MudTd DataLabel="Descripción">@context.SubscriptionDescription</MudTd>
-                    <MudTd DataLabel="Monto"> @cultureCR.NumberFormat.CurrencySymbol @costFormat(context.Cost)</MudTd>
+                    <MudTd DataLabel="Descripción" Style="width: 50%;">
+                        <MudItem xs="8">
+                            <MudTextField @bind-Value="context.SubscriptionDescription" Lines="2"  T="string" Variant="Variant.Text" ReadOnly = "true"></MudTextField>
+                        </MudItem>
+                    </MudTd>
+                    <MudTd DataLabel="Monto" Style="text-align:right"> @cultureCR.NumberFormat.CurrencySymbol @costFormat(context.Cost)</MudTd>
                 </RowTemplate>
 
                 <PagerContent>
@@ -77,6 +76,7 @@
     private bool _loading = true;
     private bool _empty = true;
     private string _searchString1 = "";
+    private List<string> _descriptionVector = new List<string>();
     private IEnumerable<Subscription> _elements = new List<Subscription>();
     private HashSet<Subscription> _selectedItems1 = new HashSet<Subscription>();
     private MudTable<Subscription> _mudTable;
@@ -125,34 +125,42 @@
 
     private async Task Subscribe()
     {
-        IEnumerable<Subscribe> _actualSubscriptions = await SubscribeService.GetBenefitsByEmployee(employeeEmail, projectName);
-        foreach (Subscription subscription in _selectedItems1)
+        if (_selectedItems1.Length() > 0)
         {
-            var _active = _actualSubscriptions.FirstOrDefault(e=>e.EmployeeEmail == employeeEmail &&
-                e.EmployerEmail == subscription.EmployerEmail && 
-                e.SubscriptionName == subscription.SubscriptionName &&
-                e.EndDate == null);
-            if (_active == null)
+            IEnumerable<Subscribe> _actualSubscriptions = await SubscribeService.GetBenefitsByEmployee(employeeEmail, projectName);
+            foreach (Subscription subscription in _selectedItems1)
             {
-                subscribe.EmployerEmail = subscription.EmployerEmail;
-                subscribe.SubscriptionName = subscription.SubscriptionName;
-                subscribe.Cost = subscription.Cost;
-                int error = SubscribeService.CreateSubscribe(subscribe, 1);
-                if (error == 1)
+                var _active = _actualSubscriptions.FirstOrDefault(e => e.EmployeeEmail == employeeEmail &&
+                    e.EmployerEmail == subscription.EmployerEmail &&
+                    e.SubscriptionName == subscription.SubscriptionName &&
+                    e.EndDate == null);
+                if (_active == null)
                 {
-                    Snackbar.Add("Suscripción realizada con éxito", Severity.Success);
+                    subscribe.EmployerEmail = subscription.EmployerEmail;
+                    subscribe.SubscriptionName = subscription.SubscriptionName;
+                    subscribe.Cost = subscription.Cost;
+                    int error = SubscribeService.CreateSubscribe(subscribe, 1);
+                    if (error == 1)
+                    {
+                        Snackbar.Add("Suscripción realizada con éxito", Severity.Success);
+                    }
+                    else
+                    {
+                        Snackbar.Add("No se pudo suscribir al beneficio porque incumple los límites impuestos en el proyecto", Severity.Warning);
+                    }
                 }
                 else
                 {
-                    Snackbar.Add("No se pudo suscribir al beneficio porque incumple los límites impuestos en el proyecto", Severity.Warning);
+                    Snackbar.Add("El beneficio ya está siendo usado", Severity.Warning);
                 }
             }
-            else
-            {
-                Snackbar.Add("El beneficio ya está siendo usado", Severity.Warning);
-            }
+            await SendConmuteSignal();
         }
-        await SendConmuteSignal();
+        else
+        {
+            Snackbar.Add("Por favor seleccione los elementos a los que se desea suscribir", Severity.Warning);
+        }
+
     }
 
     private string costFormat(double cost)

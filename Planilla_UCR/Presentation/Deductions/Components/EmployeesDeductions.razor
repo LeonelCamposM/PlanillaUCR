@@ -40,7 +40,7 @@
                     <HeaderContent>
                         <MudTh>Deducción voluntaria</MudTh>
                         <MudTh>Fecha de Inicio</MudTh>
-                        <MudTh>Monto Pagado</MudTh>
+                        <MudTh Style="text-align:right">Monto Pagado</MudTh>
                     </HeaderContent>
 
                     <RowTemplate>
@@ -113,12 +113,19 @@
 
     private async Task Unsubscribe()
     {
-        foreach (Subscribe subscription in _selectedItems1)
+        if (_selectedItems1.Length() > 0)
         {
-            SubscribeService.DeleteSubscribe(subscription);
+            foreach (Subscribe subscription in _selectedItems1)
+            {
+                SubscribeService.DeleteSubscribe(subscription);
+            }
+            Snackbar.Add("Suscripción finalizada con éxito", Severity.Success);
+            await SendConmuteSignal();
         }
-        Snackbar.Add("Suscripción finalizada con éxito", Severity.Success);
-        await SendConmuteSignal();
+        else
+        {
+            Snackbar.Add("Por favor seleccione los elementos a los que se desea desuscribir", Severity.Warning);
+        }
     }
 
     private string costFormat(double cost)
