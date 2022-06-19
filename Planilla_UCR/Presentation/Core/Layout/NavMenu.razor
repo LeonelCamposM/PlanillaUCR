@@ -140,17 +140,16 @@
                             <TabNavLink Icon="@Icons.Material.Filled.Assignment" href="@($"EmployeeProjects/{email}/{projectName}")" text="Detalles"></TabNavLink>
                     </li>
 
-                    <AuthorizeView Roles="HoursEmployee">
-                        <Authorized Context="auth">
-                            <li class="nav-item px-3">
-                                <TabNavLink  Icon="@Icons.Filled.MoreTime" href="@($"/ReportHours/{ContextMenuService.GetEmployerEmailContext()}/{email}")"  text="Reporte de horas"></TabNavLink>
-                            </li>
+                    @if (ContextMenuService.GetHoursEmployeeContext())
+                    {
+                        <li class="nav-item px-3">
+                            <TabNavLink  Icon="@Icons.Filled.MoreTime" href="@($"/ReportHours/{ContextMenuService.GetEmployerEmailContext()}/{email}")"  text="Reporte de horas"></TabNavLink>
+                        </li>
 
-                            <li class="nav-item px-3">
-                                <TabNavLink  Icon="@Icons.Filled.Timer" href="@($"/Reported_Hours/{email}/")" text="Histórico de horas"></TabNavLink>
-                            </li>
-                        </Authorized>
-                    </AuthorizeView>
+                        <li class="nav-item px-3">
+                            <TabNavLink  Icon="@Icons.Filled.Timer" href="@($"/Reported_Hours/{email}/")" text="Histórico de horas"></TabNavLink>
+                        </li>
+                    }
 
                     <li class="nav-item px-3">
                         <TabNavLink  Icon="@Icons.Filled.CreditCard" href="@($"/Last_Pay/{email}/")" text="Último pago"></TabNavLink>
@@ -192,6 +191,6 @@
 
     private void ToggleProjectsSubMenu()
     {
-        ContextMenuService.SetProjectsContext(ContextMenuService.GetShowProjectsMenu(), !ContextMenuService.GetShowProjectsSubMenu(), ContextMenuService.GetProjectsContext(), ContextMenuService.GetEmployerEmailContext());
+        ContextMenuService.SetProjectsContext(ContextMenuService.GetShowProjectsMenu(), !ContextMenuService.GetShowProjectsSubMenu(), ContextMenuService.GetProjectsContext(), ContextMenuService.GetEmployerEmailContext(), ContextMenuService.GetHoursEmployeeContext());
     }
 }

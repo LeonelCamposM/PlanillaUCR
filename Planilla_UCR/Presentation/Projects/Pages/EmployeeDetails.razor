@@ -121,7 +121,7 @@
     protected override async Task OnInitializedAsync()
     {
         agreementElements = await AgreementService.GetEmployeeProjects(email);
-        
+
         _loading = false;
         if (agreementElements.Length() > 0){
             _emptyAgreement = false;
@@ -132,9 +132,18 @@
     private async Task FindProject()
     {
         foreach (Agreement element in agreementElements) {
-            if (projectName == element.ProjectName)
+            if (projectName.Equals(element.ProjectName))
+            {
                 projectInfo = await ProjectService.GetProject(element.ProjectName);
-                ContextMenuService.SetProjectsContext(true,true,projectName, projectInfo.EmployerEmail);
+                if (element.ContractType.Equals("Por horas"))
+                {
+                    ContextMenuService.SetProjectsContext(true, true, projectName, projectInfo.EmployerEmail, true);
+                }
+                else
+                {
+                    ContextMenuService.SetProjectsContext(true, true, projectName, projectInfo.EmployerEmail, false);
+                }
+            }
         }
     }
 }
