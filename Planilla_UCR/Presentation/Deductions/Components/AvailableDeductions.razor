@@ -38,7 +38,7 @@
                         <MudButton Color="Color.Tertiary"> Deducciones voluntarias disponibles</MudButton>
                         <MudButton OnClick="SendConmuteSignal"> Mis deducciones voluntarias </MudButton>
                         <MudSpacer />
-                        <MudTextField @bind-Value="_searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                        <MudTextField @bind-Value="_searchString1" Placeholder="Buscar" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
                 </ToolBarContent> 
                     
                 <HeaderContent>
@@ -78,7 +78,7 @@
                 @foreach (Subscription _element in _selectedItems1)
                 {
                     <MudText>@_element.SubscriptionName</MudText>
-                    <MudNumericField Immediate="true" Label="Costo" Format="N2" Culture="@cultureCR" Variant="Variant.Outlined" @bind-Value=_element.Cost 
+                    <MudNumericField Immediate="false" Label="Costo" Format="N2" Culture="@cultureCR" Variant="Variant.Outlined" @bind-Value=_element.Cost 
                     Adornment="Adornment.Start" AdornmentText="@cultureCR.NumberFormat.CurrencySymbol" Required="true" RequiredError="Campo requerido" Min = "0.0" />
                 }
             </DialogContent>
@@ -95,11 +95,9 @@
     private bool _loading = true;
     private bool _empty = true;
     private string _searchString1 = "";
-    private IEnumerable<Subscription> _elements = new List<Subscription>();
+    private IList<Subscription> _elements = new List<Subscription>();
     private HashSet<Subscription> _selectedItems1 = new HashSet<Subscription>();
-    private HashSet<Subscription> _selectedItems2 = new HashSet<Subscription>();
     private MudTable<Subscription> _mudTable;
-    private double _cost;
     private Subscribe _subscribe = new Subscribe("", "", "", "", 0.0, DateTime.Now);
     public CultureInfo cultureCR = CultureInfo.GetCultureInfo("es-CR");
 
@@ -191,7 +189,6 @@
                 Snackbar.Add("Ya está suscrito a esta deducción voluntaria", Severity.Warning);
             }
         }
-        _elements = new List<Subscription>();
         await SendConmuteSignal();
     }
 

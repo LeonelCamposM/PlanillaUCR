@@ -2,7 +2,9 @@
 @using Domain.Subscribes.Entities
 @using System
 @using System.Globalization
+@using Application.ContextMenu
 @inject ISnackbar Snackbar
+@inject IContextMenuService ContextMenuService
 @inject NavigationManager nav
 @inject ISubscribeService SubscribeService
 
@@ -35,7 +37,7 @@
                         <MudButton OnClick="SendConmuteSignal"> Deducciones voluntarias disponibles</MudButton>
                         <MudButton Color="Color.Tertiary"> Mis deducciones voluntarias </MudButton>
                         <MudSpacer />
-                        <MudTextField @bind-Value="_searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                        <MudTextField @bind-Value="_searchString1" Placeholder="Buscar" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
                 </ToolBarContent> 
                     <HeaderContent>
                         <MudTh>Deducción voluntaria</MudTh>
@@ -82,6 +84,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        ContextMenuService.SetProjectsContext(true,true, projectName, ContextMenuService.GetEmployerEmailContext(), ContextMenuService.GetHoursEmployeeContext());
         _elements = await SubscribeService.GetDeductionsByEmployee(employeeEmail, projectName);
         if (_elements.Length() > 0)
         {
@@ -120,6 +123,7 @@
                 SubscribeService.DeleteSubscribe(subscription);
             }
             Snackbar.Add("Suscripción finalizada con éxito", Severity.Success);
+            nav.NavigateTo($"/Projects/{employeeEmail}/{projectName}/Deductions", true);
             await SendConmuteSignal();
         }
         else

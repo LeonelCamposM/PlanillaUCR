@@ -56,7 +56,7 @@ namespace Application.Subscriptions.Implementations
         {
             return await _subscriptionRepository.GetBenefitsByEmployee(employeeEmail, projectName);
         }
-        public async Task<IEnumerable<Subscription>> GetDeductionsByEmployee(string employeeEmail, string projectName) 
+        public async Task<IList<Subscription>> GetDeductionsByEmployee(string employeeEmail, string projectName) 
         {
             return await _subscriptionRepository.GetDeductionsByEmployee(employeeEmail, projectName);
         }

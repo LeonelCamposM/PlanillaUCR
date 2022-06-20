@@ -15,6 +15,6 @@ namespace Domain.Subscriptions.Repositories
         void ModifySubscription(Subscription subscription, string newName);
         void DeleteSubscription(Subscription subscription);
         Task<IEnumerable<Subscription>> GetBenefitsByEmployee(string employeeEmail, string projectName);
-        Task<IEnumerable<Subscription>> GetDeductionsByEmployee(string employeeEmail, string projectName);
+        Task<IList<Subscription>> GetDeductionsByEmployee(string employeeEmail, string projectName);
     }
 }
