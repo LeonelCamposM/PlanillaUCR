@@ -5,10 +5,12 @@
 @using Application.ContextMenu
 @using Application.Projects
 @using Domain.Projects.Entities
+@using Application.Payments
 
 @inject IAgreementService AgreementService
 @inject IContextMenuService ContextService
 @inject IProjectService ProjectService
+@inject IPaymentService PaymentService
 
 
 @if(_loading) {
@@ -30,6 +32,9 @@
             <br>
             Fecha de pago:
             @nextPay.ToShortDateString()
+            <br>
+             Puede pagar:
+             @canPay
 
         </MudText>
     }
@@ -41,8 +46,25 @@
     Project projectInfo = new Project("","","",0.0,0,"",1);
     bool _loading = true;
     DateTime nextPay = DateTime.Now;
+    bool canPay = false;
 
     protected override async Task OnParametersSetAsync()
+    {
+        //await PaymentService.GetEmployeeLastPayment();
+        await GetFirstProjectAgreementDate();
+        GetNextPay();
+        if(nextPay <= DateTime.Now)
+        {
+            canPay = true;
+        }
+
+
+
+
+        _loading = false;
+    }
+
+    async Task GetFirstProjectAgreementDate()
     {
         firstProjectAgreement.ProjectName = ContextService.GetProjectsContext();
         firstProjectAgreement.EmployerEmail = email;
@@ -58,7 +80,10 @@
         }
 
         nextPay = (DateTime) firstProjectAgreement.ContractStartDate;
+    }
 
+    public void GetNextPay()
+    {
         double daysInterval = 0;
         switch (projectInfo.PaymentInterval)
         {
@@ -69,7 +94,6 @@
 
         }
 
-        nextPay = nextPay.AddDays(daysInterval);
-        _loading = false;
+        nextPay = nextPay.AddDays(daysInterval); 
     }
 }
