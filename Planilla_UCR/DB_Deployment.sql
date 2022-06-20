@@ -322,9 +322,6 @@ BEGIN
 	Group by P.Email, P.Name, P.LastName1, P.LastName2, P.SSN, P.BankAccount, P.Adress, P.PhoneNumber, P.IsEnabled
 END
 
-select *
-from Agreement
-
 GO
 CREATE OR ALTER PROCEDURE [dbo].[GetProjectEmployees]
 @projectName VARCHAR(255)
@@ -342,19 +339,51 @@ BEGIN
     SELECT * FROM Employee AS E WHERE E.Email = @email 
 END
 
+-- AgreementType Stored procedures
+
 GO
-CREATE OR ALTER PROCEDURE GetSalaryPerAgreement(@MountPerHour int)
+CREATE or ALTER PROCEDURE CheckSalaryPerAgreement(@MountPerHour int)
 AS
 BEGIN 
 	SELECT * FROM AgreementType WHERE MountPerHour = @MountPerHour
 END
 
 GO
+CREATE OR ALTER PROCEDURE GetAllAgreementTypes
+AS
+BEGIN
+	SELECT *
+	FROM AgreementType AS ATP
+END
+
+
+-- Agreements stored procedures
+GO
 CREATE OR ALTER PROCEDURE GetContracteeByEmail(@ContracteeEmail varchar(255))
 AS
 BEGIN 
 	SELECT * FROM Agreement WHERE EmployeeEmail = @ContracteeEmail AND IsEnabled = 1
 END
+
+GO
+CREATE OR ALTER PROCEDURE GetAllAgreementsByProjectAndEmployer(@Project varchar(255), @EmployerEmail varchar(255))
+AS
+BEGIN
+	SELECT *
+	FROM Agreement as A
+	WHERE A.ProjectName = @Project AND A.EmployerEmail = @EmployerEmail AND A.IsEnabled = 1
+END
+
+GO
+CREATE OR ALTER PROCEDURE DesactivateAgreement(@EmployeeEmail varchar(255), @EmployerEmail varchar(255), @ProjectName varchar(255), @Justification varchar(max))
+AS
+BEGIN
+	UPDATE Agreement
+	SET Agreement.IsEnabled = 0, Agreement.Justification = @Justification, Agreement.ContractFinishDate = GETDATE()
+	WHERE Agreement.EmployeeEmail = @EmployeeEmail AND Agreement.EmployerEmail = @EmployerEmail AND Agreement.ProjectName = @ProjectName AND Agreement.IsEnabled = 1;
+END
+
+exec DesactivateAgreement @EmployeeEmail = 'jeremy@ucr.ac.cr', @EmployerEmail = 'leonel@ucr.ac.cr', @ProjectName = 'Proyecto 1', @Justification = 'Prueba por si funka'
 
 --Agreement Stored procedure
 GO

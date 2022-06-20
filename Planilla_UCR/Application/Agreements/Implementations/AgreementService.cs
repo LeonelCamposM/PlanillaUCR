@@ -25,6 +25,15 @@ namespace Application.Agreements.Implementations
         {
             return await _agreementRepository.GetContractee(agreement);
         }
+        public async Task<IEnumerable<Agreement?>> GetAllAgreementsByProjectAndEmployer(string projectName, string employerEmail)
+        {
+            return await _agreementRepository.GetAllAgreementsByProjectAndEmployer(projectName, employerEmail);
+        }
+
+        public async Task DesactivateAgreement(string employeeEmail, string employerEmail, string projectName, string justification)
+        {
+            await _agreementRepository.DesactivateAgreement(employeeEmail, employerEmail, projectName, justification);
+        }
 
         public Task<IEnumerable<Agreement>> GetEmployeeAgreements(string employeeEmail)
         {
