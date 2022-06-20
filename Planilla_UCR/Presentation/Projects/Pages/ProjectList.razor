@@ -64,12 +64,15 @@
             else
             {
 
-                <MudTable @ref="_mudTable" Items="@_projectElements" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_emptyProject" LoadingProgressColor="Color.Primary" Filter="new Func<Project,bool>(FilterFuncEmployer)">  
+                <MudTable @ref="_mudTable" Items="@_projectElements" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" 
+                Loading="@_emptyProject" LoadingProgressColor="Color.Primary" Filter="new Func<Project,bool>(FilterFuncEmployer)">  
 
                     <ToolBarContent>
                         <MudText Align="Align.Center" Typo="Typo.h6">Lista de proyectos</MudText>
                         <MudSpacer></MudSpacer>
-                        <MudTextField @bind-Value="_searchString" Placeholder="Buscar Proyecto" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                        <MudTextField @bind-Value="_searchString" Placeholder="Buscar Proyecto" Adornment="Adornment.Start" 
+                            AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0">
+                        </MudTextField>
                     </ToolBarContent>
 
                     <HeaderContent>
@@ -94,7 +97,9 @@
                     </RowTemplate>
 
                     <PagerContent>
-                            <MudPagination SelectedChanged="PageChangedR" Count="@((_mudTable.GetFilteredItemsCount() + _mudTable.RowsPerPage - 1) / _mudTable.RowsPerPage)" Color="Color.Primary" Class="pa-4"/>
+                            <MudPagination SelectedChanged="PageChangedR" 
+                                Count="@((_mudTable.GetFilteredItemsCount() + _mudTable.RowsPerPage - 1) / _mudTable.RowsPerPage)" 
+                                Color="Color.Primary" Class="pa-4"/>
                     </PagerContent>
                 </MudTable>
                 <br>
@@ -104,19 +109,29 @@
                 <MudDialog @bind-IsVisible="_visible" Options="dialogOptions">
                     <TitleContent>
                         <MudText Typo="Typo.h6">
-                            <MudIcon Icon="@Icons.Material.Filled.Warning" Color="@Color.Primary" Class="mr-2"/> Este proyecto tiene empleados contratados, si confirma esta acción se procederá a terminar de forma temprana el contrato con todos sus empleados y la fecha de fin será el día de hoy. 
+                            <MudIcon Icon="@Icons.Material.Filled.Warning" Color="@Color.Primary" Class="mr-2"/> 
+                                Este proyecto tiene empleados contratados, si confirma esta acción se procederá a terminar de forma 
+                                temprana el contrato con todos sus empleados y la fecha de fin será el día de hoy. 
                         </MudText>
                     </TitleContent>
                     <DialogContent>
                         <MudItem xs="12" Class="d-flex justify-center align-center">
-                            <MudTextField @bind-Value="_agreementMessage" Label="contratos activos con los siguienetes empleados:" Lines= "4" Variant="Variant.Outlined" ReadOnly ="true"></MudTextField>
+                            <MudTextField @bind-Value="_agreementMessage" Label="contratos activos con los siguienetes empleados:" 
+                                Lines= "4" Variant="Variant.Outlined" ReadOnly ="true">
+                            </MudTextField>
                         </MudItem>
                         <MudItem xs="12" Class="d-flex justify-center align-center">
-                            <MudTextField Required="true" RequiredError="Incluya una justificación" @bind-Value="_justification" Label="Si desea terminar los contratos asociados debe introducir una justificación:" Lines= "6" Variant="Variant.Outlined"></MudTextField>
+                            <MudTextField Required="true" RequiredError="Incluya una justificación" @bind-Value="_justification" 
+                            Label="Si desea terminar los contratos asociados debe introducir una justificación:" Lines= "6" 
+                            Variant="Variant.Outlined">
+                        </MudTextField>
                         </MudItem>
                     </DialogContent>
                     <DialogActions>
-                        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ConfirmDisableProject" Class="px-10">Confirmar borrado de proyecto</MudButton>
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ConfirmDisableProject" Class="px-10">
+                            Confirmar borrado de proyecto
+                        </MudButton>
+
                         <MudButton Variant="Variant.Filled" Color="Color.Transparent" OnClick="CancelAction" Class="px-10">Cancelar</MudButton>
                     </DialogActions>
                 </MudDialog>
@@ -202,35 +217,33 @@
 </AuthorizeView>
 
 @code {
-
+    private bool _visible;
     private bool _emptyProject = true;
     private bool _emptyAgreement = true;
     private bool _loading = true;
-    public string _searchString = "";
     private bool _isEmployer = true;
-    private bool _visible;
-    public string _agreementMessage = "";
-    public string _justification = "";
+    private string _agreementMessage = "";
+    private string _justification = "";
+    private string _searchString = "";
 
-
-    private MudTable<EmployeeList> _table;
+    private IEnumerable<Person> _people;
     private IEnumerable<Project> _projectElements;
     private IEnumerable<EmployeeList> _joinTable = new List<EmployeeList>();
-    private MudTable<Project> _mudTable;
-
-
     private IEnumerable<AgreementType> _agreementType = new List<AgreementType>();
     private IEnumerable<Agreement> _agreements = new List<Agreement>();
     private List<Person> _activeEmployees = new List<Person>();
-    private IEnumerable<Person> _people;
+
 
     [Parameter] public string personEmail { get; set; }
     [Parameter] public string projectName { get; set; }
-    public string employeeEmail { get; set; }
+
 
     private void OpenDialog() => _visible = true;
-    void CloseDialog() => _visible = false;
-    private DialogOptions dialogOptions = new() { FullWidth = true };
+    private void CloseDialog() => _visible = false;
+    private DialogOptions _dialogOptions = new() { FullWidth = true };
+
+    private MudTable<Project> _mudTable;
+    private MudTable<EmployeeList> _table;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -240,27 +253,45 @@
             _people = await PersonService.GetAllPeopleAsync();
             if (_isEmployer) 
             {
-                _projectElements = await ProjectService.GetEmployerProyects(personEmail);
-                _agreements = await AgreementService.GetEmployerAgreements(personEmail);
-                _loading = false;
-
-                if (_projectElements.Length() > 0){
-                    _emptyProject = false;
-                }
-                await InvokeAsync(StateHasChanged);
+                await LoadEmployer();
             }
-
+            
             if (!_isEmployer)
             {
-                _loading = false;
-                await CreateProjectListForEmployee();
+                await LoadEmployee();
             }
         }
-
     }
-    private async Task CreateProjectListForEmployee() {
-        _agreements = await AgreementService.GetEmployeeAgreements(personEmail);
+
+    private async Task LoadEmployer()
+    {
+        _projectElements = await ProjectService.GetEmployerProyects(personEmail);
+        _agreements = await AgreementService.GetEmployerAgreements(personEmail);
+        SelectActiveProjects();
         _loading = false;
+
+        if (_projectElements.Length() > 0){
+            _emptyProject = false;
+        }
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void SelectActiveProjects()
+    {
+        List<Project> _activeProjectElements = new List<Project>();
+        foreach (Project actualProject in _projectElements)
+        {
+            if (actualProject.IsEnabled == 1)
+            {
+                _activeProjectElements.Add(actualProject);
+            }
+        }
+        _projectElements = _activeProjectElements.AsEnumerable();
+    }
+
+    private async Task LoadEmployee() {
+        _loading = false;
+        _agreements = await AgreementService.GetEmployeeAgreements(personEmail);
 
         if (_agreements.Length() > 0)
         {
@@ -268,17 +299,15 @@
             _projectElements = await ProjectService.GetAllProjectsAsync();
             _emptyAgreement = false;
             await CreateEmployeeList();
-            int size = _joinTable.Length();
         }
         await InvokeAsync(StateHasChanged);
     }
+
     private async Task CreateEmployeeList()
     {
         _joinTable = from A in _agreements
                      join Pe in _people on A.EmployerEmail equals Pe.Email
                      join ATP in _agreementType on A.ContractType equals ATP.TypeAgreement
-                     join P in _projectElements on A.IsEnabled equals P.IsEnabled
-                     where P.IsEnabled == 1
                      select new EmployeeList
                      {
                         ProjectName = A.ProjectName,
@@ -294,6 +323,58 @@
                      };
     }
 
+    private void GoToDisable(string projectName)
+    {
+        this.projectName = projectName;
+        int amountOfAgreements = 0;
+        if (_agreements.Length() > 0)
+        {
+            amountOfAgreements = CheckActiveAgreements(amountOfAgreements); 
+            if (amountOfAgreements == 0)
+            {
+                DisableProject();
+            }
+        }
+        else
+        {
+            DisableProject();
+        }
+    }
+    public int CheckActiveAgreements(int amountOfAgreements)
+    {
+        _agreementMessage = "";
+        foreach (Agreement actualAgreement in _agreements)
+        {
+            if (actualAgreement.ProjectName == projectName && actualAgreement.ContractFinishDate > DateTime.Now)
+            {
+                foreach (Person actualPerson in _people)
+                {
+                    if (actualAgreement.EmployeeEmail == actualPerson.Email)
+                    {
+                        amountOfAgreements++;
+                        _activeEmployees.Add(actualPerson);
+                        OpenDialog();
+                        _agreementMessage += "Nombre: " + actualPerson.Name + " " + actualPerson.LastName1 + " " + 
+                                    actualPerson.LastName2 + ". Email: " + actualAgreement.EmployeeEmail + " \n";
+                    }
+                }
+            }
+        }
+        return amountOfAgreements;
+    }
+
+    private void ConfirmDisableProject()
+    {
+        if (_justification != "")
+        {
+            foreach (Person activePerson in _activeEmployees)
+            {
+                //AgreementService.DesactivateAgreement(activePerson.Email, this.projectName, _justification);
+            }
+            DisableProject();
+            CloseDialog();
+        }
+    }
     private bool FilterFuncEmployer(Project element) => FilterFuncR(element, _searchString);
 
     private bool FilterFuncR(Project element, string searchString)
@@ -315,52 +396,7 @@
             return true;
         return false;
     }
-    private void GoToDisable(string projectName)
-    {
-        this.projectName = projectName;
-        int amountOfAgreements = 0;
-        if (_agreements.Length() > 0)
-        {
-            _agreementMessage = "";
-            foreach (Agreement actualAgreement in _agreements)
-            {
-                if (actualAgreement.ProjectName == projectName && actualAgreement.ContractFinishDate > DateTime.Now)
-                {
-                    foreach (Person actualPerson in _people)
-                    {
-                        if (actualAgreement.EmployeeEmail == actualPerson.Email)
-                        {
-                            amountOfAgreements++;
-                            _activeEmployees.Add(actualPerson);
-                            OpenDialog();
-                            _agreementMessage += "Nombre: " + actualPerson.Name + " " + actualPerson.LastName1 + " " + 
-                                        actualPerson.LastName2 + ". Email: " + actualAgreement.EmployeeEmail + " \n";
-                        }
-                    }
-                }
-            }
-            if (amountOfAgreements == 0)
-            {
-                DisableProject();
-            }
-        }
-        else
-        {
-            DisableProject();
-        }
-    }
-    private void ConfirmDisableProject()
-    {
-        if (_justification != "")
-        {
-            foreach (Person activePerson in _activeEmployees)
-            {
-                //AgreementService.DesactivateAgreement(activePerson.Email, this.projectName, _justification);
-            }
-            DisableProject();
-            CloseDialog();
-        }
-    }
+    
 
     private void DisableProject() 
     {
@@ -393,7 +429,6 @@
     {
         nav.NavigateTo($"/Create_Project/{personEmail}");
     }
-    
 
     private void GoToConfigs()
     {
