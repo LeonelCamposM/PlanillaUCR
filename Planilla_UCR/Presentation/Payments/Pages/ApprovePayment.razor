@@ -1,0 +1,75 @@
+﻿@page "/Aprrove_Payment/{email}"
+
+@using Application.Agreements
+@using Domain.Agreements.Entities
+@using Application.ContextMenu
+@using Application.Projects
+@using Domain.Projects.Entities
+
+@inject IAgreementService AgreementService
+@inject IContextMenuService ContextService
+@inject IProjectService ProjectService
+
+
+@if(_loading) {
+    <MudPaper  Height="220px" Width="100%" Outlined="false" Class="border-none pa-4" Elevation="0">
+         <MudText Align="Align.Center" Typo="Typo.h6">
+              <MudProgressCircular Color="Color.Primary" Style="height:70px;width:70px;" Indeterminate="true" />
+        </MudText>
+       
+    </MudPaper>
+}else
+    {
+        <MudText> 
+            El primer contrato fué en: 
+            @firstProjectAgreement.EmployeeEmail
+            @firstProjectAgreement.ContractStartDate
+            <br>
+            Intervalo de pago:
+            @projectInfo.PaymentInterval
+            <br>
+            Fecha de pago:
+            @nextPay.ToShortDateString()
+
+        </MudText>
+    }
+
+@code {
+    [Parameter]
+    public string email { get; set; }
+    Agreement firstProjectAgreement = new Agreement("No tiene contratos todavía","","",DateTime.Now,"",0,DateTime.Now,0,"");
+    Project projectInfo = new Project("","","",0.0,0,"",1);
+    bool _loading = true;
+    DateTime nextPay = DateTime.Now;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        firstProjectAgreement.ProjectName = ContextService.GetProjectsContext();
+        firstProjectAgreement.EmployerEmail = email;
+        firstProjectAgreement = await AgreementService.GetFirstProjectAgreement(firstProjectAgreement);
+        if(firstProjectAgreement == null)
+        {
+            firstProjectAgreement =  new Agreement("No tiene contratos todavía","","",DateTime.Now,"",0,DateTime.Now,0,"");
+        }
+        projectInfo = await ProjectService.GetProject(email,  ContextService.GetProjectsContext());
+        if(projectInfo == null)
+        {
+            projectInfo =  new Project("","","",0.0,0,"",1);
+        }
+
+        nextPay = (DateTime) firstProjectAgreement.ContractStartDate;
+
+        double daysInterval = 0;
+        switch (projectInfo.PaymentInterval)
+        {
+            case "Quincenal": daysInterval = 15.0;
+                break;
+            case "Mensual": daysInterval = 30.0;
+                break;
+
+        }
+
+        nextPay = nextPay.AddDays(daysInterval);
+        _loading = false;
+    }
+}

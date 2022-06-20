@@ -685,3 +685,6 @@ VALUES('jeremy@ucr.ac.cr',
 --'2022-06-28',
 --'Ayudemos a los niños'
 --)
+
+select *
+from Agreement
