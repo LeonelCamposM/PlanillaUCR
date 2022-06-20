@@ -272,8 +272,10 @@
         _joinTable = from A in _agreements
                      join Pe in _people on A.EmployerEmail equals Pe.Email
                      join ATP in _agreementType on A.ContractType equals ATP.TypeAgreement
+                     join P in _projectElements on A.IsEnabled equals P.IsEnabled
+                     where P.IsEnabled == 1
                      select new EmployeeList
-                    {
+                     {
                         ProjectName = A.ProjectName,
                         EmployerName = Pe.Name,
                         EmployerLastName1 = Pe.LastName1,
@@ -284,7 +286,7 @@
                         ContractFinishDate = (DateTime) A.ContractFinishDate,
                         MountPerHour = ATP.MountPerHour
 
-                    };
+                     };
     }
 
     private bool FilterFuncEmployer(Project element) => FilterFuncR(element, _searchString);
