@@ -362,7 +362,7 @@ AS
 BEGIN
 	SELECT *
 	FROM Agreement as A
-	WHERE A.ProjectName = @Project AND A.EmployerEmail = @EmployerEmail AND IsEnabled = 1
+	WHERE A.ProjectName = @Project AND A.EmployerEmail = @EmployerEmail AND A.IsEnabled = 1
 END
 
 GO

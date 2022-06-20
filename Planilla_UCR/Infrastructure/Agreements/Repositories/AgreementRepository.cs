@@ -63,7 +63,7 @@ namespace Infrastructure.Agreements.Repositories
 
         public async Task DesactivateAgreement(string employeeEmail, string employerEmail, string projectName, string justification)
         {
-            System.FormattableString query = $"EXECUTE DesactivateAgreement @EmployeeEmail = {employeeEmail} @EmployerEmail = {employerEmail}, @ProjectName = {projectName}, @Justification = {justification}";
+            System.FormattableString query = $"EXECUTE DesactivateAgreement @EmployeeEmail = {employeeEmail}, @EmployerEmail = {employerEmail}, @ProjectName = {projectName}, @Justification = {justification}";
             _dbContext.Database.ExecuteSqlInterpolated(query);
         }
     }
