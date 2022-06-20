@@ -152,6 +152,7 @@ else
         populateJoinAttribute();
         checkJoinLenght();
         _loading = false;
+        await AgreementService.DesactivateAgreement(employerEmail, projectName, "Prueba desde view agreement"); // Delete this, just to proof the concept 
     }
 
     private void populateJoinAttribute() 

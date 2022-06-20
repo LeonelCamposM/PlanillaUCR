@@ -362,8 +362,18 @@ AS
 BEGIN
 	SELECT *
 	FROM Agreement as A
-	WHERE A.ProjectName = @Project AND A.EmployerEmail = @EmployerEmail
+	WHERE A.ProjectName = @Project AND A.EmployerEmail = @EmployerEmail AND IsEnabled = 1
 END
+
+GO
+CREATE OR ALTER PROCEDURE DesactivateAgreement(@EmployerEmail varchar(255), @ProjectName varchar(255), @Justification varchar(max))
+AS
+BEGIN
+	UPDATE Agreement
+	SET Agreement.IsEnabled = 0, Agreement.Justification = @Justification
+	WHERE Agreement.EmployerEmail = @EmployerEmail AND Agreement.ProjectName = @ProjectName;
+END
+
 -- Data Insert
 GO
 INSERT INTO Person

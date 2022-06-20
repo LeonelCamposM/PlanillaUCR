@@ -60,5 +60,11 @@ namespace Infrastructure.Agreements.Repositories
                 (e => e.EmployeeEmail == employeeEmail/* && e.ContractType.Equals("Por horas")*/).ToListAsync();
             return agreementList;
         }
+
+        public async Task DesactivateAgreement(string employerEmail, string projectName, string justification)
+        {
+            System.FormattableString query = $"EXECUTE DesactivateAgreement @EmployerEmail = {employerEmail}, @ProjectName = {projectName}, @Justification = {justification}";
+            _dbContext.Database.ExecuteSqlInterpolated(query);
+        }
     }
 }

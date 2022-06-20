@@ -11,6 +11,7 @@ namespace Application.Agreements
         Task<Agreement>? GetContractee(Agreement agreement);
         Task<IEnumerable<Agreement?>> GetAllAgreementsByProjectAndEmployer(string projectName, string employerEmail);
         Task<IEnumerable<Agreement>> GetEmployeeProjects(string employeeEmail);
+        Task DesactivateAgreement(string employerEmail, string projectName, string justification);
 
     }
 }
