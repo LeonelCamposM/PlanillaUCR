@@ -160,7 +160,7 @@
     async Task<bool> ValidateName(Project project)
     {
         bool valid = true;
-        IEnumerable<Project> nameCecked = await ProjectService.GetEmployerProyects(project.EmployerEmail);
+        IEnumerable<Project> nameCecked = await ProjectService.GetAllProjectsAsync();
 
         if (nameCecked.Length() != 0)
         {
@@ -169,6 +169,7 @@
                 {
                     valid=false;
                     ShowSnackNotification("El nombre de proyecto ya está siendo usado", Severity.Error);
+                    break;
                 }
             }
         }

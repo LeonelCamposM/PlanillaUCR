@@ -88,7 +88,7 @@
                         <MudTd DataLabel="Descripción" Style="text-align:justify-all">@row.ProjectDescription</MudTd>
 
                         <MudTd Style="text-align:justify-all">
-                            <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Primary"  OnClick="@(e => GoToDisable(@row.ProjectName))"/>
+                            <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Primary" OnClick="@(e => GoToDisable(@row.ProjectName))"/>
                         </MudTd>
             
                     </RowTemplate>
@@ -109,9 +109,12 @@
                     </TitleContent>
                     <DialogContent>
                         <MudItem xs="12" Class="d-flex justify-center align-center">
-                            <MudTextField @bind-Value="_agreementMessage" Label="contratos activos con los siguienetes empleados:" Lines= "6" Variant="Variant.Outlined" ReadOnly ="true"></MudTextField>
+                            <MudTextField @bind-Value="_agreementMessage" Label="contratos activos con los siguienetes empleados:" Lines= "4" Variant="Variant.Outlined" ReadOnly ="true"></MudTextField>
                         </MudItem>
-                        </DialogContent>
+                        <MudItem xs="12" Class="d-flex justify-center align-center">
+                            <MudTextField Required="true" RequiredError="Incluya una justificación" @bind-Value="_justification" Label="Si desea terminar los contratos asociados debe introducir una justificación:" Lines= "6" Variant="Variant.Outlined"></MudTextField>
+                        </MudItem>
+                    </DialogContent>
                     <DialogActions>
                         <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ConfirmDisableProject" Class="px-10">Confirmar borrado de proyecto</MudButton>
                         <MudButton Variant="Variant.Filled" Color="Color.Transparent" OnClick="CancelAction" Class="px-10">Cancelar</MudButton>
@@ -207,6 +210,7 @@
     private bool _isEmployer = true;
     private bool _visible;
     public string _agreementMessage = "";
+    public string _justification = "";
 
 
     private MudTable<EmployeeList> _table;
@@ -217,6 +221,7 @@
 
     private IEnumerable<AgreementType> _agreementType = new List<AgreementType>();
     private IEnumerable<Agreement> _agreements = new List<Agreement>();
+    private List<Person> _activeEmployees = new List<Person>();
     private IEnumerable<Person> _people;
 
     [Parameter] public string personEmail { get; set; }
@@ -326,6 +331,7 @@
                         if (actualAgreement.EmployeeEmail == actualPerson.Email)
                         {
                             amountOfAgreements++;
+                            _activeEmployees.Add(actualPerson);
                             OpenDialog();
                             _agreementMessage += "Nombre: " + actualPerson.Name + " " + actualPerson.LastName1 + " " + 
                                         actualPerson.LastName2 + ". Email: " + actualAgreement.EmployeeEmail + " \n";
@@ -335,17 +341,31 @@
             }
             if (amountOfAgreements == 0)
             {
-                ConfirmDisableProject();
+                DisableProject();
             }
+        }
+        else
+        {
+            DisableProject();
         }
     }
     private void ConfirmDisableProject()
     {
+        if (_justification != "")
+        {
+            foreach (Person activePerson in _activeEmployees)
+            {
+                //AgreementService.DesactivateAgreement(activePerson.Email, this.projectName, _justification);
+            }
+            DisableProject();
+            CloseDialog();
+        }
+    }
 
-        // si tiene y confirma se desactivan y desactivo proyecto
+    private void DisableProject() 
+    {
         ProjectService.DisableProject(this.projectName, this.personEmail);
         ShowSnackNotification(this.projectName + " DESACTIVADO exitosamente", Severity.Success);
-        CloseDialog();
     }
 
     private void CancelAction() 
