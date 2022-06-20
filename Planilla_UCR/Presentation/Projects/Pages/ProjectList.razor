@@ -229,7 +229,7 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        ContextMenuService.SetProjectsContext(false ,false, "");
+        ContextMenuService.SetProjectsContext(false, false, "", personEmail,true);
         if (firstRender)
         {
             _people = await PersonService.GetAllPeopleAsync();
