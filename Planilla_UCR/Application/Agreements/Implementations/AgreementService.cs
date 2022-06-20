@@ -33,9 +33,9 @@ namespace Application.Agreements.Implementations
         {
             return await _agreementRepository.GetEmployeeProjects(employeeEmail);
         }
-        public async Task DesactivateAgreement(string employerEmail, string projectName, string justification) 
+        public async Task DesactivateAgreement(string employeeEmail, string employerEmail, string projectName, string justification) 
         {
-            await _agreementRepository.DesactivateAgreement(employerEmail, projectName, justification);
+            await _agreementRepository.DesactivateAgreement(employeeEmail, employerEmail, projectName, justification);
         }
 
     }

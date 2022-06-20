@@ -366,12 +366,12 @@ BEGIN
 END
 
 GO
-CREATE OR ALTER PROCEDURE DesactivateAgreement(@EmployerEmail varchar(255), @ProjectName varchar(255), @Justification varchar(max))
+CREATE OR ALTER PROCEDURE DesactivateAgreement(@EmployeeEmail varchar(255), @EmployerEmail varchar(255), @ProjectName varchar(255), @Justification varchar(max))
 AS
 BEGIN
 	UPDATE Agreement
 	SET Agreement.IsEnabled = 0, Agreement.Justification = @Justification
-	WHERE Agreement.EmployerEmail = @EmployerEmail AND Agreement.ProjectName = @ProjectName;
+	WHERE Agreement.EmployeeEmail = @EmployeeEmail AND Agreement.EmployerEmail = @EmployerEmail AND Agreement.ProjectName = @ProjectName AND Agreement.IsEnabled = 1;
 END
 
 -- Data Insert

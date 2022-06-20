@@ -31,6 +31,10 @@
 @inject NavigationManager nav
 
 
+@inject IDialogService DialogService
+
+
+
 @if(_loading) 
 {
     <MudPaper  Height="220px" Width="100%" Outlined="false" Class="border-none pa-4" Elevation="0">
@@ -94,12 +98,7 @@ else
                                 <MudTd DataLabel="Salario" Style="text-align:right" >₡@context.MountPerHour.00</MudTd>
                             }
                              <MudTd DataLabel="Terminar">
-                                <MudSpacer></MudSpacer>
-                                    <MudButton Variant="Variant.Filled" @onclick="@(e => GoToFireTheEmployee(@context.EmployeeEmail))" Color="Color.Transparent">
-                                    <MudText>
-                                    Terminar
-                                    </MudText> 
-                                </MudButton>
+                                <MudButton Variant="Variant.Filled" @onclick="@(e => OpenDialog(@context.EmployeeEmail))" Color="Color.Transparent">Terminar</MudButton>
                             </MudTd>
                             </RowTemplate>
                         <PagerContent>
@@ -124,6 +123,19 @@ else
                 Volver
             </MudText> 
         </MudButton>
+                <MudDialog @bind-IsVisible="_visible" Options="dialogOptions">
+                <TitleContent>
+                    <MudText Typo="Typo.h6">
+                        <MudIcon Icon="@Icons.Material.Filled.Delete" Color="@Color.Primary" Class="mr-2"/> ¿Está seguro de borrar estos contratos?</MudText>
+                </TitleContent>
+                <DialogContent>
+                        <MudTextField @bind-Value="justificationToBeDeleted" Label="Justificación" Variant="Variant.Outlined" Required="true" RequiredError="Por favor, indique el motivo del despido"></MudTextField>
+                </DialogContent>
+                <DialogActions>
+                        <MudButton  Variant="Variant.Filled" Color="Color.Primary" @onclick="@(e => FireEmployee())" Class="px-10">Aceptar</MudButton>
+                        <MudButton Variant="Variant.Filled" Color="Color.Transparent" OnClick="CloseDialog" Class="px-10">Cancelar</MudButton>
+                </DialogActions>
+            </MudDialog>
     }
 }
 
@@ -142,6 +154,17 @@ else
     private IEnumerable<Person> _people = new List<Person>();
     private IEnumerable<JoinedTables> _myJoin = new List<JoinedTables>();
 
+
+    private DialogOptions dialogOptions = new() { FullWidth = true };
+    private bool _visible = false;
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    void CloseDialog() => _visible = false;
+    private string employerEmailToBeDeleted = "";
+    private string projectNameToBeDeleted = "";
+    private string justificationToBeDeleted = "";
+    private string employeeEmailToBeDeleted = "";
+
     protected override async Task OnInitializedAsync()
     {
         _empty = false;
@@ -152,7 +175,6 @@ else
         populateJoinAttribute();
         checkJoinLenght();
         _loading = false;
-        await AgreementService.DesactivateAgreement(employerEmail, projectName, "Prueba desde view agreement"); // Delete this, just to proof the concept 
     }
 
     private void populateJoinAttribute() 
@@ -182,9 +204,21 @@ else
             _empty = true;
         }
     }
-    private void GoToFireTheEmployee(string email)
+
+    private void OpenDialog(string employeeEmail)
     {
-       nav.NavigateTo($"/Agreements/{email}");
+        employeeEmailToBeDeleted = employeeEmail;
+        employerEmailToBeDeleted = employerEmail;
+        projectNameToBeDeleted = projectName;
+        _visible = true;
+    } 
+
+
+    private void FireEmployee()
+    {
+        AgreementService.DesactivateAgreement(employeeEmailToBeDeleted, employerEmailToBeDeleted, projectNameToBeDeleted, justificationToBeDeleted);
+        CloseDialog();
+        ShowSnackNotification("El empleado " + employeeEmailToBeDeleted + " ha sido eliminado del proyecto", Severity.Success);
     }
 
     private void PageChanged(int i)
@@ -213,5 +247,21 @@ else
     {
         nav.NavigateTo($"/View_Project_Employees/{employerEmail}/{projectName}");
     }
-
+    
+    void ShowSnackNotification(string message, Severity severity)
+    {
+        Snackbar.Configuration.SnackbarVariant = Variant.Filled;
+        Snackbar.Configuration.PreventDuplicates = false;
+        Snackbar.Configuration.MaxDisplayedSnackbars = 2;
+        Snackbar.Configuration.NewestOnTop = true;
+        Snackbar.Add($"{message}", severity, config =>
+        {
+            config.RequireInteraction = false;
+            config.ShowCloseIcon = true;
+            config.Onclick = snackbar =>
+            {
+                return Task.CompletedTask;
+            };
+        });
+    }
 }

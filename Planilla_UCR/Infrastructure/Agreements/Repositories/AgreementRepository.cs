@@ -61,9 +61,9 @@ namespace Infrastructure.Agreements.Repositories
             return agreementList;
         }
 
-        public async Task DesactivateAgreement(string employerEmail, string projectName, string justification)
+        public async Task DesactivateAgreement(string employeeEmail, string employerEmail, string projectName, string justification)
         {
-            System.FormattableString query = $"EXECUTE DesactivateAgreement @EmployerEmail = {employerEmail}, @ProjectName = {projectName}, @Justification = {justification}";
+            System.FormattableString query = $"EXECUTE DesactivateAgreement @EmployeeEmail = {employeeEmail} @EmployerEmail = {employerEmail}, @ProjectName = {projectName}, @Justification = {justification}";
             _dbContext.Database.ExecuteSqlInterpolated(query);
         }
     }
