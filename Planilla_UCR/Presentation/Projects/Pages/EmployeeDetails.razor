@@ -136,8 +136,18 @@
     private async Task FindProject()
     {
         foreach (Agreement element in agreementElements) {
-            if (projectName == element.ProjectName)
+             if (projectName == element.ProjectName)
+            {
                 projectInfo = await ProjectService.GetProject(element.ProjectName);
+                if (element.ContractType.Equals("Por horas"))
+                {
+                    ContextMenuService.SetProjectsContext(true, true, projectName, projectInfo.EmployerEmail, true);
+                }
+                else
+                {
+                    ContextMenuService.SetProjectsContext(true, true, projectName, projectInfo.EmployerEmail, false);
+                }
+            }
         }
     }
 }
