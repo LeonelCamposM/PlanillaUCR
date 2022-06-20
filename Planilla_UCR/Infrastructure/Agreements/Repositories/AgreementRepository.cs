@@ -43,10 +43,21 @@ namespace Infrastructure.Agreements.Repositories
 
         }
 
+        public async Task<IEnumerable<Agreement?>> GetAllAgreementsByProjectAndEmployer(string projectName, string employerEmail) 
+        {
+            SqlParameter myProjectName = new SqlParameter("@Project", projectName);
+            SqlParameter myEmployerEmail = new SqlParameter("@EmployerEmail", employerEmail);
+
+            var agreementList = await _dbContext.Agreements.FromSqlRaw("EXEC GetAllAgreementsByProjectAndEmployer {0},{1}",
+                myProjectName, myEmployerEmail).ToListAsync();
+            return agreementList;
+
+        }
+
         public async Task<IEnumerable<Agreement>> GetEmployeeProjects(string employeeEmail)
         {
             IList<Agreement> agreementList = await _dbContext.Agreements.Where
-                (e => e.EmployeeEmail == employeeEmail).ToListAsync();
+                (e => e.EmployeeEmail == employeeEmail/* && e.ContractType.Equals("Por horas")*/).ToListAsync();
             return agreementList;
         }
     }
