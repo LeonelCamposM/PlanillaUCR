@@ -73,14 +73,14 @@ namespace Infrastructure.Projects.Repositories
         public async Task<IEnumerable<Project>> GetEmployerProyects(string email) 
         {
             IList<Project> projectsResult = await _dbContext.Projects.Where
-                (e => e.EmployerEmail == email && e.IsEnabled == 1).ToListAsync();
+                (e => e.EmployerEmail == email).ToListAsync();
             return projectsResult;
         }
 
         public async Task<IEnumerable<Project>> GetEmployeeProyects(string name)
         {
             IList<Project> projectsResult = await _dbContext.Projects.Where
-                (e => e.ProjectName == name && e.IsEnabled == 1).ToListAsync();
+                (e => e.ProjectName == name).ToListAsync();
             return projectsResult;
         }
 
