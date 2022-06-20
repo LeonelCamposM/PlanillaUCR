@@ -142,7 +142,6 @@ else
 
     private bool _visible;
     private bool _open;
-    private void OpenDialog() => _visible = true;
     void CloseDialog() => _visible = false;
     private DialogOptions _dialogOptions = new() { FullWidth = true };
 
@@ -165,37 +164,41 @@ else
         }
     }
 
-    private async Task DeleteBenefits()
+    private void OpenDialog()
     {
         if (_selectedItems1.Length() > 0)
         {
-            foreach (Subscription toDelete in _selectedItems1)
-            {
-                IEnumerable<Subscribe> tempList = await SubscribeService.GetEmployeesBySubscription(employerEmail, projectName, toDelete.SubscriptionName);
-                if (tempList.Length() > 0)
-                {
-                    foreach (Subscribe toAppend in tempList)
-                    {
-                        _employees.Add(toAppend);
-                    }
-                }
-                SubscriptionService.DeleteSubscription(toDelete);
-            }
-            Snackbar.Add("Beneficios borrados", Severity.Success);
-            CloseDialog();
-            if (_employees.Length() > 0)
-            {
-                OpenDialogEmployee();
-            }
-            else
-            {
-                GoToMain();
-            }
+            _visible = true;
         }
         else
         {
-            Snackbar.Add("Por favor seleccione los elementos que desea borrar", Severity.Warning);
-            CloseDialog();
+            Snackbar.Add("Por favor seleccione los elementos a los que se desea suscribir", Severity.Warning);
+        }
+    } 
+
+    private async Task DeleteBenefits()
+    {
+        foreach (Subscription toDelete in _selectedItems1)
+        {
+            IEnumerable<Subscribe> tempList = await SubscribeService.GetEmployeesBySubscription(employerEmail, projectName, toDelete.SubscriptionName);
+            if (tempList.Length() > 0)
+            {
+                foreach (Subscribe toAppend in tempList)
+                {
+                    _employees.Add(toAppend);
+                }
+            }
+            SubscriptionService.DeleteSubscription(toDelete);
+        }
+        Snackbar.Add("Beneficios borrados", Severity.Success);
+        CloseDialog();
+        if (_employees.Length() > 0)
+        {
+            OpenDialogEmployee();
+        }
+        else
+        {
+            GoToMain();
         }
     }
 

@@ -97,8 +97,10 @@
     private string _searchString1 = "";
     private IEnumerable<Subscription> _elements = new List<Subscription>();
     private HashSet<Subscription> _selectedItems1 = new HashSet<Subscription>();
+    private HashSet<Subscription> _selectedItems2 = new HashSet<Subscription>();
     private MudTable<Subscription> _mudTable;
-    private Subscribe subscribe = new Subscribe("", "", "", "", 0.0, DateTime.Now);
+    private double _cost;
+    private Subscribe _subscribe = new Subscribe("", "", "", "", 0.0, DateTime.Now);
     public CultureInfo cultureCR = CultureInfo.GetCultureInfo("es-CR");
 
     [Parameter]
@@ -110,7 +112,7 @@
 
     private bool _visible;
     private bool _open;
-    private void OpenDialog() => _visible = true;
+
     void CloseDialog() => _visible = false;
     private DialogOptions dialogOptions = new() { FullWidth = true };
 
@@ -120,8 +122,8 @@
         if (_elements.Length() > 0)
         {
             _empty = false;
-            subscribe.EmployeeEmail = employeeEmail;
-            subscribe.ProjectName = projectName;
+            _subscribe.EmployeeEmail = employeeEmail;
+            _subscribe.ProjectName = projectName;
         }
         _loading = false;
     }
@@ -147,55 +149,50 @@
         await SendTableState.InvokeAsync("");
     }
 
-    private async Task Subscribe()
+    private void OpenDialog()
     {
-        CloseDialog();
         if (_selectedItems1.Length() > 0)
         {
-            IEnumerable<Subscribe> _actualSubscriptions = await SubscribeService.GetDeductionsByEmployee(employeeEmail, projectName);
-            foreach (Subscription subscription in _selectedItems1)
-            {
-                var _active = _actualSubscriptions.FirstOrDefault(e => e.EmployeeEmail == employeeEmail &&
-                    e.EmployerEmail == subscription.EmployerEmail &&
-                    e.SubscriptionName == subscription.SubscriptionName &&
-                    e.EndDate == null);
-                if (_active == null)
-                {
-                    subscribe.EmployerEmail = subscription.EmployerEmail;
-                    subscribe.SubscriptionName = subscription.SubscriptionName;
-                    subscribe.Cost = subscription.Cost;
-                    int error = SubscribeService.CreateSubscribe(subscribe, 0);
-                    if (error == 1)
-                    {
-                        Snackbar.Add("Suscripción realizada con éxito", Severity.Success);
-                    }
-                    else
-                    {
-                        Snackbar.Add("No se pudo suscribir a la deducción voluntaria", Severity.Warning);
-                    }
-                }
-                else
-                {
-                    Snackbar.Add("Ya está suscrito a esta deducción voluntaria", Severity.Warning);
-                }
-            }
-            await SendConmuteSignal();
+            _visible = true;
         }
         else
         {
             Snackbar.Add("Por favor seleccione los elementos a los que se desea suscribir", Severity.Warning);
         }
-    }
+    } 
 
-    private string DescriptionFormat(string description)
+    private async Task Subscribe()
     {
-        string formattedDescription = description;
-        if (description.Length > 255)
+        CloseDialog();
+        IEnumerable<Subscribe> _actualSubscriptions = await SubscribeService.GetDeductionsByEmployee(employeeEmail, projectName);
+        foreach (Subscription subscription in _selectedItems1)
         {
-            formattedDescription = description.Substring(0, 255);
-
+            var _active = _actualSubscriptions.FirstOrDefault(e => e.EmployeeEmail == employeeEmail &&
+                e.EmployerEmail == subscription.EmployerEmail &&
+                e.SubscriptionName == subscription.SubscriptionName &&
+                e.EndDate == null);
+            if (_active == null)
+            {
+                _subscribe.EmployerEmail = subscription.EmployerEmail;
+                _subscribe.SubscriptionName = subscription.SubscriptionName;
+                _subscribe.Cost = subscription.Cost;
+                int error = SubscribeService.CreateSubscribe(_subscribe, 0);
+                if (error == 1)
+                {
+                    Snackbar.Add("Suscripción realizada con éxito", Severity.Success);
+                }
+                else
+                {
+                    Snackbar.Add("No se pudo suscribir a la deducción voluntaria", Severity.Warning);
+                }
+            }
+            else
+            {
+                Snackbar.Add("Ya está suscrito a esta deducción voluntaria", Severity.Warning);
+            }
         }
-        return formattedDescription;
+        _elements = new List<Subscription>();
+        await SendConmuteSignal();
     }
 
     private string costFormat(double cost)
