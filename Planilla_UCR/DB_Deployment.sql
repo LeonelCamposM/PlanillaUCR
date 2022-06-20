@@ -703,5 +703,4 @@ VALUES('jeremy@ucr.ac.cr',
 --'2022-06-28',
 --'Ayudemos a los niños'
 --)
-'2012-07-15'
-)
+
