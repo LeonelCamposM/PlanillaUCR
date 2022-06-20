@@ -103,7 +103,7 @@ else
                             </MudTd>
                             </RowTemplate>
                         <PagerContent>
-                            <MudPagination SelectedChanged="PageChanged" Count="@((_table.GetFilteredItemsCount() + _table.RowsPerPage - 1) / _table.RowsPerPage)" Color="Color.Secondary" Class="pa-4"/>
+                            <MudPagination SelectedChanged="PageChanged" Count="@((_table.GetFilteredItemsCount() + _table.RowsPerPage - 1) / _table.RowsPerPage)" Color="Color.Primary" Class="pa-4"/>
                         </PagerContent>
             </MudTable>
         } else 
@@ -153,7 +153,6 @@ else
         checkJoinLenght();
         _loading = false;
     }
-
 
     private void populateJoinAttribute() 
     { 

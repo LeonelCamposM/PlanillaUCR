@@ -239,31 +239,14 @@ BEGIN
     SELECT * FROM Employee AS E WHERE E.Email = @email
 END
 
--- Agreements stored procedures
+-- AgreementType Stored procedures
+
 GO
 CREATE or ALTER PROCEDURE CheckSalaryPerAgreement(@MountPerHour int)
 AS
 BEGIN 
 	SELECT * FROM AgreementType WHERE MountPerHour = @MountPerHour
 END
-
-GO
-CREATE OR ALTER PROCEDURE GetContracteeByEmail(@ContracteeEmail varchar(255))
-AS
-BEGIN 
-	SELECT * FROM Agreement WHERE EmployeeEmail = @ContracteeEmail
-END
-
-
-GO
-CREATE OR ALTER PROCEDURE GetAllAgreementsByProjectAndEmployer(@Project varchar(255), @EmployerEmail varchar(255))
-AS
-BEGIN
-	SELECT *
-	FROM Agreement as A
-	WHERE A.ProjectName = @Project AND A.EmployerEmail = @EmployerEmail
-END
-
 
 GO
 CREATE OR ALTER PROCEDURE GetAllAgreementTypes
@@ -273,6 +256,23 @@ BEGIN
 	FROM AgreementType AS ATP
 END
 
+
+-- Agreements stored procedures
+GO
+CREATE OR ALTER PROCEDURE GetContracteeByEmail(@ContracteeEmail varchar(255))
+AS
+BEGIN 
+	SELECT * FROM Agreement WHERE EmployeeEmail = @ContracteeEmail
+END
+
+GO
+CREATE OR ALTER PROCEDURE GetAllAgreementsByProjectAndEmployer(@Project varchar(255), @EmployerEmail varchar(255))
+AS
+BEGIN
+	SELECT *
+	FROM Agreement as A
+	WHERE A.ProjectName = @Project AND A.EmployerEmail = @EmployerEmail
+END
 -- Data Insert
 GO
 INSERT INTO Person
@@ -417,12 +417,6 @@ VALUES('leonel@ucr.ac.cr',
 1
 )
 
-
-
-Insert into Agreement
-Values('mau@ucr.ac.cr', 'jeremy@ucr.ac.cr', 'Proyecto 1', '20220602','Tiempo completo', 1000,'20220620')
-
-
 Insert into AgreementType
 Values('Tiempo completo', 1000)
 
@@ -471,4 +465,3 @@ VALUES('leonel@ucr.ac.cr',
 25000,
 '2012-07-15'
 )
-
