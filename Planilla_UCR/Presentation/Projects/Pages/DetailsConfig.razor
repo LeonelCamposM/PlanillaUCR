@@ -71,7 +71,7 @@
                                 <MudItem xs="8">
                                     <MudTextField Label="Nombre del Proyecto" Class="mt-3" Variant="Variant.Outlined" ReadOnly="@_disabled"  
                                     Required="true" RequiredError="Ingrese un nombre para su proyecto" 
-                                    @bind-Value="newName" For="@(() => limits.projectName)">
+                                    @bind-Value="_newName" For="@(() => limits.projectName)">
                                     </MudTextField>
                                 </MudItem>
                                 <MudItem xs="2"> </MudItem>
@@ -172,7 +172,7 @@
                                 <MudItem xs="2"> </MudItem>
                                 <MudItem xs="8">
                                     <MudTextField Label="Nombre del Proyecto" Class="mt-3" Variant="Variant.Outlined" ReadOnly="true"
-                                    @bind-Value="newName">
+                                    @bind-Value="_newName">
                                     </MudTextField>
                                 </MudItem>
                                 <MudItem xs="2"> </MudItem>
@@ -230,7 +230,7 @@
 @code {
     private bool _loading = true;
     private bool _disabled = true;
-    private string newName = "";
+    private string _newName = "";
 
     private string _oldpersonEmail = "";
     private string _oldProjectName = "";
@@ -240,13 +240,12 @@
     private string _oldPaymentInterval = "";
     private int _oldIsEnabled = 1;
 
-
-    Project projectInfo = new Project("","","",0.0,0,"",1);
-    private IEnumerable<Agreement> agreementElements;
-    MudForm form;
-    SnackHandler snackHandler = new SnackHandler();
+    private IEnumerable<Agreement> _agreementElements;
     public CultureInfo cultureCR = CultureInfo.GetCultureInfo("es-CR");
-    LimitsValidationForm limits = new LimitsValidationForm();
+    public Project projectInfo = new Project("","","",0.0,0,"",1);
+    public LimitsValidationForm limits = new LimitsValidationForm();
+    public MudForm form;
+    SnackHandler snackHandler = new SnackHandler();
 
     [Parameter] public string personEmail { get; set; }
     [Parameter] public string projectName { get; set; }
@@ -256,11 +255,12 @@
     {
         ContextMenuService.SetProjectsContext(true,true,projectName, personEmail,true);
         projectInfo = await ProjectService.GetProject(personEmail,projectName);
-        agreementElements = await AgreementService.GetEmployeeAgreements(personEmail);
+        _agreementElements = await AgreementService.GetEmployeeAgreements(personEmail);
+        
 
         if (projectInfo != null)
         {
-            newName = projectInfo.ProjectName;
+            _newName = (projectInfo.ProjectName.ToUpper()).Trim();
             _oldpersonEmail = projectInfo.EmployerEmail;
             _oldProjectName = projectInfo.ProjectName;
             _oldProjectDescription = projectInfo.ProjectDescription;
@@ -275,10 +275,11 @@
     async Task SaveProject()
     {
         snackHandler._saving = true;
-
+        _newName = (_newName.ToUpper()).Trim();
         await form.Validate();
         bool valid = true;
-        if (projectInfo.ProjectName != newName) 
+
+        if (projectInfo.ProjectName != _newName) 
         { 
             valid = await ValidName(); 
         }
@@ -286,9 +287,9 @@
         {
             snackHandler._saving = false;
             projectInfo.MaximumAmountForBenefits = (double)_maximumAmountForBenefits;
-            ProjectService.ModifyProject(projectInfo, newName);
-            projectInfo.ProjectName = newName;
-            projectName = newName;
+            ProjectService.ModifyProject(projectInfo, _newName);
+            projectInfo.ProjectName = _newName;
+            projectName = _newName;
             ShowSnackNotification(projectInfo.ProjectName + " modificado exitosamente", Severity.Success);
             DisableForm();
 
@@ -298,11 +299,12 @@
     async Task<bool> ValidName()
     {
         bool valid = true;
-        Project tempProject = await ProjectService.GetProject(personEmail, newName);
+        _newName = (_newName.ToUpper()).Trim();
+        Project tempProject = await ProjectService.GetProject(personEmail, _newName);
         if (tempProject != null)
         {
             valid = false;
-            ShowSnackNotification("El nombre del proyecto " + newName + " ya está en uso", Severity.Error);
+            ShowSnackNotification("El nombre del proyecto " + _newName + " ya está en uso", Severity.Error);
             DisableForm();
         }
         return valid;
@@ -353,12 +355,12 @@
     private void EnableForm()
     {
         _disabled = false;
-        newName = projectInfo.ProjectName;
+        _newName = projectInfo.ProjectName;
     }
 
     private void DisableForm()
     {
         _disabled = true;
-        newName = projectInfo.ProjectName;
+        _newName = projectInfo.ProjectName;
     }
 }

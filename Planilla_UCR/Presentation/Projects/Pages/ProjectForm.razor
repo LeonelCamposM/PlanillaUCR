@@ -34,7 +34,7 @@
                 <MudItem xs="8">
                     <MudTextField Label="Nombre del Proyecto" Class="mt-3" Variant="Variant.Outlined"  
                     Required="true" RequiredError="Ingrese un nombre para su proyecto" 
-                    @bind-Value="projectInfo.ProjectName" For="@(() => limits.projectName)">
+                    @bind-Value="projectName" For="@(() => limits.projectName)">
                     </MudTextField>
                 </MudItem>
                 <MudItem xs="2"> </MudItem>
@@ -124,6 +124,7 @@
         projectInfo.MaximumAmountForBenefits = Convert.ToDouble(_maximumAmountForBenefits);
         Project projectToAdd = projectInfo;
         snackHandler._saving = true;
+        projectInfo.ProjectName = (projectName.ToUpper()).Trim();
 
         await form.Validate();
         if (form.IsValid && await (ValidateInfo(projectInfo)))
@@ -160,7 +161,7 @@
     async Task<bool> ValidateName(Project project)
     {
         bool valid = true;
-        IEnumerable<Project> nameCecked = await ProjectService.GetAllProjectsAsync();
+        IEnumerable<Project> nameCecked = await ProjectService.GetEmployerProyects(project.EmployerEmail);
 
         if (nameCecked.Length() != 0)
         {
