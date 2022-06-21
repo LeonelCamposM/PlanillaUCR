@@ -36,8 +36,10 @@
 @{
     List<BreadcrumbItem> _items = new List<BreadcrumbItem>
     {
-        new BreadcrumbItem("Inicio", href: ""),
-        new BreadcrumbItem("Contratos", href: null, disabled: true),
+            new BreadcrumbItem("Proyectos", href: $"/Projects/{employerEmail}"),
+            new BreadcrumbItem(@projectName, href: $"/Projects/Details/{employerEmail}/{projectName}"),
+            new BreadcrumbItem("Contratar empleados",  href: $"/Agreements/{employerEmail}/{projectName}"),
+            new BreadcrumbItem("Establecer contrato",  href: null, disabled: true),
     };
 }
 
@@ -129,7 +131,7 @@
                     <MudButton Disabled = "true"></MudButton>
                     <MudButton Disabled = "true"></MudButton>
                     <MudButton Disabled = "true"></MudButton>
-                    <MudButton OnClick="GoToEmployeeList" Variant="Variant.Filled" Color="Color.Transparent">
+                    <MudButton OnClick="GoToPreviousPage" Variant="Variant.Filled" Color="Color.Transparent">
                         <MudText>Volver</MudText>
                     </MudButton>
                 </MudGrid>
@@ -318,9 +320,9 @@
 
     }
 
-    private void GoToEmployeeList()
+    private void GoToPreviousPage()
     {
-        nav.NavigateTo($"/View_Project_Employees/{employerEmail}/{projectName}");
+        nav.NavigateTo($"/Agreements/{employerEmail}/{projectName}");
     }
 
     private void parseAgreementType()

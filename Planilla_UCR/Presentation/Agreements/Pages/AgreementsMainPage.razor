@@ -1,0 +1,154 @@
+﻿@page "/Agreements/{employerEmail}/{projectName}/"
+
+@using Application.People
+@using Domain.People.Entities
+@using Application.Employees
+@using Application.ContextMenu
+
+@inject NavigationManager nav
+@inject IEmployeeService PersonService
+@inject IContextMenuService ContextService
+
+@if(_loading) {
+    <MudPaper  Height="220px" Width="100%" Outlined="false" Class="border-none pa-4" Elevation="0">
+         <MudText Align="Align.Center" Typo="Typo.h6">
+              <MudProgressCircular Color="Color.Primary" Style="height:70px;width:70px;" Indeterminate="true" />
+         </MudText>
+       
+    </MudPaper>
+}else{
+    @if (!_loading)
+    {
+        List<BreadcrumbItem> _items = new List<BreadcrumbItem>
+        {
+            new BreadcrumbItem("Proyectos", href: $"/Projects/{employerEmail}"),
+            new BreadcrumbItem(@projectName, href: $"/Projects/Details/{employerEmail}/{projectName}"),
+            new BreadcrumbItem("Contratar empleados", href: null, disabled: true)
+        }; 
+        <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
+        <MudPaper Height="60px" Width="100%" Outlined="false" Class="border-none" Elevation="0"> 
+        </MudPaper>
+        if (!empty)
+        {
+                <MudText Align="Align.Center" Typo="Typo.h6">Contratar empleados</MudText>
+                <br>
+                <MudTable @ref="@_table" Items="@_elements" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" Filter="new Func<Person,bool>(FilterFunc1)">
+                    <ToolBarContent>
+                            <MudSpacer />
+                            <MudTextField @bind-Value="searchString1" Placeholder="Buscar email" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                    </ToolBarContent> 
+                    <HeaderContent>
+                        <MudTh>Email</MudTh>
+                        <MudTh>Nombre completo</MudTh>
+                        <MudTh>Cedula</MudTh>
+                        <MudTh>Acciones</MudTh>
+                    </HeaderContent>
+
+                    <RowTemplate>
+                        <MudTd DataLabel="Email">@context.Email</MudTd>
+                        <MudTd DataLabel="Nombre">@context.Name @context.LastName1 @context.LastName2</MudTd>
+                        <MudTd DataLabel="Cedula">@context.Ssn</MudTd>
+                         <MudTd DataLabel="Acciones">
+                        <MudSpacer></MudSpacer>
+                            <MudButton Variant="Variant.Filled" @onclick="@(e => GoToContractEmployee())" Color="Color.Transparent">
+                                <MudText>
+                                Contratar
+                                </MudText> 
+                            </MudButton>
+                        </MudTd>
+                    </RowTemplate>
+                <PagerContent>
+                    <MudPagination SelectedChanged="PageChanged" Count="@((_table.GetFilteredItemsCount() + _table.RowsPerPage - 1) / _table.RowsPerPage)" Color="Color.Primary" Class="pa-4"/>
+                </PagerContent>
+                </MudTable>
+                 <br>
+                <MudButton Variant="Variant.Filled" OnClick="GoToCreateEmployee" Color="Color.Primary">
+                    <MudText>
+                    Registrar Empleados
+                    </MudText> 
+                </MudButton>
+        } @*else
+        {
+           <HireEmployeesError email="@email" projectName="@projectName" SendTableState="SendConmuteSignal"></HireEmployeesError>
+        } *@
+    }
+}
+
+@code {
+    private bool _hidePosition;
+    private bool _loading = true;
+    private bool empty = true;
+    string searchString1 = "";
+    public string Disabled { get; set; } = "Empleados Contratados";
+    private IEnumerable<Person> _elements = new List<Person>();
+    private MudTable<Person> _table;
+    public string tab1 { get; set; } = "Contratar empleados";
+    public string tab2 { get; set; } = "Empleados contratados";
+
+    [Parameter]
+    public string employerEmail { get; set; }
+
+    [Parameter]
+    public string projectName { get; set; }
+
+    [Parameter]
+    public EventCallback<string> SendTableState { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _elements = await PersonService.GetAllEmployees(projectName);
+        IEnumerable<Person> hiredEmployees = await PersonService.GetProjectEmployees(projectName);
+        if (_elements.Length() == 0)
+        {
+            empty = true;
+        }
+        else
+        {
+            empty = false;
+            foreach (var item in hiredEmployees)
+            {
+                _elements = _elements.Where(e => e.Email != item.Email);
+            }
+        }
+
+
+
+        _loading = false;
+    }
+
+    private void GoToCreateEmployee()
+    {
+        nav.NavigateTo($"/Create_Employee/{employerEmail}/{projectName}");
+    }
+
+    private void GoToContractEmployee()
+    {
+       nav.NavigateTo($"/Agreements/{employerEmail}/{projectName}/New");
+    }
+
+    private void PageChanged(int i)
+    {
+        _table.NavigateTo(i - 1);
+    }
+
+    private bool FilterFunc1(Person element) => FilterFunc(element, searchString1);
+
+    private bool FilterFunc(Person element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.Email.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+
+    private async Task SendConmuteSignal()
+    {
+        await SendTableState.InvokeAsync("");
+    }
+
+    private void GoToProjectDetails()
+    {
+        nav.NavigateTo($"/Projects/Details/{employerEmail}/{projectName}");
+    }
+}
