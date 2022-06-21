@@ -33,5 +33,12 @@ namespace Infrastructure.Payments.Repositories
             _dbContext.Payments.Add(newPayment);
             await _dbContext.SaveEntitiesAsync();
         }
+
+        public async Task<IList<Payment>> GetProjectPayments(Payment payment) 
+        {
+            IList<Payment> payments = await _dbContext.Payments.Where(e => e.EmployerEmail == payment.EmployerEmail
+            && e.ProjectName == payment.ProjectName && e.StartDate == payment.StartDate && e.EndDate == payment.EndDate).ToListAsync();
+            return payments;
+        }
     }
 }
