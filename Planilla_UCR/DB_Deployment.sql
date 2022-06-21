@@ -515,6 +515,13 @@ BEGIN
 	FROM AgreementType AS ATP
 END
 
+GO
+CREATE or ALTER PROCEDURE GetSalaryPerAgreement(@MountPerHour int)
+AS
+BEGIN 
+	SELECT * FROM AgreementType WHERE MountPerHour = @MountPerHour
+END
+
 -- Data Insert
 GO
 INSERT INTO Person
