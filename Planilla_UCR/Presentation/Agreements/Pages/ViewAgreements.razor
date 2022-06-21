@@ -93,14 +93,6 @@ else
                             {
                                 <MudTd DataLabel="Salario" Style="text-align:right" >₡@context.MountPerHour.00</MudTd>
                             }
-                             <MudTd DataLabel="Terminar">
-                                <MudSpacer></MudSpacer>
-                                    <MudButton Variant="Variant.Filled" @onclick="@(e => GoToFireTheEmployee(@context.EmployeeEmail))" Color="Color.Transparent">
-                                    <MudText>
-                                    Terminar
-                                    </MudText> 
-                                </MudButton>
-                            </MudTd>
                             </RowTemplate>
                         <PagerContent>
                             <MudPagination SelectedChanged="PageChanged" Count="@((_table.GetFilteredItemsCount() + _table.RowsPerPage - 1) / _table.RowsPerPage)" Color="Color.Primary" Class="pa-4"/>
@@ -180,10 +172,6 @@ else
         {
             _empty = true;
         }
-    }
-    private void GoToFireTheEmployee(string email)
-    {
-       nav.NavigateTo($"/Agreements/{email}");
     }
 
     private void PageChanged(int i)
