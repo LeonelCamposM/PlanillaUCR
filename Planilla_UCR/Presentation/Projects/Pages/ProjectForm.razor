@@ -34,7 +34,7 @@
                 <MudItem xs="8">
                     <MudTextField Label="Nombre del Proyecto" Class="mt-3" Variant="Variant.Outlined"  
                     Required="true" RequiredError="Ingrese un nombre para su proyecto" 
-                    @bind-Value="projectName" For="@(() => limits.projectName)">
+                    @bind-Value="projectInfo.ProjectName" For="@(() => limits.projectName)">
                     </MudTextField>
                 </MudItem>
                 <MudItem xs="2"> </MudItem>
@@ -122,9 +122,9 @@
     {
         projectInfo.EmployerEmail = employerEmail;
         projectInfo.MaximumAmountForBenefits = Convert.ToDouble(_maximumAmountForBenefits);
+        projectInfo.ProjectName = projectInfo.ProjectName.Trim();
         Project projectToAdd = projectInfo;
         snackHandler._saving = true;
-        projectInfo.ProjectName = (projectName.ToUpper()).Trim();
 
         await form.Validate();
         if (form.IsValid && await (ValidateInfo(projectInfo)))
@@ -161,18 +161,17 @@
     async Task<bool> ValidateName(Project project)
     {
         bool valid = true;
-        IEnumerable<Project> nameCecked = await ProjectService.GetEmployerProyects(project.EmployerEmail);
+        IEnumerable<Project> nameCecked = await ProjectService.GetAllProjectsAsync();
 
         if (nameCecked.Length() != 0)
         {
-            foreach (Project element in nameCecked){
-                if (element.ProjectName == project.ProjectName)
-                {
-                    valid=false;
-                    ShowSnackNotification("El nombre de proyecto ya está siendo usado", Severity.Error);
-                    break;
-                }
+            Project tempProject = await ProjectService.GetProject(project.ProjectName);
+            if (tempProject != null )
+            {
+                valid=false;
+                ShowSnackNotification("El nombre de proyecto ya está siendo usado", Severity.Error);
             }
+            
         }
         return valid;
     }
