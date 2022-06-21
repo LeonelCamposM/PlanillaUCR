@@ -108,8 +108,6 @@
     private bool _emptyAgreement = true;
     private double? _maximumAmountForBenefits = 0.0;
 
-
-
     Project projectInfo = new Project("","","",0.0,0,"",1);
     MudForm form;
     SnackHandler snackHandler = new SnackHandler();
@@ -135,10 +133,12 @@
     }
     private async Task FindProject()
     {
-        foreach (Agreement element in agreementElements) {
+        foreach (Agreement element in agreementElements) 
+        {
             if (projectName == element.ProjectName)
             {
                 projectInfo = await ProjectService.GetProject(element.ProjectName);
+            }
         }
     }
 }
