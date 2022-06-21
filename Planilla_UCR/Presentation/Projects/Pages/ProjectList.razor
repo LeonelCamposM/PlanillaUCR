@@ -353,12 +353,15 @@
                     {
                         amountOfAgreements++;
                         _activeEmployees.Add(actualPerson);
-                        OpenDialog();
                         _agreementMessage += "Nombre: " + actualPerson.Name + " " + actualPerson.LastName1 + " " + 
                                     actualPerson.LastName2 + ". Email: " + actualAgreement.EmployeeEmail + " \n";
                     }
                 }
             }
+        }
+        if (amountOfAgreements > 0)
+        {
+            OpenDialog();
         }
         return amountOfAgreements;
     }
