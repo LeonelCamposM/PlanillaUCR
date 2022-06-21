@@ -79,7 +79,7 @@ else
                             <MudTh Style="text-align:justify-all">Intervalo pago</MudTh>
                             <MudTh Style="text-align:justify-all">Inicio contrato</MudTh>
                             <MudTh Style="text-align:justify-all">Fin contrato</MudTh>
-                            <MudTh Style="text-align:justify-all"> Salario</MudTh>
+                            <MudTh Style="text-align:justify-all"> Salario bruto por hora</MudTh>
                         </HeaderContent>
 
                         <RowTemplate>
@@ -89,14 +89,8 @@ else
                             <MudTd DataLabel="Intervalo pago" Style="text-align:justify-all">@context.PaymentInterval</MudTd>
                             <MudTd DataLabel="Inicio contrato" Style="text-align:justify-all">@context.ContractStartDate.ToShortDateString()</MudTd>
                             <MudTd DataLabel="Fin contrato" Style="text-align:justify-all">@context.ContractFinishDate.ToShortDateString()</MudTd>
-                            
-                            @if (context.ContractType == "Por horas")
-                            {
-                                <MudTd DataLabel="Salario" Style="text-align:right" >₡@context.MountPerHour.00/H</MudTd>
-                            } else
-                            {
-                                <MudTd DataLabel="Salario" Style="text-align:right" >₡@context.MountPerHour.00</MudTd>
-                            }
+                            <MudTd DataLabel="Salario bruto por hora<" Style="text-align:right" >₡@context.MountPerHour.00</MudTd>
+    
                              <MudTd DataLabel="Terminar">
                                 <MudButton Variant="Variant.Filled" @onclick="@(e => OpenDialog(@context.EmployeeEmail))" Color="Color.Transparent">Terminar</MudButton>
                             </MudTd>

@@ -1,4 +1,4 @@
-﻿@page "/Projects/{employeeEmail}/Agreements/New"
+﻿@page "/Projects/{employerEmail}/{projectName}/Agreements/New"
 @using Presentation.Core.Components
 @using System.ComponentModel.DataAnnotations
 @using Domain.Projects.Entities
@@ -64,8 +64,14 @@
                     <MudItem xs="2"> </MudItem>
                     <MudItem xs="2"> </MudItem>
                     <MudItem xs="8">
-                        <MudTextField @bind-Value="agreementObject.ProjectName" Label="Nombre del proyecto" Variant="Variant.Outlined" Required="true" RequiredError="El nombre del proyecto es necesario">
-                        </MudTextField>
+                    <MudSelect @bind-Value="agreementObject.ProjectName" Label="Nombre del proyecto" Variant="Variant.Outlined" Required="true"  RequiredError="El nombre del proyecto es necesario">
+                        @foreach (var project in _projects)
+                        {
+                            <MudSelectItem T="string" Value="@project.ProjectName">@project.ProjectName</MudSelectItem>
+                        }
+                    </MudSelect>
+
+
                     </MudItem>
                     <MudItem xs="2"> </MudItem>
                     <MudItem xs="2"> </MudItem>
@@ -79,7 +85,7 @@
                     </MudItem>
                     
                     <MudItem xs="4">
-                        <MudNumericField @bind-Value="salaryPerMonth" Label="Monto por hora" Variant="Variant.Outlined" 
+                        <MudNumericField @bind-Value="salaryPerHour" Label="Monto por hora" Variant="Variant.Outlined" 
                              Required="true" RequiredError="El monto por hora es necesario" HideSpinButtons="true" Min = "0"> </MudNumericField>
                     </MudItem>
                     <MudItem xs="2"> </MudItem>
@@ -130,19 +136,18 @@
 </MudGrid>
 
 @code{
-    [Parameter] public string employeeEmail { get; set; }
-    public string projectName { get; set; }
-    public string employerEmail { get; set; }
+    [Parameter] public string employerEmail { get; set; }
+    [Parameter] public string projectName { get; set; }
 
     Agreement agreementObject = new Agreement("", "", "", null, "", 0, null, 1, "");
     AgreementType anAgreementType = new AgreementType("",0);
     public CultureInfo cultureCR = CultureInfo.GetCultureInfo("es-CR");
-    public string deductions { get; set; } = "100";
+    private IEnumerable<Project> _projects = new List<Project>();
 
     MudForm form;
     DateTime? startDate;
     DateTime? endDate;
-    int? salaryPerMonth;
+    int? salaryPerHour;
     string format = "yyyy/MM/dd";
 
     private bool _isLoading = true;
@@ -152,9 +157,9 @@
 
     protected override async Task OnInitializedAsync()
     {
-        agreementObject.EmployerEmail = ContextService.GetEmployerEmailContext();
-        agreementObject.ProjectName = ContextService.GetProjectsContext();
-        agreementObject.EmployeeEmail = employeeEmail;
+        agreementObject.EmployerEmail = employerEmail;
+        agreementObject.ProjectName = projectName;
+        _projects = await ProjectService.GetEmployerProyects(employerEmail);
         _isLoading = false;
     }
 
@@ -201,7 +206,7 @@
         agreementObject.ProjectName = "";
         agreementObject.ContractFinishDate = null;
         agreementObject.ContractType = "";
-        salaryPerMonth = null;
+        salaryPerHour = null;
         startDate = null;
         endDate = null;
     }
@@ -276,7 +281,7 @@
     async Task<bool> validateAgreementsSalary()
     {
         bool isValid = true;
-        agreementObject.MountPerHour = (int)salaryPerMonth;
+        agreementObject.MountPerHour = (int)salaryPerHour;
 
         IEnumerable<AgreementType> salaryList = await AgreementTypeService.CheckSalaryPerAgreement(agreementObject.MountPerHour);
 
