@@ -58,19 +58,7 @@
                         </li>
 
                         <li class="nav-item px-3">
-                            <TabNavLink Icon="@Icons.Material.Filled.Assignment" href="@($"/Projects/{email}/{projectName}")" text="Detalles"></TabNavLink>
-                        </li>
-
-                        <li class="nav-item px-3">
                             <TabNavLink  Icon="@Icons.Filled.CreditScore" href="" text="Aprobar pagos"></TabNavLink>
-                        </li>
-
-                        @*<li class="nav-item px-3">
-                            <TabNavLink  Icon="@Icons.Filled.Article" href="" text="Informes de pago"></TabNavLink>
-                        </li>*@
-
-                        <li class="nav-item px-3">  
-                            <TabNavLink Icon="@Icons.Material.Filled.People" href="@($"/View_Project_Employees/{email}/{projectName}")" text="Empleados"></TabNavLink>
                         </li>
 
                         <li class="nav-item px-3">
@@ -78,8 +66,24 @@
                         </li>
 
                         <li class="nav-item px-3">
-                            <TabNavLink  Icon="@Icons.Material.Filled.CardMembership" href="@($"/Projects/{email}/{projectName}/Deductions")" text="Deducciones Voluntarias"></TabNavLink>
+                            <TabNavLink  Icon="@Icons.Material.Filled.HistoryEdu" href="@($"/Agreements/{email}/{projectName}/New")" text="Contratar empleados"></TabNavLink>
                         </li>
+
+                        <li class="nav-item px-3">
+                            <TabNavLink  Icon="@Icons.Material.Filled.CardMembership" href="@($"/Projects/{email}/{projectName}/Deductions")" text="Deducciones voluntarias"></TabNavLink>
+                        </li>
+
+                        <li class="nav-item px-3">
+                            <TabNavLink Icon="@Icons.Material.Filled.Assignment" href="@($"/Projects/{email}/{projectName}")" text="Detalles"></TabNavLink>
+                        </li>
+
+                        <li class="nav-item px-3">  
+                            <TabNavLink Icon="@Icons.Material.Filled.People" href="@($"/View_Project_Employees/{email}/{projectName}")" text="Empleados"></TabNavLink>
+                        </li>
+                        
+                        @*<li class="nav-item px-3">
+                            <TabNavLink  Icon="@Icons.Filled.Article" href="" text="Informes de pago"></TabNavLink>
+                        </li>*@
                        
                     }
 
