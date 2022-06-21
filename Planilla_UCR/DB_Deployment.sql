@@ -456,18 +456,6 @@ BEGIN
 	SET IsEnabled = 0
 	WHERE Person.Email = @EmployerEmail;
 
-	UPDATE Project 
-	SET IsEnabled = 0
-	WHERE Project.EmployerEmail = @EmployerEmail;
-
-	UPDATE Agreement 
-	SET IsEnabled = 0
-	WHERE Agreement.EmployerEmail = @EmployerEmail;
-
-	UPDATE Subscription 
-	SET IsEnabled = 0
-	WHERE Subscription.EmployerEmail = @EmployerEmail;
-
 END
 
 
@@ -543,8 +531,6 @@ BEGIN
 	SET Agreement.IsEnabled = 0, Agreement.Justification = @Justification, Agreement.ContractFinishDate = GETDATE()
 	WHERE Agreement.EmployeeEmail = @EmployeeEmail AND Agreement.EmployerEmail = @EmployerEmail AND Agreement.ProjectName = @ProjectName AND Agreement.IsEnabled = 1;
 END
-
-exec DesactivateAgreement @EmployeeEmail = 'jeremy@ucr.ac.cr', @EmployerEmail = 'leonel@ucr.ac.cr', @ProjectName = 'Proyecto 1', @Justification = 'Prueba por si funka'
 
 --Agreement Stored procedure
 GO
