@@ -270,7 +270,8 @@
         SelectActiveProjects();
         _loading = false;
 
-        if (_projectElements.Length() > 0){
+        if (_projectElements.Length() > 0)
+        {
             _emptyProject = false;
         }
         await InvokeAsync(StateHasChanged);
@@ -289,7 +290,8 @@
         _projectElements = _activeProjectElements.AsEnumerable();
     }
 
-    private async Task LoadEmployee() {
+    private async Task LoadEmployee() 
+    {
         _loading = false;
         _agreements = await AgreementService.GetEmployeeAgreements(personEmail);
 

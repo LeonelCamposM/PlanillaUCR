@@ -42,12 +42,12 @@
             <MudItem xs="12" sm="12">
                 <MudPaper  Height="250px" Width="100%" Outlined="false" Class="border-none pa-4" Elevation="0">
                     <MudText Align="Align.Center" Typo="Typo.h6">Detalles del proyecto</MudText>
-                    <MudForm @ref="form">
+                    <MudForm @ref="_form">
                         <MudGrid>
                             <MudItem xs="2"> </MudItem>
                             <MudItem xs="8">
                                 <MudTextField Label="Nombre del Proyecto" Class="mt-3" Variant="Variant.Outlined" ReadOnly="true"
-                                @bind-Value="projectInfo.ProjectName">
+                                @bind-Value="_projectInfo.ProjectName">
                                 </MudTextField>
                             </MudItem>
                             <MudItem xs="2"> </MudItem>
@@ -55,33 +55,33 @@
                             <MudItem xs="2"> </MudItem>
                             <MudItem xs="8">
                                 <MudTextField Label="Email del Empleador" Lines="1" Variant="Variant.Outlined" ReadOnly="true"
-                                @bind-Value="projectInfo.EmployerEmail"></MudTextField>
+                                @bind-Value="_projectInfo.EmployerEmail"></MudTextField>
                             </MudItem>
                             <MudItem xs="2"> </MudItem>
 
                             <MudItem xs="2"> </MudItem>
                             <MudItem xs="8">
                                 <MudTextField Label="Descripción del Proyecto" Lines="3" Variant="Variant.Outlined" ReadOnly="true"
-                                @bind-Value="projectInfo.ProjectDescription"></MudTextField>
+                                @bind-Value="_projectInfo.ProjectDescription"></MudTextField>
                             </MudItem>
                             <MudItem xs="2"> </MudItem>
                 
                             <MudItem xs="2"> </MudItem>
                             <MudItem xs="8">
-                                <MudTextField typeof="int" @bind-Value="projectInfo.PaymentInterval" Label="Intervalo de pago" 
+                                <MudTextField typeof="int" @bind-Value="_projectInfo.PaymentInterval" Label="Intervalo de pago" 
                                 Variant="Variant.Outlined" ReadOnly="true"></MudTextField>
                             </MudItem>
                             <MudItem xs="2"></MudItem>
 
                             <MudItem xs="2"> </MudItem>
                             <MudItem xs="4">
-                                <MudTextField Label="Monto máximo para beneficios" Format="N2" Culture="@cultureCR"
+                                <MudTextField Label="Monto máximo para beneficios" Format="N2" Culture="@_cultureCR"
                                 ReadOnly="true" Variant="Variant.Outlined" @bind-Value="_maximumAmountForBenefits" Adornment="Adornment.Start" 
-                                AdornmentText="@cultureCR.NumberFormat.CurrencySymbol"/>
+                                AdornmentText="@_cultureCR.NumberFormat.CurrencySymbol"/>
                             </MudItem>
 
                             <MudItem xs="4">
-                                <MudTextField @bind-Value="projectInfo.MaximumBenefitAmount" ReadOnly="true" Label="Cantidad máxima de beneficios" 
+                                <MudTextField @bind-Value="_projectInfo.MaximumBenefitAmount" ReadOnly="true" Label="Cantidad máxima de beneficios" 
                                 Variant="Variant.Outlined"></MudTextField>
                             </MudItem>
 
@@ -108,11 +108,11 @@
     private bool _emptyAgreement = true;
     private double? _maximumAmountForBenefits = 0.0;
 
-    Project projectInfo = new Project("","","",0.0,0,"",1);
-    MudForm form;
+    private Project _projectInfo = new Project("","","",0.0,0,"",1);
+    private MudForm _form;
+    private CultureInfo _cultureCR = CultureInfo.GetCultureInfo("es-CR");
+    private IEnumerable<Agreement> _agreementElements;
     SnackHandler snackHandler = new SnackHandler();
-    public CultureInfo cultureCR = CultureInfo.GetCultureInfo("es-CR");
-    private IEnumerable<Agreement> agreementElements;
 
     [Parameter] public string personEmail { get; set; }
     [Parameter] public string employerEmail { get; set; }
@@ -121,24 +121,26 @@
     protected override async Task OnInitializedAsync()
     {
 
-        agreementElements = await AgreementService.GetEmployeeAgreements(personEmail);
-        
+        _agreementElements = await AgreementService.GetEmployeeAgreements(personEmail);
         _loading = false;
-        if (agreementElements.Length() > 0){
+        if (_agreementElements.Length() > 0)
+        {
             _emptyAgreement = false;
 
             _loading = false;
             await FindProject();
         }
     }
+
     private async Task FindProject()
     {
-        foreach (Agreement element in agreementElements) 
+        foreach (Agreement element in _agreementElements) 
         {
             if (projectName == element.ProjectName)
             {
-                projectInfo = await ProjectService.GetProject(element.ProjectName);
+                _projectInfo = await ProjectService.GetProject(element.ProjectName);
             }
         }
+        _maximumAmountForBenefits = _projectInfo.MaximumAmountForBenefits;
     }
 }
