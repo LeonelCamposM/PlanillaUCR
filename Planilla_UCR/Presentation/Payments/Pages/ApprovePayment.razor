@@ -84,7 +84,6 @@
 @code {
     [Parameter]
     public string email { get; set; }
-    private Agreement _firstProjectAgreement = new Agreement("No tiene contratos todavía","","",DateTime.Now,"",0,DateTime.Now,0,"");
     private Project _projectInfo = new Project("","","",0.0,0,"",1);
     private bool _loading = true;
     private bool _empty = true;
@@ -103,9 +102,8 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        //await PaymentService.GetEmployeeLastPayment();
         _employees = await AgreementService.GetProjectAgreements(ContextService.GetProjectsContext(), email); 
-        await GetFirstProjectAgreementDate();
+        await GetProjectInfo();
         GetNextPay();
         if(_nextPay <= DateTime.Now)
         {
@@ -139,7 +137,7 @@
 
     private async Task GetAllEmployeesSalaries()
     {
-        Payment _payment = new Payment("", _projectInfo.EmployerEmail, _projectInfo.ProjectName, 0, (DateTime)_firstProjectAgreement.ContractStartDate, _nextPay);
+        Payment _payment = new Payment("", _projectInfo.EmployerEmail, _projectInfo.ProjectName, 0, _projectInfo.LastPaymentDate, _nextPay);
         IList<Payment> _paidEmployees = await PaymentService.GetProjectPayments(_payment);
         foreach (EmployeeAgreement _employeeAgreement in _employeesPayment)
         {
@@ -187,7 +185,7 @@
     private async Task<double> GetEmployeeBenefits(string employeeEmail)
     {
         double mountOfBenefits = 0;
-        Subscribe searchSubscribe= new Subscribe(employeeEmail, _projectInfo.EmployerEmail, _projectInfo.ProjectName, "", 0.0, (DateTime)_firstProjectAgreement.ContractStartDate, _nextPay);
+        Subscribe searchSubscribe= new Subscribe(employeeEmail, _projectInfo.EmployerEmail, _projectInfo.ProjectName, "", 0.0, _projectInfo.LastPaymentDate, _nextPay);
         IEnumerable<Subscription> subscriptions = await SubscribeService.GetSubscribes(searchSubscribe);
         foreach (Subscription _subscription in subscriptions.Where(e=> e.TypeSubscription == 1))
         {
@@ -200,7 +198,7 @@
     {
         double _workedHours = 0;
         _report.EmployeeEmail = employeeEmail;
-        _report.ReportDate = _firstProjectAgreement.ContractStartDate;
+        _report.ReportDate = _projectInfo.LastPaymentDate;
         IList<HoursReport> reports = await ReportHoursService.GetEmployeeReports(_report, _nextPay);
         foreach (HoursReport hours in reports)
         {
@@ -224,22 +222,10 @@
         return _workedDays;
     }
 
-    async Task GetFirstProjectAgreementDate()
+    async Task GetProjectInfo()
     {
-        _firstProjectAgreement.ProjectName = ContextService.GetProjectsContext();
-        _firstProjectAgreement.EmployerEmail = email;
-        _firstProjectAgreement = await AgreementService.GetFirstProjectAgreement(_firstProjectAgreement );
-        if(_firstProjectAgreement == null)
-        {
-            _firstProjectAgreement  =  new Agreement("No tiene contratos todavía","","",DateTime.Now,"",0,DateTime.Now,0,"");
-        }
         _projectInfo = await ProjectService.GetProject(email,  ContextService.GetProjectsContext());
-        if(_projectInfo == null)
-        {
-            _projectInfo =  new Project("","","",0.0,0,"",1);
-        }
-
-        _nextPay = (DateTime) _firstProjectAgreement .ContractStartDate;
+        _nextPay = _projectInfo.LastPaymentDate;
     }
 
     public void GetNextPay()
@@ -252,7 +238,6 @@
                 break;
 
         }
-
         _nextPay = _nextPay.AddDays(_daysInterval); 
     }
 
@@ -286,7 +271,7 @@
             {
                 double benefits = await GetEmployeeBenefits(element.EmployeeEmail);
                 double mountToPay = element.MountToPay - benefits;
-                Payment _payment = new Payment(element.EmployeeEmail, _projectInfo.EmployerEmail, _projectInfo.ProjectName, mountToPay, (DateTime)_firstProjectAgreement.ContractStartDate, _nextPay);
+                Payment _payment = new Payment(element.EmployeeEmail, _projectInfo.EmployerEmail, _projectInfo.ProjectName, mountToPay, _projectInfo.LastPaymentDate, _nextPay);
                 await PaymentService.AddPayment(_payment);
             }
             Snackbar.Add("Pagos aprobados", Severity.Success);

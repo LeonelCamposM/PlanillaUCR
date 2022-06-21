@@ -1,6 +1,6 @@
-﻿CREATE DATABASE DB_Planilla2
+﻿CREATE DATABASE DB_Planilla
 GO
-USE DB_Planilla2
+USE DB_Planilla
 
 -- Tables
 CREATE TABLE Person(
@@ -33,6 +33,7 @@ CREATE TABLE Project(
 	MaximumBenefitAmount int,
 	PaymentInterval varchar(255),
 	IsEnabled int NOT NULL,
+	LastPaymentDate date
 	PRIMARY KEY(EmployerEmail, ProjectName),
 	FOREIGN KEY(EmployerEmail) REFERENCES Employer(Email)
 );
@@ -58,8 +59,6 @@ CREATE TABLE Agreement(
 	IsEnabled int NOT NULL,
 	Justification varchar(max)
 );
-
-
 
 CREATE TABLE Subscription
 (
@@ -584,7 +583,8 @@ VALUES('leonel@ucr.ac.cr',
 15000,
 10,
 'Quincenal',
-1
+1,
+'2022-06-01'
 )
 
 INSERT INTO Project
@@ -594,7 +594,8 @@ VALUES('leonel@ucr.ac.cr',
 20000,
 6,
 'Mensual',
-1
+1,
+'2022-06-01'
 )
 
 INSERT INTO Project
@@ -604,7 +605,8 @@ VALUES('leonel@ucr.ac.cr',
 22000,
 7,
 'Quincenal',
-1
+1,
+'2022-06-01'
 )
 
 INSERT INTO Project
@@ -614,7 +616,8 @@ VALUES('leonel@ucr.ac.cr',
 40000,
 12,
 'Mensual',
-1
+1,
+'2022-06-01'
 )
 
 INSERT INTO Project
@@ -624,7 +627,8 @@ VALUES('leonel@ucr.ac.cr',
 20000,
 5,
 'Mensual',
-1
+1,
+'2022-06-01'
 )
 
 INSERT INTO Subscription
@@ -853,6 +857,3 @@ VALUES('jeremy@ucr.ac.cr',
 --'2022-06-28',
 --'Ayudemos a los niños'
 --)
-
-select *
-from Agreement
