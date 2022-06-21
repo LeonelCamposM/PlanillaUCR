@@ -33,9 +33,5 @@ namespace Application.AgreementTypes.Implementations
         {
             return await _agreementTypeRepository.GetAllAgreementTypes();
         }
-        public async Task<IEnumerable<AgreementType>>? GetAllAgreementTypes()
-        {
-            return await _agreementTypeRepository.GetAllAgreementTypes();
-        }
     }
 }
