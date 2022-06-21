@@ -278,7 +278,7 @@
         bool isValid = true;
         agreementObject.MountPerHour = (int)salaryPerMonth;
 
-        IEnumerable<AgreementType> salaryList = await AgreementTypeService.CheckSalaryPerAgreement(agreementObject.MountPerHour);
+        IEnumerable<AgreementType> salaryList = await AgreementTypeService.GetSalaryPerAgreement(agreementObject.MountPerHour);
 
         if (salaryList.Length() == 0)
         {
