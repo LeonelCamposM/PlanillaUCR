@@ -122,7 +122,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        ContextMenuService.SetProjectsContext(true,true,projectName, employerEmail, true);
 
         agreementElements = await AgreementService.GetEmployeeAgreements(personEmail);
         
@@ -138,6 +137,7 @@
     {
         foreach (Agreement element in agreementElements) {
             if (projectName == element.ProjectName)
+            {
                 projectInfo = await ProjectService.GetProject(element.ProjectName);
         }
     }
