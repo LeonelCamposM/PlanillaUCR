@@ -12,5 +12,7 @@ namespace Domain.Agreements.Repositories
         Task<IEnumerable<Agreement?>> GetAllAgreementsByProjectAndEmployer(string projectName, string employerEmail);
         Task<IEnumerable<Agreement>> GetEmployeeProjects(string employeeEmail);
         Task DesactivateAgreement(string employeeEmail, string employerEmail, string projectName, string justification);
+        Task<IEnumerable<Agreement>>? CheckAgreementTypeOfContractee(Agreement agreement);
+
     }
 }

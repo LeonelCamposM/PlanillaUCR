@@ -37,6 +37,9 @@ namespace Application.Agreements.Implementations
         {
             await _agreementRepository.DesactivateAgreement(employeeEmail, employerEmail, projectName, justification);
         }
-
+        public async Task<IEnumerable<Agreement>>? CheckAgreementTypeOfContractee(Agreement agreement)
+        {
+            return await _agreementRepository.CheckAgreementTypeOfContractee(agreement);
+        }
     }
 }
