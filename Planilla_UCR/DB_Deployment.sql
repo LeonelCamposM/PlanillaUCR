@@ -374,8 +374,6 @@ BEGIN
 	WHERE Agreement.EmployeeEmail = @EmployeeEmail AND Agreement.EmployerEmail = @EmployerEmail AND Agreement.ProjectName = @ProjectName AND Agreement.IsEnabled = 1;
 END
 
-exec DesactivateAgreement @EmployeeEmail = 'jeremy@ucr.ac.cr', @EmployerEmail = 'leonel@ucr.ac.cr', @ProjectName = 'Proyecto 1', @Justification = 'Prueba por si funka'
-
 -- Data Insert
 GO
 INSERT INTO Person
