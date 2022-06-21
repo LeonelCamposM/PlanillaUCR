@@ -5,11 +5,15 @@
 @using Application.ContextMenu
 @using Application.Projects
 @using Domain.Projects.Entities
+@using Domain.Payments.Entities
 @using Application.Payments
 @using Domain.People.Entities
 @using Application.People
 @using Domain.ReportOfHours.Entities
 @using Application.ReportOfHours
+@using Domain.Subscribes.Entities
+@using Domain.Subscriptions.Entities
+@using Application.Subscribes
 @using Presentation.Payments.Models
 @using System.Globalization
 
@@ -19,7 +23,8 @@
 @inject IPaymentService PaymentService
 @inject IPersonService PersonService
 @inject IReportOfHoursService ReportHoursService
-
+@inject ISubscribeService SubscribeService
+@inject ISnackbar Snackbar
 
 @if(_loading) {
     <MudPaper  Height="220px" Width="100%" Outlined="false" Class="border-none pa-4" Elevation="0">
@@ -30,29 +35,7 @@
     </MudPaper>
 }else
     {
-@*        <MudText> 
-            El primer contrato fué en: 
-            @_firstProjectAgreement.EmployeeEmail
-            @_firstProjectAgreement.ContractStartDate
-            <br>
-            Intervalo de pago:
-            @_projectInfo.PaymentInterval
-            <br>
-            Fecha de pago:
-            @_nextPay.ToShortDateString()
-            <br>
-             Puede pagar:
-             @_canPay
-
-        @foreach (Agreement employee in _employees)
-        {
-            @employee.EmployeeEmail
-             
-        }
-
-        </MudText>*@
-
-        <MudTable @ref="_mudTable" Items="@_employeesList" RowsPerPage="4" MultiSelection="true" @bind-SelectedItems="_selectedItems1" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="Color.Info" Filter="new Func<EmployeeAgreement,bool>(FilterFunc1)">
+        <MudTable @ref="_mudTable" Items="@_employeesList.Where(e=>e.MountToPay != 0)" RowsPerPage="4" MultiSelection="true" @bind-SelectedItems="_selectedItems1" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="Color.Info" Filter="new Func<EmployeeAgreement,bool>(FilterFunc1)">
             <ToolBarContent>
                 <MudText Align="Align.Center" Typo="Typo.h6">Empleados con pagos pendientes en @_nextPay.ToShortDateString()</MudText>
                 <MudSpacer />
@@ -74,7 +57,7 @@
         </MudTable>
         <br>
         <MudToolBar DisableGutters="true" Class="gap-4">
-            <MudButton Variant="Variant.Filled" Color="Color.Primary">Pagar</MudButton>
+            <MudButton Variant="Variant.Filled" OnClick="RegisterPayment" Color="Color.Primary">Pagar</MudButton>
         </MudToolBar>
 }
 
@@ -148,6 +131,7 @@
     {
         int workedDays = GetWorkedDays(employeeEmail, startDate);
         double salary = 0;
+        double appliedBenefits = await GetEmployeeBenefits(employeeEmail);
 
         if (contractType == "Tiempo completo")
         {
@@ -163,7 +147,20 @@
             double workedHours = await GetWorkedHours(employeeEmail);
             salary = _calculator.GetSalaryPerHours(mountPerHour, workedHours);
         }
+        salary += appliedBenefits;
         return salary;
+    }
+
+    private async Task<double> GetEmployeeBenefits(string employeeEmail)
+    {
+        double mountOfBenefits = 0;
+        Subscribe searchSubscribe= new Subscribe(employeeEmail, _projectInfo.EmployerEmail, _projectInfo.ProjectName, "", 0.0, (DateTime)_firstProjectAgreement.ContractStartDate, _nextPay);
+        IEnumerable<Subscription> subscriptions = await SubscribeService.GetSubscribes(searchSubscribe);
+        foreach (Subscription _subscription in subscriptions.Where(e=> e.TypeSubscription == 1))
+        {
+            mountOfBenefits += _subscription.Cost;
+        }
+        return mountOfBenefits;
     }
 
     private async Task<double> GetWorkedHours(string employeeEmail)
@@ -246,5 +243,24 @@
     {
         string costo = string.Format("{0:N}", cost);
         return costo;
+    }
+
+    private async Task RegisterPayment()
+    {
+        if (_selectedItems1.Length() > 0)
+        {
+            foreach (var element in _selectedItems1)
+            {
+                double benefits = await GetEmployeeBenefits(element.EmployeeEmail);
+                double mountToPay = element.MountToPay - benefits;
+                Payment _payment = new Payment(element.EmployeeEmail, _projectInfo.EmployerEmail, _projectInfo.ProjectName, mountToPay, (DateTime)_firstProjectAgreement.ContractStartDate, _nextPay);
+                await PaymentService.AddPayment(_payment);
+            }
+            Snackbar.Add("Pagos aprobados", Severity.Success);
+        }
+        else
+        {
+            Snackbar.Add("Por favor seleccione los pagos a aprobar", Severity.Warning);
+        }
     }
 }

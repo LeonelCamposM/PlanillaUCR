@@ -14,9 +14,14 @@ namespace Application.Payments.Implementations
             _paymentRepository = paymentRepository;
         }
 
-        public Task<Payment?> GetEmployeeLastPayment(string employeeEmail, string employerEmail, string projectName)
+        public async Task AddPayment(Payment newPayment) 
+        { 
+            await _paymentRepository.AddPayment(newPayment);
+        }
+
+        public async Task<Payment?> GetEmployeeLastPayment(string employeeEmail, string employerEmail, string projectName)
         {
-            return _paymentRepository.GetEmployeeLastPayment(employeeEmail, employerEmail, projectName);
+            return await _paymentRepository.GetEmployeeLastPayment(employeeEmail, employerEmail, projectName);
         }
     }
 }

@@ -27,5 +27,11 @@ namespace Infrastructure.Payments.Repositories
             Payment lastPay = payments.FirstOrDefault();
             return lastPay;
         }
+
+        public async Task AddPayment(Payment newPayment)
+        {
+            _dbContext.Payments.Add(newPayment);
+            await _dbContext.SaveEntitiesAsync();
+        }
     }
 }

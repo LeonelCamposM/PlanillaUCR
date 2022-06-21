@@ -6,6 +6,7 @@ namespace Domain.Payments.Repositories
 {
     public interface IPaymentRepository
     {
+        Task AddPayment(Payment newPayment);
         Task<Payment?> GetEmployeeLastPayment(string employeeEmail, string employerEmail, string projectName);
     }
 }
