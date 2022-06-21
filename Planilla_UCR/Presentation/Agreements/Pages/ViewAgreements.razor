@@ -166,8 +166,6 @@ else
     private bool _visible = false;
 
 
-
-
     protected override async Task OnInitializedAsync()
     {
         _empty = false;
@@ -223,13 +221,18 @@ else
 
     private async Task FireEmployee()
     {
-        if (checkJustificationLength())
+        bool chekedJustificationLength = checkJustificationLength();
+        if (chekedJustificationLength)
         {
-            await AgreementService.DesactivateAgreement(employeeEmailToBeDeleted, employerEmailToBeDeleted, projectNameToBeDeleted, justificationToBeDeleted);
             CloseDialog();
-            ShowSnackNotification("El empleado " + employeeEmailToBeDeleted + " ha sido eliminado del proyecto", Severity.Success);
+            await AgreementService.DesactivateAgreement(employeeEmailToBeDeleted, employerEmailToBeDeleted, projectNameToBeDeleted, justificationToBeDeleted);
+            ShowSnackNotification("El empleado con el email" + employeeEmailToBeDeleted + " ha sido eliminado del proyecto", Severity.Success);
             await Task.Delay(5000); // Time in miliseconds
             nav.NavigateTo($"/Projects/{employerEmail}/{projectName}/Agreements/See", true);
+        }
+        else
+        {
+            CloseDialog();
         }
     }
 

@@ -40,7 +40,6 @@ namespace Infrastructure.Agreements.Repositories
                 myAgreement = agreementList.First();
             }
             return myAgreement;
-
         }
 
         public async Task<IEnumerable<Agreement?>> GetAllAgreementsByProjectAndEmployer(string projectName, string employerEmail) 
