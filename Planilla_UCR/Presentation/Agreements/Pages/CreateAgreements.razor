@@ -141,18 +141,15 @@
 @code{
     [Parameter] public string employerEmail { get; set; }
     [Parameter] public string projectName { get; set; }
-
     Agreement myAgreement = new Agreement("", "", "", null, "", 0, null, 1, "");
     AgreementType myAgreementType = new AgreementType("",0);
     public CultureInfo cultureCR = CultureInfo.GetCultureInfo("es-CR");
     private IEnumerable<Project> _projects = new List<Project>();
-
     MudForm form;
     DateTime? startDate;
     DateTime? endDate;
     int? salaryPerHour;
     string format = "yyyy/MM/dd";
-
     private bool _isLoading = true;
     private bool _saving = false;
     private bool _canSend = false;
