@@ -25,13 +25,9 @@ namespace Application.AgreementTypes.Implementations
             return await _agreementTypeRepository.GetTypesOfAgreement();
         }
 
-        public async Task<IEnumerable<AgreementType>>? CheckSalaryPerAgreement(int mountPerHour)
+        public async Task<IEnumerable<AgreementType>>? GetSalaryPerAgreement(int mountPerHour)
         {
-            return await _agreementTypeRepository.CheckSalaryPerAgreement(mountPerHour);
-        }
-        public async Task<IEnumerable<AgreementType>>? GetAllAgreementTypes()
-        {
-            return await _agreementTypeRepository.GetAllAgreementTypes();
+            return await _agreementTypeRepository.GetSalaryPerAgreement(mountPerHour);
         }
         public async Task<IEnumerable<AgreementType>>? GetAllAgreementTypes()
         {
