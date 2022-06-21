@@ -1,74 +1,28 @@
-﻿
+﻿using System;
 namespace Presentation.Payments.Models
 {
-    public class SalaryCalculator
+    public class PaymentCalculator
     {
-        double SEM = 5.50;
-        double IVM = 4.0;
-        double PopularBankApport = 1.0;
-        public SalaryCalculator()
+        double FullTimeHours = 8.0;
+        double PartTimeHours = 4.0;
+        public PaymentCalculator()
         {
 
         }
 
-        public double GetRentTax(double grossSalary)
+        public double GetFullTimeSalary(double mountPerHour, int workedDay)
         {
-            double RentTax = 0;
-            if(grossSalary <= 863000)
-            {
-                RentTax = 0;
-            }
-            else if (863000 < grossSalary && grossSalary <= 1267000)
-            {
-                RentTax = 10;
-            }
-            else if (1267000 < grossSalary && grossSalary <= 2223000)
-            {
-                RentTax = 15;
-            }
-            else if (2223000 < grossSalary && grossSalary <= 4445000)
-            {
-                RentTax = 20;
-            }
-            else if (4445000 < grossSalary)
-            {
-                RentTax = 25;
-            }
-            return RentTax;
+            return (FullTimeHours * Convert.ToDouble(workedDay)) * mountPerHour;
         }
 
-        public double GetCSSTax()
+        public double GetPartTimeSalary(double mountPerHour, int workedDay)
         {
-            double CSSTax = SEM+IVM+PopularBankApport;
-            return CSSTax;
+            return (PartTimeHours * Convert.ToDouble(workedDay)) * mountPerHour;
         }
 
-        public double getTaxPercentage(string taxName, double grossSalary)
-        {
-            double taxPercentage = 0;
-            if (taxName == "CCSS")
-            {
-                taxPercentage = GetCSSTax();
-            }
-            else
-            {
-                taxPercentage = GetRentTax(grossSalary);
-            }
-            return taxPercentage;
-        }
-
-        public double getTaxAmount(string taxName, double grossSalary)
-        {
-            double taxPercentage = 0;
-            if (taxName == "CCSS")
-            {
-                taxPercentage = grossSalary * (GetCSSTax()/ 100);
-            }
-            else
-            {
-                taxPercentage = grossSalary * (GetRentTax(grossSalary) / 100);
-            }
-            return taxPercentage;
+        public double GetSalaryPerHours(double mountPerHour, double workedHours)
+        { 
+            return mountPerHour * workedHours;
         }
     }
 }

@@ -56,5 +56,13 @@ namespace Infrastructure.Agreements.Repositories
             Agreement firstAgreement = agreements.FirstOrDefault();
             return firstAgreement;
         }
+
+        public async Task<IList<Agreement>> GetProjectAgreements(string projectName, string employerEmail) 
+        {
+            IList<Agreement> agreementList = await _dbContext.Agreements.Where
+               (e => e.EmployerEmail == employerEmail && e.ProjectName == projectName
+               && e.IsEnabled == 1).ToListAsync();
+            return agreementList;
+        }
     }
 }

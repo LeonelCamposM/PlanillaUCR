@@ -35,5 +35,10 @@ namespace Application.Agreements.Implementations
         {
             return _agreementRepository.GetFirstProjectAgreement(searchAgreement);
         }
+
+        public Task<IList<Agreement>> GetProjectAgreements(string projectName, string employerEmail)
+        {
+            return _agreementRepository.GetProjectAgreements(projectName, employerEmail);
+        }
     }
 }
