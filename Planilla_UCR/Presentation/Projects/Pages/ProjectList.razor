@@ -369,7 +369,7 @@
         {
             foreach (Person activePerson in _activeEmployees)
             {
-                //AgreementService.DesactivateAgreement(activePerson.Email, this.projectName, _justification);
+                AgreementService.DesactivateAgreement(activePerson.Email,personEmail, this.projectName, _justification);
             }
             DisableProject();
             CloseDialog();
