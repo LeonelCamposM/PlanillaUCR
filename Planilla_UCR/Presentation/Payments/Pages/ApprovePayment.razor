@@ -1,4 +1,4 @@
-﻿@page "/Approve_Payment/{email}"
+﻿@page "/Approve_Payment/{email}/{projectName}"
 
 @using Application.Agreements
 @using Domain.Agreements.Entities
@@ -84,6 +84,8 @@
 @code {
     [Parameter]
     public string email { get; set; }
+    [Parameter]
+    public string projectName { get; set; }
     private Project _projectInfo = new Project("","","",0.0,0,"",1);
     private bool _loading = true;
     private bool _empty = true;
@@ -102,6 +104,7 @@
 
     protected override async Task OnParametersSetAsync()
     {
+        ContextService.SetProjectsContext(true,true, projectName, email, ContextService.GetHoursEmployeeContext());
         _employees = await AgreementService.GetProjectAgreements(ContextService.GetProjectsContext(), email); 
         await GetProjectInfo();
         GetNextPay();
@@ -155,6 +158,11 @@
         if (_employeesList.Length() > 0)
         {
             _empty = false;
+        }
+        else
+        {
+            _projectInfo.LastPaymentDate = _nextPay;
+            ProjectService.UpdatePaymentDate(_projectInfo);
         }
     }
 
@@ -224,7 +232,11 @@
 
     async Task GetProjectInfo()
     {
-        _projectInfo = await ProjectService.GetProject(email,  ContextService.GetProjectsContext());
+        _projectInfo = await ProjectService.GetProject(email,  projectName);
+        if(_projectInfo == null)
+        {
+            _projectInfo =  new Project("","","",0.0,0,"",1);
+        }
         _nextPay = _projectInfo.LastPaymentDate;
     }
 
@@ -275,7 +287,12 @@
                 await PaymentService.AddPayment(_payment);
             }
             Snackbar.Add("Pagos aprobados", Severity.Success);
-            nav.NavigateTo($"/Approve_Payment/{email}");
+            nav.NavigateTo($"/Approve_Payment/{email}/{projectName}", true);
+            if (_employeesList.Length() == 0)
+            {
+                _projectInfo.LastPaymentDate = _nextPay;
+                ProjectService.UpdatePaymentDate(_projectInfo);
+            }
         }
         else
         {

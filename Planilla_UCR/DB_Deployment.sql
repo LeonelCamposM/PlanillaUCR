@@ -59,7 +59,7 @@ CREATE TABLE Agreement(
 	IsEnabled int NOT NULL,
 	Justification varchar(max)
 );
-
+delete from Payment WHERE GrossSalary = 120000 select * from Payment select* from Project UPDATE Project SET LastPaymentDate = '2022-06-01' WHERE EmployerEmail = 'leonel@ucr.ac.cr' AND ProjectName = 'Proyecto 1'
 CREATE TABLE Subscription
 (
 	EmployerEmail varchar(255) NOT NULL,
@@ -376,7 +376,6 @@ BEGIN
     SELECT * FROM Project WHERE Project.ProjectName = @ProjectName AND Project.IsEnabled = 1;
 END
 
-
 GO
 CREATE OR ALTER PROCEDURE ModifyProject(
 	@ProjectName varchar(255),
@@ -394,6 +393,17 @@ BEGIN
 	WHERE EmployerEmail= @EmployerEmail AND ProjectName = @ProjectName;
 END
 
+GO
+CREATE OR ALTER PROCEDURE UpdatePaymentDate(
+	@ProjectName varchar(255),
+	@EmployerEmail varchar(255),
+	@LastPaymentDate date
+) AS
+BEGIN
+	UPDATE Project
+	SET LastPaymentDate = @LastPaymentDate
+	WHERE EmployerEmail= @EmployerEmail AND ProjectName = @ProjectName;
+END
 
 -- People Stored Procedures
 GO
@@ -422,7 +432,6 @@ BEGIN
 	Adress=@NewAdress, PhoneNumber=@NewPhoneNumber
 	WHERE Email=@EmailPerson AND IsEnabled=1
 END
-
 
 GO
 CREATE OR ALTER PROCEDURE GetInfoPerson(@EmailPerson varchar(255))
@@ -457,7 +466,6 @@ BEGIN
 	WHERE Subscription.EmployerEmail = @EmployerEmail;
 
 END
-
 
 -- Employee Stored Procedures
 GO
