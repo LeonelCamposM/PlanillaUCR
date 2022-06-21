@@ -37,7 +37,7 @@
     List<BreadcrumbItem> _items = new List<BreadcrumbItem>
     {
         new BreadcrumbItem("Inicio", href: ""),
-        new BreadcrumbItem("Contratos", href: $"/Projects/{employerEmail}/{projectName}/Agreements/New"),
+        new BreadcrumbItem("Contratos", href: null, disabled: true),
     };
 }
 
@@ -48,6 +48,7 @@
         <MudPaper  Height="220px" Width="100%" Outlined="false" Class="border-none pa-4" Elevation="0">
              <MudForm @ref="form">
                 <MudText Align="Align.Center" Typo="Typo.h6">Establecimiento de contrato</MudText>
+                <br>
                 <MudGrid>
                     @*Small fields *@
                     <MudItem xs="2"> </MudItem>
