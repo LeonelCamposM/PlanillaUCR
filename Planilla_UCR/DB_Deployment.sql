@@ -59,7 +59,7 @@ CREATE TABLE Agreement(
 	IsEnabled int NOT NULL,
 	Justification varchar(max)
 );
-delete from Payment WHERE GrossSalary = 120000 select * from Payment select* from Project UPDATE Project SET LastPaymentDate = '2022-06-01' WHERE EmployerEmail = 'leonel@ucr.ac.cr' AND ProjectName = 'Proyecto 1'
+
 CREATE TABLE Subscription
 (
 	EmployerEmail varchar(255) NOT NULL,

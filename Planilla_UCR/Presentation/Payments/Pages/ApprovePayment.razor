@@ -180,9 +180,8 @@
         {
             salary = _calculator.GetPartTimeSalary(mountPerHour, workedDays);
         }
-        if (contractType == "Por horas")
+        if (contractType == "Servicios profesionales")
         {
-            // Hay que sacar la suma total de las horas trabajadas
             double workedHours = await GetWorkedHours(employeeEmail);
             salary = _calculator.GetSalaryPerHours(mountPerHour, workedHours);
         }
@@ -221,12 +220,13 @@
         if (startDate.Month == _nextPay.Month)
         {
             _workedDays = _nextPay.Day - startDate.Day;
+            int _workedWeeks = _workedDays / 7;
+            _workedDays -= _workedWeeks;
             if (startDate.Date > _nextPay.Date)
             {
                 _workedDays = 0;
             }
         }
-
         return _workedDays;
     }
 
@@ -242,15 +242,60 @@
 
     public void GetNextPay()
     {
+        GetDaysInterval();
+        _nextPay = _nextPay.AddDays(_daysInterval); 
+    }
+
+    public void GetDaysInterval()
+    {
+        DateTime lastPaymentDate = _projectInfo.LastPaymentDate;
+
         switch (_projectInfo.PaymentInterval)
         {
-            case "Quincenal": _daysInterval = 15.0;
-                break;
-            case "Mensual": _daysInterval = 30.0;
-                break;
+            case "Semanal":
+                {
+                    _daysInterval = 7.0;
+                }break;
+            case "Bisemanal":
+                {
+                    _daysInterval = 15.0;
+                }break;
+            case "Quincenal":
+                {
+                    if (lastPaymentDate.Day == 14)
+                    {
+                        _daysInterval = 14.0;
+                    }
+                    else
+                    {
+                        if (lastPaymentDate.Day == 28)
+                        {
+                            DateTime nextFortnight = lastPaymentDate.AddMonths(1);
+                            nextFortnight = nextFortnight.AddDays(-14);
+                            TimeSpan t = nextFortnight - lastPaymentDate;
+                            _daysInterval = t.Days;
+                        }
+                        else
+                        {
+                            if (lastPaymentDate.Day < 14)
+                            {
+                                _daysInterval = 14 - lastPaymentDate.Day;
+                            }
+                            else
+                            {
+                                _daysInterval = 28 - lastPaymentDate.Day;
+                            }
+                        }
+                    }
+            }break;
+            case "Mensual": 
+            {
+                DateTime nextMonth = lastPaymentDate.AddMonths(1);
+                TimeSpan t = nextMonth - lastPaymentDate;
+                _daysInterval = t.Days;
+            }break;
 
         }
-        _nextPay = _nextPay.AddDays(_daysInterval); 
     }
 
     private bool FilterFunc1(EmployeeAgreement element) => FilterFunc(element, searchString1);
@@ -287,12 +332,12 @@
                 await PaymentService.AddPayment(_payment);
             }
             Snackbar.Add("Pagos aprobados", Severity.Success);
-            nav.NavigateTo($"/Approve_Payment/{email}/{projectName}", true);
             if (_employeesList.Length() == 0)
             {
                 _projectInfo.LastPaymentDate = _nextPay;
                 ProjectService.UpdatePaymentDate(_projectInfo);
             }
+            nav.NavigateTo($"/Approve_Payment/{email}/{projectName}/", true);
         }
         else
         {
