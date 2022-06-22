@@ -209,6 +209,14 @@
                 valid = false;
             }
         }
+        
+        Agreement searchAgreement = new Agreement(EmployeeEmail, ContextMenuService.GetEmployerEmailContext(), ContextMenuService.GetProjectsContext(), null, "",1,null,1,""); 
+        searchAgreement = await AgreementService.GetContractee(searchAgreement);
+        if (searchAgreement.ContractStartDate > hoursReport.ReportDate)
+        {
+                ShowSnackNotification("No es posible reportar antes de la fecha de inicio de su contrato", Severity.Error);
+                valid = false;
+        }
         return valid;
     }
 }
