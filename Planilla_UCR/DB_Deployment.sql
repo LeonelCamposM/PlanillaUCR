@@ -1,6 +1,9 @@
-﻿CREATE DATABASE DB_Planilla
+﻿--DB
+
+CREATE DATABASE DB_Planilla
 GO
 USE DB_Planilla
+
 
 -- Tables
 CREATE TABLE Person(
