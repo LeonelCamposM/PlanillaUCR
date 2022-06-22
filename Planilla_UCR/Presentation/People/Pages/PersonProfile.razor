@@ -196,7 +196,7 @@
             
             foreach(var agreement in agreementsList)
             {
-                await AgreementService.DesactivateAgreement(agreement.EmployeeEmail, agreement.EmployerEmail, agreement.ProjectName, "Me voy a retirar");
+                await AgreementService.DesactivateAgreement(agreement.EmployeeEmail, agreement.EmployerEmail, agreement.ProjectName, "Cierre de negocio");
             }
             ProjectService.DisableProject(project.ProjectName, project.EmployerEmail);
         }
