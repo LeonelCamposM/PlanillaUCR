@@ -34,7 +34,7 @@ namespace Tests.Application
 
 
         [Fact]
-        public async Task GetPersonTest()
+        public async Task GetProjectTest()
         {
             //arrange
             var project = new Project(EmployerEmail, ProjectName, ProjectDescription, MaximumAmountForBenefits, MaximumBenefitAmount, PaymentInterval, IsEnabled, LastPaymentDate);
