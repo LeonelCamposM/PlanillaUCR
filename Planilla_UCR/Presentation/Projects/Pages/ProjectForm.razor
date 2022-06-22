@@ -153,7 +153,7 @@
         if(_emailChecked == null)
         {
             _valid = false;
-            ShowSnackNotification("El email no pertenece a un empleador", Severity.Error);
+            ShowSnackNotification("El email: " +project.EmployerEmail +", no pertenece a un empleador", Severity.Error);
         }   
         return _valid;
     }

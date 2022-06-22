@@ -300,12 +300,12 @@
             _agreementType = await AgreementTypeService.GetAllAgreementTypes();
             _projectElements = await ProjectService.GetAllProjectsAsync();
             _emptyAgreement = false;
-            CreateEmployeeList();
+            await CreateEmployeeList();
         }
         await InvokeAsync(StateHasChanged);
     }
 
-    private void CreateEmployeeList()
+    private async Task CreateEmployeeList()
     {
         _joinTable = from A in _agreements
                      join Pe in _people on A.EmployerEmail equals Pe.Email
