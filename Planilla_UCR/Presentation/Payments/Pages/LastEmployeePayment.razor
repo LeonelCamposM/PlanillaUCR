@@ -4,6 +4,7 @@
 @using Application.Agreements
 @using Domain.Agreements.Entities
 @using Application.Subscriptions
+@using Domain.People.Entities
 @using Domain.Subscriptions.Entities
 @using Application.LegalDeductions
 @using Domain.LegalDeductions.Entities
@@ -11,11 +12,13 @@
 @using Domain.Subscribes.Entities
 @using System.Globalization
 @using Presentation.Payments.Models
+@using Application.People
 
 @inject IPaymentService PaymentService
 @inject IContextMenuService ContextMenuService
 @inject IAgreementService AgreementService
 @inject ILegalDeductionService LegalDeductionService
+@inject IPersonService PersonService
 @inject ISubscribeService SubscribeService
 @inject NavigationManager nav
 @inject ISubscriptionService SuscriptionService
@@ -89,7 +92,7 @@
 
                 <MudTable @ref="@_table" Items="@deductions" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" Filter="new Func<Subscription,bool>(FilterFunc1)">
                     <ToolBarContent>
-                            <MudText Align="Align.Center" Typo="Typo.h6">Deducciones :</MudText>
+                            <MudText Align="Align.Center" Typo="Typo.h6">Deducciones voluntarias:</MudText>
                             <MudSpacer />
                             <MudTextField @bind-Value="searchString1" Placeholder="Buscar" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
                     </ToolBarContent> 
@@ -194,8 +197,8 @@
                 netSalary -= salaryCalculator.getTaxAmount(item.DeductionName, lastPay.GrossSalary);
             }
 
-
-            rows.Add(@"Empleador: "+lastPay.EmployerEmail +"#"+"Tipo de contrato: "+agreement.ContractType+"#"+"Desde: "+lastPay.StartDate.ToShortDateString() +" Hasta: "+ lastPay.EndDate.ToShortDateString());
+            Person employer = await PersonService.GetPerson(lastPay.EmployerEmail);
+            rows.Add(@"Empleador: "+employer.Name +" "+employer.LastName1 +" "+employer.LastName2  +"#"+"Tipo de contrato: "+agreement.ContractType+"#"+"Desde: "+lastPay.StartDate.ToShortDateString() +" Hasta: "+ lastPay.EndDate.ToShortDateString());
             rows.Add( @"Proyecto: "+lastPay.ProjectName +"#"+" "+"#"+"Salario bruto: "+ cultureCR.NumberFormat.CurrencySymbol+ costFormat(grossSalary));
             rows.Add( @" "+"#"+" "+"#"+"Salario neto: "+cultureCR.NumberFormat.CurrencySymbol+ costFormat(netSalary));
         }
