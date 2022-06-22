@@ -812,14 +812,14 @@ VALUES('Hacienda',
 48000.3
 )
 
-INSERT INTO Payment (EmployeeEmail,EmployerEmail, ProjectName,GrossSalary, StartDate, EndDate)
-VALUES('jeremy@ucr.ac.cr',
-'leonel@ucr.ac.cr',
-'Proyecto 1',
-150000,
-'2022-06-1',
-'2022-06-28'
-)
+--INSERT INTO Payment (EmployeeEmail,EmployerEmail, ProjectName,GrossSalary, StartDate, EndDate)
+--VALUES('jeremy@ucr.ac.cr',
+--'leonel@ucr.ac.cr',
+--'Proyecto 1',
+--150000,
+--'2022-06-1',
+--'2022-06-28'
+--)
 
 --INSERT INTO Payment (EmployeeEmail,EmployerEmail, ProjectName, GrossSalary, StartDate, EndDate)
 --VALUES('jeremy@ucr.ac.cr',
