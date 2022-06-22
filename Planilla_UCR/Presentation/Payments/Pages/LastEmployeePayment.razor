@@ -86,48 +86,24 @@
                   </MudTable>
                 <br />
                 <br />
-                <MudGrid>
-                        <MudItem xs="6">  
-                        <MudTable @ref="@_table" Items="@deductions" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" Filter="new Func<Subscription,bool>(FilterFunc1)">
-                            <ToolBarContent>
-                                    <MudText Align="Align.Center" Typo="Typo.h6">Deducciones :</MudText>
-                                    <MudSpacer />
-                                    <MudTextField @bind-Value="searchString1" Placeholder="Buscar" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-                            </ToolBarContent> 
-                            <HeaderContent>
-                                <MudTh>Nombre</MudTh>
-                                <MudTh>Costo</MudTh>
-                            </HeaderContent>
 
-                            <RowTemplate>
-                                    <MudTd DataLabel="Nombre">@context.SubscriptionName</MudTd>
-                                    <MudTd DataLabel="Costo">@cultureCR.NumberFormat.CurrencySymbol @costFormat(context.Cost)</MudTd>
-                            </RowTemplate>
-                        </MudTable>
-                         </MudItem>  
-                        <MudItem xs="6">  
-                        <MudTable @ref="@_table" Items="@benefits" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" Filter="new Func<Subscription,bool>(FilterFunc3)">
-                            <ToolBarContent>
-                                    <MudText Align="Align.Center" Typo="Typo.h6">Beneficios : </MudText>
-                                    <MudSpacer />
-                                    <MudTextField @bind-Value="searchString3" Placeholder="Buscar" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-                            </ToolBarContent> 
-                            <HeaderContent>
-                                <MudTh>Nombre</MudTh>
-                                <MudTh>Costo</MudTh>
-                            </HeaderContent>
-                     
+                <MudTable @ref="@_table" Items="@deductions" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" Filter="new Func<Subscription,bool>(FilterFunc1)">
+                    <ToolBarContent>
+                            <MudText Align="Align.Center" Typo="Typo.h6">Deducciones :</MudText>
+                            <MudSpacer />
+                            <MudTextField @bind-Value="searchString1" Placeholder="Buscar" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                    </ToolBarContent> 
+                    <HeaderContent>
+                        <MudTh>Nombre</MudTh>
+                        <MudTh>Costo</MudTh>
+                    </HeaderContent>
 
-                            <RowTemplate>
-                                    <MudTd DataLabel="Nombre">@context.SubscriptionName</MudTd>
-                                    <MudTd DataLabel="Costo">@cultureCR.NumberFormat.CurrencySymbol @costFormat(context.Cost)</MudTd>
-                            </RowTemplate>
-                        </MudTable>
-                    </MudItem>
-                    <MudSpacer></MudSpacer>
-                    <MudItem xs="6">
-                    </MudItem>  
-                </MudGrid>
+                    <RowTemplate>
+                            <MudTd DataLabel="Nombre">@context.SubscriptionName</MudTd>
+                            <MudTd DataLabel="Costo">@cultureCR.NumberFormat.CurrencySymbol @costFormat(context.Cost)</MudTd>
+                    </RowTemplate>
+                </MudTable>
+
             }else
             {
                 <MudText Align="Align.Center" Typo="Typo.h6">
@@ -200,10 +176,12 @@
             }
 
             empty = false;
+            double grossSalary = lastPay.GrossSalary;
             double netSalary = lastPay.GrossSalary;
             foreach (var item in benefits)
             {
                 netSalary += item.Cost;
+                grossSalary += item.Cost;
             }
 
             foreach (var item in deductions)
@@ -218,7 +196,7 @@
 
 
             rows.Add(@"Empleador: "+lastPay.EmployerEmail +"#"+"Tipo de contrato: "+agreement.ContractType+"#"+"Desde: "+lastPay.StartDate.ToShortDateString() +" Hasta: "+ lastPay.EndDate.ToShortDateString());
-            rows.Add( @"Proyecto: "+lastPay.ProjectName +"#"+" "+"#"+"Salario bruto: "+ cultureCR.NumberFormat.CurrencySymbol+ costFormat(lastPay.GrossSalary));
+            rows.Add( @"Proyecto: "+lastPay.ProjectName +"#"+" "+"#"+"Salario bruto: "+ cultureCR.NumberFormat.CurrencySymbol+ costFormat(grossSalary));
             rows.Add( @" "+"#"+" "+"#"+"Salario neto: "+cultureCR.NumberFormat.CurrencySymbol+ costFormat(netSalary));
         }
         _loading = false;
