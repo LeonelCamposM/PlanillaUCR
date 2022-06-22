@@ -78,7 +78,7 @@
 
                                 <MudItem xs="2"> </MudItem>
                                 <MudItem xs="8">
-                                    <MudTextField Label="Descripción del Proyecto" Lines="6" Variant="Variant.Outlined" ReadOnly="@_disabled"
+                                    <MudTextField Label="Descripción del proyecto" Lines="6" Variant="Variant.Outlined" ReadOnly="@_disabled"
                                     @bind-Value="_projectInfo.ProjectDescription"  For="@(() => _limits.description )"
                                     ></MudTextField>
                                 </MudItem>
@@ -88,10 +88,10 @@
                                 <MudItem xs="8">
                                     <MudSelect typeof="int" @bind-Value="_projectInfo.PaymentInterval" Label="Intervalo de pago" Variant="Variant.Outlined"
                                     ReadOnly="@_disabled" >
-                                        <MudSelectItem Value="@("Quincenal")">Pago Quincenal</MudSelectItem>
-                                        <MudSelectItem Value="@("Mensual")">Pago Mensual</MudSelectItem>
-                                        <MudSelectItem Value="@("Semanal")">Pago Semanal</MudSelectItem>
-                                        <MudSelectItem Value="@("Bisemanal")">Pago Bisemanal</MudSelectItem>
+                                        <MudSelectItem Value="@("Quincenal")">Pago quincenal</MudSelectItem>
+                                        <MudSelectItem Value="@("Mensual")">Pago mensual</MudSelectItem>
+                                        <MudSelectItem Value="@("Semanal")">Pago semanal</MudSelectItem>
+                                        <MudSelectItem Value="@("Bisemanal")">Pago bisemanal</MudSelectItem>
                                     </MudSelect>
                                 </MudItem>
                                 <MudItem xs="2"></MudItem>
@@ -171,7 +171,7 @@
                             <MudGrid>
                                 <MudItem xs="2"> </MudItem>
                                 <MudItem xs="8">
-                                    <MudTextField Label="Nombre del Proyecto" Class="mt-3" Variant="Variant.Outlined" ReadOnly="true"
+                                    <MudTextField Label="Nombre del proyecto" Class="mt-3" Variant="Variant.Outlined" ReadOnly="true"
                                     @bind-Value="_newName">
                                     </MudTextField>
                                 </MudItem>
@@ -179,14 +179,14 @@
 
                                 <MudItem xs="2"> </MudItem>
                                 <MudItem xs="8">
-                                    <MudTextField Label="Email del Empleador" Lines="1" Variant="Variant.Outlined" ReadOnly="true"
+                                    <MudTextField Label="Email del empleador" Lines="1" Variant="Variant.Outlined" ReadOnly="true"
                                     @bind-Value="_projectInfo.EmployerEmail"></MudTextField>
                                 </MudItem>
                                 <MudItem xs="2"> </MudItem>
 
                                 <MudItem xs="2"> </MudItem>
                                 <MudItem xs="8">
-                                    <MudTextField Label="Descripción del Proyecto" Lines="3" Variant="Variant.Outlined" ReadOnly="true"
+                                    <MudTextField Label="Descripción del proyecto" Lines="3" Variant="Variant.Outlined" ReadOnly="true"
                                     @bind-Value="_projectInfo.ProjectDescription"></MudTextField>
                                 </MudItem>
                                 <MudItem xs="2"> </MudItem>

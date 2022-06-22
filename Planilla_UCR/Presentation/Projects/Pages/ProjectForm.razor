@@ -32,7 +32,7 @@
 
                 <MudItem xs="2"> </MudItem>
                 <MudItem xs="8">
-                    <MudTextField Label="Nombre del Proyecto" Class="mt-3" Variant="Variant.Outlined"  
+                    <MudTextField Label="Nombre del proyecto" Class="mt-3" Variant="Variant.Outlined"  
                     Required="true" RequiredError="Ingrese un nombre para su proyecto" 
                     @bind-Value="projectInfo.ProjectName" For="@(() => limits.projectName)">
                     </MudTextField>
@@ -41,7 +41,7 @@
 
                 <MudItem xs="2"> </MudItem>
                 <MudItem xs="8">
-                    <MudTextField Label="Descripción del Proyecto" Variant="Variant.Outlined"
+                    <MudTextField Label="Descripción del proyecto" Variant="Variant.Outlined"
                     @bind-Value="projectInfo.ProjectDescription"  For="@(() => limits.description )"
                     ></MudTextField>
                 </MudItem>
@@ -50,10 +50,10 @@
                 <MudItem xs="2"> </MudItem>
                 <MudItem xs="8">
                     <MudSelect typeof="int" @bind-Value="projectInfo.PaymentInterval" Label="Intervalo de pago" Variant="Variant.Outlined">
-                        <MudSelectItem Value="@("Quincenal")">Pago Quincenal</MudSelectItem>
-                        <MudSelectItem Value="@("Mensual")">Pago Mensual</MudSelectItem>
-                        <MudSelectItem Value="@("Semanal")">Pago Semanal</MudSelectItem>
-                        <MudSelectItem Value="@("Bisemanal")">Pago Bisemanal</MudSelectItem>
+                        <MudSelectItem Value="@("Quincenal")">Pago quincenal</MudSelectItem>
+                        <MudSelectItem Value="@("Mensual")">Pago mensual</MudSelectItem>
+                        <MudSelectItem Value="@("Semanal")">Pago semanal</MudSelectItem>
+                        <MudSelectItem Value="@("Bisemanal")">Pago bisemanal</MudSelectItem>
                     </MudSelect>
                 </MudItem>
                 <MudItem xs="2"></MudItem>
