@@ -230,11 +230,6 @@
         }
     }
 
-    private void GoToViewError()
-    {
-        nav.NavigateTo($"/View_Project_Employees_Error/{email}/{projectName}");
-    }
-
     private void GoToProjectDetails()
     {
         nav.NavigateTo($"/Projects/Details/{email}/{projectName}");
@@ -254,11 +249,6 @@
         if (element.EmployeeEmail.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
         return false;
-    }
-
-    private async Task SendConmuteSignal()
-    {
-        await SendTableState.InvokeAsync("");
     }
 
     private void GoToCreateEmployee()
