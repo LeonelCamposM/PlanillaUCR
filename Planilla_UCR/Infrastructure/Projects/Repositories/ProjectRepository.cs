@@ -61,7 +61,7 @@ namespace Infrastructure.Projects.Repositories
             await _dbContext.SaveEntitiesAsync();
         }
 
-        public async Task<IEnumerable<Project?>> GetAllNameProjects(string name)
+        public async Task<IEnumerable<Project>> GetAllNameProjects(string name)
         {
             {
                 var nameList = await _dbContext.Projects.FromSqlRaw("EXEC ProjectNameCheck @name",
@@ -80,7 +80,7 @@ namespace Infrastructure.Projects.Repositories
         public async Task<IEnumerable<Project>> GetEmployeeProyects(string name)
         {
             IList<Project> projectsResult = await _dbContext.Projects.Where
-                (e => e.ProjectName == name && e.IsEnabled == 1).ToListAsync();
+                (e => e.ProjectName == name).ToListAsync();
             return projectsResult;
         }
 
@@ -97,6 +97,12 @@ namespace Infrastructure.Projects.Repositories
 
             _dbContext.Database.ExecuteSqlInterpolated(query);
 
+        }
+
+        public void DisableProject(string projectName, string employerEmail)
+        {
+            System.FormattableString query = ($@"EXECUTE DisableProject @ProjectName = {projectName}, @EmployerEmail = {employerEmail}");
+            _dbContext.Database.ExecuteSqlInterpolated(query);
         }
 
         public void UpdatePaymentDate(Project project)
