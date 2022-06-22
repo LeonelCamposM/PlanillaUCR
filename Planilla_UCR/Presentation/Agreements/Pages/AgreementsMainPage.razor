@@ -28,10 +28,11 @@
         <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
         <MudPaper Height="60px" Width="100%" Outlined="false" Class="border-none" Elevation="0"> 
         </MudPaper>
-        if (!empty)
+        <MudText Align="Align.Center" Typo="Typo.h6">Contratar empleados</MudText>
+        <br>
+        if (!_empty)
         {
-                <MudText Align="Align.Center" Typo="Typo.h6">Contratar empleados</MudText>
-                <br>
+
                 <MudTable @ref="@_table" Items="@_elements" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" Filter="new Func<Person,bool>(FilterFunc1)">
                     <ToolBarContent>
                             <MudSpacer />
@@ -50,7 +51,7 @@
                         <MudTd DataLabel="Cedula">@context.Ssn</MudTd>
                          <MudTd DataLabel="Acciones">
                         <MudSpacer></MudSpacer>
-                            <MudButton Variant="Variant.Filled" @onclick="@(e => GoToContractEmployee())" Color="Color.Transparent">
+                            <MudButton Variant="Variant.Filled" @onclick="@(e => GoToContractEmployee(@context.Email))" Color="Color.Transparent">
                                 <MudText>
                                 Contratar
                                 </MudText> 
@@ -62,22 +63,27 @@
                 </PagerContent>
                 </MudTable>
                  <br>
-                <MudButton Variant="Variant.Filled" OnClick="GoToCreateEmployee" Color="Color.Primary">
-                    <MudText>
-                    Registrar Empleados
-                    </MudText> 
-                </MudButton>
-        } @*else
+        } 
+        else
         {
-           <HireEmployeesError email="@email" projectName="@projectName" SendTableState="SendConmuteSignal"></HireEmployeesError>
-        } *@
+            <MudPaper Height="60px" Width="100%" Outlined="false" Class="border-none" Elevation="0"> 
+            </MudPaper>
+            <br />
+            <MudText Align="Align.Center" Typo="Typo.h5">No hay empleados registrados</MudText>
+            <br />        
+        } 
+            <MudButton Variant="Variant.Filled" OnClick="GoToCreateEmployee" Color="Color.Primary">
+                <MudText>
+                Registrar Empleados
+                </MudText> 
+            </MudButton>
     }
 }
 
 @code {
     private bool _hidePosition;
     private bool _loading = true;
-    private bool empty = true;
+    private bool _empty = true;
     string searchString1 = "";
     public string Disabled { get; set; } = "Empleados Contratados";
     private IEnumerable<Person> _elements = new List<Person>();
@@ -98,18 +104,17 @@
     {
         _elements = await PersonService.GetAllEmployees(projectName);
         IEnumerable<Person> hiredEmployees = await PersonService.GetProjectEmployees(projectName);
+        _empty = false;
+        foreach (var item in hiredEmployees)
+        {
+            _elements = _elements.Where(e => e.Email != item.Email);
+        }
+        
         if (_elements.Length() == 0)
         {
-            empty = true;
+            _empty = true;
         }
-        else
-        {
-            empty = false;
-            foreach (var item in hiredEmployees)
-            {
-                _elements = _elements.Where(e => e.Email != item.Email);
-            }
-        }
+        
 
 
 
@@ -121,9 +126,9 @@
         nav.NavigateTo($"/Create_Employee/{employerEmail}/{projectName}");
     }
 
-    private void GoToContractEmployee()
+    private void GoToContractEmployee(string employeeEmail)
     {
-       nav.NavigateTo($"/Agreements/{employerEmail}/{projectName}/New");
+       nav.NavigateTo($"/Agreements/{employerEmail}/{projectName}/{employeeEmail}/New");
     }
 
     private void PageChanged(int i)

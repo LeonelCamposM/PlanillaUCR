@@ -51,11 +51,10 @@
         <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
         <MudPaper Height="60px" Width="100%" Outlined="false" Class="border-none" Elevation="0"> 
         </MudPaper>
-
+        <MudText Align="Align.Center" Typo="Typo.h6">Empleados Contratados</MudText>
+        <br>
         if(!_empty)
         {
-                <MudText Align="Align.Center" Typo="Typo.h6">Empleados Contratados</MudText>
-                <br>
                 <MudTable @ref="@_table" Items="@_myJoin" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" Filter="new Func<JoinedTables,bool>(FilterFunc1)" >
                     <ToolBarContent>
                             <MudSpacer />
@@ -98,12 +97,8 @@
                             <MudPagination SelectedChanged="PageChanged" Count="@((_table.GetFilteredItemsCount() + _table.RowsPerPage - 1) / _table.RowsPerPage)" Color="Color.Primary" Class="pa-4"/>
                         </PagerContent>
             </MudTable>
-
-
         }else
         {
-            <MudText Align="Align.Center" Typo="Typo.h6">Empleados Contratados</MudText>
-            <br>
             <MudPaper  Height="220px" Width="100%" Outlined="true" Class="pa-32" Elevation="25">  
                 <MudPaper Height="60px" Width="100%" Outlined="false" Class="border-none" Elevation="0"> 
                 </MudPaper>

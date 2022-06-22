@@ -1,4 +1,4 @@
-﻿@page "/Agreements/{employerEmail}/{projectName}/New"
+﻿@page "/Agreements/{employerEmail}/{projectName}/{employeeEmail}/New"
 @using Presentation.Core.Components
 @using System.ComponentModel.DataAnnotations
 @using Domain.Projects.Entities
@@ -104,10 +104,18 @@
                     <MudItem xs="4">
                         <MudDatePicker Label="Fecha de finalización" @bind-Date="endDate" DateFormat="yyyy.MM.dd" Variant="Variant.Outlined" Required="true" RequiredError="La fecha de finalización es necesaria"/>
                     </MudItem> 
-                    <MudItem xs="2"></MudItem> 
+                    <MudItem xs="2"> </MudItem>
+                    <MudItem xs="2"> </MudItem>
+                    <MudItem xs="8">
+                        <MudDivider />
+                    </MudItem> 
+                    <MudItem xs="2"> </MudItem>
+                    <br /> <br />
                     <MudButton Disabled = "true"></MudButton>
                     <MudButton Disabled = "true"></MudButton>
                     <MudButton Disabled = "true"></MudButton>
+                    
+
                    @*Create buton *@
                     <MudButton Disabled="@_saving" @bind-IsValid="@_canSend" Variant="Variant.Filled" Color="Color.Primary" DisableElevation="true" OnClick="TryToAdd">                    
                         @if (_saving)
@@ -144,6 +152,7 @@
 @code{
     [Parameter] public string employerEmail { get; set; }
     [Parameter] public string projectName { get; set; }
+    [Parameter] public string employeeEmail { get; set; }
     Agreement myAgreement = new Agreement("", "", "", null, "", 0, null, 1, "");
     AgreementType myAgreementType = new AgreementType("",0);
     public CultureInfo cultureCR = CultureInfo.GetCultureInfo("es-CR");
@@ -162,6 +171,7 @@
     {
         myAgreement.EmployerEmail = employerEmail;
         myAgreement.ProjectName = projectName;
+        myAgreement.EmployeeEmail = employeeEmail;
         _projects = await ProjectService.GetEmployerProyects(employerEmail);
         _isLoading = false;
     }
@@ -173,7 +183,8 @@
         {
             await SaveAgreementType();
             await SaveAgreement();
-            ShowSnackNotification("Información guardada correctamente", Severity.Success);   
+            ShowSnackNotification("Información guardada correctamente", Severity.Success);
+            GoToPreviousPage();
         }
 
     }
