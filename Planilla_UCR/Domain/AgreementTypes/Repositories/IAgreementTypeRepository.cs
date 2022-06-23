@@ -9,10 +9,10 @@ namespace Domain.AgreementTypes.Repositories
     {
         Task CreateAgreementTypeAsync(AgreementType agreement);
 
-        Task<IEnumerable<AgreementType>>? GetTypesOfAgreement();
-
+        Task<IEnumerable<AgreementType>>? GetAllAgreementTypes();
+        Task<IEnumerable<AgreementType>>? checkAgreementType(string agreementType, int mountPerHour);
         Task<IEnumerable<AgreementType>>? CheckSalaryPerAgreement(int mountPerHour);
-
+>>>>>>>>> Temporary merge branch 2
         Task<IEnumerable<AgreementType>>? GetAllAgreementTypes();
     }
 }
