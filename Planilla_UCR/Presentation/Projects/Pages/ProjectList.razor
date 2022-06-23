@@ -193,15 +193,7 @@
                          <MudTd DataLabel="Tipo contrato" Style="text-align:justify-all">@row.ContractType</MudTd>
                         <MudTd DataLabel="Inicio contrato" Style="text-align:justify-all">@row.ContractStartDate.ToShortDateString()</MudTd>
                         <MudTd DataLabel="Fin contrato" Style="text-align:justify-all">@row.ContractFinishDate.ToShortDateString()</MudTd>
-                        @if (row.ContractType == "Por horas")
-                        {
-                            <MudTd DataLabel="Salario" Style="text-align:right" >₡@row.MountPerHour.00/H</MudTd>
-                        } 
-                        else
-                        {
-                            <MudTd DataLabel="Salario" Style="text-align:right" >₡@row.MountPerHour.00</MudTd>
-                        }
-            
+                        <MudTd DataLabel="Salario por horas" Style="text-align:right" >₡@row.MountPerHour.00/H</MudTd>
                     </RowTemplate>
 
                     <PagerContent>
