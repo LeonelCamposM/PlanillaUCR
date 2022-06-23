@@ -564,13 +564,6 @@ BEGIN
 	A.ContractType = @ContractType
 END
 
-GO
-CREATE or ALTER PROCEDURE GetSalaryPerAgreement(@MountPerHour int)
-AS
-BEGIN 
-	SELECT * FROM AgreementType WHERE MountPerHour = @MountPerHour
-END
-
 -- Data Insert
 GO
 INSERT INTO Person
@@ -905,4 +898,3 @@ VALUES('Hacienda',
 --'2022-06-28',
 --'Ayudemos a los niños'
 --)
-

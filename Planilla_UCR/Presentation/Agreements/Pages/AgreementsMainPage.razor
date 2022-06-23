@@ -50,7 +50,7 @@
                         <MudTd DataLabel="Cedula">@context.Ssn</MudTd>
                          <MudTd DataLabel="Acciones">
                         <MudSpacer></MudSpacer>
-                            <MudButton Variant="Variant.Filled" @onclick="@(e => GoToContractEmployee())" Color="Color.Transparent">
+                            <MudButton Variant="Variant.Filled" @onclick="@(e => GoToContractEmployee(@context.Email))" Color="Color.Transparent">
                                 <MudText>
                                 Contratar
                                 </MudText> 
