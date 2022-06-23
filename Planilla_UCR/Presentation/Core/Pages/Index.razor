@@ -25,6 +25,9 @@
         }
     </Authorized>
     <NotAuthorized>
+        @{
+            nav.NavigateTo($"/Loggin", true);
+        }
     </NotAuthorized>
 </AuthorizeView>
 
