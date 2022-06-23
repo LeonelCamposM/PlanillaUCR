@@ -603,7 +603,7 @@ VALUES('mau@ucr.ac.cr',
 )
 
 INSERT INTO Person
-VALUES('nasheazofeifa3003@gmail.com',
+VALUES('naye@ucr.ac.cr',
 'Nasheri',
 'Azofeifa',
 'Porras',
@@ -640,7 +640,7 @@ INSERT INTO Employee
 VALUES('jeremy@ucr.ac.cr')
 
 INSERT INTO Employee
-VALUES('nasheazofeifa3003@gmail.com')
+VALUES('naye@ucr.ac.cr')
 
 INSERT INTO Project
 VALUES('leonel@ucr.ac.cr',
@@ -779,7 +779,7 @@ INSERT INTO Agreement
 VALUES('mau@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Proyecto 1','2022-06-1','Servicios profesionales', 2000, '2026-06-1', 1, '')
 
 INSERT INTO Agreement
-VALUES('nasheazofeifa3003@gmail.com', 'leonel@ucr.ac.cr', 'Proyecto 1','2022-06-1','Medio tiempo', 1600, '2026-06-1', 1, '')
+VALUES('naye@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Proyecto 1','2022-06-1','Medio tiempo', 1600, '2026-06-1', 1, '')
 
 INSERT INTO ReportOfHours
 VALUES('leonel@ucr.ac.cr', 'Proyecto 1','mau@ucr.ac.cr', '2022-6-2',4)
