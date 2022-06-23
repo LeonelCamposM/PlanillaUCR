@@ -21,7 +21,7 @@ namespace Application.Agreements.Implementations
             await _agreementRepository.CreateAgreementAsync(agreement);
         }
 
-        public async Task<Agreement>? GetContractee(Agreement agreement)
+        public async Task<Agreement?> GetContractee(Agreement agreement)
         {
             return await _agreementRepository.GetContractee(agreement);
         }
@@ -29,17 +29,34 @@ namespace Application.Agreements.Implementations
         {
             return await _agreementRepository.GetAllAgreementsByProjectAndEmployer(projectName, employerEmail);
         }
-        public async Task<IEnumerable<Agreement>> GetEmployeeProjects(string employeeEmail)
-        {
-            return await _agreementRepository.GetEmployeeProjects(employeeEmail);
-        }
-        public async Task DesactivateAgreement(string employeeEmail, string employerEmail, string projectName, string justification) 
+
+        public async Task DesactivateAgreement(string employeeEmail, string employerEmail, string projectName, string justification)
         {
             await _agreementRepository.DesactivateAgreement(employeeEmail, employerEmail, projectName, justification);
+        }
+
+        public Task<IEnumerable<Agreement>> GetEmployeeAgreements(string employeeEmail)
+        {
+            return _agreementRepository.GetEmployeeAgreements(employeeEmail);
+        }
+        public Task<IEnumerable<Agreement>> GetEmployerAgreements(string employerEmail)
+        {
+            return _agreementRepository.GetEmployerAgreements(employerEmail);
+        }
+
+        public Task<Agreement?> GetFirstProjectAgreement(Agreement searchAgreement)
+        {
+            return _agreementRepository.GetFirstProjectAgreement(searchAgreement);
+        }
+
+        public Task<IList<Agreement>> GetProjectAgreements(string projectName, string employerEmail)
+        {
+            return _agreementRepository.GetProjectAgreements(projectName, employerEmail);
         }
         public async Task<IEnumerable<Agreement>>? CheckAgreementTypeOfContractee(Agreement agreement)
         {
             return await _agreementRepository.CheckAgreementTypeOfContractee(agreement);
         }
+
     }
 }

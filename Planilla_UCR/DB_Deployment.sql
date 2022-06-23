@@ -1,6 +1,9 @@
-﻿CREATE DATABASE DB_Planilla2
+﻿--DB
+
+CREATE DATABASE DB_Planilla
 GO
-USE DB_Planilla2
+USE DB_Planilla
+
 
 -- Tables
 CREATE TABLE Person(
@@ -33,6 +36,7 @@ CREATE TABLE Project(
 	MaximumBenefitAmount int,
 	PaymentInterval varchar(255),
 	IsEnabled int NOT NULL,
+	LastPaymentDate date
 	PRIMARY KEY(EmployerEmail, ProjectName),
 	FOREIGN KEY(EmployerEmail) REFERENCES Employer(Email)
 );
@@ -58,8 +62,6 @@ CREATE TABLE Agreement(
 	IsEnabled int NOT NULL,
 	Justification varchar(max)
 );
-
-
 
 CREATE TABLE Subscription
 (
@@ -377,7 +379,6 @@ BEGIN
     SELECT * FROM Project WHERE Project.ProjectName = @ProjectName AND Project.IsEnabled = 1;
 END
 
-
 GO
 CREATE OR ALTER PROCEDURE ModifyProject(
 	@ProjectName varchar(255),
@@ -395,6 +396,28 @@ BEGIN
 	WHERE EmployerEmail= @EmployerEmail AND ProjectName = @ProjectName;
 END
 
+GO
+CREATE OR ALTER PROCEDURE DisableProject
+(
+	@ProjectName varchar(255),
+	@EmployerEmail varchar(255)
+) AS
+BEGIN
+	UPDATE Project
+	SET IsEnabled = 0
+	WHERE EmployerEmail= @EmployerEmail AND ProjectName = @ProjectName;
+END
+GO
+CREATE OR ALTER PROCEDURE UpdatePaymentDate(
+	@ProjectName varchar(255),
+	@EmployerEmail varchar(255),
+	@LastPaymentDate date
+) AS
+BEGIN
+	UPDATE Project
+	SET LastPaymentDate = @LastPaymentDate
+	WHERE EmployerEmail= @EmployerEmail AND ProjectName = @ProjectName;
+END
 
 -- People Stored Procedures
 GO
@@ -424,7 +447,6 @@ BEGIN
 	WHERE Email=@EmailPerson AND IsEnabled=1
 END
 
-
 GO
 CREATE OR ALTER PROCEDURE GetInfoPerson(@EmailPerson varchar(255))
 AS
@@ -445,20 +467,7 @@ BEGIN
 	SET IsEnabled = 0
 	WHERE Person.Email = @EmployerEmail;
 
-	UPDATE Project 
-	SET IsEnabled = 0
-	WHERE Project.EmployerEmail = @EmployerEmail;
-
-	UPDATE Agreement 
-	SET IsEnabled = 0
-	WHERE Agreement.EmployerEmail = @EmployerEmail;
-
-	UPDATE Subscription 
-	SET IsEnabled = 0
-	WHERE Subscription.EmployerEmail = @EmployerEmail;
-
 END
-
 
 -- Employee Stored Procedures
 GO
@@ -555,6 +564,13 @@ BEGIN
 	A.ContractType = @ContractType
 END
 
+GO
+CREATE or ALTER PROCEDURE GetSalaryPerAgreement(@MountPerHour int)
+AS
+BEGIN 
+	SELECT * FROM AgreementType WHERE MountPerHour = @MountPerHour
+END
+
 -- Data Insert
 GO
 INSERT INTO Person
@@ -624,7 +640,8 @@ VALUES('leonel@ucr.ac.cr',
 15000,
 10,
 'Quincenal',
-1
+1,
+'2022-06-01'
 )
 
 INSERT INTO Project
@@ -634,7 +651,8 @@ VALUES('leonel@ucr.ac.cr',
 20000,
 6,
 'Mensual',
-1
+1,
+'2022-06-01'
 )
 
 INSERT INTO Project
@@ -644,7 +662,8 @@ VALUES('leonel@ucr.ac.cr',
 22000,
 7,
 'Quincenal',
-1
+1,
+'2022-06-01'
 )
 
 INSERT INTO Project
@@ -654,7 +673,8 @@ VALUES('leonel@ucr.ac.cr',
 40000,
 12,
 'Mensual',
-1
+1,
+'2022-06-01'
 )
 
 INSERT INTO Project
@@ -664,7 +684,8 @@ VALUES('leonel@ucr.ac.cr',
 20000,
 5,
 'Mensual',
-1
+1,
+'2022-06-01'
 )
 
 INSERT INTO Subscription
@@ -831,14 +852,14 @@ VALUES('Hacienda',
 48000.3
 )
 
-INSERT INTO Payment (EmployeeEmail,EmployerEmail, ProjectName,GrossSalary, StartDate, EndDate)
-VALUES('jeremy@ucr.ac.cr',
-'leonel@ucr.ac.cr',
-'Proyecto 1',
-150000,
-'2022-06-1',
-'2022-06-28'
-)
+--INSERT INTO Payment (EmployeeEmail,EmployerEmail, ProjectName,GrossSalary, StartDate, EndDate)
+--VALUES('jeremy@ucr.ac.cr',
+--'leonel@ucr.ac.cr',
+--'Proyecto 1',
+--150000,
+--'2022-06-1',
+--'2022-06-28'
+--)
 
 --INSERT INTO Payment (EmployeeEmail,EmployerEmail, ProjectName, GrossSalary, StartDate, EndDate)
 --VALUES('jeremy@ucr.ac.cr',
@@ -884,3 +905,4 @@ VALUES('jeremy@ucr.ac.cr',
 --'2022-06-28',
 --'Ayudemos a los niños'
 --)
+

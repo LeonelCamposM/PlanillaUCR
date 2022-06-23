@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Application.Projects.Implementations
 {
-    internal class ProjectService : IProjectService
+    public class ProjectService : IProjectService
     {
         private readonly IProjectRepository _projectRepository;
         
@@ -50,6 +50,16 @@ namespace Application.Projects.Implementations
         public void ModifyProject(Project project, string newProjectName)
         {
              _projectRepository.ModifyProject(project, newProjectName);
+        }
+
+        public void DisableProject(string projectName, string employerEmail)
+        {
+            _projectRepository.DisableProject(projectName, employerEmail);
+        }
+
+        public void UpdatePaymentDate(Project project) 
+        { 
+            _projectRepository.UpdatePaymentDate(project);
         }
     }
 }
