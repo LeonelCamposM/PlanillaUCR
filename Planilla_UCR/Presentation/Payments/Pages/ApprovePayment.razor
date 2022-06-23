@@ -219,7 +219,7 @@
         IList<HoursReport> reports = await ReportHoursService.GetEmployeeReports(_report, _nextPay);
         foreach (HoursReport hours in reports)
         {
-            _workedHours = hours.ReportHours;
+            _workedHours += hours.ReportHours;
         }
         return _workedHours;
     }
