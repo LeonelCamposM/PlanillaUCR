@@ -500,6 +500,19 @@ BEGIN
 	FROM AgreementType AS ATP
 END
 
+GO
+CREATE OR ALTER PROCEDURE checkAgreementType(
+@AgreementType varchar(255),
+@MountPerHour int) 
+AS
+BEGIN
+	SELECT *
+	FROM AgreementType AS ATP
+	Where ATP.TypeAgreement = @AgreementType and ATP.MountPerHour = @MountPerHour
+END
+
+select *
+from AgreementType
 
 -- Agreements stored procedures
 
@@ -734,17 +747,8 @@ VALUES('leonel@ucr.ac.cr',
 1
 )
 
-Insert into AgreementType
-Values('Tiempo completo', 1000)
-
-Insert into AgreementType
-Values('Medio tiempo', 500)
-
-Insert into AgreementType
-Values('Servicios profesionales', 700)
-
-Insert into AgreementType
-Values('Por horas', 10)
+INSERT INTO AgreementType
+VALUES('Tiempo completo',1000)
 
 INSERT INTO Agreement
 VALUES('jeremy@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Proyecto 1','2022-06-1','Tiempo completo', 1000, '2026-06-1', 1, '')

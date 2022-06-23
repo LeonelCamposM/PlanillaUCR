@@ -1,6 +1,5 @@
 ﻿@page "/View_Project_Employees/{email}/{projectName}"
 
-
 @using Domain.Agreements.DTOs
 @using Application.Agreements
 @using Domain.Agreements.Entities
@@ -21,13 +20,15 @@
 @using Presentation.Core.Components
 @using System.ComponentModel.DataAnnotations
 @using Presentation.Agreements.Models
-
+@using Application.ContextMenu
 
 @inject IProjectService ProjectService
 @inject ISnackbar Snackbar
 @inject IAgreementService AgreementService
 @inject IAgreementTypeService AgreementTypeService
 @inject IEmployeeService EmployeeService
+@inject IContextMenuService ContextMenuService
+
 @inject NavigationManager nav
 
 
@@ -51,12 +52,12 @@
         <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
         <MudPaper Height="60px" Width="100%" Outlined="false" Class="border-none" Elevation="0"> 
         </MudPaper>
-        <MudText Align="Align.Center" Typo="Typo.h6">Empleados Contratados</MudText>
-        <br>
+
         if(!_empty)
         {
                 <MudTable @ref="@_table" Items="@_myJoin" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" Filter="new Func<JoinedTables,bool>(FilterFunc1)" >
                     <ToolBarContent>
+                            <MudText> Empleados contratados </MudText>
                             <MudSpacer />
                             <MudTextField @bind-Value="mySearchString" Placeholder="Buscar email" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
                     </ToolBarContent> 
@@ -78,6 +79,8 @@
                             <MudTh Style="text-align:justify-all">Inicio contrato</MudTh>
                             <MudTh Style="text-align:justify-all">Fin contrato</MudTh>
                             <MudTh Style="text-align:justify-all"> Salario bruto por hora</MudTh>
+                            <MudTh Style="text-align:justify-all"> Acción</MudTh>
+
                         </HeaderContent>
 
                         <RowTemplate>
@@ -87,7 +90,7 @@
                             <MudTd DataLabel="Intervalo pago" Style="text-align:justify-all">@context.PaymentInterval</MudTd>
                             <MudTd DataLabel="Inicio contrato" Style="text-align:justify-all">@context.ContractStartDate.ToShortDateString()</MudTd>
                             <MudTd DataLabel="Fin contrato" Style="text-align:justify-all">@context.ContractFinishDate.ToShortDateString()</MudTd>
-                             <MudTd DataLabel="Salario bruto por hora<" Style="text-align:right" >₡@context.MountPerHour,00</MudTd>
+                            <MudTd DataLabel="Salario bruto por hora<" Style="text-align:right" >₡@context.MountPerHour,00</MudTd>
     
                              <MudTd DataLabel="Terminar">
                                 <MudButton Variant="Variant.Filled" @onclick="@(e => OpenDialog(@context.EmployeeEmail))" Color="Color.Transparent">Terminar</MudButton>
@@ -99,7 +102,12 @@
             </MudTable>
         }else
         {
-            <MudPaper  Height="220px" Width="100%" Outlined="true" Class="pa-32" Elevation="25">  
+            <MudPaper  Height="320px" Width="100%" Outlined="true" Class="pa-32" Elevation="25">  
+                <MudToolBar>
+                    <MudText> Empleados contratados  </MudText>
+                    <MudSpacer />
+                    <MudTextField @bind-Value="mySearchString" Placeholder="Buscar email" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                </MudToolBar> 
                 <MudPaper Height="60px" Width="100%" Outlined="false" Class="border-none" Elevation="0"> 
                 </MudPaper>
                 <br />
@@ -161,6 +169,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        ContextMenuService.SetProjectsContext(true, true, projectName, email, false);
         _empty = false;
         _projects = await ProjectService.GetEmployerProyects(email);
         _agreements = await AgreementService.GetAllAgreementsByProjectAndEmployer(projectName, email);
@@ -176,7 +185,7 @@
         _myJoin = from P in _projects
                   join A in _agreements on P.ProjectName equals A.ProjectName
                   join Pe in _people on A.EmployeeEmail equals Pe.Email
-                  join ATP in _agreementType on A.ContractType equals ATP.TypeAgreement
+                  
                   select new JoinedTables
                     {
                         PaymentInterval = P.PaymentInterval,
@@ -184,7 +193,7 @@
                         ContractType = A.ContractType,
                         ContractStartDate = (DateTime) A.ContractStartDate,
                         ContractFinishDate = (DateTime) A.ContractFinishDate,
-                        MountPerHour = ATP.MountPerHour,
+                        MountPerHour = A.MountPerHour,
                         Name = Pe.Name,
                         LastName1 = Pe.LastName1,
                         LastName2 =  Pe.LastName2

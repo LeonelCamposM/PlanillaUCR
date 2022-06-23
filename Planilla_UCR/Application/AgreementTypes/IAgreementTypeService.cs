@@ -10,5 +10,7 @@ namespace Application.AgreementTypes
         Task CreateAgreementTypeAsync(AgreementType agreement);
 
         Task<IEnumerable<AgreementType>>? GetAllAgreementTypes();
+        Task<IEnumerable<AgreementType>>? checkAgreementType(string agreementType, int mountPerHour);
+
     }
 }

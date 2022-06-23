@@ -24,5 +24,10 @@ namespace Application.AgreementTypes.Implementations
         {
             return await _agreementTypeRepository.GetAllAgreementTypes();
         }
+
+        public async Task<IEnumerable<AgreementType>>? checkAgreementType(string agreementType, int mountPerHour)
+        {
+            return await _agreementTypeRepository.checkAgreementType(agreementType, mountPerHour);
+        }
     }
 }
