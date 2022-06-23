@@ -511,9 +511,6 @@ BEGIN
 	Where ATP.TypeAgreement = @AgreementType and ATP.MountPerHour = @MountPerHour
 END
 
-select *
-from AgreementType
-
 -- Agreements stored procedures
 
 GO
