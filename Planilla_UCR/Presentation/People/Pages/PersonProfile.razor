@@ -149,12 +149,9 @@
     bool fixed_header = true;
     bool fixed_footer = false;
     SnackHandler snackHandler = new SnackHandler();
-
-    
     private IEnumerable<Agreement> agreementsList;
     private IEnumerable<Subscription> benefitsList;
     private IEnumerable<Subscription> deductionsList;
-
 
     private void OpenDialog() => visible = true;
     void CloseDialog() => visible = false;
@@ -184,23 +181,38 @@
             benefitsList = await SubscriptionService.GetBenefitsByProject(project.EmployerEmail,project.ProjectName);
             deductionsList = await SubscriptionService.GetDeductionsByProject(project.EmployerEmail,project.ProjectName);
             agreementsList = await AgreementService.GetAllAgreementsByProjectAndEmployer(project.ProjectName, project.EmployerEmail);
-            foreach(Subscription benefit in benefitsList)
-            {
-                SubscriptionService.DeleteSubscription(benefit);
-            }
-            foreach(Subscription deduction in deductionsList)
-            {
-                SubscriptionService.DeleteSubscription(deduction);
-            }
-            foreach(var agreement in agreementsList)
-            {
-                await AgreementService.DesactivateAgreement(agreement.EmployeeEmail, agreement.EmployerEmail, agreement.ProjectName, "Cierre de negocio");
-            }
+            DeleteBenefits(benefitsList);
+            DeleteDeductions(deductionsList);
+            await DeleteAgreetments(agreementsList);
             ProjectService.DisableProject(project.ProjectName, project.EmployerEmail);
         }
         EmployerService.DeleteEmployer(personInfo.Email);
         ShowSnackNotification("Se ha eliminado la cuenta de "+personInfo.Name, Severity.Success);
         nav.NavigateTo($"/delete", true);
+    }
+
+    private void DeleteBenefits(IEnumerable<Subscription> benefitsList)
+    {
+        foreach(Subscription benefit in benefitsList)
+        {
+            SubscriptionService.DeleteSubscription(benefit);
+        }
+    }
+
+    private void DeleteDeductions(IEnumerable<Subscription> deductionsList)
+    {
+        foreach(Subscription deduction in deductionsList)
+        {
+            SubscriptionService.DeleteSubscription(deduction);
+        }
+    }
+
+    async Task DeleteAgreetments(IEnumerable<Agreement> agreementsList)
+    {
+        foreach(var agreement in agreementsList)
+        {
+            await AgreementService.DesactivateAgreement(agreement.EmployeeEmail, agreement.EmployerEmail, agreement.ProjectName, "Cierre de negocio");
+        }
     }
 
     private void GoToProfileConfig()
