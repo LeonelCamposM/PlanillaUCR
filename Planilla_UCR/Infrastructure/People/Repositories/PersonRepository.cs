@@ -39,7 +39,7 @@ namespace Infrastructure.People.Repositories
                 t.BankAccount, t.Adress, t.PhoneNumber, t.IsEnabled)).ToListAsync();
         }
 
-        public async Task UpdatePerson(Person personInfo)
+        public void UpdatePerson(Person personInfo)
         {
             System.FormattableString query = ($@"EXECUTE UpdatePerson @EmailPerson = {personInfo.Email}, 
                 @NewName = {personInfo.Name}, @NewLastName1 = {personInfo.LastName1}, @NewLastName2 = {personInfo.LastName2}, 
