@@ -211,7 +211,7 @@
 
     async Task DeleteAgreetments(string employerEmail, string projectName)
     {
-        agreementsList = await AgreementService.GetAllAgreementsByProjectAndEmployer(employerEmail, projectName);
+        agreementsList = await AgreementService.GetAllAgreementsByProjectAndEmployer(projectName,employerEmail);
         var justification = "cierre de negocio";
         EmailObject emailData = new EmailObject("", "", "", "", "");
         foreach(var agreement in agreementsList)
