@@ -29,7 +29,7 @@ namespace Application.Email
                 smtp.Host = "smtp.gmail.com"; //for gmail host  
                 smtp.EnableSsl = true;
                 smtp.UseDefaultCredentials = false;
-                smtp.Credentials = new NetworkCredential(encriptor.Decrypt(user), encriptor.Decrypt(key));
+                smtp.Credentials = new NetworkCredential(encriptor.Decrypt(user), "eqnivjmwcqlcqjqe");
                 smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
                 smtp.Send(message);
             }

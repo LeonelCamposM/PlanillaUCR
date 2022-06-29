@@ -215,8 +215,12 @@
         var justification = "cierre de negocio";
         foreach(var agreement in agreementsList)
         {
+            firedEmployee.Email = agreement.EmployeeEmail;
+            firedEmployee = await PersonService.GetInfoPerson(firedEmployee);
+            var firedEmployeeName = firedEmployee.Name + " " + firedEmployee.LastName1;
+            var employerName = personInfo.Name+ " " + personInfo.LastName1 + " " + personInfo.LastName2;
             await AgreementService.DesactivateAgreement(agreement.EmployeeEmail, agreement.EmployerEmail, agreement.ProjectName, justification);
-            EmailService.FiredEmployeeEmail(agreement.EmployeeEmail,personInfo.Name, agreement.ProjectName,justification, agreement.EmployeeEmail);
+            EmailService.FiredEmployeeEmail(firedEmployeeName,employerName, agreement.ProjectName,justification, agreement.EmployeeEmail);
         }
     }
 
