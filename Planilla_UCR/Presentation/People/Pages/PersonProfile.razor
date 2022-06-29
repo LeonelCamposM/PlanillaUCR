@@ -213,6 +213,7 @@
     async Task DeleteAgreetments(IEnumerable<Agreement> agreementsList)
     {
         var justification = "cierre de negocio";
+        EmailObject emailData = new EmailObject("", "", "", "", "");
         foreach(var agreement in agreementsList)
         {
             firedEmployee.Email = agreement.EmployeeEmail;
@@ -220,7 +221,13 @@
             var firedEmployeeName = firedEmployee.Name + " " + firedEmployee.LastName1;
             var employerName = personInfo.Name+ " " + personInfo.LastName1 + " " + personInfo.LastName2;
             await AgreementService.DesactivateAgreement(agreement.EmployeeEmail, agreement.EmployerEmail, agreement.ProjectName, justification);
-            EmailService.FiredEmployeeEmail(firedEmployeeName,employerName, agreement.ProjectName,justification, agreement.EmployeeEmail);
+            emailData.EmployeeName = firedEmployeeName;
+            emailData.EmployerName = employerName;
+            emailData.ProjectName = agreement.ProjectName;
+            emailData.Message = justification;
+            emailData.Destiny = agreement.EmployeeEmail;
+            EmailService.SendFiredEmployeeEmail(emailData);
+            //EmailService.SendFiredEmployeeEmail(firedEmployeeName,employerName, agreement.ProjectName,justification, agreement.EmployeeEmail);
         }
     }
 

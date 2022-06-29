@@ -11,7 +11,7 @@ namespace Application.Email
     {
         public EmailSender() { }
         private string user = "i/MVRXAfhPPNVbUc0F0ILYn2xj4vSGjeCu1sXhBD7I0fFZBI5H7wD/8GHhHlMzPo";
-        private string key = "lu1/NVjrC7Ne5sGH7v/sLmJRebekIr5lJdP1dcSrJVcVg9KwW/r5NgjIHPi/ojqa";
+        private string key = "G+z7w7qrNcg4x481n38igQ6oEUPa6lnukm094LviyB++ymhuIHNIAMSYRfDU1BkO";
         
         public void SendMail(string email, string subject, string htmlContent)
         {
@@ -29,7 +29,7 @@ namespace Application.Email
                 smtp.Host = "smtp.gmail.com"; //for gmail host  
                 smtp.EnableSsl = true;
                 smtp.UseDefaultCredentials = false;
-                smtp.Credentials = new NetworkCredential(encriptor.Decrypt(user), "eqnivjmwcqlcqjqe");
+                smtp.Credentials = new NetworkCredential(encriptor.Decrypt(user), encriptor.Decrypt(key));
                 smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
                 smtp.Send(message);
             }
