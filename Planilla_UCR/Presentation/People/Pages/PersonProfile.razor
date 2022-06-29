@@ -178,12 +178,9 @@
         projectsList = await ProjectService.GetEmployerProyects(userEmail);
         foreach(var project in projectsList)
         {
-            benefitsList = await SubscriptionService.GetBenefitsByProject(project.EmployerEmail,project.ProjectName);
-            deductionsList = await SubscriptionService.GetDeductionsByProject(project.EmployerEmail,project.ProjectName);
-            agreementsList = await AgreementService.GetAllAgreementsByProjectAndEmployer(project.ProjectName, project.EmployerEmail);
-            DeleteBenefits(benefitsList);
-            DeleteDeductions(deductionsList);
-            await DeleteAgreetments(agreementsList);
+            await DeleteBenefits(project.EmployerEmail,project.ProjectName);
+            await DeleteDeductions(project.EmployerEmail,project.ProjectName);
+            await DeleteAgreetments(project.EmployerEmail,project.ProjectName);
             ProjectService.DisableProject(project.ProjectName, project.EmployerEmail);
         }
         EmployerService.DeleteEmployer(personInfo.Email);
@@ -191,24 +188,27 @@
         nav.NavigateTo($"/delete", true);
     }
 
-    private void DeleteBenefits(IEnumerable<Subscription> benefitsList)
+    private async Task DeleteBenefits(string employerEmail, string projectName)
     {
+        benefitsList = await SubscriptionService.GetBenefitsByProject(employerEmail,projectName);
         foreach(Subscription benefit in benefitsList)
         {
             SubscriptionService.DeleteSubscription(benefit);
         }
     }
 
-    private void DeleteDeductions(IEnumerable<Subscription> deductionsList)
+    private async Task DeleteDeductions(string employerEmail, string projectName)
     {
+        deductionsList = await SubscriptionService.GetDeductionsByProject(employerEmail,projectName);
         foreach(Subscription deduction in deductionsList)
         {
             SubscriptionService.DeleteSubscription(deduction);
         }
     }
 
-    async Task DeleteAgreetments(IEnumerable<Agreement> agreementsList)
+    private async Task DeleteAgreetments(string employerEmail, string projectName)
     {
+        agreementsList = await AgreementService.GetAllAgreementsByProjectAndEmployer(employerEmail, projectName);
         foreach(var agreement in agreementsList)
         {
             await AgreementService.DesactivateAgreement(agreement.EmployeeEmail, agreement.EmployerEmail, agreement.ProjectName, "Cierre de negocio");
