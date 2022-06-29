@@ -170,38 +170,38 @@
         }
     }
 
-    private async Task<double> GetSalary(Agreement _agreement, int _daysInterval, DateTime _lastPaymentDate)
+    private async Task<double> GetSalary(Agreement agreement, int daysInterval, DateTime lastPaymentDate)
     {
-        double salary = await GetSalaryByType(_agreement, _daysInterval, _lastPaymentDate);
-        double appliedBenefits = await GetEmployeeBenefits(_agreement, _daysInterval, _lastPaymentDate);
+        double salary = await GetSalaryByType(agreement, daysInterval, lastPaymentDate);
+        double appliedBenefits = await GetEmployeeBenefits(agreement, daysInterval, lastPaymentDate);
         salary += appliedBenefits;
         return salary;
     }
 
-    private async Task<double> GetSalaryByType(Agreement _agreement, int _daysInterval, DateTime _lastPaymentDate)
+    private async Task<double> GetSalaryByType(Agreement agreement, int daysInterval, DateTime lastPaymentDate)
     {
-        int workedDays = GetWorkedDays(_agreement.EmployeeEmail, (DateTime)_agreement.ContractStartDate, _daysInterval);
+        int workedDays = GetWorkedDays(agreement.EmployeeEmail, (DateTime)agreement.ContractStartDate, daysInterval);
         double grossSalary = 0;
-        if (_agreement.ContractType == "Tiempo completo")
+        if (agreement.ContractType == "Tiempo completo")
         {
-            grossSalary = _calculator.GetFullTimeSalary(_agreement.MountPerHour, workedDays);
+            grossSalary = _calculator.GetFullTimeSalary(agreement.MountPerHour, workedDays);
         }
-        if (_agreement.ContractType == "Medio tiempo")
+        if (agreement.ContractType == "Medio tiempo")
         {
-            grossSalary = _calculator.GetPartTimeSalary(_agreement.MountPerHour, workedDays);
+            grossSalary = _calculator.GetPartTimeSalary(agreement.MountPerHour, workedDays);
         }
-        if (_agreement.ContractType == "Por horas")
+        if (agreement.ContractType == "Servicios profesionales")
         {
-            double workedHours = await GetWorkedHours(_agreement, _daysInterval, _lastPaymentDate);
-            grossSalary = _calculator.GetSalaryPerHours(_agreement.MountPerHour, workedHours);
+            double workedHours = await GetWorkedHours(agreement, daysInterval, lastPaymentDate);
+            grossSalary = _calculator.GetSalaryPerHours(agreement.MountPerHour, workedHours);
         }
         return grossSalary;
     }
 
-    private int GetWorkedDays(string employeeEmail, DateTime startDate, int _daysInterval)
+    private int GetWorkedDays(string employeeEmail, DateTime startDate, int daysInterval)
     {
-        DateTime _nextPayment = startDate.AddDays(_daysInterval);
-        int _workedDays = Convert.ToInt32(_daysInterval);
+        DateTime _nextPayment = startDate.AddDays(daysInterval);
+        int _workedDays = Convert.ToInt32(daysInterval);
         if (startDate.Month == _nextPayment.Month)
         {
             _workedDays = _nextPayment.Day - startDate.Day;
@@ -227,15 +227,15 @@
         return mountOfBenefits;
     }
 
-    private async Task<double> GetWorkedHours(Agreement _agreement, int _daysInterval, DateTime _lastPaymentDate)
+    private async Task<double> GetWorkedHours(Agreement agreement, int daysInterval, DateTime lastPaymentDate)
     {
         double _workedHours = 0;
-        _report.EmployeeEmail = _agreement.EmployeeEmail;
-        _report.ReportDate = _lastPaymentDate;
-        IList<HoursReport> reports = await ReportHoursService.GetEmployeeReports(_report, _lastPaymentDate.AddDays(_daysInterval));
+        _report.EmployeeEmail = agreement.EmployeeEmail;
+        _report.ReportDate = lastPaymentDate;
+        IList<HoursReport> reports = await ReportHoursService.GetEmployeeReports(_report, lastPaymentDate.AddDays(daysInterval));
         foreach (HoursReport hours in reports)
         {
-            _workedHours = hours.ReportHours;
+            _workedHours += hours.ReportHours;
         }
         return _workedHours;
     }
