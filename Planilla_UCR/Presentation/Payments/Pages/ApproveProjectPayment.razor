@@ -82,7 +82,7 @@
                 </MudTd>
                 <MudTd DataLabel="Intervalo de pago">@context.PaymentInterval</MudTd>
                  <MudTd DataLabel="Último pago">@context.LastPaymentDate.ToShortDateString()</MudTd>
-                <MudTd DataLabel="Costo" Style="text-align:right"> @cultureCR.NumberFormat.CurrencySymbol @costFormat(context.MountToPay) </MudTd>
+                <MudTd DataLabel="Costo" Style="text-align:right"> @cultureCR.NumberFormat.CurrencySymbol @CostFormat(context.MountToPay) </MudTd>
             </RowTemplate>
             <PagerContent>
                 <MudPagination SelectedChanged="PageChanged" Count="@((_mudTable.GetFilteredItemsCount() + _mudTable.RowsPerPage - 1) / _mudTable.RowsPerPage)" Color="Color.Primary" Class="pa-4"/>
@@ -348,9 +348,9 @@
         _mudTable.NavigateTo(i - 1);
     }
 
-    private string costFormat(double cost)
+    private string CostFormat(double cost)
     {
-        string costo = string.Format("{0:N}", cost);
-        return costo;
+        string formatedCost = string.Format("{0:N}", cost);
+        return formatedCost;
     }
 }
