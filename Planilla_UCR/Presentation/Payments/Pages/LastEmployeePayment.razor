@@ -39,7 +39,7 @@
     List<BreadcrumbItem> _items = new List<BreadcrumbItem>
     {
         new BreadcrumbItem("Proyectos", href: $"/Projects/{email}"),
-            new BreadcrumbItem(@projectName, href: $"/EmployeeProjects/{email}/{projectName}"),
+            new BreadcrumbItem(@projectName, href: $"/Projects/{email}/{ContextMenuService.GetEmployerEmailContext()}/{projectName}"),
         new BreadcrumbItem("Último pago", href: null, disabled: true)
     }; 
     <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
