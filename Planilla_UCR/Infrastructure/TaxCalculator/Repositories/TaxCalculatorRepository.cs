@@ -6,7 +6,7 @@ namespace Infrastructure.TaxCalculator.Repositories
     {
         private readonly double SEM = 5.50;
         private readonly double IVM = 4.0;
-        private readonly double PopularBankApport = 1.0;
+        private readonly double POPULAR_BANK_APPORT = 1.0;
 
         public TaxCalculatorRepository()
         {
@@ -14,34 +14,34 @@ namespace Infrastructure.TaxCalculator.Repositories
 
         public double GetRentTax(double grossSalary)
         {
-            double RentTax = 0;
+            double rentTax = 0;
             if (grossSalary <= 863000)
             {
-                RentTax = 0;
+                rentTax = 0;
             }
             else if (863000 < grossSalary && grossSalary <= 1267000)
             {
-                RentTax = 10;
+                rentTax = 10;
             }
             else if (1267000 < grossSalary && grossSalary <= 2223000)
             {
-                RentTax = 15;
+                rentTax = 15;
             }
             else if (2223000 < grossSalary && grossSalary <= 4445000)
             {
-                RentTax = 20;
+                rentTax = 20;
             }
             else if (4445000 < grossSalary)
             {
-                RentTax = 25;
+                rentTax = 25;
             }
-            return RentTax;
+            return rentTax;
         }
 
         public double GetCSSTax()
         {
-            double CSSTax = SEM + IVM + PopularBankApport;
-            return CSSTax;
+            double cssTax = SEM + IVM + POPULAR_BANK_APPORT;
+            return cssTax;
         }
 
         public double GetTaxPercentage(string taxName, double grossSalary)
@@ -60,7 +60,7 @@ namespace Infrastructure.TaxCalculator.Repositories
 
         public double GetTaxAmount(string taxName, double grossSalary)
         {
-            double taxPercentage = 0;
+            double taxPercentage;
             if (taxName == "CCSS")
             {
                 taxPercentage = grossSalary * (GetCSSTax() / 100);
