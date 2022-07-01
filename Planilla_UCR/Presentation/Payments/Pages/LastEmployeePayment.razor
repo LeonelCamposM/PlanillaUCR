@@ -13,6 +13,7 @@
 @using System.Globalization
 @using Presentation.Payments.Models
 @using Application.People
+@using Application.TaxCalculator
 
 @inject IPaymentService PaymentService
 @inject IContextMenuService ContextMenuService
@@ -22,6 +23,8 @@
 @inject ISubscribeService SubscribeService
 @inject NavigationManager nav
 @inject ISubscriptionService SuscriptionService
+@inject ITaxCalculatorService TaxCalculatorService
+
 @page "/Last_Pay/{email}"
 
 @if(_loading) {
@@ -85,8 +88,8 @@
 
                                 <RowTemplate>
                                         <MudTd DataLabel="Nombre">@context.DeductionName</MudTd>
-                                        <MudTd DataLabel="Pocentaje"> @salaryCalculator.getTaxPercentage(context.DeductionName, lastPay.GrossSalary) % </MudTd>
-                                        <MudTd DataLabel="Monto"> @cultureCR.NumberFormat.CurrencySymbol @costFormat(salaryCalculator.getTaxAmount(context.DeductionName, lastPay.GrossSalary))</MudTd>
+                                        <MudTd DataLabel="Pocentaje"> @TaxCalculatorService.GetTaxPercentage(context.DeductionName, lastPay.GrossSalary) % </MudTd>
+                                        <MudTd DataLabel="Monto"> @cultureCR.NumberFormat.CurrencySymbol @costFormat(TaxCalculatorService.GetTaxAmount(context.DeductionName, lastPay.GrossSalary))</MudTd>
                                 </RowTemplate>
                       </MudTable>
                       <br />
@@ -139,7 +142,6 @@
     private IList<Subscription> deductions = new List<Subscription>();
     private MudTable<Subscription> _table;
     private MudTable<LegalDeduction> _table2;
-    public SalaryCalculator salaryCalculator = new SalaryCalculator();
     public bool ServiciosProfesionales = false;
 
     Payment lastPay;
@@ -177,7 +179,7 @@
             subscriptions = await SubscribeService.GetSubscriptionCostsByDate(searchSubscribe);
             if(ServiciosProfesionales)
             {
-                 foreach (var item in subscriptions)
+                foreach (var item in subscriptions)
                 {
                     if(item.TypeSubscription == 1)
                     {
@@ -188,7 +190,7 @@
             else
             {
                 legalDeductions = await LegalDeductionService.GetAllAsync();
-                
+
 
                 foreach (var item in subscriptions)
                 {
@@ -210,7 +212,7 @@
 
                 foreach (var item in legalDeductions)
                 {
-                    netSalary -= salaryCalculator.getTaxAmount(item.DeductionName, lastPay.GrossSalary);
+                    netSalary -= TaxCalculatorService.GetTaxAmount(item.DeductionName, lastPay.GrossSalary);
                 }
             }
 

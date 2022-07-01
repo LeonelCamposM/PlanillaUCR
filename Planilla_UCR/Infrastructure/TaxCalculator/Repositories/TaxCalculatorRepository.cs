@@ -1,20 +1,21 @@
-﻿
-namespace Presentation.Payments.Models
-{
-    public class SalaryCalculator
-    {
-        double SEM = 5.50;
-        double IVM = 4.0;
-        double PopularBankApport = 1.0;
-        public SalaryCalculator()
-        {
+﻿using Domain.TaxCalculator.Repositories;
 
+namespace Infrastructure.TaxCalculator.Repositories
+{
+    public class TaxCalculatorRepository : ITaxCalculatorRepository
+    {
+        private readonly double SEM = 5.50;
+        private readonly double IVM = 4.0;
+        private readonly double PopularBankApport = 1.0;
+
+        public TaxCalculatorRepository()
+        {
         }
 
         public double GetRentTax(double grossSalary)
         {
             double RentTax = 0;
-            if(grossSalary <= 863000)
+            if (grossSalary <= 863000)
             {
                 RentTax = 0;
             }
@@ -39,11 +40,11 @@ namespace Presentation.Payments.Models
 
         public double GetCSSTax()
         {
-            double CSSTax = SEM+IVM+PopularBankApport;
+            double CSSTax = SEM + IVM + PopularBankApport;
             return CSSTax;
         }
 
-        public double getTaxPercentage(string taxName, double grossSalary)
+        public double GetTaxPercentage(string taxName, double grossSalary)
         {
             double taxPercentage = 0;
             if (taxName == "CCSS")
@@ -57,12 +58,12 @@ namespace Presentation.Payments.Models
             return taxPercentage;
         }
 
-        public double getTaxAmount(string taxName, double grossSalary)
+        public double GetTaxAmount(string taxName, double grossSalary)
         {
             double taxPercentage = 0;
             if (taxName == "CCSS")
             {
-                taxPercentage = grossSalary * (GetCSSTax()/ 100);
+                taxPercentage = grossSalary * (GetCSSTax() / 100);
             }
             else
             {
