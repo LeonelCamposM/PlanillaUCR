@@ -50,7 +50,7 @@
                         <MudTd DataLabel="Cedula">@context.Ssn</MudTd>
                          <MudTd DataLabel="Acciones">
                         <MudSpacer></MudSpacer>
-                            <MudButton Variant="Variant.Filled" @onclick="@(e => GoToContractEmployee(@context.Email))" Color="Color.Transparent">
+                            <MudButton Variant="Variant.Filled" @onclick="@(e => GoToContractEmployee(@context.Email, @context.Name, @context.LastName1, @context.LastName2))" Color="Color.Transparent">
                                 <MudText>
                                 Contratar
                                 </MudText> 
@@ -90,7 +90,7 @@
 @code {
     private bool _hidePosition;
     private bool _loading = true;
-    private bool _empty = true;
+    private bool _empty = false;
     string mySearchString = "";
     public string Disabled { get; set; } = "Empleados Contratados";
     private IEnumerable<Person> _elements = new List<Person>();
@@ -112,12 +112,11 @@
         ContextMenuService.SetProjectsContext(true, true, projectName, employerEmail, false);
         _elements = await PersonService.GetAllEmployees(projectName);
         IEnumerable<Person> hiredEmployees = await PersonService.GetProjectEmployees(projectName);
-        _empty = false;
         foreach (var item in hiredEmployees)
         {
             _elements = _elements.Where(e => e.Email != item.Email);
         }
-        
+
         if (_elements.Length() == 0)
         {
             _empty = true;
@@ -130,9 +129,10 @@
         nav.NavigateTo($"/Create_Employee/{employerEmail}/{projectName}");
     }
 
-    private void GoToContractEmployee(string employeeEmail)
+    private void GoToContractEmployee(string employeeEmail, string name, string lastname1, string lastname2)
     {
-       nav.NavigateTo($"/Agreements/{employerEmail}/{projectName}/{employeeEmail}/New");
+        string employeeName = name + " " + lastname1 + " " + lastname2;
+        nav.NavigateTo($"/Agreements/{employerEmail}/{projectName}/{employeeEmail}/{employeeName}/New");
     }
 
     private void PageChanged(int i)
