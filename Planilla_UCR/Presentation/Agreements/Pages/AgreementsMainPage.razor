@@ -17,8 +17,6 @@
        
     </MudPaper>
 }else{
-    @if (!_loading)
-    {
         List<BreadcrumbItem> _items = new List<BreadcrumbItem>
         {
             new BreadcrumbItem("Proyectos", href: $"/Projects/{employerEmail}"),
@@ -35,7 +33,7 @@
                     <ToolBarContent>
                             <MudText> Contratar empleados </MudText>
                             <MudSpacer />
-                            <MudTextField @bind-Value="mySearchString" Placeholder="Buscar email" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                            <MudTextField @bind-Value="_mySearchString" Placeholder="Buscar email" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
                     </ToolBarContent> 
                     <HeaderContent>
                         <MudTh>Email</MudTh>
@@ -69,7 +67,7 @@
             <MudToolBar>
                 <MudText> Contratar Empleados </MudText>
                 <MudSpacer />
-                <MudTextField @bind-Value="mySearchString" Placeholder="Buscar email" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                <MudTextField @bind-Value="_mySearchString" Placeholder="Buscar email" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
             </MudToolBar> 
                 <MudPaper Height="60px" Width="100%" Outlined="false" Class="border-none" Elevation="0"> 
                 </MudPaper>
@@ -84,28 +82,20 @@
             Registrar Empleados
             </MudText> 
         </MudButton>
-    }
 }
 
 @code {
+    [Parameter]
+    public string employerEmail { get; set; }
+    [Parameter]
+    public string projectName { get; set; }
+    private IEnumerable<Person> _elements = new List<Person>();
+    private MudTable<Person> _table;
     private bool _hidePosition;
     private bool _loading = true;
     private bool _empty = false;
-    string mySearchString = "";
-    public string Disabled { get; set; } = "Empleados Contratados";
-    private IEnumerable<Person> _elements = new List<Person>();
-    private MudTable<Person> _table;
-    public string tab1 { get; set; } = "Contratar empleados";
-    public string tab2 { get; set; } = "Empleados contratados";
-
-    [Parameter]
-    public string employerEmail { get; set; }
-
-    [Parameter]
-    public string projectName { get; set; }
-
-    [Parameter]
-    public EventCallback<string> SendTableState { get; set; }
+    private string _mySearchString = "";
+   
 
     protected override async Task OnInitializedAsync()
     {
@@ -140,7 +130,7 @@
         _table.NavigateTo(i - 1);
     }
 
-    private bool FilterFunc1(Person element) => FilterFunc(element, mySearchString);
+    private bool FilterFunc1(Person element) => FilterFunc(element, _mySearchString);
 
     private bool FilterFunc(Person element, string searchString)
     {
@@ -151,8 +141,4 @@
         return false;
     }
 
-    private async Task SendConmuteSignal()
-    {
-        await SendTableState.InvokeAsync("");
-    }
 }

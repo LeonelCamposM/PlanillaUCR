@@ -92,7 +92,7 @@
                     
                     <MudItem xs="4">
 
-                        <MudNumericField @bind-Value="salaryPerHour" Label="Monto por hora" Variant="Variant.Outlined" Format="N2" Culture="@cultureCR"
+                        <MudNumericField @bind-Value="_salaryPerHour" Label="Monto por hora" Variant="Variant.Outlined" Format="N2" Culture="@cultureCR"
                              Adornment="Adornment.Start" AdornmentText="@cultureCR.NumberFormat.CurrencySymbol" Required="true" RequiredError="El monto por hora es necesario" HideSpinButtons="true" Min = "0"> 
                         </MudNumericField>
 
@@ -156,8 +156,7 @@
     MudForm form;
     DateTime? startDate;
     DateTime? endDate;
-    int? salaryPerHour;
-    string format = "yyyy/MM/dd";
+    private int? _salaryPerHour;
     private bool _isLoading = true;
     private bool _saving = false;
     private bool _canSend = false;
@@ -297,7 +296,7 @@
     private async Task<bool> validateAgreementTypeOfContractee()
     {
         bool isValid = true;
-        myAgreement.MountPerHour = (int)salaryPerHour;
+        myAgreement.MountPerHour = (int)_salaryPerHour;
 
         IEnumerable<Agreement> salaryList = await AgreementService.CheckAgreementTypeOfContractee(myAgreement);
 
@@ -330,7 +329,7 @@
     private void parseAgreementType()
     {
         myAgreementType.TypeAgreement = myAgreement.ContractType;
-        myAgreementType.MountPerHour = (int)salaryPerHour;
+        myAgreementType.MountPerHour = (int)_salaryPerHour;
     }
 
     private async Task<bool> checkAgreementType(string myAgreement, int mountPerHour)
