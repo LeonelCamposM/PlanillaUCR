@@ -68,7 +68,7 @@
     private bool _hidePosition;
     private bool _loading = true;
     private bool _empty = true;
-    string searchString = "";
+    public string searchString = "";
     private IEnumerable<HoursReport> _elements = new List<HoursReport>();
     private MudTable<HoursReport> _table;
     private string _projectName { get; set; }
@@ -79,11 +79,7 @@
         _elements = await HoursReportService.GetAllReportsAsync(email);
         _elements = _elements.Where(e => e.ProjectName == _projectName);
         _elements = _elements.OrderByDescending (report => report.ReportDate);
-        if (_elements.Length() == 0)
-        {
-            _empty = true;
-        }
-        else
+        if (_elements.Length() != 0)
         {
             _empty = false;
         }
