@@ -7,26 +7,26 @@ namespace Presentation.Employees.Models
     {
         public string ProjectName { get; set; }
         public string ContractType { get; set; }
-        public DateTime PaymentDate { get; set; }
-        public double GrossSalary { get; set; }
-        public double LegalDeductions { get; set; }
-        public double VoluntaryDeductions { get; set; }
-        public double NetSalary { get; set; }
+        public string PaymentDate { get; set; }
+        public string GrossSalary { get; set; }
+        public string LegalDeductions { get; set; }
+        public string VoluntaryDeductions { get; set; }
+        public string NetSalary { get; set; }
 
         public PaymentHistoryModel()
         {
             ProjectName = "";
             ContractType = "";
-            PaymentDate = DateTime.Now;
-            GrossSalary = 0.0;
-            LegalDeductions = 0.0;
-            VoluntaryDeductions = 0.0;
-            NetSalary = 0.0;
+            PaymentDate = "";
+            GrossSalary = "";
+            LegalDeductions = "";
+            VoluntaryDeductions = "";
+            NetSalary = "";
         }
 
         public PaymentHistoryModel(string projectName, string contractType,
-            DateTime paymentDate, double grossSalary, double legalDeductions,
-            double voluntaryDeductions, double netSalary)
+            string paymentDate,string grossSalary, string legalDeductions,
+            string voluntaryDeductions, string netSalary)
         {
             ProjectName = projectName;
             ContractType = contractType;

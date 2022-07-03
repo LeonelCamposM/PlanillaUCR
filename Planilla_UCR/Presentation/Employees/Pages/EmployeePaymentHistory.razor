@@ -63,8 +63,13 @@
             </HeaderContent>
            
             <RowTemplate>
-                    <MudTd DataLabel="Proyecto"></MudTd>
-                    <MudTd DataLabel="Tipo contrato"></MudTd>
+                    <MudTd DataLabel="Proyecto">@context.ProjectName</MudTd>
+                    <MudTd DataLabel="Tipo contrato">@context.ContractType</MudTd>
+                    <MudTd DataLabel="Fecha pago">@context.PaymentDate</MudTd>
+                    <MudTd DataLabel="Salario Bruto">@context.GrossSalary</MudTd>
+                    <MudTd DataLabel="Deducciones obligatorias">@context.LegalDeductions</MudTd>
+                    <MudTd DataLabel="Deducciones voluntarias">@context.VoluntaryDeductions</MudTd>
+                    <MudTd DataLabel="Salario neto">@context.NetSalary</MudTd>
             </RowTemplate>
         </MudTable>
    
@@ -78,15 +83,17 @@
 
 
 @code {
-    [Parameter]
-    public string email { get; set; }
-  
+        [Parameter]
+        public string email { get; set; }
+
+    private bool _loading = true;
+    private bool _empty = true;
+
     private MudTable<PaymentHistoryModel>  _tablePaymentHistory;
     private IList<PaymentHistoryModel> _payments = new List<PaymentHistoryModel>();
     private IList<Payment> _paymentsList = new List<Payment>();
-  
-    private bool _loading = true;
-    private bool _empty = true;
+    private CultureInfo _cultureCR = CultureInfo.GetCultureInfo("es-CR");
+    
 
 
     //_lastPay = await PaymentService.GetEmployeeLastPayment(email, ContextMenuService.GetEmployerEmailContext(), projectName);
@@ -95,9 +102,23 @@
     protected override async Task OnParametersSetAsync()
     {
         _paymentsList = (IList<Payment>) await PaymentService.GetEmployeePayments(email);
+        await GetPaymentHistory();
         _loading = false;
     }
 
-}
+    private async Task GetPaymentHistory()
+    {
+        foreach (Payment payment in _paymentsList){
+            PaymentHistoryModel _paymentHistoryModel = new PaymentHistoryModel(payment.ProjectName, "tipo contrato", payment.EndDate.ToShortDateString(),
+               CostFormat(payment.GrossSalary), _cultureCR.NumberFormat.CurrencySymbol+CostFormat(0.0), _cultureCR.NumberFormat.CurrencySymbol+CostFormat(0.0), _cultureCR.NumberFormat.CurrencySymbol+CostFormat(0.0));
+            _payments.Add(_paymentHistoryModel);
+        }
+    }
 
-      
+    private string CostFormat(double cost)
+    {
+        string formatedCost = string.Format("{0:N}", cost);
+        return formatedCost;
+    }
+
+}     
