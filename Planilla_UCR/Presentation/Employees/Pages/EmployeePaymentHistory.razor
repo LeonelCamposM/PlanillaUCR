@@ -116,12 +116,13 @@
         foreach (Payment payment in _paymentsList){
             await GetContractType(payment.EmployerEmail, payment.ProjectName);
             _costVoluntaryDeductions = await GetVoluntaryDeductionsCost(payment.EmployerEmail, payment.ProjectName, payment.StartDate,payment.EndDate);
-            _costNetSalary = GetNetSalary(payment.GrossSalary, _costVoluntaryDeductions);
-            _costLegalDeductions = GetLegalDeductions(payment.GrossSalary, _costVoluntaryDeductions);
+            _costNetSalary = await GetNetSalary(payment.GrossSalary, _costVoluntaryDeductions);
+            _costLegalDeductions = await GetLegalDeductions(payment.GrossSalary, _costVoluntaryDeductions);
 
             PaymentHistoryModel _paymentHistoryModel = new PaymentHistoryModel(payment.ProjectName,  
                 _agreement.ContractType, payment.EndDate.ToShortDateString(),
-               CostFormat(payment.GrossSalary), _cultureCR.NumberFormat.CurrencySymbol+CostFormat(_costLegalDeductions),
+               _cultureCR.NumberFormat.CurrencySymbol+CostFormat(payment.GrossSalary), 
+               _cultureCR.NumberFormat.CurrencySymbol+CostFormat(_costLegalDeductions),
                _cultureCR.NumberFormat.CurrencySymbol+CostFormat(_costVoluntaryDeductions), 
                _cultureCR.NumberFormat.CurrencySymbol+CostFormat(_costNetSalary));
             _payments.Add(_paymentHistoryModel);
@@ -149,10 +150,10 @@
         return voluntaryDeductionsCost;
     }
 
-
-    private double GetLegalDeductions(double grossSalary, double voluntaryDedudctions)
+    private async Task<double> GetLegalDeductions(double grossSalary, double voluntaryDedudctions)
     {
         double legalDeductionsCost = 0.0;
+        _legalDeductions = await LegalDeductionService.GetAllAsync();
         foreach (var item in _legalDeductions)
         {
             legalDeductionsCost += TaxCalculatorService.GetTaxAmount(item.DeductionName, grossSalary);
@@ -160,11 +161,11 @@
         return legalDeductionsCost;
     }
 
-
-    private double GetNetSalary(double grossSalary, double voluntaryDedudctions)
+    private async Task<double> GetNetSalary(double grossSalary, double voluntaryDedudctions)
     {
         double netSalary = grossSalary;
         netSalary -= voluntaryDedudctions;
+         _legalDeductions = await LegalDeductionService.GetAllAsync();
         foreach (var item in _legalDeductions)
         {
             netSalary -= TaxCalculatorService.GetTaxAmount(item.DeductionName, grossSalary);
@@ -172,11 +173,9 @@
         return netSalary;
     }
 
-
     private string CostFormat(double cost)
     {
         string formatedCost = string.Format("{0:N}", cost);
         return formatedCost;
     }
-
 }     
