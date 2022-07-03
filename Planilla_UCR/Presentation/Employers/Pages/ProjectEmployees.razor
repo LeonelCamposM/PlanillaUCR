@@ -55,11 +55,11 @@
 
         if(!_empty)
         {
-                <MudTable @ref="@_table" Items="@_myJoin" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" Filter="new Func<JoinedTables,bool>(FilterFunc1)" >
+                <MudTable @ref="@_table" Items="@_myJoin" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" Filter="new Func<JoinedTables,bool>(Filter)" >
                     <ToolBarContent>
                             <MudText> Empleados contratados </MudText>
                             <MudSpacer />
-                            <MudTextField @bind-Value="mySearchString" Immediate="true" Placeholder="Buscar email" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                            <MudTextField @bind-Value="_mySearchString" Immediate="true" Placeholder="Buscar email" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
                     </ToolBarContent> 
                 
                         <ColGroup>
@@ -106,7 +106,7 @@
                 <MudToolBar>
                     <MudText> Empleados contratados  </MudText>
                     <MudSpacer />
-                    <MudTextField @bind-Value="mySearchString" Placeholder="Buscar email" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                    <MudTextField @bind-Value="_mySearchString" Placeholder="Buscar email" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
                 </MudToolBar> 
                 <MudPaper Height="60px" Width="100%" Outlined="false" Class="border-none" Elevation="0"> 
                 </MudPaper>
@@ -131,7 +131,7 @@
                     </MudText>
                 </TitleContent>
                 <DialogContent>
-                        <MudTextField @bind-Value="justificationToBeDeleted" Lines="10" Label="Justificación" Variant="Variant.Outlined" Required="true" RequiredError="Por favor, indique el motivo del despido"></MudTextField>
+                        <MudTextField @bind-Value="_justificationToBeDeleted" Lines="10" Label="Justificación" Variant="Variant.Outlined" Required="true" RequiredError="Por favor, indique el motivo del despido"></MudTextField>
                 </DialogContent>
                 <DialogActions>
                         <MudButton  Variant="Variant.Filled" Color="Color.Primary" @onclick="@(e => FireEmployee())" Class="px-10">Aceptar</MudButton>
@@ -142,7 +142,7 @@
 }
 
 @code {
-        [Parameter]
+    [Parameter]
     public string projectName { get; set; }
     [Parameter]
     public string email { get; set; }
@@ -157,12 +157,12 @@
     private IEnumerable<JoinedTables> _myJoin = new List<JoinedTables>();
     private MudTable<JoinedTables> _table;
     private bool _loading = true;
-    private string mySearchString = "";
+    private string _mySearchString = "";
     private bool _empty = true;
-    private string employerEmailToBeDeleted = "";
-    private string projectNameToBeDeleted = "";
-    private string justificationToBeDeleted = "";
-    private string employeeEmailToBeDeleted = "";
+    private string _employerEmailToBeDeleted = "";
+    private string _projectNameToBeDeleted = "";
+    private string _justificationToBeDeleted = "";
+    private string _employeeEmailToBeDeleted = "";
     private bool _visible = false;
 
 
@@ -210,16 +210,16 @@
 
     private void OpenDialog(string employeeEmail)
     {
-        employeeEmailToBeDeleted = employeeEmail;
-        employerEmailToBeDeleted = email;
-        projectNameToBeDeleted = projectName;
+        _employeeEmailToBeDeleted = employeeEmail;
+        _employerEmailToBeDeleted = email;
+        _projectNameToBeDeleted = projectName;
         _visible = true;
     }
 
     private void CloseDialog()
     {
         _visible = false;
-        justificationToBeDeleted = "";
+        _justificationToBeDeleted = "";
     } 
 
     private async Task FireEmployee()
@@ -228,8 +228,8 @@
         if (chekedJustificationLength)
         {
             CloseDialog();
-            await AgreementService.DesactivateAgreement(employeeEmailToBeDeleted, employerEmailToBeDeleted, projectNameToBeDeleted, justificationToBeDeleted);
-            ShowSnackNotification("El empleado con el email" + employeeEmailToBeDeleted + " ha sido eliminado del proyecto", Severity.Success);
+            await AgreementService.DesactivateAgreement(_employeeEmailToBeDeleted, _employerEmailToBeDeleted, _projectNameToBeDeleted, _justificationToBeDeleted);
+            ShowSnackNotification("El empleado con el email" + _employeeEmailToBeDeleted + " ha sido eliminado del proyecto", Severity.Success);
             await Task.Delay(5000); // Time in miliseconds
             nav.NavigateTo($"/View_Project_Employees/{email}/{projectName}", true);
         }
@@ -244,7 +244,7 @@
         _table.NavigateTo(i - 1);
     }
 
-    private bool FilterFunc1(JoinedTables element) => FilterFunc(element, mySearchString);
+    private bool Filter(JoinedTables element) => FilterFunc(element, _mySearchString);
 
     private bool FilterFunc(JoinedTables element, string searchString)
     {
@@ -282,7 +282,7 @@
     private bool checkJustificationLength()
     {
         bool result = true;
-        if (justificationToBeDeleted.Length == 0)
+        if (_justificationToBeDeleted.Length == 0)
         {
             result = false;
             ShowSnackNotification("Por favor, escriba una justificación", Severity.Error);

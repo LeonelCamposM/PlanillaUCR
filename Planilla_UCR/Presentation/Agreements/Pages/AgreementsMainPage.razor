@@ -1,13 +1,18 @@
 ﻿@page "/Agreements/{employerEmail}/{projectName}/"
 
+@using Application.Agreements
 @using Application.People
+@using Domain.Agreements.Entities
 @using Domain.People.Entities
 @using Application.Employees
 @using Application.ContextMenu
+@using Presentation.Agreements.Models
 
 @inject NavigationManager nav
 @inject IEmployeeService PersonService
 @inject IContextMenuService ContextMenuService
+@inject IAgreementService AgreementService
+
 
 @if(_loading) {
     <MudPaper  Height="220px" Width="100%" Outlined="false" Class="border-none pa-4" Elevation="0">
@@ -43,7 +48,7 @@
                     </HeaderContent>
 
                     <RowTemplate>
-                        <MudTd DataLabel="Nombre">@context.Name @context.LastName1 @context.LastName2</MudTd>
+                        <MudTd DataLabel="Nombre completo">@context.Name, @context.LastName1, @context.LastName2</MudTd>
                         <MudTd DataLabel="Email">@context.Email</MudTd>
                         <MudTd DataLabel="Cedula">@context.Ssn</MudTd>
                          <MudTd DataLabel="Acciones">
@@ -90,29 +95,43 @@
     [Parameter]
     public string projectName { get; set; }
     private IEnumerable<Person> _elements = new List<Person>();
+    IEnumerable<Person> _hiredEmployees;
     private MudTable<Person> _table;
     private bool _hidePosition;
     private bool _loading = true;
     private bool _empty = false;
     private string _mySearchString = "";
-   
+
+    IEnumerable<Agreement> _allAgreements;
+
 
     protected override async Task OnInitializedAsync()
     {
         ContextMenuService.SetProjectsContext(true, true, projectName, employerEmail, false);
         _elements = await PersonService.GetAllEmployees(projectName);
-        IEnumerable<Person> hiredEmployees = await PersonService.GetProjectEmployees(projectName);
-        foreach (var item in hiredEmployees)
-        {
-            _elements = _elements.Where(e => e.Email != item.Email);
-        }
+        _hiredEmployees =  await PersonService.GetProjectEmployees(projectName);
+        populateJoinAttribute();
+        checkJoinLenght();
+        _loading = false;
+    }
 
+
+    private void populateJoinAttribute() 
+    {
+        var myResult = (from num in _elements
+                        select num)
+                       .Except(_hiredEmployees).ToList();
+        _elements = myResult;
+    }
+
+    private void checkJoinLenght()
+    {
         if (_elements.Length() == 0)
         {
             _empty = true;
         }
-        _loading = false;
     }
+
 
     private void GoToCreateEmployee()
     {
@@ -125,7 +144,7 @@
         nav.NavigateTo($"/Agreements/{employerEmail}/{projectName}/{employeeEmail}/{employeeName}/New");
     }
 
-    private void PageChanged(int i)
+    private void PageChanged(int i) // Change name
     {
         _table.NavigateTo(i - 1);
     }
