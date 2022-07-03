@@ -488,7 +488,7 @@ AS
 BEGIN
 	SELECT P.Email, P.Name, P.LastName1, P.LastName2, P.SSN, P.BankAccount, P.Adress, P.PhoneNumber, P.IsEnabled
 	FROM Agreement as A JOIN  Person as P ON A.EmployeeEmail = P.Email
-	Where A.ProjectName = @projectName
+	Where A.ProjectName = @projectName AND A.IsEnabled = 1
 END
 
 GO
@@ -499,7 +499,6 @@ BEGIN
 END
 
 -- AgreementType Stored procedures
-
 
 GO
 CREATE OR ALTER PROCEDURE GetAllAgreementTypes
@@ -544,7 +543,7 @@ AS
 BEGIN
 	UPDATE Agreement
 	SET Agreement.IsEnabled = 0, Agreement.Justification = @Justification, Agreement.ContractFinishDate = GETDATE()
-	WHERE Agreement.EmployeeEmail = @EmployeeEmail AND Agreement.EmployerEmail = @EmployerEmail AND Agreement.ProjectName = @ProjectName AND Agreement.IsEnabled = 1;
+	WHERE Agreement.EmployeeEmail = @EmployeeEmail AND Agreement.EmployerEmail = @EmployerEmail AND Agreement.ProjectName = @ProjectName;
 END
 
 GO
