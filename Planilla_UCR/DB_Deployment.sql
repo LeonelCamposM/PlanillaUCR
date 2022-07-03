@@ -564,6 +564,18 @@ BEGIN
 	A.ContractType = @ContractType
 END
 
+--Payments stored procedures 
+GO
+CREATE OR ALTER PROCEDURE GetEmployeePayments
+@employeeEmail VARCHAR(255)
+AS
+BEGIN
+	SELECT *
+	FROM Payment 
+	Where EmployeeEmail = @employeeEmail;
+END
+
+
 -- Data Insert
 GO
 INSERT INTO Person

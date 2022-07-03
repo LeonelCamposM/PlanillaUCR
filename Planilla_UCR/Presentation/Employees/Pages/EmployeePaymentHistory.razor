@@ -83,12 +83,20 @@
   
     private MudTable<PaymentHistoryModel>  _tablePaymentHistory;
     private IList<PaymentHistoryModel> _payments = new List<PaymentHistoryModel>();
+    private IList<Payment> _paymentsList = new List<Payment>();
   
-    private bool _loading = false;
+    private bool _loading = true;
     private bool _empty = true;
 
 
     //_lastPay = await PaymentService.GetEmployeeLastPayment(email, ContextMenuService.GetEmployerEmailContext(), projectName);
+
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _paymentsList = (IList<Payment>) await PaymentService.GetEmployeePayments(email);
+        _loading = false;
+    }
 
 }
 
