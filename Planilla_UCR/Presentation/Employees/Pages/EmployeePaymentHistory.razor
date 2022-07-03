@@ -91,12 +91,17 @@
 
     private MudTable<PaymentHistoryModel>  _tablePaymentHistory;
     private IList<PaymentHistoryModel> _payments = new List<PaymentHistoryModel>();
+
     private IList<Payment> _paymentsList = new List<Payment>();
     private IList<Subscription> _deductions = new List<Subscription>();
+    private IEnumerable<LegalDeduction> _legalDeductions = new List<LegalDeduction>();
+
     private CultureInfo _cultureCR = CultureInfo.GetCultureInfo("es-CR");
 
     private Agreement _agreement;
     private double _costVoluntaryDeductions;
+    private double _costLegalDeductions;
+    private double _costNetSalary;
 
 
     protected override async Task OnParametersSetAsync()
@@ -110,13 +115,15 @@
     {
         foreach (Payment payment in _paymentsList){
             await GetContractType(payment.EmployerEmail, payment.ProjectName);
-            await GetVoluntaryDeductionsCost(payment.EmployerEmail, payment.ProjectName, payment.StartDate,payment.EndDate);
+            _costVoluntaryDeductions = await GetVoluntaryDeductionsCost(payment.EmployerEmail, payment.ProjectName, payment.StartDate,payment.EndDate);
+            _costNetSalary = GetNetSalary(payment.GrossSalary, _costVoluntaryDeductions);
+            _costLegalDeductions = GetLegalDeductions(payment.GrossSalary, _costVoluntaryDeductions);
 
             PaymentHistoryModel _paymentHistoryModel = new PaymentHistoryModel(payment.ProjectName,  
                 _agreement.ContractType, payment.EndDate.ToShortDateString(),
-               CostFormat(payment.GrossSalary), _cultureCR.NumberFormat.CurrencySymbol+CostFormat(0.0),
+               CostFormat(payment.GrossSalary), _cultureCR.NumberFormat.CurrencySymbol+CostFormat(_costLegalDeductions),
                _cultureCR.NumberFormat.CurrencySymbol+CostFormat(_costVoluntaryDeductions), 
-               _cultureCR.NumberFormat.CurrencySymbol+CostFormat(0.0));
+               _cultureCR.NumberFormat.CurrencySymbol+CostFormat(_costNetSalary));
             _payments.Add(_paymentHistoryModel);
         }
     }
@@ -127,18 +134,44 @@
         _agreement = await AgreementService.GetContractee(toSearchagreement);
     }
 
-    private async Task GetVoluntaryDeductionsCost(string employerEmail, string projectName, DateTime startDate, DateTime endDate)
+    private async Task<double> GetVoluntaryDeductionsCost(string employerEmail, string projectName, DateTime startDate, DateTime endDate)
     {
+        double voluntaryDeductionsCost = 0.0;
         Subscribe searchSubscribe= new Subscribe(email,  employerEmail, projectName, "", 0.0, startDate,  endDate);
         IEnumerable<Subscription> subscriptions = await SubscribeService.GetSubscriptionCostsByDate(searchSubscribe);
         foreach (var item in subscriptions)
         {
             if(item.TypeSubscription == 0)
             {
-               _costVoluntaryDeductions += item.Cost;
+                voluntaryDeductionsCost += item.Cost;
             }
         }
+        return voluntaryDeductionsCost;
     }
+
+
+    private double GetLegalDeductions(double grossSalary, double voluntaryDedudctions)
+    {
+        double legalDeductionsCost = 0.0;
+        foreach (var item in _legalDeductions)
+        {
+            legalDeductionsCost += TaxCalculatorService.GetTaxAmount(item.DeductionName, grossSalary);
+        }
+        return legalDeductionsCost;
+    }
+
+
+    private double GetNetSalary(double grossSalary, double voluntaryDedudctions)
+    {
+        double netSalary = grossSalary;
+        netSalary -= voluntaryDedudctions;
+        foreach (var item in _legalDeductions)
+        {
+            netSalary -= TaxCalculatorService.GetTaxAmount(item.DeductionName, grossSalary);
+        }
+        return netSalary;
+    }
+
 
     private string CostFormat(double cost)
     {
