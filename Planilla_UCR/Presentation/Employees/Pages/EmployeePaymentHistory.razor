@@ -83,8 +83,8 @@
 
 
 @code {
-        [Parameter]
-        public string email { get; set; }
+    [Parameter]
+    public string email { get; set; }
 
     private bool _loading = true;
     private bool _empty = true;
@@ -92,11 +92,11 @@
     private MudTable<PaymentHistoryModel>  _tablePaymentHistory;
     private IList<PaymentHistoryModel> _payments = new List<PaymentHistoryModel>();
     private IList<Payment> _paymentsList = new List<Payment>();
+    private IList<Subscription> _deductions = new List<Subscription>();
     private CultureInfo _cultureCR = CultureInfo.GetCultureInfo("es-CR");
-    
 
-
-    //_lastPay = await PaymentService.GetEmployeeLastPayment(email, ContextMenuService.GetEmployerEmailContext(), projectName);
+    private Agreement _agreement;
+    private double _costVoluntaryDeductions;
 
 
     protected override async Task OnParametersSetAsync()
@@ -109,9 +109,34 @@
     private async Task GetPaymentHistory()
     {
         foreach (Payment payment in _paymentsList){
-            PaymentHistoryModel _paymentHistoryModel = new PaymentHistoryModel(payment.ProjectName, "tipo contrato", payment.EndDate.ToShortDateString(),
-               CostFormat(payment.GrossSalary), _cultureCR.NumberFormat.CurrencySymbol+CostFormat(0.0), _cultureCR.NumberFormat.CurrencySymbol+CostFormat(0.0), _cultureCR.NumberFormat.CurrencySymbol+CostFormat(0.0));
+            await GetContractType(payment.EmployerEmail, payment.ProjectName);
+            await GetVoluntaryDeductionsCost(payment.EmployerEmail, payment.ProjectName, payment.StartDate,payment.EndDate);
+
+            PaymentHistoryModel _paymentHistoryModel = new PaymentHistoryModel(payment.ProjectName,  
+                _agreement.ContractType, payment.EndDate.ToShortDateString(),
+               CostFormat(payment.GrossSalary), _cultureCR.NumberFormat.CurrencySymbol+CostFormat(0.0),
+               _cultureCR.NumberFormat.CurrencySymbol+CostFormat(_costVoluntaryDeductions), 
+               _cultureCR.NumberFormat.CurrencySymbol+CostFormat(0.0));
             _payments.Add(_paymentHistoryModel);
+        }
+    }
+
+    private async Task GetContractType(string employerEmail,string projectName)
+    {
+        Agreement toSearchagreement = new Agreement(email, employerEmail, projectName, null, "", 0, null, 1, "");
+        _agreement = await AgreementService.GetContractee(toSearchagreement);
+    }
+
+    private async Task GetVoluntaryDeductionsCost(string employerEmail, string projectName, DateTime startDate, DateTime endDate)
+    {
+        Subscribe searchSubscribe= new Subscribe(email,  employerEmail, projectName, "", 0.0, startDate,  endDate);
+        IEnumerable<Subscription> subscriptions = await SubscribeService.GetSubscriptionCostsByDate(searchSubscribe);
+        foreach (var item in subscriptions)
+        {
+            if(item.TypeSubscription == 0)
+            {
+               _costVoluntaryDeductions += item.Cost;
+            }
         }
     }
 
