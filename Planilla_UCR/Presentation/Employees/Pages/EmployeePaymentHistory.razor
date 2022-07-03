@@ -1,0 +1,95 @@
+﻿@using Application.Payments
+@using Application.ContextMenu
+@using Domain.Payments.Entities
+@using Application.Agreements
+@using Domain.Agreements.Entities
+@using Application.Subscriptions
+@using Domain.People.Entities
+@using Domain.Subscriptions.Entities
+@using Application.LegalDeductions
+@using Domain.LegalDeductions.Entities
+@using Application.Subscribes
+@using Domain.Subscribes.Entities
+@using System.Globalization
+@using Presentation.Payments.Models
+@using Application.People
+@using Application.TaxCalculator
+@using Presentation.Employees.Models
+
+@inject IPaymentService PaymentService
+@inject IContextMenuService ContextMenuService
+@inject IAgreementService AgreementService
+@inject ILegalDeductionService LegalDeductionService
+@inject IPersonService PersonService
+@inject ISubscribeService SubscribeService
+@inject NavigationManager nav
+@inject ISubscriptionService SuscriptionService
+@inject ITaxCalculatorService TaxCalculatorService
+@page "/{email}/Payment_History"
+
+@if(_loading) 
+{
+    <MudPaper  Height="220px" Width="100%" Outlined="false" Class="border-none pa-4" Elevation="0">
+         <MudText Align="Align.Center" Typo="Typo.h6">
+              <MudProgressCircular Color="Color.Primary" Style="height:70px;width:70px;" Indeterminate="true" />
+        </MudText>
+       
+    </MudPaper>
+} else 
+{
+    List<BreadcrumbItem> _items = new List<BreadcrumbItem>
+    {
+        new BreadcrumbItem("Proyectos", href: $"/Projects/{email}"),
+        new BreadcrumbItem("Reporte histórico de pagos", href: null, disabled: true)
+    }; 
+    <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
+    <MudPaper Height="60px" Width="100%" Outlined="false" Class="border-none" Elevation="0"> 
+    </MudPaper>
+    if (_empty)
+    {
+        <MudTable @ref="@_tablePaymentHistory" Items="@_payments" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading">
+            <ToolBarContent>
+                    <MudText Align="Align.Center" Typo="Typo.h6">Reporte histórico de pagos:</MudText>
+                    <MudSpacer /> 
+            </ToolBarContent> 
+            <HeaderContent>
+                <MudTh>Proyecto</MudTh>
+                <MudTh>Tipo contrato</MudTh>
+                <MudTh>Fecha pago</MudTh>
+                <MudTh>Salario Bruto</MudTh>
+                <MudTh>Deducciones obligatorias</MudTh>
+                <MudTh>Deducciones voluntarias</MudTh>
+                <MudTh>Salario neto</MudTh>
+            </HeaderContent>
+           
+            <RowTemplate>
+                    <MudTd DataLabel="Proyecto"></MudTd>
+                    <MudTd DataLabel="Tipo contrato"></MudTd>
+            </RowTemplate>
+        </MudTable>
+   
+    }else
+    {
+        <MudText Align="Align.Center" Typo="Typo.h6">
+            No existen pagos
+        </MudText>
+    }
+}
+
+
+@code {
+    [Parameter]
+    public string email { get; set; }
+  
+    private MudTable<PaymentHistoryModel>  _tablePaymentHistory;
+    private IList<PaymentHistoryModel> _payments = new List<PaymentHistoryModel>();
+  
+    private bool _loading = false;
+    private bool _empty = true;
+
+
+    //_lastPay = await PaymentService.GetEmployeeLastPayment(email, ContextMenuService.GetEmployerEmailContext(), projectName);
+
+}
+
+      
