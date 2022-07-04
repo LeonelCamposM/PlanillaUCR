@@ -95,14 +95,11 @@
     [Parameter]
     public string projectName { get; set; }
     private IEnumerable<Person> _elements = new List<Person>();
-    IEnumerable<Person> _hiredEmployees;
+    private IEnumerable<Person> _hiredEmployees = new List<Person>();
     private MudTable<Person> _table;
-    private bool _hidePosition;
     private bool _loading = true;
     private bool _empty = false;
     private string _mySearchString = "";
-
-    IEnumerable<Agreement> _allAgreements;
 
 
     protected override async Task OnInitializedAsync()
@@ -110,28 +107,26 @@
         ContextMenuService.SetProjectsContext(true, true, projectName, employerEmail, false);
         _elements = await PersonService.GetAllEmployees(projectName);
         _hiredEmployees =  await PersonService.GetProjectEmployees(projectName);
-        PopulateJoinAttribute();
-        CheckJoinLenght();
+        RemoveHiredEmployees();
+        CheckElementLength();
         _loading = false;
     }
 
 
-    private void PopulateJoinAttribute() 
+    private void RemoveHiredEmployees() 
     {
-        var myResult = (from num in _elements
-                        select num)
+        _elements = (from myElement in _elements
+                        select myElement)
                        .Except(_hiredEmployees).ToList();
-        _elements = myResult;
     }
 
-    private void CheckJoinLenght()
+    private void CheckElementLength()
     {
         if (_elements.Length() == 0)
         {
             _empty = true;
         }
     }
-
 
     private void GoToCreateEmployee()
     {
@@ -144,9 +139,9 @@
         nav.NavigateTo($"/Agreements/{employerEmail}/{projectName}/{employeeEmail}/{employeeName}/New");
     }
 
-    private void PageChanged(int i) // Change name
+    private void PageChanged(int index)
     {
-        _table.NavigateTo(i - 1);
+        _table.NavigateTo(index - 1);
     }
 
     private bool Filter(Person element) => FilterFunction(element, _mySearchString);
