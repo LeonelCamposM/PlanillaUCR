@@ -31,7 +31,6 @@
         <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
         <MudPaper Height="60px" Width="100%" Outlined="false" Class="border-none" Elevation="0"> 
         </MudPaper>
-
         if (!_empty)
         {
                 <MudTable @ref="@_table" Items="@_elements"  RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" Filter="new Func<Person,bool>(Filter)">
@@ -46,9 +45,8 @@
                         <MudTh>Cedula</MudTh>
                         <MudTh>Acciones</MudTh>
                     </HeaderContent>
-
                     <RowTemplate>
-                        <MudTd DataLabel="Nombre completo">@context.Name, @context.LastName1, @context.LastName2</MudTd>
+                        <MudTd DataLabel="Nombre completo">@context.Name @context.LastName1 @context.LastName2</MudTd>
                         <MudTd DataLabel="Email">@context.Email</MudTd>
                         <MudTd DataLabel="Cedula">@context.Ssn</MudTd>
                          <MudTd DataLabel="Acciones">
@@ -63,8 +61,7 @@
                 <PagerContent>
                     <MudPagination SelectedChanged="PageChanged" Count="@((_table.GetFilteredItemsCount() + _table.RowsPerPage - 1) / _table.RowsPerPage)" Color="Color.Primary" Class="pa-4"/>
                 </PagerContent>
-                </MudTable>
-                
+                </MudTable>    
         } 
         else
         {
@@ -88,7 +85,6 @@
             </MudText> 
         </MudButton>
 }
-
 @code {
     [Parameter]
     public string employerEmail { get; set; }
@@ -101,7 +97,6 @@
     private bool _empty = false;
     private string _mySearchString = "";
 
-
     protected override async Task OnInitializedAsync()
     {
         ContextMenuService.SetProjectsContext(true, true, projectName, employerEmail, false);
@@ -111,7 +106,6 @@
         CheckElementLength();
         _loading = false;
     }
-
 
     private void RemoveHiredEmployees() 
     {
@@ -154,5 +148,4 @@
             return true;
         return false;
     }
-
 }
