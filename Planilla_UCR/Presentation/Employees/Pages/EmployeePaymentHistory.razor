@@ -15,7 +15,12 @@
 @using Application.People
 @using Application.TaxCalculator
 @using Presentation.Employees.Models
-
+@using Presentation.Shared.Models
+@using Presentation.Core.Components
+@using System.Text.RegularExpressions
+@using System.ComponentModel.DataAnnotations
+@using System.IO
+@using CsvHelper
 @inject IPaymentService PaymentService
 @inject IContextMenuService ContextMenuService
 @inject IAgreementService AgreementService
@@ -25,6 +30,7 @@
 @inject NavigationManager nav
 @inject ISubscriptionService SuscriptionService
 @inject ITaxCalculatorService TaxCalculatorService
+@inject ISnackbar Snackbar
 @page "/{email}/Payment_History"
 
 @if(_loading) 
@@ -73,7 +79,7 @@
             </RowTemplate>
         </MudTable>
          <br>
-        <MudButton OnClick="Export" Variant="Variant.Filled" Color="Color.Primary">
+        <MudButton OnClick="ExportExcel" Variant="Variant.Filled" Color="Color.Primary">
                 <MudText>Exportar excel</MudText>
         </MudButton>
 
@@ -91,11 +97,13 @@
     [Parameter]
     public string email { get; set; }
 
+    SnackHandler snackHandler = new SnackHandler();
     private bool _loading = true;
     private bool _empty = true;
 
     private MudTable<PaymentHistoryModel>  _tablePaymentHistory;
     private IList<PaymentHistoryModel> _payments = new List<PaymentHistoryModel>();
+    private IEnumerable<PaymentHistoryModel> _payments2 = new List<PaymentHistoryModel>();
 
     private IList<Payment> _paymentsList = new List<Payment>();
     private IList<Subscription> _deductions = new List<Subscription>();
@@ -112,11 +120,11 @@
     protected override async Task OnParametersSetAsync()
     {
         _paymentsList = (IList<Payment>) await PaymentService.GetEmployeePayments(email);
-        await GetPaymentHistory();
+        _payments2 = await GetPaymentHistory();
         _loading = false;
     }
 
-    private async Task GetPaymentHistory()
+    private async Task<IList<PaymentHistoryModel>> GetPaymentHistory()
     {
         foreach (Payment payment in _paymentsList){
             await GetContractType(payment.EmployerEmail, payment.ProjectName);
@@ -124,14 +132,12 @@
             _costNetSalary = await GetNetSalary(payment.GrossSalary, _costVoluntaryDeductions);
             _costLegalDeductions = await GetLegalDeductions(payment.GrossSalary, _costVoluntaryDeductions);
 
-            PaymentHistoryModel _paymentHistoryModel = new PaymentHistoryModel(payment.ProjectName,  
-                _agreement.ContractType, payment.EndDate.ToShortDateString(),
-               _cultureCR.NumberFormat.CurrencySymbol+CostFormat(payment.GrossSalary), 
-               _cultureCR.NumberFormat.CurrencySymbol+CostFormat(_costLegalDeductions),
-               _cultureCR.NumberFormat.CurrencySymbol+CostFormat(_costVoluntaryDeductions), 
-               _cultureCR.NumberFormat.CurrencySymbol+CostFormat(_costNetSalary));
+            PaymentHistoryModel _paymentHistoryModel = new PaymentHistoryModel(payment.ProjectName,  _agreement.ContractType,
+                payment.EndDate.ToShortDateString(), CostFormat(payment.GrossSalary),CostFormat(_costLegalDeductions),
+               CostFormat(_costVoluntaryDeductions), CostFormat(_costNetSalary));
             _payments.Add(_paymentHistoryModel);
         }
+        return _payments;
     }
 
     private async Task GetContractType(string employerEmail,string projectName)
@@ -170,7 +176,7 @@
     {
         double netSalary = grossSalary;
         netSalary -= voluntaryDedudctions;
-         _legalDeductions = await LegalDeductionService.GetAllAsync();
+        _legalDeductions = await LegalDeductionService.GetAllAsync();
         foreach (var item in _legalDeductions)
         {
             netSalary -= TaxCalculatorService.GetTaxAmount(item.DeductionName, grossSalary);
@@ -184,23 +190,84 @@
         return formatedCost;
     }
 
-    public void Export(){
-
-
-    }
-
-    
-
-    public static IEnumerable<string> ToCsv<T>(IEnumerable<T> list)
+    public void ExportExcel()
     {
-        var fields = typeof(T).GetFields();
-        var properties = typeof(T).GetProperties();
-
-        foreach (var @object in list)
-        {
-            yield return string.Join(",", fields.Select(x => (x.GetValue(@object) ?? string.Empty).ToString())
-                    .Concat(properties.Select(p => (p.GetValue(@object, null) ?? string.Empty).ToString())) .ToArray());
-        }
+        Export<PaymentHistoryModel>(_payments2, "Histórico de pagos.csv");
+        ShowSnackNotification("Excel descargado", Severity.Success);
     }
 
+    public void Export<PaymentHistoryModel>(IEnumerable<PaymentHistoryModel> list,string file)
+    {
+	    var lines = GetLines(list);
+	    System.IO.File.WriteAllLines(file,lines);
+    }
+
+    private IEnumerable<string> GetLines<T>(IEnumerable<T> list)
+    {
+        var type = typeof(T);
+	    var props = type.GetProperties();
+	    string[] headings = { "Proyecto", "Tipo de contrato","Fecha pago","Salario Bruto","Deducciones obligatorias",
+            "Deducciones voluntarias","Salario neto"};
+
+
+	    string header = "";
+	    var firstDone = false;
+	    foreach(var prop in headings)
+	    {
+		    if(!firstDone)
+		    {
+			    header +=prop;
+			    firstDone=true;
+		    }
+		    else
+		    { 
+			    header +=";"+ prop;
+		    }
+	    }
+
+	    List<string> lines = new List<string>();
+	    lines.Add(header);
+	    foreach(var obj in list)
+	    {
+		    firstDone = false;
+		    string line = "";
+		    foreach(var prop in props)
+		    {
+			    var value = prop.GetValue(obj).ToString();
+			    if(typeof(string)==prop.PropertyType)
+			    {
+				    value = "\""+value+"\"";
+			    }
+			
+			    if(!firstDone)
+			    {
+				    line +=value;
+				    firstDone=true;
+			    }
+			    else
+			    {
+				    line += ";"+value;
+			    }
+		    }
+		    lines.Add(line);
+	    }
+	    return lines;
+    }
+    
+    void ShowSnackNotification(string message, Severity severity)
+    {
+        Snackbar.Configuration.SnackbarVariant = Variant.Filled;
+        Snackbar.Configuration.PreventDuplicates = false;
+        Snackbar.Configuration.MaxDisplayedSnackbars = 10;
+        Snackbar.Configuration.NewestOnTop = true;
+        Snackbar.Add($"{message}", severity, config =>
+        {
+            config.RequireInteraction = false;
+            config.ShowCloseIcon = true;
+            config.Onclick = snackbar =>
+            {
+                return Task.CompletedTask;
+            };
+        });
+    }
 }     
