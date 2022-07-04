@@ -175,12 +175,12 @@
         _agreements = await AgreementService.GetAllAgreementsByProjectAndEmployer(projectName, email);
         _agreementType = await AgreementTypeService.GetAllAgreementTypes();
         _people = await EmployeeService.GetProjectEmployees(projectName);
-        populateJoinAttribute();
-        checkJoinLenght();
+        PopulateJoinAttribute();
+        CheckJoinLenght();
         _loading = false;
     }
 
-    private void populateJoinAttribute() 
+    private void PopulateJoinAttribute() 
     { 
         _myJoin = from P in _projects
                   join A in _agreements on P.ProjectName equals A.ProjectName
@@ -200,7 +200,7 @@
                     };
     }
 
-    private void checkJoinLenght()
+    private void CheckJoinLenght()
     {
         if (_myJoin.Length() == 0)
         {
@@ -224,7 +224,7 @@
 
     private async Task FireEmployee()
     {
-        bool chekedJustificationLength = checkJustificationLength();
+        bool chekedJustificationLength = CheckJustificationLength();
         if (chekedJustificationLength)
         {
             CloseDialog();
@@ -244,9 +244,9 @@
         _table.NavigateTo(i - 1);
     }
 
-    private bool Filter(JoinedTables element) => FilterFunc(element, _mySearchString);
+    private bool Filter(JoinedTables element) => FilterFunction(element, _mySearchString);
 
-    private bool FilterFunc(JoinedTables element, string searchString)
+    private bool FilterFunction(JoinedTables element, string searchString)
     {
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
@@ -279,7 +279,7 @@
         });
     }
 
-    private bool checkJustificationLength()
+    private bool CheckJustificationLength()
     {
         bool result = true;
         if (_justificationToBeDeleted.Length == 0)

@@ -174,7 +174,7 @@
 
     private async Task TryToAdd()
     {
-        bool isValid = await validateFields();
+        bool isValid = await ValidateFields();
         if (isValid)
         {
             await SaveAgreementType();
@@ -185,17 +185,17 @@
 
     }
 
-    private async Task<bool> validateFields()
+    private async Task<bool> ValidateFields()
     {
         await form.Validate();
         bool isValid = false;
         if (form.IsValid)
         {
-            bool isValidDates = validateDates();
-            bool isValidEmployeeEmail = await validateEmployeeEmail();
-            bool isValidEmployerEmail = await validateEmployerEmail();
-            bool isValidProjectName = await validateProjectName();
-            bool isValidAgreementSalary = await validateAgreementTypeOfContractee();
+            bool isValidDates = ValidateDates();
+            bool isValidEmployeeEmail = await ValidateEmployeeEmail();
+            bool isValidEmployerEmail = await ValidateEmployerEmail();
+            bool isValidProjectName = await ValidateProjectName();
+            bool isValidAgreementSalary = await ValidateAgreementTypeOfContractee();
             isValid = isValidDates && isValidEmployeeEmail && isValidEmployerEmail && isValidProjectName && isValidAgreementSalary;
         }
 
@@ -206,8 +206,8 @@
     {
         bool isValid = false;
         _saving = true;
-        parseAgreementType();
-        isValid = await checkAgreementType(myAgreementType.TypeAgreement, myAgreementType.MountPerHour);
+        ParseAgreementType();
+        isValid = await CheckAgreementType(myAgreementType.TypeAgreement, myAgreementType.MountPerHour);
         if (isValid) 
         {         
             await AgreementTypeService.CreateAgreementTypeAsync(myAgreementType);
@@ -219,13 +219,13 @@
     private async Task SaveAgreement()
     {
         _saving = true;
-        formatDates();
+        FormatDates();
         await AgreementService.CreateAgreementAsync(myAgreement);
         _saving = false;
         ShowSnackNotification("Contrato establecido", Severity.Success);
     }
 
-    private bool validateDates()
+    private bool ValidateDates()
     {
         bool isValid = true;
         if (startDate > endDate)
@@ -254,13 +254,13 @@
         });
     }
 
-    private void formatDates()
+    private void FormatDates()
     {
         myAgreement.ContractStartDate = startDate;
         myAgreement.ContractFinishDate = endDate;
     }
 
-    private async Task<bool> validateEmployeeEmail()
+    private async Task<bool> ValidateEmployeeEmail()
     {
         bool isValid = true;
         IEnumerable<Employee> employeeList = await EmployeeService.GetEmployeeByEmail(myAgreement.EmployeeEmail);
@@ -281,7 +281,7 @@
         return isValid;
     }
 
-    private async Task<bool> validateEmployerEmail()
+    private async Task<bool> ValidateEmployerEmail()
     {
         bool isValid = true;
         IEnumerable<Person> personList = await PersonService.GetPersonByEmail(myAgreement.EmployerEmail);
@@ -293,7 +293,7 @@
         return isValid;
     }
 
-    private async Task<bool> validateAgreementTypeOfContractee()
+    private async Task<bool> ValidateAgreementTypeOfContractee()
     {
         bool isValid = true;
         myAgreement.MountPerHour = (int)_salaryPerHour;
@@ -307,7 +307,7 @@
         return isValid;
     }
 
-    private async Task<bool> validateProjectName()
+    private async Task<bool> ValidateProjectName()
     {
         bool isValid = true;
         Project Project = new Project("","","",0,0,"", 1);
@@ -326,13 +326,13 @@
         nav.NavigateTo($"/Agreements/{employerEmail}/{projectName}");
     }
 
-    private void parseAgreementType()
+    private void ParseAgreementType()
     {
         myAgreementType.TypeAgreement = myAgreement.ContractType;
         myAgreementType.MountPerHour = (int)_salaryPerHour;
     }
 
-    private async Task<bool> checkAgreementType(string myAgreement, int mountPerHour)
+    private async Task<bool> CheckAgreementType(string myAgreement, int mountPerHour)
     {
         bool isValid = true;
         IEnumerable<AgreementType>salaryList = await AgreementTypeService.checkAgreementType(myAgreement, mountPerHour);

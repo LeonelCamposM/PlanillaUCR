@@ -110,13 +110,13 @@
         ContextMenuService.SetProjectsContext(true, true, projectName, employerEmail, false);
         _elements = await PersonService.GetAllEmployees(projectName);
         _hiredEmployees =  await PersonService.GetProjectEmployees(projectName);
-        populateJoinAttribute();
-        checkJoinLenght();
+        PopulateJoinAttribute();
+        CheckJoinLenght();
         _loading = false;
     }
 
 
-    private void populateJoinAttribute() 
+    private void PopulateJoinAttribute() 
     {
         var myResult = (from num in _elements
                         select num)
@@ -124,7 +124,7 @@
         _elements = myResult;
     }
 
-    private void checkJoinLenght()
+    private void CheckJoinLenght()
     {
         if (_elements.Length() == 0)
         {
@@ -149,9 +149,9 @@
         _table.NavigateTo(i - 1);
     }
 
-    private bool Filter(Person element) => FilterFunc(element, _mySearchString);
+    private bool Filter(Person element) => FilterFunction(element, _mySearchString);
 
-    private bool FilterFunc(Person element, string searchString)
+    private bool FilterFunction(Person element, string searchString)
     {
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
