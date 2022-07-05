@@ -273,12 +273,13 @@
     {
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
-        if (element.ProjectName.Contains(searchString1, StringComparison.OrdinalIgnoreCase))
+        if (element.ProjectName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
-        if (element.ContractType.Contains(searchString2, StringComparison.OrdinalIgnoreCase))
+        if (element.ContractType.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
-        if (element.ProjectName.Contains(searchString3, StringComparison.OrdinalIgnoreCase))
+        if (element.PaymentDate.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
+       
         return false;
     }
 
