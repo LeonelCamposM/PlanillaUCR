@@ -54,7 +54,7 @@
     </MudPaper>
     if (_empty)
     {
-        <MudTable @ref="@_tablePaymentHistory" Items="@_payments" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" Filter="new Func<PaymentHistoryModel,bool>(FilterFuncProjectName)">
+        <MudTable @ref="@_tablePaymentHistory" Items="@_payments" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" Filter="new Func<PaymentHistoryModel,bool>(FiltersFunc)">
             <ToolBarContent>
                 <MudText Align="Align.Center" Typo="Typo.h6">Reporte histórico de pagos:</MudText>
                 <MudSpacer></MudSpacer>
@@ -270,9 +270,9 @@
         paymentDateFilter = selected; 
     }
 
-    private bool FilterFuncProjectName(PaymentHistoryModel element) => FilterFuncProject(element, projectNameFilter,contracTypeFilter, paymentDateFilter);
+    private bool FiltersFunc(PaymentHistoryModel element) => FilterFunc(element, projectNameFilter,contracTypeFilter, paymentDateFilter);
 
-    private bool FilterFuncProject(PaymentHistoryModel element, string searchString1, string searchString2, string searchString3)
+    private bool FilterFunc(PaymentHistoryModel element, string searchString1, string searchString2, string searchString3)
     {
         bool projectNameBool = (element.ProjectName.Equals(searchString1));
         bool contractTypeBool = (element.ContractType.Contains(searchString2, StringComparison.OrdinalIgnoreCase));
@@ -283,7 +283,6 @@
             return true;
         if( (projectNameBool && contractTypeBool && paymentDateBool)  || ((contractTypeBool && paymentDateBool)  && string.IsNullOrWhiteSpace(searchString1)))
             return true;
-            
          if((string.IsNullOrWhiteSpace(searchString1) && string.IsNullOrWhiteSpace(searchString2) && string.IsNullOrWhiteSpace(searchString3)))
             return true;
             
