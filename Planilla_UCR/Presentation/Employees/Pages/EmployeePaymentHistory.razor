@@ -45,6 +45,7 @@
 {
     List<BreadcrumbItem> _items = new List<BreadcrumbItem>
     {
+        new BreadcrumbItem("Inicio", href: ""),
         new BreadcrumbItem("Proyectos", href: $"/Projects/{email}"),
         new BreadcrumbItem("Reporte histórico de pagos", href: null, disabled: true)
     }; 
@@ -60,16 +61,18 @@
 
                 <MudItem xs="2">
                 <MudSelect Dense="true" T="string" Label="Proyecto" Variant="Variant.Outlined" TextChanged="OnProjectNameSelect">
-                     @foreach (var state in _paymentsProjectNames) {
-                    <MudSelectItem T="string" Value="@state">
-                        @state
-                    </MudSelectItem>
+                    <MudSelectItem Value="@(" ")"/>
+                    @foreach (var state in _paymentsProjectNames) {
+                        <MudSelectItem T="string" Value="@state">
+                            @state
+                        </MudSelectItem>
                     }   
                 </MudSelect>
                 </MudItem>
                 
                 <MudItem xs="2">
                 <MudSelect Dense="true" T="string" Label="Tipo contrato" Variant="Variant.Outlined"  TextChanged="OnContractTypeSelect">
+                    <MudSelectItem Value="@(" ")"/>
                     <MudSelectItem Value="@("Medio tiempo")"/>
                     <MudSelectItem Value="@("Servicios profesionales")"/>
                     <MudSelectItem Value="@("Tiempo completo")"/>
@@ -78,10 +81,11 @@
                 
                 <MudItem xs="2">
                 <MudSelect Dense="true" T="string" Label="Fecha" Variant="Variant.Outlined"  TextChanged="OnPaymentDateSelect">
+                     <MudSelectItem Value="@(" ")"/>
                     @foreach (var state in _paymentsDates) {
-                    <MudSelectItem T="string" Value="@state">
-                        @state
-                    </MudSelectItem>
+                        <MudSelectItem T="string" Value="@state">
+                            @state
+                        </MudSelectItem>
                     }   
                 </MudSelect>
                 </MudItem>
@@ -124,10 +128,10 @@
 
 
 @code {
-    [Parameter]
-    public string email { get; set; }
+        [Parameter]
+        public string email { get; set; }
 
-    SnackHandler snackHandler = new SnackHandler();
+        SnackHandler snackHandler = new SnackHandler();
     private bool _loading = true;
     private bool _empty = true;
 
@@ -253,8 +257,8 @@
     }
 
     private void OnProjectNameSelect(string selected) {
-       filterString = selected;
-       projectNameFilter = selected;
+        filterString = selected;
+        projectNameFilter = selected;
     }
 
     private void OnContractTypeSelect(string selected) {
@@ -263,23 +267,23 @@
     }
 
     private void OnPaymentDateSelect(string selected) {
-       filterString = selected;
-       paymentDateFilter = selected; 
+        filterString = selected;
+        paymentDateFilter = selected; 
     }
 
     private bool FilterFuncProjectName(PaymentHistoryModel element) => FilterFuncProject(element,  filterString, projectNameFilter,contracTypeFilter, paymentDateFilter);
 
     private bool FilterFuncProject(PaymentHistoryModel element, string searchString, string searchString1, string searchString2, string searchString3)
     {
-        if (string.IsNullOrWhiteSpace(searchString))
+        bool projectNameBool = (element.ProjectName.Contains(searchString1, StringComparison.OrdinalIgnoreCase));
+        bool contractTypeBool = (element.ContractType.Contains(searchString2, StringComparison.OrdinalIgnoreCase));
+        bool paymentDateBool = (element.PaymentDate.Contains(searchString3, StringComparison.OrdinalIgnoreCase));
+        if( (projectNameBool && contractTypeBool && paymentDateBool)  || ((projectNameBool && contractTypeBool)  && string.IsNullOrWhiteSpace(searchString3)))
             return true;
-        if (element.ProjectName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        if( (projectNameBool && contractTypeBool && paymentDateBool)  || ((projectNameBool && paymentDateBool)  && string.IsNullOrWhiteSpace(searchString2)))
             return true;
-        if (element.ContractType.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        if( (projectNameBool && contractTypeBool && paymentDateBool)  || ((contractTypeBool && paymentDateBool)  && string.IsNullOrWhiteSpace(searchString1)))
             return true;
-        if (element.PaymentDate.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-       
         return false;
     }
 
