@@ -110,7 +110,7 @@
                         <MudButton Disabled = "true"></MudButton>
                         <MudButton Disabled = "true"></MudButton>
                         <MudButton Disabled = "true"></MudButton>                 
-                        <MudButton Disabled="@_saving" @bind-IsValid="@_canSend" Variant="Variant.Filled" Color="Color.Primary" DisableElevation="true" OnClick="TryToAdd">                    
+                        <MudButton Disabled="@_saving" @bind-IsValid="@_canSend" Variant="Variant.Filled" Color="Color.Primary" DisableElevation="true" OnClick="TryToEstablishAgreement">                    
                             @if (_saving)
                             {
                                 <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true"/>
@@ -158,7 +158,7 @@
         _isLoading = false;
     }
 
-    private async Task TryToAdd()
+    private async Task TryToEstablishAgreement()
     {
         bool isValid = await ValidateFields();
         if (isValid)
@@ -204,9 +204,18 @@
 
     private async Task SaveAgreement()
     {
+        bool isOld = false;
         _saving = true;
         FormatDates();
-        await AgreementService.CreateAgreementAsync(_myAgreement);
+        isOld = await CheckIfAgreementIsDesactivated();
+        if (isOld)
+        {
+            UpdateAgreementStatus();       
+        }
+        else
+        {
+            await AgreementService.CreateAgreementAsync(_myAgreement);
+        }
         _saving = false;
         ShowSnackNotification("Contrato establecido", Severity.Success);
     }
@@ -327,5 +336,21 @@
             isValid=false;
         }
         return isValid;
+    }
+
+    private async Task<bool> CheckIfAgreementIsDesactivated()
+    {
+        bool isAnExistingAgreement = false;
+        IEnumerable<Agreement> agreementList = await AgreementService.CheckIfAgreementIsDesactivated(_myAgreement);
+        if (agreementList.Count() != 0)
+        {
+            isAnExistingAgreement = true;
+        }
+        return isAnExistingAgreement;
+    }
+
+    private void UpdateAgreementStatus()
+    {
+        AgreementService.UpdateAgreementStatus(_myAgreement);
     }
 }

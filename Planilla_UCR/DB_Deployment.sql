@@ -477,7 +477,7 @@ AS
 BEGIN
 	SELECT P.Email, P.Name, P.LastName1, P.LastName2, P.SSN, P.BankAccount, P.Adress, P.PhoneNumber, P.IsEnabled
 	FROM Employee JOIN  Person AS P ON Employee.Email = P.Email left JOIN Agreement as A ON A.EmployeeEmail = Employee.Email
-	Where A.ProjectName IS NULL OR A.ProjectName != @projectName
+	Where A.ProjectName IS NULL OR A.ProjectName != @projectName OR A.IsEnabled <= 1
 	Group by P.Email, P.Name, P.LastName1, P.LastName2, P.SSN, P.BankAccount, P.Adress, P.PhoneNumber, P.IsEnabled
 END
 
@@ -532,7 +532,6 @@ BEGIN
 	WHERE A.ProjectName = @Project AND A.EmployerEmail = @EmployerEmail AND A.IsEnabled = 1 AND A.ContractFinishDate > GETDATE()
 END
 
-
 GO
 CREATE OR ALTER PROCEDURE DesactivateAgreement(
 @EmployeeEmail varchar(255), 
@@ -542,7 +541,7 @@ CREATE OR ALTER PROCEDURE DesactivateAgreement(
 AS
 BEGIN
 	UPDATE Agreement
-	SET Agreement.IsEnabled = 0, Agreement.Justification = @Justification, Agreement.ContractFinishDate = GETDATE()
+	SET Agreement.IsEnabled = -1, Agreement.Justification = @Justification, Agreement.ContractFinishDate = GETDATE()
 	WHERE Agreement.EmployeeEmail = @EmployeeEmail AND Agreement.EmployerEmail = @EmployerEmail AND Agreement.ProjectName = @ProjectName;
 END
 
@@ -561,6 +560,36 @@ BEGIN
 	A.EmployerEmail = @EmployerEmail AND
 	A.ProjectName = @ProjectName AND
 	A.ContractType = @ContractType
+END
+
+GO
+CREATE OR ALTER PROCEDURE CheckIfAgreementIsDesactivated(
+@EmployeeEmail varchar(255), 
+@EmployerEmail varchar(255),
+@ProjectName varchar(255))
+AS
+BEGIN
+	Select *
+	From Agreement as A
+	Where A.EmployeeEmail = @EmployeeEmail AND A.EmployerEmail = @EmployerEmail AND A.ProjectName = @ProjectName AND A.IsEnabled = -1 
+END
+
+GO
+CREATE OR ALTER PROCEDURE UpdateAgreementStatus(
+@EmployeeEmail varchar(255), 
+@EmployerEmail varchar(255),
+@ProjectName varchar(255),
+@ContractStartDate date,
+@ContractFinishDate date,
+@ContractType varchar(255),
+@MountPerHour int)
+AS
+BEGIN
+	UPDATE Agreement
+	SET Agreement.ContractStartDate = @ContractStartDate, Agreement.ContractType = @ContractType, 
+	Agreement.MountPerHour = @MountPerHour, Agreement.ContractFinishDate = @ContractFinishDate,
+	Agreement.IsEnabled = 1, Agreement.Justification = ''
+	WHERE Agreement.EmployeeEmail = @EmployeeEmail AND Agreement.EmployerEmail = @EmployerEmail AND Agreement.ProjectName = @ProjectName and Agreement.IsEnabled <= 0;
 END
 
 -- Data Insert
