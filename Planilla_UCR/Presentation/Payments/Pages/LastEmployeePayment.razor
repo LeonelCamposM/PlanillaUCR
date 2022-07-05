@@ -165,10 +165,13 @@
         double netSalary = _lastPay.GrossSalary;
         Subscribe searchSubscribe= new Subscribe(email, _lastPay.EmployerEmail, projectName, "", 0.0, _lastPay.StartDate, _lastPay.EndDate);
         IList<Subscription> subscriptions = (await SubscribeService.GetSubscriptionCostsByDate(searchSubscribe)).ToList();
-        _legalDeductions = await LegalDeductionService.GetAllAsync();
-        foreach (var item in _legalDeductions)
+        if (_payTaxes)
         {
-            netSalary -= TaxCalculatorService.GetTaxAmount(item.DeductionName, _lastPay.GrossSalary);
+            _legalDeductions = await LegalDeductionService.GetAllAsync();
+            foreach (var item in _legalDeductions)
+            {
+                netSalary -= TaxCalculatorService.GetTaxAmount(item.DeductionName, _lastPay.GrossSalary);
+            }
         }
         IList<Subscription> _deductionsNotPaid = new List<Subscription>();
         subscriptions = subscriptions.Where(e => e.TypeSubscription == 0).ToList();
@@ -176,7 +179,6 @@
         subscriptions = subscriptions.Except(_deductionsNotPaid).ToList();
         _deductions = subscriptions;
         netSalary -= _paymentCalculator.DeductionsCost(subscriptions);
-
         return netSalary;
     }
 
