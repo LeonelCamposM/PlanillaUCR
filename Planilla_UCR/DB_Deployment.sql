@@ -4,7 +4,6 @@ CREATE DATABASE DB_Planilla
 GO
 USE DB_Planilla
 
-
 -- Tables
 CREATE TABLE Person(
 	Email varchar(255) NOT NULL primary key,
@@ -119,30 +118,6 @@ CREATE TABLE Payment(
 	FOREIGN KEY(EmployeeEmail) REFERENCES Employee(Email)
 );
 
-CREATE TABLE PaymentContainsSubscription(
-	EmployeeEmail varchar(255) NOT NULL,
-	EmployerEmail varchar(255) NOT NULL,
-	ProjectName varchar(255) NOT NULL,
-	StartDate date NOT NULL,
-	EndDate date NOT NULL,
-	SubscriptionName varchar(255) NOT NULL,
-	PRIMARY KEY(EmployeeEmail,EmployerEmail,ProjectName, StartDate, EndDate, SubscriptionName),
-	FOREIGN KEY(EmployeeEmail, EmployerEmail,ProjectName, StartDate, EndDate) REFERENCES Payment(EmployeeEmail, EmployerEmail, ProjectName, StartDate, EndDate) ON UPDATE CASCADE,
-	FOREIGN KEY(EmployerEmail, ProjectName, SubscriptionName) REFERENCES Subscription(EmployerEmail, ProjectName, SubscriptionName) 
-);
-
-
-CREATE TABLE Applies(
-	EmployeeEmail varchar(255) NOT NULL,
-	EmployerEmail varchar(255) NOT NULL,
-	ProjectName varchar(255) NOT NULL,
-	StartDate date NOT NULL,
-	EndDate date NOT NULL,
-	DeductionName varchar(255) NOT NULL,
-	PRIMARY KEY(EmployeeEmail,EmployerEmail,ProjectName, StartDate, EndDate, DeductionName),
-	FOREIGN KEY(EmployeeEmail, EmployerEmail,ProjectName, StartDate, EndDate) REFERENCES Payment(EmployeeEmail, EmployerEmail, ProjectName, StartDate, EndDate) ON UPDATE CASCADE,
-	FOREIGN KEY(DeductionName) REFERENCES LegalDeduction(DeductionName)
-);
 
 -- Suscription Stored Procedures
 GO
@@ -739,6 +714,123 @@ VALUES('nyazofeifa3003@gmail.com',
 '2022-06-01'
 )
 
+----------------
+
+INSERT INTO Project
+VALUES('leonel@ucr.ac.cr',
+'Proyecto 2',
+'Emprendimiento de zapatos',
+22000,
+7,
+'Quincenal',
+1,
+'2022-06-01'
+)
+
+INSERT INTO Project
+VALUES('leonel@ucr.ac.cr',
+'Proyecto 6',
+'Emprendimiento de peluches',
+22000,
+7,
+'Quincenal',
+1,
+'2022-06-01'
+)
+
+INSERT INTO Project
+VALUES('leonel@ucr.ac.cr',
+'Proyecto 7',
+'Emprendimiento artesanal',
+22000,
+7,
+'Quincenal',
+1,
+'2022-06-01'
+)
+
+
+INSERT INTO Project
+VALUES('leonel@ucr.ac.cr',
+'Proyecto 8',
+'Emprendimiento tecnológico',
+22000,
+7,
+'Quincenal',
+1,
+'2022-06-01'
+)
+
+
+INSERT INTO Project
+VALUES('leonel@ucr.ac.cr',
+'Proyecto 9',
+'Emprendimiento de costura',
+22000,
+7,
+'Quincenal',
+1,
+'2022-06-01'
+)
+
+
+INSERT INTO Project
+VALUES('leonel@ucr.ac.cr',
+'Proyecto 10',
+'Salón de belleza',
+22000,
+7,
+'Quincenal',
+1,
+'2022-06-01'
+)
+
+INSERT INTO Project
+VALUES('leonel@ucr.ac.cr',
+'Proyecto 11',
+'Pulperia',
+22000,
+7,
+'Quincenal',
+1,
+'2022-06-01'
+)
+
+INSERT INTO Project
+VALUES('leonel@ucr.ac.cr',
+'Proyecto 12',
+'Chino',
+22000,
+7,
+'Quincenal',
+1,
+'2022-06-01'
+)
+
+INSERT INTO Project
+VALUES('leonel@ucr.ac.cr',
+'Proyecto 13',
+'Pulperia',
+22000,
+7,
+'Quincenal',
+1,
+'2022-06-01'
+)
+
+INSERT INTO Project
+VALUES('leonel@ucr.ac.cr',
+'Proyecto 14',
+'Emprendimiento de bolsos',
+22000,
+7,
+'Quincenal',
+1,
+'2022-06-01'
+)
+
+
+---------------
 
 INSERT INTO Subscription
 VALUES('leonel@ucr.ac.cr',
@@ -806,9 +898,10 @@ VALUES('leonel@ucr.ac.cr',
 1
 )
 
+-----------
 INSERT INTO Subscription
 VALUES('leonel@ucr.ac.cr',
-'Proyecto 1',
+'Proyecto 3',
 'Apple del futuro',
 'Apple',
 'Subscripción futura',
@@ -816,6 +909,43 @@ VALUES('leonel@ucr.ac.cr',
 0,
 1
 )
+
+
+INSERT INTO Subscription
+VALUES('leonel@ucr.ac.cr',
+'Proyecto 3',
+'Gym',
+'Golden Gym',
+'Gimnasio equipado con todo lo necesario.',
+25000,
+1,
+1
+)
+
+INSERT INTO Subscription
+VALUES('leonel@ucr.ac.cr',
+'Proyecto 3',
+'Piscina',
+'Aquanautas',
+'Piscinas temperadas, ubicadas en San Pedro.',
+12000,
+1,
+1
+)
+
+INSERT INTO Subscription
+VALUES('leonel@ucr.ac.cr',
+'Proyecto 3',
+'Starbucks descuento',
+'Starbucks',
+'Descuento en un starbucks',
+12000,
+0,
+1
+)
+
+-------------------
+
 
 INSERT INTO AgreementType
 VALUES('Tiempo completo', 1600)
@@ -838,7 +968,6 @@ VALUES('jeremy@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Proyecto 4','2022-06-1','Medio t
 INSERT INTO Agreement
 VALUES('jeremy@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Proyecto 5','2022-06-1','Tiempo completo', 1600, '2026-06-1', 1, '')
 
-
 INSERT INTO Agreement
 VALUES('mau@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Proyecto 1','2022-06-1','Servicios profesionales', 2000, '2026-06-1', 1, '')
 
@@ -847,6 +976,38 @@ VALUES('naye@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Proyecto 1','2022-06-1','Medio tie
 
 INSERT INTO Agreement
 VALUES('naye@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Proyecto 3','2022-06-1','Medio tiempo', 1600, '2026-06-1', 1, '')
+
+--------------------------------------------------------------
+INSERT INTO Agreement
+VALUES('jeremy@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Proyecto 2','2022-06-1','Tiempo completo', 1600, '2026-06-1', 1, '')
+
+INSERT INTO Agreement
+VALUES('jeremy@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Proyecto 6','2022-06-1','Tiempo completo', 1600, '2026-06-1', 1, '')
+
+INSERT INTO Agreement
+VALUES('jeremy@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Proyecto 7','2022-06-1','Tiempo completo', 1600, '2026-06-1', 1, '')
+
+INSERT INTO Agreement
+VALUES('jeremy@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Proyecto 8','2022-06-1','Tiempo completo', 1600, '2026-06-1', 1, '')
+
+INSERT INTO Agreement
+VALUES('jeremy@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Proyecto 9','2022-06-1','Tiempo completo', 1600, '2026-06-1', 1, '')
+
+INSERT INTO Agreement
+VALUES('jeremy@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Proyecto 10','2022-06-1','Tiempo completo', 1600, '2026-06-1', 1, '')
+
+INSERT INTO Agreement
+VALUES('jeremy@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Proyecto 11','2022-06-1','Tiempo completo', 1600, '2026-06-1', 1, '')
+
+INSERT INTO Agreement
+VALUES('jeremy@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Proyecto 12','2022-06-1','Tiempo completo', 1600, '2026-06-1', 1, '')
+
+INSERT INTO Agreement
+VALUES('jeremy@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Proyecto 13','2022-06-1','Tiempo completo', 1600, '2026-06-1', 1, '')
+
+INSERT INTO Agreement
+VALUES('jeremy@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Proyecto 14','2022-06-1','Tiempo completo', 1600, '2026-06-1', 1, '')
+------------------------------------------------
 
 INSERT INTO ReportOfHours
 VALUES('leonel@ucr.ac.cr', 'Proyecto 1','mau@ucr.ac.cr', '2022-6-2',4)
@@ -876,6 +1037,16 @@ VALUES('leonel@ucr.ac.cr',
 '2022-06-2'
 )
 
+INSERT INTO Subscribes (EmployerEmail, ProjectName, SubscriptionName, EmployeeEmail, Cost, StartDate)
+VALUES('leonel@ucr.ac.cr',
+'Proyecto 3',
+'Gym',
+'jeremy@ucr.ac.cr',
+12000,
+'2022-06-2'
+)
+
+
 INSERT INTO LegalDeduction (DeductionName, Cost)
 VALUES('CCSS',
 25000.3
@@ -885,3 +1056,98 @@ INSERT INTO LegalDeduction (DeductionName, Cost)
 VALUES('Hacienda',
 48000.3
 )
+
+-------------------------------------
+
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Proyecto 1',153600, '2022/6/1', '2022/06/14')
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Proyecto 3',153600, '2022/6/1', '2022/06/14')
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Proyecto 4',192000, '2022/6/1','2022/7/1')
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Proyecto 5',384000,'2022/6/1','2022/7/1')
+
+---
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Proyecto 1',153600, '2022/6/15', '2022/06/28')
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Proyecto 3',153600, '2022/6/15', '2022/06/28')
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Proyecto 2',153600, '2022/6/1', '2022/06/14')
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Proyecto 2',153600, '2022/6/15', '2022/06/28')
+
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Proyecto 4',153600, '2022/6/1', '2022/06/14')
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Proyecto 4',153600, '2022/6/15', '2022/06/28')
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Proyecto 5',153600, '2022/6/1', '2022/06/14')
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Proyecto 5',153600, '2022/6/15', '2022/06/28')
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Proyecto 6',153600, '2022/6/1', '2022/06/14')
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Proyecto 6',153600, '2022/6/15', '2022/06/28')
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Proyecto 7',153600, '2022/6/1', '2022/06/14')
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Proyecto 7',153600, '2022/6/15', '2022/06/28')
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Proyecto 8',153600, '2022/6/1', '2022/06/14')
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Proyecto 8',153600, '2022/6/15', '2022/06/28')
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Proyecto 9',153600, '2022/6/1', '2022/06/14')
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Proyecto 9',153600, '2022/6/15', '2022/06/28')
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Proyecto 10',153600, '2022/6/1', '2022/06/14')
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Proyecto 10',153600, '2022/6/15', '2022/06/28')
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Proyecto 11',153600, '2022/6/1', '2022/06/14')
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Proyecto 11',153600, '2022/6/15', '2022/06/28')
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Proyecto 12',153600, '2022/6/1', '2022/06/14')
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Proyecto 12',153600, '2022/6/15', '2022/06/28')
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Proyecto 13',153600, '2022/6/1', '2022/06/14')
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Proyecto 13',153600, '2022/6/15', '2022/06/28')
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Proyecto 14',153600, '2022/6/1', '2022/06/14')
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Proyecto 14',153600, '2022/6/15', '2022/06/28')
