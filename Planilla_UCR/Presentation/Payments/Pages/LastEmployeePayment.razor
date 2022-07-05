@@ -171,9 +171,11 @@
             netSalary -= TaxCalculatorService.GetTaxAmount(item.DeductionName, _lastPay.GrossSalary);
         }
         IList<Subscription> _deductionsNotPaid = new List<Subscription>();
-        _deductionsNotPaid = _paymentCalculator.ApplyDeductions(netSalary, subscriptions.Where(e => e.TypeSubscription == 0).ToList());
+        subscriptions = subscriptions.Where(e => e.TypeSubscription == 0).ToList();
+        _deductionsNotPaid = _paymentCalculator.ApplyDeductions(netSalary, subscriptions);
         subscriptions = subscriptions.Except(_deductionsNotPaid).ToList();
-        netSalary -= _paymentCalculator.DeductionsCost(subscriptions.Where(e=> e.TypeSubscription == 0).ToList());
+        _deductions = subscriptions;
+        netSalary -= _paymentCalculator.DeductionsCost(subscriptions);
 
         return netSalary;
     }
