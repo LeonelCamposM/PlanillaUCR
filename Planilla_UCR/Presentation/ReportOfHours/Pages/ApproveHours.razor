@@ -4,10 +4,14 @@
 @using Application.ReportOfHours
 @using Domain.ReportOfHours.Entities
 @using Application.ContextMenu
+@using Application.Agreements
+@using Domain.Agreements.Entities
 
 @inject NavigationManager nav
 @inject IReportOfHoursService HoursReportService
 @inject IContextMenuService ContextMenuService
+@inject IAgreementService AgreementService
+@inject IPersonService PersonService
 
 @page "/Approve_Hours/{email}"
 @if(_loading) {
@@ -23,7 +27,7 @@
         List<BreadcrumbItem> _items = new List<BreadcrumbItem>
         {
             new BreadcrumbItem("Proyectos", href: $"/Projects/{email}"),
-            new BreadcrumbItem(@_projectName, href: $"/Projects/{email}/{ContextMenuService.GetEmployerEmailContext()}/{_projectName}"),
+            new BreadcrumbItem(@_projectName, href: $"/Projects/{email}/{_projectName}"),
             new BreadcrumbItem("Histórico de horas", href: null, disabled: true)
         }; 
         <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
@@ -31,33 +35,38 @@
         </MudPaper>
         if (!_empty)
         {
-                <MudTable @ref="@_table" Items="@_elements" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" Filter="new Func<HoursReport,bool>(FilterFunction)">
+                <MudTable @ref="@_table" Items="@_elements" RowsPerPage="4" MultiSelection="true" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" Filter="new Func<HoursReport,bool>(FilterFunction)">
                     <ToolBarContent>
-                            <MudText Align="Align.Center" Typo="Typo.h6">Horas reportadas</MudText>
+                            <MudText Align="Align.Center" Typo="Typo.h6">Horas por aprobar</MudText>
                             <MudSpacer />
                             <MudTextField @bind-Value="searchString" Placeholder="Buscar fecha" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
                     </ToolBarContent> 
                     <HeaderContent>
                         <MudTh>Nombre proyecto</MudTh>
+                        <MudTh>Nombre empleado</MudTh>
                         <MudTh>Fecha</MudTh>
                         <MudTh>Horas</MudTh>
                     </HeaderContent>
 
                     <RowTemplate>
                          <MudTd DataLabel="Nombre proyecto">@context.ProjectName</MudTd>
-                         <MudTd DataLabel="Fecha">@context.ReportDate.Value.Date.Day/@context.ReportDate.Value.Date.Month/@context.ReportDate.Value.Date.Year</MudTd>
+                    <MudTd DataLabel="Nombre empleado"> @context.EmployeeEmail</MudTd>
+                         <MudTd DataLabel="Fecha">@context.ReportDate.Value.ToShortDateString()</MudTd>
                          <MudTd DataLabel="Horas">@context.ReportHours</MudTd>
                     </RowTemplate>
                 <PagerContent>
                     <MudPagination SelectedChanged="PageChanged" Count="@((_table.GetFilteredItemsCount() + _table.RowsPerPage - 1) / _table.RowsPerPage)" Color="Color.Primary" Class="pa-4"/>
                 </PagerContent>
                 </MudTable>
+                <br>
+                <MudToolBar DisableGutters="true" Class="gap-4">
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary">Aprobar</MudButton>
+                </MudToolBar>
         }else
         {
             <MudText Align="Align.Center" Typo="Typo.h6">
-            No existen horas reportadas en este proyecto
+            No existen horas por aprobar en este proyecto
             </MudText>
-           
         }
     }
 }
@@ -69,16 +78,25 @@
     private bool _loading = true;
     private bool _empty = true;
     public string searchString = "";
-    private IEnumerable<HoursReport> _elements = new List<HoursReport>();
+    private List<HoursReport> _elements = new List<HoursReport>();
     private MudTable<HoursReport> _table;
     private string _projectName { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         _projectName = ContextMenuService.GetProjectsContext();
-        _elements = await HoursReportService.GetAllReportsAsync(email);
-        _elements = _elements.Where(e => e.ProjectName == _projectName);
-        _elements = _elements.OrderByDescending (report => report.ReportDate);
+        IList<Agreement> _employees = await AgreementService.GetProjectAgreements(ContextMenuService.GetProjectsContext(), email);
+        foreach (Agreement employee in _employees) {
+            IEnumerable<HoursReport> reports = await HoursReportService.GetAllReportsAsync(employee.EmployeeEmail);
+            reports = reports.Where(e => e.Approved == 0);
+            reports = reports.OrderByDescending (report => report.ReportDate);
+            foreach (HoursReport employeeReport in reports)
+            {
+                employeeReport.EmployeeEmail =  await GetEmployeeName(employeeReport.EmployeeEmail);
+                _elements.Add(employeeReport);
+            }
+        }
+
         if (_elements.Length() != 0)
         {
             _empty = false;
@@ -97,14 +115,31 @@
     {
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
-        if (element.ReportDate.ToString().Contains(searchString, StringComparison.OrdinalIgnoreCase))
-        return true;
+
+        string dateString = element.ReportDate.Value.ToShortDateString();
+        if (dateString.Contains(searchString))
+            return true;
         return false;
     }
 
     private void GoToReportHours()
     {
-       nav.NavigateTo($"/Projects/ReportHours/{"leonel@ucr.ac.cr"}/{email}");
+        nav.NavigateTo($"/Projects/ReportHours/{"leonel@ucr.ac.cr"}/{email}");
     }
 
+    private async Task<string> GetEmployeeName(string email)
+    {
+        string fullName = "";
+        IEnumerable<Person> employee =  await PersonService.GetPersonByEmail(email);
+        Person employeeInfo = employee.FirstOrDefault();
+        if(employee.Length() != 0)
+        {
+            fullName =  employeeInfo.Name +" "+ employeeInfo.LastName1 +" "+ employeeInfo.LastName2;
+        }
+        else
+        {
+            fullName = "";
+        }
+        return fullName;
+    }
 }

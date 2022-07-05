@@ -45,7 +45,7 @@
 
                     <RowTemplate>
                          <MudTd DataLabel="Nombre proyecto">@context.ProjectName</MudTd>
-                         <MudTd DataLabel="Fecha">@context.ReportDate.Value.Date.Day/@context.ReportDate.Value.Date.Month/@context.ReportDate.Value.Date.Year</MudTd>
+                         <MudTd DataLabel="Fecha">@context.ReportDate.Value.ToShortDateString()</MudTd>
                          <MudTd DataLabel="Horas">@context.ReportHours</MudTd>
                     </RowTemplate>
                 <PagerContent>
