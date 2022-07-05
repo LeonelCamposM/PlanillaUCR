@@ -40,5 +40,11 @@ namespace Infrastructure.Payments.Repositories
             && e.ProjectName == payment.ProjectName && e.StartDate == payment.StartDate && e.EndDate == payment.EndDate).ToListAsync();
             return payments;
         }
+        public async Task<IList<Payment>> GetEmployerPayments(string email)
+        {
+            IList<Payment> payments = await _dbContext.Payments.Where(e => e.EmployerEmail == email).ToListAsync();
+            return payments;
+        }
+
     }
 }

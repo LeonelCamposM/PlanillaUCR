@@ -9,5 +9,6 @@ namespace Domain.Payments.Repositories
         Task AddPayment(Payment newPayment);
         Task<Payment?> GetEmployeeLastPayment(string employeeEmail, string employerEmail, string projectName);
         Task<IList<Payment>> GetProjectPayments(Payment payment);
+        Task<IList<Payment>> GetEmployerPayments(string email);
     }
 }

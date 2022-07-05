@@ -28,5 +28,10 @@ namespace Application.Payments.Implementations
         { 
             return await _paymentRepository.GetProjectPayments(payment);
         }
+
+        public async Task<IList<Payment>> GetEmployerPayments(string email)
+        {
+            return await _paymentRepository.GetEmployerPayments(email);
+        }
     }
 }
