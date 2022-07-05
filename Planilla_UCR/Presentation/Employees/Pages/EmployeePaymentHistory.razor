@@ -69,7 +69,7 @@
                 </MudItem>
                 
                 <MudItem xs="2">
-                <MudSelect Dense="true" T="string" Label="Tipo contrato" Variant="Variant.Outlined">
+                <MudSelect Dense="true" T="string" Label="Tipo contrato" Variant="Variant.Outlined"  TextChanged="OnContractTypeSelect">
                     <MudSelectItem Value="@("Medio tiempo")"/>
                     <MudSelectItem Value="@("Servicios profesionales")"/>
                     <MudSelectItem Value="@("Tiempo completo")"/>
@@ -77,7 +77,7 @@
                 </MudItem>
                 
                 <MudItem xs="2">
-                <MudSelect Dense="true" T="string" Label="Fecha" Variant="Variant.Outlined">
+                <MudSelect Dense="true" T="string" Label="Fecha" Variant="Variant.Outlined"  TextChanged="OnPaymentDateSelect">
                     @foreach (var state in _paymentsDates) {
                     <MudSelectItem T="string" Value="@state">
                         @state
@@ -149,7 +149,9 @@
     private double _costNetSalary;
 
     string projectNameFilter = "";
-
+    string contracTypeFilter = "";
+    string paymentDateFilter = "";
+    string filterString = "";
 
     protected override async Task OnParametersSetAsync()
     {
@@ -251,16 +253,31 @@
     }
 
     private void OnProjectNameSelect(string selected) {
-        projectNameFilter = selected;
+       filterString = selected;
+       projectNameFilter = selected;
     }
 
-    private bool FilterFuncProjectName(PaymentHistoryModel element) => FilterFuncProject(element,  projectNameFilter);
+    private void OnContractTypeSelect(string selected) {
+        filterString = selected;
+        contracTypeFilter = selected;
+    }
 
-    private bool FilterFuncProject(PaymentHistoryModel element, string searchString)
+    private void OnPaymentDateSelect(string selected) {
+       filterString = selected;
+       paymentDateFilter = selected; 
+    }
+
+    private bool FilterFuncProjectName(PaymentHistoryModel element) => FilterFuncProject(element,  filterString, projectNameFilter,contracTypeFilter, paymentDateFilter);
+
+    private bool FilterFuncProject(PaymentHistoryModel element, string searchString, string searchString1, string searchString2, string searchString3)
     {
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
-        if (element.ProjectName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        if (element.ProjectName.Contains(searchString1, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.ContractType.Contains(searchString2, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.ProjectName.Contains(searchString3, StringComparison.OrdinalIgnoreCase))
             return true;
         return false;
     }
