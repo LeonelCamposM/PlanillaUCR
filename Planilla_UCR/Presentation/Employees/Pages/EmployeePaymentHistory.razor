@@ -235,12 +235,13 @@
     private async Task<IList<String>> GetProyectName()
     {
         foreach (Payment payment in _paymentsList)
-        {
+        { 
             if (!_paymentsProjectNames.Contains(payment.ProjectName))
             {
                 _paymentsProjectNames.Add(payment.ProjectName);
             }
         }
+        _paymentsProjectNames = _paymentsProjectNames.Reverse().Take(10).ToList();
         return _paymentsProjectNames;
     }
 
@@ -253,27 +254,25 @@
                 _paymentsDates.Add(payment.EndDate.ToShortDateString());
             }
         }
+        _paymentsDates =  _paymentsDates.Reverse().Take(10).ToList();
         return _paymentsDates;
     }
 
     private void OnProjectNameSelect(string selected) {
-        filterString = selected;
         projectNameFilter = selected;
     }
 
     private void OnContractTypeSelect(string selected) {
-        filterString = selected;
         contracTypeFilter = selected;
     }
 
     private void OnPaymentDateSelect(string selected) {
-        filterString = selected;
         paymentDateFilter = selected; 
     }
 
-    private bool FilterFuncProjectName(PaymentHistoryModel element) => FilterFuncProject(element,  filterString, projectNameFilter,contracTypeFilter, paymentDateFilter);
+    private bool FilterFuncProjectName(PaymentHistoryModel element) => FilterFuncProject(element, projectNameFilter,contracTypeFilter, paymentDateFilter);
 
-    private bool FilterFuncProject(PaymentHistoryModel element, string searchString, string searchString1, string searchString2, string searchString3)
+    private bool FilterFuncProject(PaymentHistoryModel element, string searchString1, string searchString2, string searchString3)
     {
         bool projectNameBool = (element.ProjectName.Equals(searchString1));
         bool contractTypeBool = (element.ContractType.Contains(searchString2, StringComparison.OrdinalIgnoreCase));
