@@ -34,5 +34,10 @@ namespace Application.ReportOfHours.Implementations
         { 
             return _reportRepository.GetEmployeeReports(hoursReport, endDate);
         }
+
+        public Task UpdateReport(HoursReport report)
+        {
+            return _reportRepository.UpdateReport(report);
+        }
     }
 }

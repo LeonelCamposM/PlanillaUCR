@@ -53,5 +53,13 @@ namespace Infrastructure.ReportOfHours.Repositories
                  (endDate >= e.ReportDate && e.ReportDate >= hoursReport.ReportDate)).ToListAsync();
             return reports;
         }
+
+        public async Task UpdateReport(HoursReport updateReport)
+        {
+            System.FormattableString query = ($@"EXECUTE ApproveHoursReport 
+            @EmployerEmail = {updateReport.EmployerEmail}, @ProjectName = {updateReport.ProjectName},
+            @ReportDate = {updateReport.ReportDate}, @EmployeeEmail = {updateReport.EmployeeEmail}");
+            _dbContext.Database.ExecuteSqlInterpolated(query);
+        }
     }
 }

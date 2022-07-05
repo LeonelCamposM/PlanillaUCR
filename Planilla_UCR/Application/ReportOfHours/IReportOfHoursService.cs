@@ -11,5 +11,6 @@ namespace Application.ReportOfHours
         Task<IEnumerable<HoursReport>> GetAllReportsAsync(string email);
         Task<bool> HasReportAsync(HoursReport report);
         Task<IList<HoursReport>> GetEmployeeReports(HoursReport hoursReport, DateTime endDate);
+        Task UpdateReport(HoursReport report);
     }
 }

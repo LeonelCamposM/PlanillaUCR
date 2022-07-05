@@ -565,6 +565,21 @@ BEGIN
 	A.ContractType = @ContractType
 END
 
+--- Report Hours Stored Procedures
+GO
+CREATE OR ALTER PROCEDURE ApproveHoursReport(
+@EmployeeEmail varchar(255), 
+@EmployerEmail varchar(255),
+@ProjectName varchar(255),
+@ReportDate varchar(255) 
+)
+AS
+BEGIN
+	UPDATE ReportOfHours
+	SET ReportOfHours.Approved = 1
+	WHERE ReportOfHours.EmployeeEmail = @EmployeeEmail AND ReportOfHours.EmployerEmail = @EmployerEmail AND ReportOfHours.ProjectName = @ProjectName AND ReportOfHours.ReportDate = @ReportDate;
+END
+
 -- Data Insert
 GO
 INSERT INTO Person
