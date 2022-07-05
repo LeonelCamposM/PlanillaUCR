@@ -128,10 +128,10 @@
 
 
 @code {
-        [Parameter]
-        public string email { get; set; }
+    [Parameter]
+    public string email { get; set; }
 
-        SnackHandler snackHandler = new SnackHandler();
+    SnackHandler snackHandler = new SnackHandler();
     private bool _loading = true;
     private bool _empty = true;
 
@@ -275,7 +275,7 @@
 
     private bool FilterFuncProject(PaymentHistoryModel element, string searchString, string searchString1, string searchString2, string searchString3)
     {
-        bool projectNameBool = (element.ProjectName.Contains(searchString1, StringComparison.OrdinalIgnoreCase));
+        bool projectNameBool = (element.ProjectName.Equals(searchString1));
         bool contractTypeBool = (element.ContractType.Contains(searchString2, StringComparison.OrdinalIgnoreCase));
         bool paymentDateBool = (element.PaymentDate.Contains(searchString3, StringComparison.OrdinalIgnoreCase));
         if( (projectNameBool && contractTypeBool && paymentDateBool)  || ((projectNameBool && contractTypeBool)  && string.IsNullOrWhiteSpace(searchString3)))
@@ -284,6 +284,10 @@
             return true;
         if( (projectNameBool && contractTypeBool && paymentDateBool)  || ((contractTypeBool && paymentDateBool)  && string.IsNullOrWhiteSpace(searchString1)))
             return true;
+            
+         if((string.IsNullOrWhiteSpace(searchString1) && string.IsNullOrWhiteSpace(searchString2) && string.IsNullOrWhiteSpace(searchString3)))
+            return true;
+            
         return false;
     }
 
