@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using Domain.Subscriptions.Entities;
 namespace Presentation.Payments.Models
 {
     public class PaymentCalculator
@@ -23,6 +25,33 @@ namespace Presentation.Payments.Models
         public double GetSalaryPerHours(double mountPerHour, double workedHours)
         { 
             return mountPerHour * workedHours;
+        }
+
+        public IList<Subscription> ApplyDeductions(double netSalary, IList<Subscription> deductions) 
+        {
+            IList<Subscription> _deductionsNotPaid = new List<Subscription>();
+            foreach (var item in deductions)
+            {
+                if (netSalary - item.Cost <= 0)
+                {
+                    _deductionsNotPaid.Add(item);
+                }
+                else 
+                {
+                    netSalary -= item.Cost;                
+                }
+            }
+            return _deductionsNotPaid;
+        }
+
+        public double DeductionsCost(IList<Subscription> deductions) 
+        { 
+            double cost = 0;
+            foreach (var item in deductions)
+            {
+               cost += item.Cost;
+            }
+            return cost;
         }
     }
 }

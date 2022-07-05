@@ -194,7 +194,7 @@
 
     private async Task<double> GetSalaryByType(int mountPerHour, string employeeEmail, string contractType, DateTime startDate)
     {
-        int workedDays = GetWorkedDays(employeeEmail, startDate);
+        int workedDays = await GetWorkedDays(employeeEmail, startDate);
         double grossSalary = 0;
         if (contractType == "Tiempo completo")
         {
@@ -212,18 +212,19 @@
         return grossSalary;
     }
 
-    private int GetWorkedDays(string employeeEmail, DateTime startDate)
+    private async Task<int> GetWorkedDays(string employeeEmail, DateTime startDate)
     {
         int _workedDays = Convert.ToInt32(_daysInterval);
-        if (startDate.Month == _nextPay.Month)
+        Payment _lastPay = await PaymentService.GetEmployeeLastPayment(employeeEmail, email, projectName);
+        if (_lastPay == null)
         {
             _workedDays = _nextPay.Day - startDate.Day;
-            int _workedWeeks = _workedDays / 7;
-            _workedDays -= _workedWeeks;
-            if (startDate.Date > _nextPay.Date)
-            {
-                _workedDays = 0;
-            }
+        }
+        int _workedWeeks = _workedDays / 7;
+        _workedDays -= _workedWeeks;
+        if (startDate.Date > _nextPay.Date)
+        {
+            _workedDays = 0;
         }
         return _workedDays;
     }

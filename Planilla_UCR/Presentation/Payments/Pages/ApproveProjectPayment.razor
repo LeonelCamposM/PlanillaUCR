@@ -316,7 +316,7 @@
                         mountToPay, _pModel.LastPaymentDate, _pModel.LastPaymentDate.AddDays(_pModel.DayInterval));
                     await PaymentService.AddPayment(_payment);
                 }
-                Project _projectInfo = new Project(_pModel.EmployerEmail, _pModel.ProjectName, "", 0, 0, "", 1);
+                Project _projectInfo = new Project(_pModel.EmployerEmail, _pModel.ProjectName, "", 0, 0, "", 1, _pModel.LastPaymentDate.AddDays(_pModel.DayInterval));
                 ProjectService.UpdatePaymentDate(_projectInfo);
             }
             Snackbar.Add("Pagos aprobados", Severity.Success);
