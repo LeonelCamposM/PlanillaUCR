@@ -53,10 +53,40 @@
     </MudPaper>
     if (_empty)
     {
-        <MudTable @ref="@_tablePaymentHistory" Items="@_payments" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading">
+        <MudTable @ref="@_tablePaymentHistory" Items="@_payments" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" Filter="new Func<PaymentHistoryModel,bool>(FilterFuncProjectName)">
             <ToolBarContent>
-                    <MudText Align="Align.Center" Typo="Typo.h6">Reporte histórico de pagos:</MudText>
-                    <MudSpacer /> 
+                <MudText Align="Align.Center" Typo="Typo.h6">Reporte histórico de pagos:</MudText>
+                <MudSpacer></MudSpacer>
+
+                <MudItem xs="2">
+                <MudSelect Dense="true" T="string" Label="Proyecto" Variant="Variant.Outlined" TextChanged="OnProjectNameSelect">
+                     @foreach (var state in _paymentsProjectNames) {
+                    <MudSelectItem T="string" Value="@state">
+                        @state
+                    </MudSelectItem>
+                    }   
+                </MudSelect>
+                </MudItem>
+                
+                <MudItem xs="2">
+                <MudSelect Dense="true" T="string" Label="Tipo contrato" Variant="Variant.Outlined">
+                    <MudSelectItem Value="@("Medio tiempo")"/>
+                    <MudSelectItem Value="@("Servicios profesionales")"/>
+                    <MudSelectItem Value="@("Tiempo completo")"/>
+                </MudSelect>
+                </MudItem>
+                
+                <MudItem xs="2">
+                <MudSelect Dense="true" T="string" Label="Fecha" Variant="Variant.Outlined">
+                    @foreach (var state in _paymentsDates) {
+                    <MudSelectItem T="string" Value="@state">
+                        @state
+                    </MudSelectItem>
+                    }   
+                </MudSelect>
+                </MudItem>
+
+
             </ToolBarContent> 
             <HeaderContent>
                 <MudTh>Proyecto</MudTh>
@@ -108,6 +138,8 @@
     private IList<Payment> _paymentsList = new List<Payment>();
     private IList<Subscription> _deductions = new List<Subscription>();
     private IEnumerable<LegalDeduction> _legalDeductions = new List<LegalDeduction>();
+    private IList<String> _paymentsDates = new List<String>();
+    private IList<String> _paymentsProjectNames = new List<String>();
 
     private CultureInfo _cultureCR = CultureInfo.GetCultureInfo("es-CR");
 
@@ -116,11 +148,15 @@
     private double _costLegalDeductions;
     private double _costNetSalary;
 
+    string projectNameFilter = "";
+
 
     protected override async Task OnParametersSetAsync()
     {
         _paymentsList = (IList<Payment>) await PaymentService.GetEmployeePayments(email);
         _payments2 = await GetPaymentHistory();
+        _paymentsDates = await GetPaymentDate();
+        _paymentsProjectNames = await GetProyectName();
         _loading = false;
     }
 
@@ -190,6 +226,45 @@
         return formatedCost;
     }
 
+    private async Task<IList<String>> GetProyectName()
+    {
+        foreach (Payment payment in _paymentsList)
+        {
+            if (!_paymentsProjectNames.Contains(payment.ProjectName))
+            {
+                _paymentsProjectNames.Add(payment.ProjectName);
+            }
+        }
+        return _paymentsProjectNames;
+    }
+
+    private async Task<IList<String>> GetPaymentDate()
+    {
+        foreach (Payment payment in _paymentsList)
+        {
+            if (!_paymentsDates.Contains(payment.EndDate.ToShortDateString()))
+            {
+                _paymentsDates.Add(payment.EndDate.ToShortDateString());
+            }
+        }
+        return _paymentsDates;
+    }
+
+    private void OnProjectNameSelect(string selected) {
+        projectNameFilter = selected;
+    }
+
+    private bool FilterFuncProjectName(PaymentHistoryModel element) => FilterFuncProject(element,  projectNameFilter);
+
+    private bool FilterFuncProject(PaymentHistoryModel element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.ProjectName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+
     public void ExportExcel()
     {
         Export<PaymentHistoryModel>(_payments2, "Histórico de pagos.csv");
@@ -198,60 +273,64 @@
 
     public void Export<PaymentHistoryModel>(IEnumerable<PaymentHistoryModel> list,string file)
     {
-	    var lines = GetLines(list);
-	    System.IO.File.WriteAllLines(file,lines);
+        var lines = GetLines(list);
+        System.IO.File.WriteAllLines(file,lines);
     }
 
     private IEnumerable<string> GetLines<T>(IEnumerable<T> list)
     {
+        string header = GetHeader<T>(list);
         var type = typeof(T);
-	    var props = type.GetProperties();
-	    string[] headings = { "Proyecto", "Tipo de contrato","Fecha pago","Salario Bruto","Deducciones obligatorias",
+        var props = type.GetProperties();
+        var firstDone = false;
+        List<string> lines = new List<string>();
+        lines.Add(header);
+        foreach(var obj in list)
+        {
+            firstDone = false;
+            string line = "";
+            foreach(var prop in props)
+            {
+                var value = prop.GetValue(obj).ToString();
+                if(typeof(string)==prop.PropertyType)
+                {
+                    value = "\""+value+"\"";
+                }
+                if(!firstDone)
+                {
+                    line +=value;
+                    firstDone=true;
+                }
+                else
+                {
+                    line += ";"+value;
+                }
+            }
+            lines.Add(line);
+        }
+        return lines;
+    }
+
+
+    private string GetHeader<T>(IEnumerable<T> list)
+    {
+        string[] headings = {"Proyecto", "Tipo de contrato","Fecha pago","Salario Bruto","Deducciones obligatorias",
             "Deducciones voluntarias","Salario neto"};
-
-
-	    string header = "";
-	    var firstDone = false;
-	    foreach(var prop in headings)
-	    {
-		    if(!firstDone)
-		    {
-			    header +=prop;
-			    firstDone=true;
-		    }
-		    else
-		    { 
-			    header +=";"+ prop;
-		    }
-	    }
-
-	    List<string> lines = new List<string>();
-	    lines.Add(header);
-	    foreach(var obj in list)
-	    {
-		    firstDone = false;
-		    string line = "";
-		    foreach(var prop in props)
-		    {
-			    var value = prop.GetValue(obj).ToString();
-			    if(typeof(string)==prop.PropertyType)
-			    {
-				    value = "\""+value+"\"";
-			    }
-			
-			    if(!firstDone)
-			    {
-				    line +=value;
-				    firstDone=true;
-			    }
-			    else
-			    {
-				    line += ";"+value;
-			    }
-		    }
-		    lines.Add(line);
-	    }
-	    return lines;
+        string header = "";
+        var firstDone = false;
+        foreach(var prop in headings)
+        {
+            if(!firstDone)
+            {
+                header +=prop;
+                firstDone=true;
+            }
+            else
+            { 
+                header +=";"+ prop;
+            }
+        }
+        return header;
     }
     
     void ShowSnackNotification(string message, Severity severity)

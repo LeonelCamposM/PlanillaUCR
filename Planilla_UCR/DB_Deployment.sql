@@ -830,6 +830,16 @@ INSERT INTO Agreement
 VALUES('jeremy@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Proyecto 1','2022-06-1','Tiempo completo', 1600, '2026-06-1', 1, '')
 
 INSERT INTO Agreement
+VALUES('jeremy@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Proyecto 3','2022-06-1','Servicios profesionales', 2000, '2026-06-1', 1, '')
+
+INSERT INTO Agreement
+VALUES('jeremy@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Proyecto 4','2022-06-1','Medio tiempo', 1600, '2026-06-1', 1, '')
+
+INSERT INTO Agreement
+VALUES('jeremy@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Proyecto 5','2022-06-1','Tiempo completo', 1600, '2026-06-1', 1, '')
+
+
+INSERT INTO Agreement
 VALUES('mau@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Proyecto 1','2022-06-1','Servicios profesionales', 2000, '2026-06-1', 1, '')
 
 INSERT INTO Agreement
