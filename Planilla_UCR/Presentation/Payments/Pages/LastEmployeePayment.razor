@@ -179,7 +179,16 @@
         _deductionsNotPaid = PaymentCalculatorService.ApplyDeductions(netSalary, subscriptions);
         subscriptions = subscriptions.Except(_deductionsNotPaid).ToList();
         _deductions = subscriptions;
-        netSalary -= PaymentCalculatorService.DeductionsCost(subscriptions);
+        double deductionsMountToPay = PaymentCalculatorService.DeductionsCost(subscriptions);
+        if (netSalary < deductionsMountToPay)
+        {
+            _deductions.Last().Cost = netSalary - (deductionsMountToPay - _deductions.Last().Cost);
+            netSalary = 0;
+        }
+        else
+        {
+            netSalary -= deductionsMountToPay; 
+        }
         return netSalary;
     }
 

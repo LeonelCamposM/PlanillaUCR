@@ -31,11 +31,19 @@ namespace Infrastructure.PaymentCalculator.Repositories
         public IList<Subscription> ApplyDeductions(double netSalary, IList<Subscription> deductions)
         {
             IList<Subscription> _deductionsNotPaid = new List<Subscription>();
+            bool firstNotPaid = false;
             foreach (var item in deductions)
             {
                 if (netSalary - item.Cost <= 0)
                 {
-                    _deductionsNotPaid.Add(item);
+                    if (!firstNotPaid)
+                    {
+                        firstNotPaid = true;
+                    }
+                    else 
+                    {
+                        _deductionsNotPaid.Add(item);
+                    }
                 }
                 else
                 {
