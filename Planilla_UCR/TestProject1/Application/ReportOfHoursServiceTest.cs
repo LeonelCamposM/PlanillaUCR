@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Application.ReportOfHours.Implementations;
-using Application.ReportOfHours;
 using Moq;
 using Xunit;
 using System;
@@ -45,11 +44,11 @@ namespace Tests.Application
                 e=> e.ProjectName == _projectName && e.EmployeeEmail == _employeeEmail && e.EmployerEmail == _employerEmail));
 
             //act
-            var _theses = await hoursReportService.GetProjectHoursReport(_projectName, _employeeEmail, _employerEmail);
+            var reports = await hoursReportService.GetProjectHoursReport(_projectName, _employeeEmail, _employerEmail);
 
             //assert
             mockHoursReportRepository.Verify(repo => repo.GetProjectHoursReport(_projectName, _employeeEmail, _employerEmail), Times.Once);
-            _theses.Count().Should().Equals(4);
+            reports.Count().Should().Equals(4);
         }
 
         [Fact]
