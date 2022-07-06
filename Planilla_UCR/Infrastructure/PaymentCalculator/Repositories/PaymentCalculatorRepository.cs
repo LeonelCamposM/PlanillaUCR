@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using Domain.Subscriptions.Entities;
-namespace Presentation.Payments.Models
+using Domain.PaymentCalculator.Repositories;
+
+namespace Infrastructure.PaymentCalculator.Repositories
 {
-    public class PaymentCalculator
+    public class PaymentCalculatorRepository : IPaymentCalculatorRepository
     {
         double FullTimeHours = 8.0;
         double PartTimeHours = 4.0;
-        public PaymentCalculator()
+        public PaymentCalculatorRepository()
         {
-
         }
 
         public double GetFullTimeSalary(double mountPerHour, int workedDay)
@@ -23,11 +24,11 @@ namespace Presentation.Payments.Models
         }
 
         public double GetSalaryPerHours(double mountPerHour, double workedHours)
-        { 
+        {
             return mountPerHour * workedHours;
         }
 
-        public IList<Subscription> ApplyDeductions(double netSalary, IList<Subscription> deductions) 
+        public IList<Subscription> ApplyDeductions(double netSalary, IList<Subscription> deductions)
         {
             IList<Subscription> _deductionsNotPaid = new List<Subscription>();
             foreach (var item in deductions)
@@ -36,20 +37,20 @@ namespace Presentation.Payments.Models
                 {
                     _deductionsNotPaid.Add(item);
                 }
-                else 
+                else
                 {
-                    netSalary -= item.Cost;                
+                    netSalary -= item.Cost;
                 }
             }
             return _deductionsNotPaid;
         }
 
-        public double DeductionsCost(IList<Subscription> deductions) 
-        { 
+        public double DeductionsCost(IList<Subscription> deductions)
+        {
             double cost = 0;
             foreach (var item in deductions)
             {
-               cost += item.Cost;
+                cost += item.Cost;
             }
             return cost;
         }
