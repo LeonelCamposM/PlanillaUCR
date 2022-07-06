@@ -687,7 +687,7 @@ INSERT INTO Employer
 VALUES('nyazofeifa3003@gmail.com')
 
 INSERT INTO Employer
-VALUES('naye@ucr.ac.cr')
+VALUES('wendy@ucr.ac.cr')
 
 INSERT INTO Employee
 VALUES('mau@ucr.ac.cr')
@@ -746,8 +746,8 @@ VALUES('leonel@ucr.ac.cr',
 )
 
 INSERT INTO Project
-VALUES('nyazofeifa3003@gmail.com',
-'Patatas',
+VALUES('wendy@ucr.ac.cr',
+'Proyecto 1',
 'Emprendimiento de comida',
 20000,
 5,
