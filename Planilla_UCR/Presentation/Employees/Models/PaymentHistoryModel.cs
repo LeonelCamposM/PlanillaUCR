@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Presentation.Employees.Models
 {
-    internal class PaymentHistoryModel
+    public class PaymentHistoryModel
     {
         public string ProjectName { get; set; }
         public string ContractType { get; set; }

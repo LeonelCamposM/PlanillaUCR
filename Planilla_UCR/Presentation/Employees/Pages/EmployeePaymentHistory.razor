@@ -11,6 +11,7 @@
 @using Application.Subscribes
 @using Domain.Subscribes.Entities
 @using System.Globalization
+@using Presentation.Employees.XLS
 @using Presentation.Payments.Models
 @using Application.People
 @using Application.TaxCalculator
@@ -20,7 +21,7 @@
 @using System.Text.RegularExpressions
 @using System.ComponentModel.DataAnnotations
 @using System.IO
-@using CsvHelper
+@inject IJSRuntime js
 @inject IPaymentService PaymentService
 @inject IContextMenuService ContextMenuService
 @inject IAgreementService AgreementService
@@ -30,7 +31,6 @@
 @inject NavigationManager nav
 @inject ISubscriptionService SuscriptionService
 @inject ITaxCalculatorService TaxCalculatorService
-@inject ISnackbar Snackbar
 @page "/{email}/Payment_History"
 
 @if(_loading) 
@@ -123,11 +123,10 @@
 
         </MudTable>
          <br>
-        <MudButton OnClick="ExportExcel" Variant="Variant.Filled" Color="Color.Primary">
+        <MudButton OnClick="ClickExportXLS" Variant="Variant.Filled" Color="Color.Primary">
                 <MudText>Exportar excel</MudText>
         </MudButton>
-        
-   
+
     }else
     {
         <MudText Align="Align.Center" Typo="Typo.h6">
@@ -135,7 +134,6 @@
         </MudText>
     }
 }
-
 
 @code {
     [Parameter]
@@ -147,7 +145,7 @@
 
     private MudTable<PaymentHistoryModel>  _tablePaymentHistory;
     private IList<PaymentHistoryModel> _payments = new List<PaymentHistoryModel>();
-    private IEnumerable<PaymentHistoryModel> _payments2 = new List<PaymentHistoryModel>();
+    private IEnumerable<PaymentHistoryModel> _paymentsHistory = new List<PaymentHistoryModel>();
 
     private IList<Payment> _paymentsList = new List<Payment>();
     private IList<Subscription> _deductions = new List<Subscription>();
@@ -167,10 +165,13 @@
     string paymentDateFilter = "";
     string filterString = "";
 
+    private PaymentHistoryModel[] _paymentsHistoryExcel;
+
+
     protected override async Task OnParametersSetAsync()
     {
         _paymentsList = (IList<Payment>) await PaymentService.GetEmployeePayments(email);
-        _payments2 = await GetPaymentHistory();
+        _paymentsHistory = await GetPaymentHistory();
         _paymentsDates = await GetPaymentDate();
         _paymentsProjectNames = await GetProyectName();
         _loading = false;
@@ -298,90 +299,16 @@
         return false;
     }
 
-    
-    public void ExportExcel()
+    private async void ClickExportXLS()
     {
-        Export<PaymentHistoryModel>(_payments2, "Histórico de pagos.csv");
-        ShowSnackNotification("Excel descargado", Severity.Success);
+        GetExcelContent();
+        var xls = new Excel();
+        await xls.GenerateExcelReport2Async(js, _paymentsHistoryExcel, "Reporte histórico de mis pagos.xlsx");
     }
 
-    public void Export<PaymentHistoryModel>(IEnumerable<PaymentHistoryModel> list,string file)
+    private void GetExcelContent()
     {
-        var lines = GetLines(list);
-        System.IO.File.WriteAllLines(file,lines);
-    }
-
-    private IEnumerable<string> GetLines<T>(IEnumerable<T> list)
-    {
-        string header = GetHeader<T>(list);
-        var type = typeof(T);
-        var props = type.GetProperties();
-        var firstDone = false;
-        List<string> lines = new List<string>();
-        lines.Add(header);
-        foreach(var obj in list)
-        {
-            firstDone = false;
-            string line = "";
-            foreach(var prop in props)
-            {
-                var value = prop.GetValue(obj).ToString();
-                if(typeof(string)==prop.PropertyType)
-                {
-                    value = "\""+value+"\"";
-                }
-                if(!firstDone)
-                {
-                    line +=value;
-                    firstDone=true;
-                }
-                else
-                {
-                    line += ";"+value;
-                }
-            }
-            lines.Add(line);
-        }
-        return lines;
-    }
-
-
-    private string GetHeader<T>(IEnumerable<T> list)
-    {
-        string[] headings = {"Proyecto", "Tipo de contrato","Fecha pago","Salario Bruto","Deducciones obligatorias",
-            "Deducciones voluntarias","Salario neto"};
-        string header = "";
-        var firstDone = false;
-        foreach(var prop in headings)
-        {
-            if(!firstDone)
-            {
-                header +=prop;
-                firstDone=true;
-            }
-            else
-            { 
-                header +=";"+ prop;
-            }
-        }
-        return header;
-    }
-    
-    void ShowSnackNotification(string message, Severity severity)
-    {
-        Snackbar.Configuration.SnackbarVariant = Variant.Filled;
-        Snackbar.Configuration.PreventDuplicates = false;
-        Snackbar.Configuration.MaxDisplayedSnackbars = 10;
-        Snackbar.Configuration.NewestOnTop = true;
-        Snackbar.Add($"{message}", severity, config =>
-        {
-            config.RequireInteraction = false;
-            config.ShowCloseIcon = true;
-            config.Onclick = snackbar =>
-            {
-                return Task.CompletedTask;
-            };
-        });
+        _paymentsHistoryExcel = _paymentsHistory.ToArray();
     }
 
     private void PageChanged(int i)
