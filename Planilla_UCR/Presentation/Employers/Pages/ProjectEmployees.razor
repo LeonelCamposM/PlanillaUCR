@@ -142,7 +142,7 @@
     private IEnumerable<Project> _projects = new List<Project>();
     private IEnumerable<Agreement> _agreements = new List<Agreement>();
     private IEnumerable<AgreementType> _agreementType = new List<AgreementType>();
-    private IEnumerable<Person> _people = new List<Person>();
+    private IEnumerable<Person> _hiredEmployees = new List<Person>();
     private IEnumerable<JoinedTables> _myJoin = new List<JoinedTables>();
     private MudTable<JoinedTables> _table;
     private bool _loading = true;
@@ -161,7 +161,7 @@
         _projects = await ProjectService.GetEmployerProyects(email);
         _agreements = await AgreementService.GetAllAgreementsByProjectAndEmployer(projectName, email);
         _agreementType = await AgreementTypeService.GetAllAgreementTypes();
-        _people = await EmployeeService.GetProjectEmployees(projectName);
+        _hiredEmployees = await EmployeeService.GetProjectEmployees(projectName, email);
         PopulateJoinAttribute();
         CheckJoinLenght();
         _loading = false;
@@ -171,7 +171,7 @@
     { 
         _myJoin = from P in _projects
                   join A in _agreements on P.ProjectName equals A.ProjectName
-                  join Pe in _people on A.EmployeeEmail equals Pe.Email
+                  join Pe in _hiredEmployees on A.EmployeeEmail equals Pe.Email
                   
                   select new JoinedTables
                     {

@@ -26,14 +26,14 @@
         {
             new BreadcrumbItem("Proyectos", href: $"/Projects/{employerEmail}"),
             new BreadcrumbItem(@projectName, href: $"/Projects/{employerEmail}/{projectName}"),
-            new BreadcrumbItem("Contratar empleados", href: null, disabled: true)
+            new BreadcrumbItem("Contrataciones", href: null, disabled: true)
         }; 
         <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
         <MudPaper Height="60px" Width="100%" Outlined="false" Class="border-none" Elevation="0"> 
         </MudPaper>
         if (!_empty)
         {
-                <MudTable @ref="@_table" Items="@_elements"  RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" Filter="new Func<Person,bool>(Filter)">
+                <MudTable @ref="@_table" Items="@_hiredableEmployees"  RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" Filter="new Func<Person,bool>(Filter)">
                     <ToolBarContent>
                             <MudText> Contratar empleados </MudText>
                             <MudSpacer />
@@ -90,7 +90,7 @@
     public string employerEmail { get; set; }
     [Parameter]
     public string projectName { get; set; }
-    private IEnumerable<Person> _elements = new List<Person>();
+    private IEnumerable<Person> _hiredableEmployees = new List<Person>();
     private IEnumerable<Person> _hiredEmployees = new List<Person>();
     private MudTable<Person> _table;
     private bool _loading = true;
@@ -100,8 +100,8 @@
     protected override async Task OnInitializedAsync()
     {
         ContextMenuService.SetProjectsContext(true, true, projectName, employerEmail, false);
-        _elements = await PersonService.GetAllEmployees(projectName);
-        _hiredEmployees =  await PersonService.GetProjectEmployees(projectName);
+        _hiredableEmployees = await PersonService.GetAllEmployees(projectName);
+        _hiredEmployees =  await PersonService.GetProjectEmployees(projectName, employerEmail);
         RemoveHiredEmployees();
         CheckElementLength();
         _loading = false;
@@ -109,14 +109,14 @@
 
     private void RemoveHiredEmployees() 
     {
-        _elements = (from myElement in _elements
+        _hiredableEmployees = (from myElement in _hiredableEmployees
                         select myElement)
                        .Except(_hiredEmployees).ToList();
     }
 
     private void CheckElementLength()
     {
-        if (_elements.Length() == 0)
+        if (_hiredableEmployees.Length() == 0)
         {
             _empty = true;
         }

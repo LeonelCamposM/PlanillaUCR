@@ -482,13 +482,14 @@ BEGIN
 END
 
 GO
-CREATE OR ALTER PROCEDURE [dbo].[GetProjectEmployees]
-@projectName VARCHAR(255)
+CREATE OR ALTER PROCEDURE [dbo].[GetProjectEmployees](
+@projectName VARCHAR(255),
+@employerEmail VARCHAR(255))
 AS
 BEGIN
 	SELECT P.Email, P.Name, P.LastName1, P.LastName2, P.SSN, P.BankAccount, P.Adress, P.PhoneNumber, P.IsEnabled
 	FROM Agreement as A JOIN  Person as P ON A.EmployeeEmail = P.Email
-	Where A.ProjectName = @projectName AND A.IsEnabled = 1
+	Where A.ProjectName = @projectName AND A.IsEnabled = 1 AND A.EmployerEmail = @employerEmail
 END
 
 GO
