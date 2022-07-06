@@ -54,11 +54,16 @@
     </MudPaper>
     if (_empty)
     {
+        <MudGrid>
+            <MudItem xs="12" Class="d-flex justify-center align-center">
+                <MudItem xs="4">
+                     <MudText Align="Align.Center" Typo="Typo.h6" GutterBottom="true">Reporte histórico de pagos</MudText>
+                </MudItem>
+             </MudItem>
+        </MudGrid>
+        <br>
         <MudTable @ref="@_tablePaymentHistory" Items="@_payments" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" Filter="new Func<PaymentHistoryModel,bool>(FiltersFunc)">
             <ToolBarContent>
-                <MudText Align="Align.Center" Typo="Typo.h6">Reporte histórico de pagos:</MudText>
-                <MudSpacer></MudSpacer>
-
                 <MudItem xs="2">
                 <MudSelect Dense="true" T="string" Label="Proyecto" Variant="Variant.Outlined" TextChanged="OnProjectNameSelect">
                     <MudSelectItem Value="@(" ")"/>
@@ -103,20 +108,25 @@
             </HeaderContent>
            
             <RowTemplate>
-                    <MudTd DataLabel="Proyecto">@context.ProjectName</MudTd>
-                    <MudTd DataLabel="Tipo contrato">@context.ContractType</MudTd>
-                    <MudTd DataLabel="Fecha pago">@context.PaymentDate</MudTd>
-                    <MudTd DataLabel="Salario Bruto">@context.GrossSalary</MudTd>
-                    <MudTd DataLabel="Deducciones obligatorias">@context.LegalDeductions</MudTd>
-                    <MudTd DataLabel="Deducciones voluntarias">@context.VoluntaryDeductions</MudTd>
-                    <MudTd DataLabel="Salario neto">@context.NetSalary</MudTd>
+                <MudTd DataLabel="Proyecto">@context.ProjectName</MudTd>
+                <MudTd DataLabel="Tipo contrato">@context.ContractType</MudTd>
+                <MudTd DataLabel="Fecha pago">@context.PaymentDate</MudTd>
+                <MudTd DataLabel="Salario Bruto">@context.GrossSalary</MudTd>
+                <MudTd DataLabel="Deducciones obligatorias">@context.LegalDeductions</MudTd>
+                <MudTd DataLabel="Deducciones voluntarias">@context.VoluntaryDeductions</MudTd>
+                <MudTd DataLabel="Salario neto">@context.NetSalary</MudTd>
             </RowTemplate>
+
+            <PagerContent>
+                    <MudPagination SelectedChanged="PageChanged" Count="@((_tablePaymentHistory.GetFilteredItemsCount() + _tablePaymentHistory.RowsPerPage - 1) / _tablePaymentHistory.RowsPerPage)" Color="Color.Primary" Class="pa-4"/>
+            </PagerContent>
+
         </MudTable>
          <br>
         <MudButton OnClick="ExportExcel" Variant="Variant.Filled" Color="Color.Primary">
                 <MudText>Exportar excel</MudText>
         </MudButton>
-
+        
    
     }else
     {
@@ -277,18 +287,18 @@
         bool projectNameBool = (element.ProjectName.Equals(searchString1));
         bool contractTypeBool = (element.ContractType.Contains(searchString2, StringComparison.OrdinalIgnoreCase));
         bool paymentDateBool = (element.PaymentDate.Contains(searchString3, StringComparison.OrdinalIgnoreCase));
-        if( (projectNameBool && contractTypeBool && paymentDateBool)  || ((projectNameBool && contractTypeBool)  && string.IsNullOrWhiteSpace(searchString3)))
+        if((projectNameBool && contractTypeBool && paymentDateBool) || ((projectNameBool && contractTypeBool) && string.IsNullOrWhiteSpace(searchString3)))
             return true;
-        if( (projectNameBool && contractTypeBool && paymentDateBool)  || ((projectNameBool && paymentDateBool)  && string.IsNullOrWhiteSpace(searchString2)))
+        if((projectNameBool && contractTypeBool && paymentDateBool) || ((projectNameBool && paymentDateBool) && string.IsNullOrWhiteSpace(searchString2)))
             return true;
-        if( (projectNameBool && contractTypeBool && paymentDateBool)  || ((contractTypeBool && paymentDateBool)  && string.IsNullOrWhiteSpace(searchString1)))
+        if((projectNameBool && contractTypeBool && paymentDateBool) || ((contractTypeBool && paymentDateBool) && string.IsNullOrWhiteSpace(searchString1)))
             return true;
-         if((string.IsNullOrWhiteSpace(searchString1) && string.IsNullOrWhiteSpace(searchString2) && string.IsNullOrWhiteSpace(searchString3)))
-            return true;
-            
+        if((string.IsNullOrWhiteSpace(searchString1) && string.IsNullOrWhiteSpace(searchString2) && string.IsNullOrWhiteSpace(searchString3)))
+            return true;  
         return false;
     }
 
+    
     public void ExportExcel()
     {
         Export<PaymentHistoryModel>(_payments2, "Histórico de pagos.csv");
@@ -372,5 +382,10 @@
                 return Task.CompletedTask;
             };
         });
+    }
+
+    private void PageChanged(int i)
+    {
+       _tablePaymentHistory.NavigateTo(i - 1);
     }
 }     
