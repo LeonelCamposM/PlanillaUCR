@@ -1,0 +1,272 @@
+﻿@page "/Reports/{email}/{projectName}"
+
+@using Domain.Agreements.DTOs
+@using Application.Agreements
+@using Domain.Agreements.Entities
+@using Application.People
+@using Domain.People.Entities
+@using Domain.Employees.Entities
+@using Application.Employees
+@using Application.Employers
+@using Domain.Employers.Entities
+@using Domain.Employers.DTOs
+@using Application.AgreementTypes
+@using Domain.AgreementTypes.Entities
+@using Domain.AgreementTypes.DTOs
+@using Domain.Projects.DTOs
+@using Domain.Projects.Entities
+@using Application.Projects
+@using Presentation.Projects.Models
+@using Presentation.Core.Components
+@using System.ComponentModel.DataAnnotations
+@using Presentation.Agreements.Models
+@using Application.ContextMenu
+
+@inject IProjectService ProjectService
+@inject ISnackbar Snackbar
+@inject IAgreementService AgreementService
+@inject IAgreementTypeService AgreementTypeService
+@inject IEmployeeService EmployeeService
+@inject IContextMenuService ContextMenuService
+
+@inject NavigationManager nav
+
+
+@inject IDialogService DialogService
+
+@if(_loading) {
+    <MudPaper  Height="220px" Width="100%" Outlined="false" Class="border-none pa-4" Elevation="0">
+         <MudText Align="Align.Center" Typo="Typo.h6">
+              <MudProgressCircular Color="Color.Secondary" Style="height:70px;width:70px;" Indeterminate="true" />
+         </MudText>
+    </MudPaper>
+}else{
+
+        List<BreadcrumbItem> _items = new List<BreadcrumbItem>
+        {
+            new BreadcrumbItem("Reportes", href: $"/Reports/{email}/{projectName}"),
+            new BreadcrumbItem("Pago planilla",  href: null, disabled: true)
+        }; 
+        <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
+        <MudPaper Height="60px" Width="100%" Outlined="false" Class="border-none" Elevation="0"> 
+        </MudPaper>
+
+        if(!_empty)
+        {
+            <MudTable @ref="@_table" Items="@_myJoin" RowsPerPage="4" Striped="true" Bordered="true" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" Filter="new Func<JoinedTables,bool>(Filter)" >
+                        <HeaderContent>
+                            <MudTh Style="text-align:justify-all">Total gastos empleador</MudTh>
+                            <MudTh Style="text-align:justify-all"> ₡ 1 000 000 </MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                        <MudTd DataLabel="Total gastos empleador" Style="text-align:justify-all">@context.Name @context.LastName1 @context.LastName2</MudTd>
+                        <MudTd DataLabel="₡ 1 000 000" Style="text-align:justify-all">@context.EmployeeEmail</MudTd>
+                        </RowTemplate>
+            </MudTable>
+                <br>
+
+            <MudTable @ref="@_table" Items="@_myJoin" RowsPerPage="4" Striped="true" Bordered="true" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" Filter="new Func<JoinedTables,bool>(Filter)" >
+                    <ToolBarContent>
+                            <MudSpacer />
+                    </ToolBarContent> 
+                        <HeaderContent>
+                            <MudTh Style="text-align:justify-all">Desglose salario</MudTh>
+                            <MudTh Style="text-align:justify-all"> Monto </MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                        <MudTd DataLabel="Desglose salario" Style="text-align:justify-all"> Salario empleado por hora</MudTd>
+                        <MudTd DataLabel="Monto" Style="text-align:justify-all"> ₡ 1 000 000 </MudTd>
+                        <MudTd DataLabel="Desglose salario" Style="text-align:justify-all"> Salario empleado tiempo completo</MudTd>
+                        <MudTd DataLabel="Monto" Style="text-align:justify-all"> ₡ 1 000 000 </MudTd>
+                        <MudTd DataLabel="Desglose salario" Style="text-align:justify-all"> Salario servicios profesionales</MudTd>
+                        <MudTd DataLabel="Monto" Style="text-align:justify-all"> ₡ 1 000 000 </MudTd>
+                        <MudTd DataLabel="Desglose salario" Style="text-align:justify-all"> Total en salario</MudTd>
+                        <MudTd DataLabel="Monto" Style="text-align:justify-all"> ₡ 1 000 000 </MudTd>
+                        </RowTemplate>
+            </MudTable>
+                <br>
+
+            <MudTable @ref="@_table" Items="@_myJoin" RowsPerPage="4" Striped="true" Bordered="true" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" Filter="new Func<JoinedTables,bool>(Filter)" >
+                    <ToolBarContent>
+                            <MudSpacer />
+                    </ToolBarContent> 
+                        <HeaderContent>
+                            <MudTh Style="text-align:justify-all">Desglose aporte del patrono</MudTh>
+                            <MudTh Style="text-align:justify-all"> Monto </MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                        <MudTd DataLabel="Desglose salario" Style="text-align:justify-all">@context.Name @context.LastName1 @context.LastName2</MudTd>
+                        <MudTd DataLabel="Monto" Style="text-align:justify-all">@context.EmployeeEmail</MudTd>
+                        </RowTemplate>
+            </MudTable>
+                <br>
+
+            <MudTable @ref="@_table" Items="@_myJoin" RowsPerPage="4" Striped="true" Bordered="true" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" Filter="new Func<JoinedTables,bool>(Filter)" >
+                    <ToolBarContent>
+                            <MudSpacer />
+                    </ToolBarContent> 
+                        <HeaderContent>
+                            <MudTh Style="text-align:justify-all">Desglose beneficios</MudTh>
+                            <MudTh Style="text-align:justify-all"> Monto </MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                        <MudTd DataLabel="Desglose salario" Style="text-align:justify-all">@context.Name @context.LastName1 @context.LastName2</MudTd>
+                        <MudTd DataLabel="Monto" Style="text-align:justify-all">@context.EmployeeEmail</MudTd>
+                        </RowTemplate>
+            </MudTable>
+        }
+        <br>
+            <MudButton Variant="Variant.Filled" OnClick="GoToCreateEmployee" Color="Color.Primary">
+                <MudText>
+                Registrar Empleados
+                </MudText> 
+            </MudButton> 
+    
+}
+
+@code {
+    [Parameter]
+    public string projectName { get; set; }
+    [Parameter]
+    public string email { get; set; }
+    [Parameter]
+    public EventCallback<string> SendTableState { get; set; }
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    private DialogOptions _dialogOptions = new() { FullWidth = true };
+    private IEnumerable<Project> _projects = new List<Project>();
+    private IEnumerable<Agreement> _agreements = new List<Agreement>();
+    private IEnumerable<AgreementType> _agreementType = new List<AgreementType>();
+    private IEnumerable<Person> _hiredEmployees = new List<Person>();
+    private IEnumerable<JoinedTables> _myJoin = new List<JoinedTables>();
+    private MudTable<JoinedTables> _table;
+    private bool _loading = true;
+    private string _mySearchString = "";
+    private bool _empty = true;
+    private string _employerEmailToBeDeleted = "";
+    private string _projectNameToBeDeleted = "";
+    private string _justificationToBeDeleted = "";
+    private string _employeeEmailToBeDeleted = "";
+    private bool _visible = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ContextMenuService.SetProjectsContext(true, true, projectName, email, false);
+        _empty = false;
+        _projects = await ProjectService.GetEmployerProyects(email);
+        _agreements = await AgreementService.GetAllAgreementsByProjectAndEmployer(projectName, email);
+        _agreementType = await AgreementTypeService.GetAllAgreementTypes();
+        _hiredEmployees = await EmployeeService.GetProjectEmployees(projectName, email);
+        PopulateJoinAttribute();
+        CheckJoinLenght();
+        _loading = false;
+    }
+
+    private void PopulateJoinAttribute() 
+    { 
+        _myJoin = from P in _projects
+                  join A in _agreements on P.ProjectName equals A.ProjectName
+                  join Pe in _hiredEmployees on A.EmployeeEmail equals Pe.Email
+                  
+                  select new JoinedTables
+                    {
+                        PaymentInterval = P.PaymentInterval,
+                        EmployeeEmail = A.EmployeeEmail,
+                        ContractType = A.ContractType,
+                        ContractStartDate = (DateTime) A.ContractStartDate,
+                        ContractFinishDate = (DateTime) A.ContractFinishDate,
+                        MountPerHour = A.MountPerHour,
+                        Name = Pe.Name,
+                        LastName1 = Pe.LastName1,
+                        LastName2 =  Pe.LastName2
+                    };
+    }
+
+    private void CheckJoinLenght()
+    {
+        if (_myJoin.Length() == 0)
+        {
+            _empty = true;
+        }
+    }
+
+    private void OpenDialog(string employeeEmail)
+    {
+        _employeeEmailToBeDeleted = employeeEmail;
+        _employerEmailToBeDeleted = email;
+        _projectNameToBeDeleted = projectName;
+        _visible = true;
+    }
+
+    private void CloseDialog()
+    {
+        _visible = false;
+        _justificationToBeDeleted = "";
+    } 
+
+    private async Task FireEmployee()
+    {
+        bool chekedJustificationLength = CheckJustificationLength();
+        if (chekedJustificationLength)
+        {
+            CloseDialog();
+            await AgreementService.DesactivateAgreement(_employeeEmailToBeDeleted, _employerEmailToBeDeleted, _projectNameToBeDeleted, _justificationToBeDeleted);
+            ShowSnackNotification("El empleado con el email " + _employeeEmailToBeDeleted + " ha sido eliminado del proyecto", Severity.Success);
+            await Task.Delay(3500); // Time in miliseconds
+            nav.NavigateTo($"/View_Project_Employees/{email}/{projectName}", true);
+        }
+        else
+        {
+            CloseDialog();
+        }
+    }
+
+    private void PageChanged(int i)
+    {
+        _table.NavigateTo(i - 1);
+    }
+
+    private bool Filter(JoinedTables element) => FilterFunction(element, _mySearchString);
+
+    private bool FilterFunction(JoinedTables element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.EmployeeEmail.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+
+    private void GoToCreateEmployee()
+    {
+        nav.NavigateTo($"/Create_Employee/{email}/{projectName}");
+    }
+    
+    void ShowSnackNotification(string message, Severity severity)
+    {
+        Snackbar.Configuration.SnackbarVariant = Variant.Filled;
+        Snackbar.Configuration.PreventDuplicates = false;
+        Snackbar.Configuration.MaxDisplayedSnackbars = 2;
+        Snackbar.Configuration.VisibleStateDuration = 3000;
+        Snackbar.Configuration.NewestOnTop = true;
+        Snackbar.Add($"{message}", severity, config =>
+        {
+            config.RequireInteraction = false;
+            config.ShowCloseIcon = true;
+            config.Onclick = snackbar =>
+            {
+                return Task.CompletedTask;
+            };
+        });
+    }
+
+    private bool CheckJustificationLength()
+    {
+        bool result = true;
+        if (_justificationToBeDeleted.Length == 0)
+        {
+            result = false;
+            ShowSnackNotification("Por favor, escriba una justificación", Severity.Error);
+        }
+        return result;
+    }
+}
