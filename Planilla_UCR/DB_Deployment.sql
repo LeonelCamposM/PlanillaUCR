@@ -908,7 +908,3 @@ INSERT INTO LegalDeduction (DeductionName, Cost)
 VALUES('Hacienda',
 48000.3
 )
-
-
-select * from
-ReportOfHours

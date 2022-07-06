@@ -70,7 +70,7 @@
             </MudText>
             if(last.Equals("true"))
             {
-                Snackbar.Add("Horas aprobadas", Severity.Success);    
+                Snackbar.Add("Horas aprobadas", Severity.Success);   
             }
         }
     }
@@ -107,8 +107,9 @@
     private async Task GetProjectHoursReport()
     {
         IList<Agreement> _employees = await AgreementService.GetProjectAgreements(ContextMenuService.GetProjectsContext(), email);
+        _employees = _employees.Where(e => e.ContractType == "Servicios profesionales").ToList();
         foreach (Agreement employee in _employees) {
-            IEnumerable<HoursReport> reports = await HoursReportService.GetProjecthoursReport(projectName, employee.EmployeeEmail, email);
+            IEnumerable<HoursReport> reports = await HoursReportService.GetProjectHoursReport(projectName, employee.EmployeeEmail, email);
             foreach (HoursReport employeeReport in reports)
             {
                 employeeReport.EmployeeEmail +=  "," + await GetEmployeeName(employeeReport.EmployeeEmail);

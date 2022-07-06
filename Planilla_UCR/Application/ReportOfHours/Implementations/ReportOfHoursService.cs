@@ -40,9 +40,9 @@ namespace Application.ReportOfHours.Implementations
             return _reportRepository.UpdateReport(report);
         }
 
-        public async Task<IEnumerable<HoursReport>> GetProjecthoursReport(string projectName, string employeeEmail, string employerEmail)
+        public async Task<IEnumerable<HoursReport>> GetProjectHoursReport(string projectName, string employeeEmail, string employerEmail)
         {
-            return await _reportRepository.GetProjecthoursReport(projectName, employeeEmail, employerEmail);
+            return await _reportRepository.GetProjectHoursReport(projectName, employeeEmail, employerEmail);
         }
     }
 }

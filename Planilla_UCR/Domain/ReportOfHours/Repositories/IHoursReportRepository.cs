@@ -12,8 +12,6 @@ namespace Domain.ReportOfHours.Repositories
         Task<bool> HasReportAsync(HoursReport report);
         Task<IList<HoursReport>> GetEmployeeReports(HoursReport hoursReport, DateTime endDate);
         Task UpdateReport(HoursReport report);
-        Task<IEnumerable<HoursReport>> GetProjecthoursReport(string projectName, string employeeEmail, string employerEmail);
-
-
+        Task<IEnumerable<HoursReport>> GetProjectHoursReport(string projectName, string employeeEmail, string employerEmail);
     }
 }

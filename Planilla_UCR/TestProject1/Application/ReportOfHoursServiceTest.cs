@@ -36,19 +36,19 @@ namespace Tests.Application
         public HoursReport report = new HoursReport("leonel@ucr.ac.cr", "Proyecto 3", "mau@ucr.ac.cr", DateTime.Now.AddDays(8), 5, 0);
 
         [Fact]
-        public async Task GetProjecthoursReport()
+        public async Task GetProjectHoursReport()
         {
             //arrange
             var mockHoursReportRepository = new Mock<IHoursReportRepository>();
             var hoursReportService = new ReportOfHoursService(mockHoursReportRepository.Object);
-            mockHoursReportRepository.Setup(repo => repo.GetProjecthoursReport("Proyecto 1", "mau@ucr.ac.cr", "leonel@ucr.ac.cr")).ReturnsAsync(reportsList.Where(
+            mockHoursReportRepository.Setup(repo => repo.GetProjectHoursReport("Proyecto 1", "mau@ucr.ac.cr", "leonel@ucr.ac.cr")).ReturnsAsync(reportsList.Where(
                 e=> e.ProjectName == _projectName && e.EmployeeEmail == _employeeEmail && e.EmployerEmail == _employerEmail));
 
             //act
-            var _theses = await hoursReportService.GetProjecthoursReport(_projectName, _employeeEmail, _employerEmail);
+            var _theses = await hoursReportService.GetProjectHoursReport(_projectName, _employeeEmail, _employerEmail);
 
             //assert
-            mockHoursReportRepository.Verify(repo => repo.GetProjecthoursReport(_projectName, _employeeEmail, _employerEmail), Times.Once);
+            mockHoursReportRepository.Verify(repo => repo.GetProjectHoursReport(_projectName, _employeeEmail, _employerEmail), Times.Once);
             _theses.Count().Should().Equals(4);
         }
 
