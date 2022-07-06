@@ -6,7 +6,7 @@ using Domain.ReportOfHours.Repositories;
 
 namespace Application.ReportOfHours.Implementations
 {
-    internal class ReportOfHoursService : IReportOfHoursService
+    public class ReportOfHoursService : IReportOfHoursService
     {
         private readonly IHoursReportRepository _reportRepository;
 
