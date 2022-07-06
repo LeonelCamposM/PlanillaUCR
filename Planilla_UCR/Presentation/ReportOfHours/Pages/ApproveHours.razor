@@ -14,7 +14,7 @@
 @inject IPersonService PersonService
 @inject ISnackbar Snackbar
 
-@page "/Approve_Hours/{email}/{projectName}"
+@page "/Approve_Hours/{email}/{projectName}/{last}"
 @if(_loading) {
     <MudPaper  Height="220px" Width="100%" Outlined="false" Class="border-none pa-4" Elevation="0">
          <MudText Align="Align.Center" Typo="Typo.h6">
@@ -62,12 +62,22 @@
                 <br>
                 <MudToolBar DisableGutters="true" Class="gap-4">
                     <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="UpdateApprovedHours">Aprobar</MudButton>
-                </MudToolBar>
+            </MudToolBar>
         }else
         {
-            <MudText Align="Align.Center" Typo="Typo.h6">
-            No existen horas por aprobar en este proyecto
-            </MudText>
+            if(last.Equals("true"))
+            {
+                Snackbar.Add("Horas aprobadas", Severity.Success);
+                <MudText Align="Align.Center" Typo="Typo.h6">
+                No existen horas por aprobar en este proyecto
+                </MudText>
+            }
+            else
+            {
+                <MudText Align="Align.Center" Typo="Typo.h6">
+                No existen horas por aprobar en este proyecto
+                </MudText>
+            }
         }
     }
 }
@@ -77,6 +87,8 @@
     public string email { get; set; }
     [Parameter]
     public string projectName { get; set; }
+    [Parameter]
+    public string last { get; set; }
     private bool _hidePosition;
     private bool _loading = true;
     private bool _empty = true;
@@ -105,6 +117,7 @@
         {
             _empty = false;
         }
+
         _loading = false;
     }
 
@@ -155,16 +168,20 @@
             {
                 element.Approved = 1;
                 element.EmployeeEmail = element.EmployeeEmail.Split(",")[0];
-                _loading = true;
                 await HoursReportService.UpdateReport(element);
-                _loading = false;
+                _elements.Remove(element);
             }
             Snackbar.Add("Horas aprobadas", Severity.Success);
-            nav.NavigateTo($"/Approve_Hours/{email}/{projectName}/", true);
         }
         else
         {
-            Snackbar.Add("Por favor seleccione las horas a aprobar", Severity.Warning);
+            Snackbar.Add("Por favor seleccione las horas a aprobar", Severity.Error);
+        }
+
+        if (_elements.Length() == 0)
+        {
+            last = "true";
+            nav.NavigateTo($"/Approve_Hours/{email}/{projectName}/{last}", true);
         }
     }
 }
