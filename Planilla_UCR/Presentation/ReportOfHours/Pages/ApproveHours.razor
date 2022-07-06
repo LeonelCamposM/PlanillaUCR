@@ -65,18 +65,12 @@
             </MudToolBar>
         }else
         {
+            <MudText Align="Align.Center" Typo="Typo.h6">
+                No existen horas por aprobar en este proyecto
+            </MudText>
             if(last.Equals("true"))
             {
-                Snackbar.Add("Horas aprobadas", Severity.Success);
-                <MudText Align="Align.Center" Typo="Typo.h6">
-                No existen horas por aprobar en este proyecto
-                </MudText>
-            }
-            else
-            {
-                <MudText Align="Align.Center" Typo="Typo.h6">
-                No existen horas por aprobar en este proyecto
-                </MudText>
+                Snackbar.Add("Horas aprobadas", Severity.Success);    
             }
         }
     }
@@ -101,24 +95,26 @@
     protected override async Task OnParametersSetAsync()
     {
         ContextMenuService.SetProjectsContext(true,true, projectName, email, ContextMenuService.GetHoursEmployeeContext());
-        IList<Agreement> _employees = await AgreementService.GetProjectAgreements(ContextMenuService.GetProjectsContext(), email);
-        foreach (Agreement employee in _employees) {
-            IEnumerable<HoursReport> reports = await HoursReportService.GetAllReportsAsync(employee.EmployeeEmail);
-            reports = reports.Where(e => e.Approved == 0);
-            reports = reports.OrderByDescending (report => report.ReportDate);
-            foreach (HoursReport employeeReport in reports)
-            {
-                employeeReport.EmployeeEmail +=  "," + await GetEmployeeName(employeeReport.EmployeeEmail);
-                _elements.Add(employeeReport);
-            }
-        }
-
+        await GetProjectHoursReport();
         if (_elements.Length() != 0)
         {
             _empty = false;
         }
 
         _loading = false;
+    }
+
+    private async Task GetProjectHoursReport()
+    {
+        IList<Agreement> _employees = await AgreementService.GetProjectAgreements(ContextMenuService.GetProjectsContext(), email);
+        foreach (Agreement employee in _employees) {
+            IEnumerable<HoursReport> reports = await HoursReportService.GetProjecthoursReport(projectName, employee.EmployeeEmail, email);
+            foreach (HoursReport employeeReport in reports)
+            {
+                employeeReport.EmployeeEmail +=  "," + await GetEmployeeName(employeeReport.EmployeeEmail);
+                _elements.Add(employeeReport);
+            }
+        }
     }
 
     private void PageChanged(int i)

@@ -61,5 +61,13 @@ namespace Infrastructure.ReportOfHours.Repositories
             @ReportDate = {updateReport.ReportDate}, @EmployeeEmail = {updateReport.EmployeeEmail}");
             _dbContext.Database.ExecuteSqlInterpolated(query);
         }
+
+        public async Task<IEnumerable<HoursReport>> GetProjecthoursReport(string projectName, string employeeEmail, string employerEmail)
+        {
+            IEnumerable<HoursReport> reports = await _dbContext.HoursReport.Where(e => e.EmployeeEmail == employeeEmail).ToListAsync();
+            reports = reports.Where(e => e.Approved == 0 && e.ProjectName == projectName && e.EmployerEmail == employerEmail);
+            reports = reports.OrderByDescending(report => report.ReportDate);
+            return reports;
+        }
     }
 }
