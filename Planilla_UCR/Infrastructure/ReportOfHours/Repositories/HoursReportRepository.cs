@@ -50,7 +50,7 @@ namespace Infrastructure.ReportOfHours.Repositories
         {
             IList<HoursReport> reports = await _dbContext.HoursReport.Where
                 (e=> e.EmployeeEmail == hoursReport.EmployeeEmail &&
-                 (endDate >= e.ReportDate && e.ReportDate >= hoursReport.ReportDate)).ToListAsync();
+                 (endDate >= e.ReportDate && e.ReportDate >= hoursReport.ReportDate) && e.Approved == 1).ToListAsync();
             return reports;
         }
 
