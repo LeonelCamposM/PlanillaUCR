@@ -715,6 +715,17 @@ VALUES('leonel@ucr.ac.cr',
 )
 
 INSERT INTO Project
+VALUES('nyazofeifa3003@gmail.com',
+'Fábrica de chocolates',
+'Emprendimiento de chocolates',
+15000,
+10,
+'Quincenal',
+1,
+'2022-06-01'
+)
+
+INSERT INTO Project
 VALUES('leonel@ucr.ac.cr',
 'Dulces artesanales',
 'Emprendimiento de confites',
@@ -857,6 +868,9 @@ VALUES('leonel@ucr.ac.cr',
 1,
 '2022-06-01'
 )
+
+
+
 INSERT INTO Subscription
 VALUES('leonel@ucr.ac.cr',
 'Fábrica de chocolates',
@@ -1050,6 +1064,10 @@ VALUES('jeremy@ucr.ac.cr', 'leonel@ucr.ac.cr', 'El pueblo','2022-06-1','Tiempo c
 
 INSERT INTO Agreement
 VALUES('jeremy@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Trendy Purse','2022-06-1','Tiempo completo', 1600, '2026-06-1', 1, '')
+
+
+INSERT INTO Agreement
+VALUES('nayeri.azofeifa@ucr.ac.cr', 'nyazofeifa3003@gmail.com', 'Fábrica de chocolates','2022-06-1','Tiempo completo', 1600, '2026-06-1', 1, '')
 
 
 INSERT INTO ReportOfHours
