@@ -52,7 +52,7 @@
     <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
     <MudPaper Height="60px" Width="100%" Outlined="false" Class="border-none" Elevation="0"> 
     </MudPaper>
-    if (_empty)
+    if (!_empty)
     {
         <MudGrid>
             <MudItem xs="12" Class="d-flex justify-center align-center">
@@ -139,7 +139,6 @@
     [Parameter]
     public string email { get; set; }
 
-    SnackHandler snackHandler = new SnackHandler();
     private bool _loading = true;
     private bool _empty = true;
 
@@ -153,8 +152,6 @@
     private IList<String> _paymentsDates = new List<String>();
     private IList<String> _paymentsProjectNames = new List<String>();
 
-    private CultureInfo _cultureCR = CultureInfo.GetCultureInfo("es-CR");
-
     private Agreement _agreement;
     private double _costVoluntaryDeductions;
     private double _costLegalDeductions;
@@ -163,7 +160,6 @@
     string projectNameFilter = "";
     string contracTypeFilter = "";
     string paymentDateFilter = "";
-    string filterString = "";
 
     private PaymentHistoryModel[] _paymentsHistoryExcel;
 
@@ -189,6 +185,9 @@
                 payment.EndDate.ToShortDateString(), CostFormat(payment.GrossSalary),CostFormat(_costLegalDeductions),
                CostFormat(_costVoluntaryDeductions), CostFormat(_costNetSalary));
             _payments.Add(_paymentHistoryModel);
+        }
+        if (_payments.Length() > 0){
+            _empty = false;
         }
         return _payments;
     }
