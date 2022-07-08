@@ -1,9 +1,8 @@
 ﻿using FluentAssertions;
 using Xunit;
-using Moq;
 using Application.PaymentCalculator.Implementations;
 
-namespace Tests.Infrastructure
+namespace Tests.Application
 {
 
     public class PaymentCalculatorTest
