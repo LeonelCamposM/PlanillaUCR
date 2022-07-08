@@ -48,12 +48,11 @@ namespace Infrastructure.Payments.Repositories
             return employeePaymentList;
         }
 
-        public async Task<Payment?> GetEmployeeLastestPayment(string employeeEmail)
+        public async Task<IEnumerable<Payment>> GetEmployeeLastestPayments(string email)
         {
-            IEnumerable<Payment> payments = await _dbContext.Payments.Where(e => e.EmployeeEmail == 
-                employeeEmail).OrderByDescending(pay => pay.EndDate).ToListAsync();
-            Payment lastPay = payments.FirstOrDefault();
-            return lastPay;
+            var employeePaymentList = await _dbContext.Payments.FromSqlRaw("EXEC GetEmployeeFiveLatestPayments @employeeEmail",
+                 new SqlParameter("employeeEmail", email)).ToListAsync();
+            return employeePaymentList;
         }
     }
 }
