@@ -48,15 +48,29 @@
     </MudPaper>
     if (!_empty)
     {   
-        <MudButton Variant="Variant.Filled" Color="Color.Primary">
-                <MudText Class="ms-2">Enviar por correo</MudText>
-        </MudButton>
-
-        <br />
-        <br />
+        <MudText Align="Align.Center" Typo="Typo.h6">
+            Reporte de últimos pagos
+        </MudText>
         <br />
         <MudSimpleTable Style="overflow-x: auto;">
+            
         <thead>
+            <MudToolBar>
+            <MudItem xs="5">
+                    <MudSelect Dense="true" T="string" Label="Pago seleccionado" Variant="Variant.Outlined" TextChanged="OnPaymentSelect">
+                        <MudSelectItem Value="@(" ")"/>
+                        @foreach (var state in _paymentIDS) {
+                            <MudSelectItem T="string" Value="@state">
+                                @state
+                            </MudSelectItem>
+                        }   
+                    </MudSelect>
+            </MudItem>
+            &nbsp;&nbsp;
+            <MudButton Variant="Variant.Filled" Color="Color.Primary">
+                    <MudText Class="ms-2">Enviar por correo</MudText>
+            </MudButton>
+            </MudToolBar>
             <tr>
                 @foreach (var h in headings)
                 {
@@ -152,14 +166,24 @@
     private bool _loading = true;
     private bool _empty = true;
     private bool _payTaxes = false;
+    private string _selectedPayment = string.Empty;
+    private IList<string> _paymentIDS = new List<string>();
 
     // Payment data 
     private Payment _lastPay;
     private Agreement _agreement;
 
+
     protected override async Task OnParametersSetAsync()
     {
-        _lastPay = await PaymentService.GetEmployeeLastPayment(email, ContextMenuService.GetEmployerEmailContext(), projectName);
+        var lastEmployeePayments = await PaymentService.GetLastEmployeePayments(email);
+        foreach (var payment in lastEmployeePayments)
+        {
+            _paymentIDS.Add(payment.ProjectName +" "+ payment.EndDate.ToShortDateString());
+        }
+
+        _lastPay = lastEmployeePayments.FirstOrDefault();
+
         if (_lastPay != null)
         {
             await UpdatePayTaxes();
@@ -253,5 +277,9 @@
     {
         string formatedCost = string.Format("{0:N}", cost);
         return formatedCost;
+    }
+
+     private void OnPaymentSelect(string selected) {
+        _selectedPayment = selected;
     }
 }
