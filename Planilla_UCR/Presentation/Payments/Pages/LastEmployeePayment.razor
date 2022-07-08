@@ -34,7 +34,6 @@
          <MudText Align="Align.Center" Typo="Typo.h6">
               <MudProgressCircular Color="Color.Primary" Style="height:70px;width:70px;" Indeterminate="true" />
         </MudText>
-       
     </MudPaper>
 } else 
 {
@@ -48,7 +47,14 @@
     <MudPaper Height="60px" Width="100%" Outlined="false" Class="border-none" Elevation="0"> 
     </MudPaper>
     if (!_empty)
-    {
+    {   
+        <MudButton Variant="Variant.Filled" Color="Color.Primary">
+                <MudText Class="ms-2">Enviar por correo</MudText>
+        </MudButton>
+
+        <br />
+        <br />
+        <br />
         <MudSimpleTable Style="overflow-x: auto;">
         <thead>
             <tr>
@@ -82,15 +88,21 @@
                     </ToolBarContent> 
                     <HeaderContent>
                         <MudTh>Nombre</MudTh>
-                        <MudTh>Porcentaje</MudTh>
                         <MudTh>Monto</MudTh>
+
                     </HeaderContent>
-                     
 
                     <RowTemplate>
                             <MudTd DataLabel="Nombre">@context.DeductionName</MudTd>
-                            <MudTd DataLabel="Pocentaje"> @TaxCalculatorService.GetTaxPercentage(context.DeductionName, _lastPay.GrossSalary) % </MudTd>
-                            <MudTd DataLabel="Monto"> @_cultureCR.NumberFormat.CurrencySymbol @CostFormat(TaxCalculatorService.GetTaxAmount(context.DeductionName, _lastPay.GrossSalary))</MudTd>
+                            @if(!@context.DeductionName.Equals("Total"))
+                            {
+                                <MudTd DataLabel="Monto">@_cultureCR.NumberFormat.CurrencySymbol @CostFormat(TaxCalculatorService.GetTaxAmount(context.DeductionName, _lastPay.GrossSalary))</MudTd>
+                            }
+                            else
+                            {
+                                <MudTd DataLabel="Monto">@_cultureCR.NumberFormat.CurrencySymbol @CostFormat(context.Cost)</MudTd>
+                            }
+                            
                     </RowTemplate>
             </MudTable>
             <br />
@@ -103,7 +115,7 @@
                 </ToolBarContent> 
                 <HeaderContent>
                     <MudTh>Nombre</MudTh>
-                    <MudTh>Costo</MudTh>
+                    <MudTh>Monto</MudTh>
                 </HeaderContent>
 
                 <RowTemplate>
@@ -133,7 +145,7 @@
     private MudTable<Subscription> _tableDeductions;
     private IList<Subscription> _deductions = new List<Subscription>();
     private MudTable<LegalDeduction> _tableLegalDeductions;
-    private IEnumerable<LegalDeduction> _legalDeductions = new List<LegalDeduction>();
+    private IList<LegalDeduction> _legalDeductions = new List<LegalDeduction>();
 
     // Page control
     private CultureInfo _cultureCR = CultureInfo.GetCultureInfo("es-CR");
@@ -152,9 +164,11 @@
         {
             await UpdatePayTaxes();
             double netSalary = await GetNetSalary();
-            Person employer = await PersonService.GetPerson(_lastPay.EmployerEmail);
-            rows.Add(@"Empleador: "+employer.Name +" "+employer.LastName1 +" "+employer.LastName2  +"#"+"Tipo de contrato: "+_agreement.ContractType+"#"+"Desde: "+_lastPay.StartDate.ToShortDateString() +" Hasta: "+ _lastPay.EndDate.ToShortDateString());
-            rows.Add( @"Proyecto: "+_lastPay.ProjectName +"#"+" "+"#"+"Salario bruto: "+ _cultureCR.NumberFormat.CurrencySymbol+ CostFormat(_lastPay.GrossSalary));
+            Person employer = await PersonService.GetPerson(_lastPay.EmployeeEmail);
+            CalculateTotalAmountDeductions();
+            CalculateTotalAmountTaxes();
+            rows.Add(@"Nombre: "+employer.Name +" "+employer.LastName1 +" "+employer.LastName2  +"#"+"Tipo de contrato: "+_agreement.ContractType+"#"+"Fecha: "+ _lastPay.EndDate.ToShortDateString());
+            rows.Add( @"Proyecto: "+_lastPay.ProjectName +"#"+" "+"#"+"Salario: "+ _cultureCR.NumberFormat.CurrencySymbol+ CostFormat(_lastPay.GrossSalary));
             rows.Add( @" "+"#"+" "+"#"+"Salario neto: "+_cultureCR.NumberFormat.CurrencySymbol+ CostFormat(netSalary));
             _empty = false;
         }
@@ -168,7 +182,8 @@
         IList<Subscription> subscriptions = (await SubscribeService.GetSubscriptionCostsByDate(searchSubscribe)).ToList();
         if (_payTaxes)
         {
-            _legalDeductions = await LegalDeductionService.GetAllAsync();
+            var _legalDeductions2 = await LegalDeductionService.GetAllAsync();
+            _legalDeductions = _legalDeductions2.ToList();
             foreach (var item in _legalDeductions)
             {
                 netSalary -= TaxCalculatorService.GetTaxAmount(item.DeductionName, _lastPay.GrossSalary);
@@ -190,6 +205,34 @@
             netSalary -= deductionsMountToPay; 
         }
         return netSalary;
+    }
+
+
+
+    private void CalculateTotalAmountDeductions()
+    {
+        double totalDeductions = 0;
+        foreach (var item in _deductions)
+        {
+            totalDeductions += item.Cost;
+        }
+
+        Subscription total = new Subscription("","","","","Total: ",0,1,1);
+        total.SubscriptionName = "Total";
+        total.Cost = totalDeductions;
+        _deductions.Add(total);
+    }
+
+    private void CalculateTotalAmountTaxes()
+    {
+        double totalTaxes = 0;
+        foreach (var item in _legalDeductions)
+        {
+            totalTaxes += TaxCalculatorService.GetTaxAmount(item.DeductionName, _lastPay.GrossSalary);
+        }
+
+        LegalDeduction total = new LegalDeduction("Total",totalTaxes);
+        _legalDeductions.Add(total);
     }
 
     private async Task UpdatePayTaxes()
