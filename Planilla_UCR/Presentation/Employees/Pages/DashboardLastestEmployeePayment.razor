@@ -59,29 +59,39 @@
              </MudItem>
         </MudGrid>
         <br>
-        <MudSimpleTable Style="overflow-x: auto;">
-        <thead>
-            <tr>
-                @foreach (var h in headings)
-                {
-                    <th>@h</th> 
-                }
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var row in rows)
-            {
-                <tr>
-                    @foreach (var x in row.Split("#"))
+      
+        <MudItem xs="12" Class="d-flex justify-center align-center">
+            <MudItem xs="4">
+                <MudChart ChartType="ChartType.Pie" InputData="@data" InputLabels="@labels" Width="300px" Height="300px"/>
+            </MudItem>
+      
+            <MudItem xs="6">
+                <MudSimpleTable Style="overflow-x: auto;">
+                <thead>
+                    <tr>
+                        @foreach (var h in headings)
+                        {
+                            <th>@h</th> 
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var row in rows)
                     {
-                        <td>@x</td> 
+                        <tr>
+                            @foreach (var x in row.Split("#"))
+                            {
+                                <td>@x</td> 
+                            }
+                            <td> <MudLink Color="Color.Primary" Underline="Underline.Always" Href="@($"/{email}/Payment_History")"> ver más </MudLink></td> 
+                        </tr>
                     }
-                </tr>
-            }
-        </tbody>
-        </MudSimpleTable>
-         <br>
+                </tbody>
+                </MudSimpleTable>
+            </MudItem>
+        </MudItem>
 
+             
     }else
     {
         <MudText Align="Align.Center" Typo="Typo.h6">
@@ -98,9 +108,12 @@
     private bool _empty = true;
     private bool _payTaxes = false;
 
-    string[] headings = {"Proyecto", "Tipo de contrato","Fecha pago","Salario Bruto","Deducciones obligatorias",
-            "Deducciones voluntarias","Salario neto"};
+    string[] headings = {"Proyecto","Fecha pago","Salario neto", " "};
     IList<string> rows = new List<string>();
+
+    int dataSize = 3;
+    double[] data = { 77, 25, 20};
+    string[] labels = { "Salario Neto", "Deducciones obligatorias", "Deducciones voluntarias"};
 
     private Payment _lastestPay;
     private Agreement _agreement;
@@ -108,17 +121,6 @@
 
     private IEnumerable<LegalDeduction> _legalDeductions = new List<LegalDeduction>();
     private IList<Subscription> _deductions = new List<Subscription>();
-
-    /*
-    private IList<PaymentHistoryModel> _payments = new List<PaymentHistoryModel>();
-    private IEnumerable<PaymentHistoryModel> _paymentsHistory = new List<PaymentHistoryModel>();
-
-    private IList<Payment> _paymentsList = new List<Payment>();
-
-
-    private IList<String> _paymentsDates = new List<String>();
-    private IList<String> _paymentsProjectNames = new List<String>();
-    */
 
     private double _costVoluntaryDeductions;
     private double _costLegalDeductions;
@@ -131,10 +133,10 @@
         if (_lastestPay != null)
         {
             _latestPayment = await GetLatestPayment();
-            rows.Add(_latestPayment.ProjectName + "#" + _latestPayment.ContractType + "#" +
-            _latestPayment.PaymentDate + "#" + _latestPayment.GrossSalary + "#" +
-            _latestPayment.LegalDeductions + "#" + _latestPayment.VoluntaryDeductions + "#" +
-            _latestPayment.NetSalary);
+            rows.Add(_latestPayment.ProjectName + "#" + _latestPayment.PaymentDate + "#" + _latestPayment.NetSalary);
+            data[0] = _costNetSalary;
+            data[1] = _costLegalDeductions;
+            data[2] = _costVoluntaryDeductions;
             _empty = false;
         }
         _loading = false;
@@ -149,12 +151,6 @@
         PaymentHistoryModel _paymentHistoryModel = new PaymentHistoryModel(_lastestPay.ProjectName,  _agreement.ContractType,
         _lastestPay.EndDate.ToShortDateString(), CostFormat(_lastestPay.GrossSalary),CostFormat(_costLegalDeductions),
         CostFormat(_costVoluntaryDeductions), CostFormat(_costNetSalary));
-        /*
-         * if (_lastestPay > 0){
-            _empty = false;
-        }
-        
-         */
         return _paymentHistoryModel;
     }
 
