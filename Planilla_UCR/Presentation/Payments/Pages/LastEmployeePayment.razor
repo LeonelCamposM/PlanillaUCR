@@ -56,7 +56,7 @@
             
         <thead>
             <MudToolBar>
-            <MudItem xs="5">
+            <MudItem xs="6">
                     <MudSelect Dense="true" T="string" Label="Pago seleccionado" Variant="Variant.Outlined" TextChanged="OnPaymentSelect">
                         <MudSelectItem Value="@(" ")"/>
                         @foreach (var state in _paymentIDS) {
@@ -172,18 +172,23 @@
     // Payment data 
     private Payment _lastPay;
     private Agreement _agreement;
+    private IList<Payment> _lastEmployeePayments;
 
 
     protected override async Task OnParametersSetAsync()
     {
-        var lastEmployeePayments = await PaymentService.GetLastEmployeePayments(email);
-        foreach (var payment in lastEmployeePayments)
+        _lastEmployeePayments = (IList<Payment>) await PaymentService.GetLastEmployeePayments(email);
+        foreach (var payment in _lastEmployeePayments)
         {
-            _paymentIDS.Add(payment.ProjectName +" "+ payment.EndDate.ToShortDateString());
+            _paymentIDS.Add(payment.ProjectName +": "+ payment.EndDate.ToShortDateString());
         }
 
-        _lastPay = lastEmployeePayments.FirstOrDefault();
+        _lastPay = _lastEmployeePayments.FirstOrDefault();
+        await LoadPage();
+    }
 
+    private async Task  LoadPage()
+    {
         if (_lastPay != null)
         {
             await UpdatePayTaxes();
@@ -191,6 +196,7 @@
             Person employer = await PersonService.GetPerson(_lastPay.EmployeeEmail);
             CalculateTotalAmountDeductions();
             CalculateTotalAmountTaxes();
+            rows = new List<string>();
             rows.Add(@"Nombre: "+employer.Name +" "+employer.LastName1 +" "+employer.LastName2  +"#"+"Tipo de contrato: "+_agreement.ContractType+"#"+"Fecha: "+ _lastPay.EndDate.ToShortDateString());
             rows.Add( @"Proyecto: "+_lastPay.ProjectName +"#"+" "+"#"+"Salario: "+ _cultureCR.NumberFormat.CurrencySymbol+ CostFormat(_lastPay.GrossSalary));
             rows.Add( @" "+"#"+" "+"#"+"Salario neto: "+_cultureCR.NumberFormat.CurrencySymbol+ CostFormat(netSalary));
@@ -279,7 +285,12 @@
         return formatedCost;
     }
 
-     private void OnPaymentSelect(string selected) {
+    private  async Task OnPaymentSelect(string selected) {
         _selectedPayment = selected;
+        string project = selected.Split(": ")[0];
+        string date = selected.Split(": ")[1];
+        _lastPay = _lastEmployeePayments.Where(e => e.ProjectName == project && e.EndDate.ToShortDateString().Equals(date)).FirstOrDefault();
+        await LoadPage();
+        await InvokeAsync(StateHasChanged);
     }
 }
