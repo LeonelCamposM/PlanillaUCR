@@ -4,6 +4,7 @@ CREATE DATABASE DB_Planilla
 GO
 USE DB_Planilla
 
+
 -- Tables
 CREATE TABLE Person(
 	Email varchar(255) NOT NULL primary key,
@@ -1015,7 +1016,98 @@ VALUES('leonel@ucr.ac.cr',
 0,
 1
 )
+---------------------------------------------------
+INSERT INTO Subscription
+VALUES('leonel@ucr.ac.cr',
+'Dulces artesanales',
+'Ayudemos a los niños',
+'Hospital de los niños',
+'Cuota voluntaria para ayudar a los más necesitados.',
+14000,
+0,
+1
+)
 
+INSERT INTO Subscription
+VALUES('leonel@ucr.ac.cr',
+'Asian Bay',
+'Ayudemos a los niños',
+'Hospital de los niños',
+'Cuota voluntaria para ayudar a los más necesitados.',
+7000,
+0,
+1
+)
+
+INSERT INTO Subscription
+VALUES('leonel@ucr.ac.cr',
+'CarmelArt',
+'Ayudemos a los niños',
+'Hospital de los niños',
+'Cuota voluntaria para ayudar a los más necesitados.',
+10000,
+0,
+1
+)
+
+INSERT INTO Subscription
+VALUES('leonel@ucr.ac.cr',
+'El pueblo',
+'Ayudemos a los niños',
+'Hospital de los niños',
+'Cuota voluntaria para ayudar a los más necesitados.',
+5000,
+0,
+1
+)
+
+INSERT INTO Subscription
+VALUES('leonel@ucr.ac.cr',
+'Fragancias Doradas',
+'Ayudemos a los niños',
+'Hospital de los niños',
+'Cuota voluntaria para ayudar a los más necesitados.',
+2000,
+0,
+1
+)
+
+INSERT INTO Subscription
+VALUES('leonel@ucr.ac.cr',
+'Kaites',
+'Ayudemos a los niños',
+'Hospital de los niños',
+'Cuota voluntaria para ayudar a los más necesitados.',
+20000,
+0,
+1
+)
+
+INSERT INTO Subscription
+VALUES('leonel@ucr.ac.cr',
+'La Hilita',
+'Ayudemos a los niños',
+'Hospital de los niños',
+'Cuota voluntaria para ayudar a los más necesitados.',
+12000,
+0,
+1
+)
+
+
+INSERT INTO Subscription
+VALUES('leonel@ucr.ac.cr',
+'Armario Vintage',
+'Ayudemos a los niños',
+'Hospital de los niños',
+'Cuota voluntaria para ayudar a los más necesitados.',
+15000,
+0,
+1
+)
+
+
+--------------------------------------
 INSERT INTO AgreementType
 VALUES('Tiempo completo', 1600)
 
@@ -1115,8 +1207,86 @@ VALUES('leonel@ucr.ac.cr',
 'Gym',
 'jeremy@ucr.ac.cr',
 12000,
-'2022-06-2'
+'2022-05-2'
 )
+
+---------------------------------
+
+INSERT INTO Subscribes (EmployerEmail, ProjectName, SubscriptionName, EmployeeEmail, Cost, StartDate)
+VALUES('leonel@ucr.ac.cr',
+'Dulces artesanales',
+'Ayudemos a los niños',
+'jeremy@ucr.ac.cr',
+14000,
+'2022-06-1'
+)
+
+
+INSERT INTO Subscribes (EmployerEmail, ProjectName, SubscriptionName, EmployeeEmail, Cost, StartDate)
+VALUES('leonel@ucr.ac.cr',
+'Asian Bay',
+'Ayudemos a los niños',
+'jeremy@ucr.ac.cr',
+7000,
+'2022-06-1'
+)
+
+INSERT INTO Subscribes (EmployerEmail, ProjectName, SubscriptionName, EmployeeEmail, Cost, StartDate)
+VALUES('leonel@ucr.ac.cr',
+'CarmelArt',
+'Ayudemos a los niños',
+'jeremy@ucr.ac.cr',
+10000,
+'2022-06-1'
+)
+
+
+INSERT INTO Subscribes (EmployerEmail, ProjectName, SubscriptionName, EmployeeEmail, Cost, StartDate)
+VALUES('leonel@ucr.ac.cr',
+'El pueblo',
+'Ayudemos a los niños',
+'jeremy@ucr.ac.cr',
+5000,
+'2022-06-1'
+)
+
+INSERT INTO Subscribes (EmployerEmail, ProjectName, SubscriptionName, EmployeeEmail, Cost, StartDate)
+VALUES('leonel@ucr.ac.cr',
+'Fragancias Doradas',
+'Ayudemos a los niños',
+'jeremy@ucr.ac.cr',
+2000,
+'2022-06-1'
+)
+
+INSERT INTO Subscribes (EmployerEmail, ProjectName, SubscriptionName, EmployeeEmail, Cost, StartDate)
+VALUES('leonel@ucr.ac.cr',
+'Kaites',
+'Ayudemos a los niños',
+'jeremy@ucr.ac.cr',
+20000,
+'2022-06-1'
+)
+
+INSERT INTO Subscribes (EmployerEmail, ProjectName, SubscriptionName, EmployeeEmail, Cost, StartDate)
+VALUES('leonel@ucr.ac.cr',
+'La Hilita',
+'Ayudemos a los niños',
+'jeremy@ucr.ac.cr',
+12000,
+'2022-06-1'
+)
+
+INSERT INTO Subscribes (EmployerEmail, ProjectName, SubscriptionName, EmployeeEmail, Cost, StartDate)
+VALUES('leonel@ucr.ac.cr',
+'Armario Vintage',
+'Ayudemos a los niños',
+'jeremy@ucr.ac.cr',
+15000,
+'2022-06-1'
+)
+
+------------------------------------
 
 INSERT INTO LegalDeduction (DeductionName, Cost)
 VALUES('CCSS',
@@ -1128,7 +1298,6 @@ VALUES('Hacienda',
 48000.3
 )
 
---select * from Agreement order by ProjectName
 
 INSERT INTO Payment
 VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Armario Vintage',153600, '2022-06-01', '2022-06-14')
