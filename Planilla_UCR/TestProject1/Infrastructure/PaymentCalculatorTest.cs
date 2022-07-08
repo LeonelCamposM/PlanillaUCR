@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Xunit;
-using Infrastructure.PaymentCalculator.Repositories;
+using Moq;
+using Application.PaymentCalculator.Implementations;
 
 namespace Tests.Infrastructure
 {
@@ -18,7 +19,7 @@ namespace Tests.Infrastructure
         public void GetProjectHoursReport()
         {
             //arrange
-            var paymentCalculatorService = new PaymentCalculatorRepository();
+            var paymentCalculatorService = new PaymentCalculatorService();
 
             //act
             var grossSalaryFT = paymentCalculatorService.GetFullTimeSalary(_mountPerHour, _workedDays);
