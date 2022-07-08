@@ -28,9 +28,20 @@
     </NotAuthorized>
 </AuthorizeView>
 
+<AuthorizeView Roles="Employee">
+    <Authorized> 
+        @{
+            authorizedEmployee = true;
+        }
+    </Authorized>
+    <NotAuthorized>
+    </NotAuthorized>
+</AuthorizeView>
+
 @code{
     public string email { get; set; }
     public bool authorized { get; set; } = false;
+    public bool authorizedEmployee { get; set; } = false;
     //AccountDTO accountData = new AccountDTO("leonel@ucr.ac.cr","Prueba01!");
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -40,8 +51,16 @@
         {
             if (authorized)
             {
-                ContextMenuService.SetProjectsContext(false, false, "", "", false);
-                nav.NavigateTo($"Projects/{email}/", true);
+                if (authorizedEmployee)
+                {
+                    ContextMenuService.SetProjectsContext(false, false, "", "", false);
+                    nav.NavigateTo($"/Dashboard/{email}/", true);
+                }
+                else
+                {
+                    ContextMenuService.SetProjectsContext(false, false, "", "", false);
+                    nav.NavigateTo($"Projects/{email}/", true);
+                }
             }
             else{
                 nav.NavigateTo($"/Loggin", true);
