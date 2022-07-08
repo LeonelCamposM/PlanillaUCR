@@ -119,7 +119,6 @@ CREATE TABLE Payment(
 	FOREIGN KEY(EmployeeEmail) REFERENCES Employee(Email)
 );
 
-
 -- Suscription Stored Procedures
 GO
  CREATE OR ALTER PROCEDURE GetAllBenefits
@@ -1089,7 +1088,6 @@ VALUES('leonel@ucr.ac.cr',
 12000,
 '2022-06-2'
 )
-
 
 INSERT INTO LegalDeduction (DeductionName, Cost)
 VALUES('CCSS',
