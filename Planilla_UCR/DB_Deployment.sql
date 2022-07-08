@@ -1054,13 +1054,13 @@ VALUES('jeremy@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Trendy Purse','2022-06-1','Tiemp
 
 
 INSERT INTO ReportOfHours
-VALUES('leonel@ucr.ac.cr', 'Fabrica de chocolates','mau@ucr.ac.cr', '2022-06-29',4.0 ,0)
+VALUES('leonel@ucr.ac.cr', 'Fabrica de chocolates','mau@ucr.ac.cr', '2022-06-15',4.0 ,0)
 
 INSERT INTO ReportOfHours
-VALUES('leonel@ucr.ac.cr', 'Fabrica de chocolates','mau@ucr.ac.cr', '2022-06-30',5.0 ,0)
+VALUES('leonel@ucr.ac.cr', 'Fabrica de chocolates','mau@ucr.ac.cr', '2022-06-17',5.0 ,0)
 
 INSERT INTO ReportOfHours
-VALUES('leonel@ucr.ac.cr', 'Fabrica de chocolates','mau@ucr.ac.cr', '2022-07-5',8.0 ,0)
+VALUES('leonel@ucr.ac.cr', 'Fabrica de chocolates','mau@ucr.ac.cr', '2022-06-20',8.0 ,0)
 
 
 INSERT INTO Subscribes (EmployerEmail, ProjectName, SubscriptionName, EmployeeEmail, Cost, StartDate)
@@ -1132,7 +1132,6 @@ VALUES('naye@ucr.ac.cr','leonel@ucr.ac.cr','Dulces artesanales',75000, '2022/06/
 
 INSERT INTO Payment
 VALUES('naye@ucr.ac.cr','leonel@ucr.ac.cr','Dulces artesanales',75000, '2022/06/15', '2022/06/28')
---Hay que pagarle a Naye por medio tiempo.
 
 INSERT INTO Payment
 VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','El pueblo',153600, '2022/06/01', '2022/06/14')
@@ -1143,21 +1142,11 @@ VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','El pueblo',153600, '2022/06/15', '
 INSERT INTO Payment
 VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Fabrica de chocolates',153600, '2022/06/01', '2022/06/14')
 
---INSERT INTO Payment
---VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Fabrica de chocolates',153600, '2022/06/15', '2022/06/28')
-
 INSERT INTO Payment
 VALUES('naye@ucr.ac.cr','leonel@ucr.ac.cr','Fabrica de chocolates',75000, '2022/06/01', '2022/06/14')
 
---INSERT INTO Payment
---VALUES('naye@ucr.ac.cr','leonel@ucr.ac.cr','Fabrica de chocolates',75000, '2022/06/15', '2022/06/28')
-
 INSERT INTO Payment
 VALUES('mau@ucr.ac.cr','leonel@ucr.ac.cr','Fabrica de chocolates',100000, '2022/06/01', '2022/06/14')
-
---INSERT INTO Payment
---VALUES('mau@ucr.ac.cr','leonel@ucr.ac.cr','Fabrica de chocolates',100000, '2022/06/15', '2022/06/28')
---Hay que pagarle a ny y a Mau.
 
 INSERT INTO Payment
 VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Fragancias Doradas',153600, '2022/06/01', '2022/06/14')
