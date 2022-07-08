@@ -1,9 +1,10 @@
-﻿@page "/Reports/{email}/{projectName}"
+﻿@page "/Reports/{employerEmail}/{projectName}"
 
 @using Domain.Agreements.DTOs
 @using Application.Agreements
 @using Domain.Agreements.Entities
 @using Application.People
+@using Domain.Payments.Entities
 @using Domain.People.Entities
 @using Domain.Employees.Entities
 @using Application.Employees
@@ -19,8 +20,10 @@
 @using Presentation.Projects.Models
 @using Presentation.Core.Components
 @using System.ComponentModel.DataAnnotations
-@using Presentation.Agreements.Models
+@using Presentation.Employers.Models
 @using Application.ContextMenu
+@using Application.LegalDeductions
+@using Domain.LegalDeductions.Entities
 
 @inject IProjectService ProjectService
 @inject ISnackbar Snackbar
@@ -28,11 +31,9 @@
 @inject IAgreementTypeService AgreementTypeService
 @inject IEmployeeService EmployeeService
 @inject IContextMenuService ContextMenuService
-
-@inject NavigationManager nav
-
-
 @inject IDialogService DialogService
+@inject ILegalDeductionService LegalDeductionService
+@inject NavigationManager nav
 
 @if(_loading) {
     <MudPaper  Height="220px" Width="100%" Outlined="false" Class="border-none pa-4" Elevation="0">
@@ -44,7 +45,7 @@
 
         List<BreadcrumbItem> _items = new List<BreadcrumbItem>
         {
-            new BreadcrumbItem("Reportes", href: $"/Reports/{email}/{projectName}"),
+            new BreadcrumbItem("Reportes", href: $"/Reports/{employerEmail}/{projectName}"),
             new BreadcrumbItem("Pago planilla",  href: null, disabled: true)
         }; 
         <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
@@ -53,22 +54,19 @@
 
         if(!_empty)
         {
-            <MudTable @ref="@_table" Items="@_myJoin" RowsPerPage="4" Striped="true" Bordered="true" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" Filter="new Func<JoinedTables,bool>(Filter)" >
+            <MudTable @ref="@_table" Items="@_templateTableTempList" Striped="true" Bordered="true" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading">
                         <HeaderContent>
                             <MudTh Style="text-align:justify-all">Total gastos empleador</MudTh>
                             <MudTh Style="text-align:justify-all"> ₡ 1 000 000 </MudTh>
                         </HeaderContent>
                         <RowTemplate>
-                        <MudTd DataLabel="Total gastos empleador" Style="text-align:justify-all">@context.Name @context.LastName1 @context.LastName2</MudTd>
-                        <MudTd DataLabel="₡ 1 000 000" Style="text-align:justify-all">@context.EmployeeEmail</MudTd>
+                        <MudTd DataLabel="Total gastos empleador" Style="text-align:justify-all">@context.Name</MudTd>
+                        <MudTd DataLabel="₡ 1 000 000" Style="text-align:justify-all">@context.Amount</MudTd>
                         </RowTemplate>
             </MudTable>
-                <br>
-
-            <MudTable @ref="@_table" Items="@_myJoin" RowsPerPage="4" Striped="true" Bordered="true" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" Filter="new Func<JoinedTables,bool>(Filter)" >
-                    <ToolBarContent>
-                            <MudSpacer />
-                    </ToolBarContent> 
+        <br>
+        ShowSnackNotification("Mensaje entre la tabla 1 y 2", Severity.Success);
+        <MudTable @ref="@_table" Items="@_templateTableTempList" RowsPerPage="4" Striped="true" Bordered="true" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading">
                         <HeaderContent>
                             <MudTh Style="text-align:justify-all">Desglose salario</MudTh>
                             <MudTh Style="text-align:justify-all"> Monto </MudTh>
@@ -76,51 +74,50 @@
                         <RowTemplate>
                         <MudTd DataLabel="Desglose salario" Style="text-align:justify-all"> Salario empleado por hora</MudTd>
                         <MudTd DataLabel="Monto" Style="text-align:justify-all"> ₡ 1 000 000 </MudTd>
-                        <MudTd DataLabel="Desglose salario" Style="text-align:justify-all"> Salario empleado tiempo completo</MudTd>
-                        <MudTd DataLabel="Monto" Style="text-align:justify-all"> ₡ 1 000 000 </MudTd>
-                        <MudTd DataLabel="Desglose salario" Style="text-align:justify-all"> Salario servicios profesionales</MudTd>
-                        <MudTd DataLabel="Monto" Style="text-align:justify-all"> ₡ 1 000 000 </MudTd>
-                        <MudTd DataLabel="Desglose salario" Style="text-align:justify-all"> Total en salario</MudTd>
-                        <MudTd DataLabel="Monto" Style="text-align:justify-all"> ₡ 1 000 000 </MudTd>
+
                         </RowTemplate>
             </MudTable>
                 <br>
 
-            <MudTable @ref="@_table" Items="@_myJoin" RowsPerPage="4" Striped="true" Bordered="true" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" Filter="new Func<JoinedTables,bool>(Filter)" >
-                    <ToolBarContent>
-                            <MudSpacer />
-                    </ToolBarContent> 
+            <MudTable @ref="@_table" Items="@_templateTableTempList" Striped="true" Bordered="true" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading"> 
                         <HeaderContent>
                             <MudTh Style="text-align:justify-all">Desglose aporte del patrono</MudTh>
                             <MudTh Style="text-align:justify-all"> Monto </MudTh>
                         </HeaderContent>
                         <RowTemplate>
-                        <MudTd DataLabel="Desglose salario" Style="text-align:justify-all">@context.Name @context.LastName1 @context.LastName2</MudTd>
-                        <MudTd DataLabel="Monto" Style="text-align:justify-all">@context.EmployeeEmail</MudTd>
+                        <MudTd DataLabel="Desglose salario" Style="text-align:justify-all">@context.Name </MudTd>
+                        <MudTd DataLabel="Monto" Style="text-align:justify-all">@context.Amount</MudTd>
                         </RowTemplate>
             </MudTable>
                 <br>
 
-            <MudTable @ref="@_table" Items="@_myJoin" RowsPerPage="4" Striped="true" Bordered="true" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" Filter="new Func<JoinedTables,bool>(Filter)" >
-                    <ToolBarContent>
-                            <MudSpacer />
-                    </ToolBarContent> 
+            <MudTable @ref="@_table" Items="@_templateTableTempList" Striped="true" Bordered="true" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading">
                         <HeaderContent>
                             <MudTh Style="text-align:justify-all">Desglose beneficios</MudTh>
                             <MudTh Style="text-align:justify-all"> Monto </MudTh>
                         </HeaderContent>
                         <RowTemplate>
-                        <MudTd DataLabel="Desglose salario" Style="text-align:justify-all">@context.Name @context.LastName1 @context.LastName2</MudTd>
-                        <MudTd DataLabel="Monto" Style="text-align:justify-all">@context.EmployeeEmail</MudTd>
+                        <MudTd DataLabel="Desglose salario" Style="text-align:justify-all">@context.Name</MudTd>
+                        <MudTd DataLabel="Monto" Style="text-align:justify-all">@context.Amount</MudTd>
                         </RowTemplate>
             </MudTable>
         }
         <br>
-            <MudButton Variant="Variant.Filled" OnClick="GoToCreateEmployee" Color="Color.Primary">
+            <MudButton Variant="Variant.Filled" @onclick="@(e => OpenDialog(employerEmail))" Color="Color.Primary">
                 <MudText>
-                Registrar Empleados
+                Exportar
                 </MudText> 
             </MudButton> 
+            <MudDialog @bind-IsVisible="_visible" Options="_dialogOptions">
+                <TitleContent>
+                    <MudText Typo="Typo.h6" Style="text-align:center">
+                        Se ha enviado el reporte a su correo electrónico: @employerEmail
+                    </MudText>
+                </TitleContent>
+                <DialogActions>
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="CloseDialog" Class="px-10">Aceptar</MudButton>
+                </DialogActions>
+            </MudDialog>
     
 }
 
@@ -128,46 +125,77 @@
     [Parameter]
     public string projectName { get; set; }
     [Parameter]
-    public string email { get; set; }
-    [Parameter]
-    public EventCallback<string> SendTableState { get; set; }
+    public string employerEmail { get; set; }
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
     private DialogOptions _dialogOptions = new() { FullWidth = true };
-    private IEnumerable<Project> _projects = new List<Project>();
-    private IEnumerable<Agreement> _agreements = new List<Agreement>();
-    private IEnumerable<AgreementType> _agreementType = new List<AgreementType>();
+
+
+
+    private IEnumerable<Payment> _paymentList = new List<Payment>();
+    private IEnumerable<Agreement> _agreementList = new List<Agreement>();
     private IEnumerable<Person> _hiredEmployees = new List<Person>();
-    private IEnumerable<JoinedTables> _myJoin = new List<JoinedTables>();
-    private MudTable<JoinedTables> _table;
+    private IEnumerable<LegalDeduction> _deductionList = new List<LegalDeduction>();
+
+
+
+    private IList<ReportePlanillasTemplateTable> _templateTableTempList = new List<ReportePlanillasTemplateTable>();
+    private IList<ReportePlanillasTemplateTable> _templateTableFinalList = new List<ReportePlanillasTemplateTable>();
+
+    private double _totalDeductions;
+    private double _totalSalaries = 10000.0;
+    private double _totalBenefits;
+    private double _totalFinal; @* Look for a better name*@
+
+
+
+
+
+    private MudTable<ReportePlanillasTemplateTable> _table;
     private bool _loading = true;
-    private string _mySearchString = "";
     private bool _empty = true;
-    private string _employerEmailToBeDeleted = "";
-    private string _projectNameToBeDeleted = "";
-    private string _justificationToBeDeleted = "";
-    private string _employeeEmailToBeDeleted = "";
     private bool _visible = false;
 
     protected override async Task OnInitializedAsync()
     {
-        ContextMenuService.SetProjectsContext(true, true, projectName, email, false);
+        ContextMenuService.SetProjectsContext(true, true, projectName, employerEmail, false);
         _empty = false;
-        _projects = await ProjectService.GetEmployerProyects(email);
-        _agreements = await AgreementService.GetAllAgreementsByProjectAndEmployer(projectName, email);
-        _agreementType = await AgreementTypeService.GetAllAgreementTypes();
-        _hiredEmployees = await EmployeeService.GetProjectEmployees(projectName, email);
-        PopulateJoinAttribute();
-        CheckJoinLenght();
+        // Payment _payment = new Payment("", _projectInfo.EmployerEmail, _projectInfo.ProjectName, 0, _projectInfo.LastPaymentDate, _nextPay);
+        //IList<Payment> _paidEmployees = 
+        // _paymentList = await PaymentService.GetProjectPayments(_payment);
+        _deductionList = await LegalDeductionService.GetAllAsync();
+        fillOutDeductionsTable();
+        //_projects = await ProjectService.GetEmployerProyects(employerEmail);
+        //_agreements = await AgreementService.GetAllAgreementsByProjectAndEmployer(projectName, employerEmail);
+        //_agreementType = await AgreementTypeService.GetAllAgreementTypes();
+        //_hiredEmployees = await EmployeeService.GetProjectEmployees(projectName, employerEmail);
+        //PopulateJoinAttribute();
+        //CheckJoinLenght();
         _loading = false;
     }
 
-    private void PopulateJoinAttribute() 
+
+    private void fillOutDeductionsTable()
+    {
+        double deductionCost = 0.0;
+        string deductionName;
+        foreach (var deduction in _deductionList)
+        {
+            deductionCost = _totalSalaries * deduction.Cost;
+            deductionName = deduction.DeductionName + ": " + Math.Round(deduction.Cost * 100, 2) + "%";
+            ReportePlanillasTemplateTable myTempTable = new ReportePlanillasTemplateTable(deductionName, deductionCost);
+            _templateTableTempList.Add(myTempTable);
+            _totalDeductions += deductionCost;
+        }
+
+    }
+    /*
+    private void JoinAgreementAndPayment() 
     { 
         _myJoin = from P in _projects
                   join A in _agreements on P.ProjectName equals A.ProjectName
                   join Pe in _hiredEmployees on A.EmployeeEmail equals Pe.Email
                   
-                  select new JoinedTables
+                  select new HiredEmployeesJoinedTables
                     {
                         PaymentInterval = P.PaymentInterval,
                         EmployeeEmail = A.EmployeeEmail,
@@ -180,6 +208,7 @@
                         LastName2 =  Pe.LastName2
                     };
     }
+    
 
     private void CheckJoinLenght()
     {
@@ -188,31 +217,29 @@
             _empty = true;
         }
     }
-
+    */
     private void OpenDialog(string employeeEmail)
     {
-        _employeeEmailToBeDeleted = employeeEmail;
-        _employerEmailToBeDeleted = email;
-        _projectNameToBeDeleted = projectName;
         _visible = true;
+
     }
 
     private void CloseDialog()
     {
         _visible = false;
-        _justificationToBeDeleted = "";
     } 
-
+    
     private async Task FireEmployee()
     {
-        bool chekedJustificationLength = CheckJustificationLength();
+        bool chekedJustificationLength = true; // CheckJustificationLength();
+
         if (chekedJustificationLength)
         {
             CloseDialog();
-            await AgreementService.DesactivateAgreement(_employeeEmailToBeDeleted, _employerEmailToBeDeleted, _projectNameToBeDeleted, _justificationToBeDeleted);
-            ShowSnackNotification("El empleado con el email " + _employeeEmailToBeDeleted + " ha sido eliminado del proyecto", Severity.Success);
+            //await AgreementService.DesactivateAgreement(_employeeEmailToBeDeleted, _employerEmailToBeDeleted, _projectNameToBeDeleted, _justificationToBeDeleted);
+            //ShowSnackNotification("El empleado con el email " + _employeeEmailToBeDeleted + " ha sido eliminado del proyecto", Severity.Success);
             await Task.Delay(3500); // Time in miliseconds
-            nav.NavigateTo($"/View_Project_Employees/{email}/{projectName}", true);
+            nav.NavigateTo($"/View_Project_Employees/{employerEmail}/{projectName}", true);
         }
         else
         {
@@ -220,27 +247,6 @@
         }
     }
 
-    private void PageChanged(int i)
-    {
-        _table.NavigateTo(i - 1);
-    }
-
-    private bool Filter(JoinedTables element) => FilterFunction(element, _mySearchString);
-
-    private bool FilterFunction(JoinedTables element, string searchString)
-    {
-        if (string.IsNullOrWhiteSpace(searchString))
-            return true;
-        if (element.EmployeeEmail.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        return false;
-    }
-
-    private void GoToCreateEmployee()
-    {
-        nav.NavigateTo($"/Create_Employee/{email}/{projectName}");
-    }
-    
     void ShowSnackNotification(string message, Severity severity)
     {
         Snackbar.Configuration.SnackbarVariant = Variant.Filled;
@@ -259,14 +265,4 @@
         });
     }
 
-    private bool CheckJustificationLength()
-    {
-        bool result = true;
-        if (_justificationToBeDeleted.Length == 0)
-        {
-            result = false;
-            ShowSnackNotification("Por favor, escriba una justificación", Severity.Error);
-        }
-        return result;
-    }
 }

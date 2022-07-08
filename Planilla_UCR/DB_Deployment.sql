@@ -131,7 +131,6 @@ CREATE TABLE PaymentContainsSubscription(
 	FOREIGN KEY(EmployerEmail, ProjectName, SubscriptionName) REFERENCES Subscription(EmployerEmail, ProjectName, SubscriptionName) 
 );
 
-
 CREATE TABLE Applies(
 	EmployeeEmail varchar(255) NOT NULL,
 	EmployerEmail varchar(255) NOT NULL,

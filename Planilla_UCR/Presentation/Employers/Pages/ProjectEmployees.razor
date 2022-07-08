@@ -19,7 +19,7 @@
 @using Presentation.Projects.Models
 @using Presentation.Core.Components
 @using System.ComponentModel.DataAnnotations
-@using Presentation.Agreements.Models
+@using Presentation.Employers.Models
 @using Application.ContextMenu
 
 @inject IProjectService ProjectService
@@ -49,7 +49,7 @@
     </MudPaper>
     if(!_empty)
     {
-            <MudTable @ref="@_table" Items="@_myJoin" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" Filter="new Func<JoinedTables,bool>(Filter)" >
+            <MudTable @ref="@_table" Items="@_myJoin" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" Filter="new Func<HiredEmployeesJoinedTables,bool>(Filter)" >
                 <ToolBarContent>
                         <MudText> Empleados contratados </MudText>
                         <MudSpacer />
@@ -135,16 +135,14 @@
     public string projectName { get; set; }
     [Parameter]
     public string email { get; set; }
-    [Parameter]
-    public EventCallback<string> SendTableState { get; set; }
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
     private DialogOptions _dialogOptions = new() { FullWidth = true };
     private IEnumerable<Project> _projects = new List<Project>();
     private IEnumerable<Agreement> _agreements = new List<Agreement>();
     private IEnumerable<AgreementType> _agreementType = new List<AgreementType>();
     private IEnumerable<Person> _hiredEmployees = new List<Person>();
-    private IEnumerable<JoinedTables> _myJoin = new List<JoinedTables>();
-    private MudTable<JoinedTables> _table;
+    private IEnumerable<HiredEmployeesJoinedTables> _myJoin = new List<HiredEmployeesJoinedTables>();
+    private MudTable<HiredEmployeesJoinedTables> _table;
     private bool _loading = true;
     private string _mySearchString = "";
     private bool _empty = true;
@@ -173,7 +171,7 @@
                   join A in _agreements on P.ProjectName equals A.ProjectName
                   join Pe in _hiredEmployees on A.EmployeeEmail equals Pe.Email
                   
-                  select new JoinedTables
+                  select new HiredEmployeesJoinedTables
                     {
                         PaymentInterval = P.PaymentInterval,
                         EmployeeEmail = A.EmployeeEmail,
@@ -231,9 +229,9 @@
         _table.NavigateTo(i - 1);
     }
 
-    private bool Filter(JoinedTables element) => FilterFunction(element, _mySearchString);
+    private bool Filter(HiredEmployeesJoinedTables element) => FilterFunction(element, _mySearchString);
 
-    private bool FilterFunction(JoinedTables element, string searchString)
+    private bool FilterFunction(HiredEmployeesJoinedTables element, string searchString)
     {
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
