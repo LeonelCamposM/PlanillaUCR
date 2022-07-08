@@ -538,18 +538,6 @@ BEGIN
 	A.ContractType = @ContractType
 END
 
---Payments stored procedures 
-GO
-CREATE OR ALTER PROCEDURE GetEmployeePayments
-@employeeEmail VARCHAR(255)
-AS
-BEGIN
-	SELECT *
-	FROM Payment 
-	Where EmployeeEmail = @employeeEmail;
-END
-
-
 GO
 CREATE OR ALTER PROCEDURE CheckIfAgreementIsDesactivated(
 @EmployeeEmail varchar(255), 
@@ -594,6 +582,32 @@ BEGIN
 	SET ReportOfHours.Approved = 1
 	WHERE ReportOfHours.EmployeeEmail = @EmployeeEmail AND ReportOfHours.EmployerEmail = @EmployerEmail AND ReportOfHours.ProjectName = @ProjectName AND ReportOfHours.ReportDate = @ReportDate;
 END
+
+--Payments stored procedures 
+GO
+CREATE OR ALTER PROCEDURE GetEmployeePayments
+@employeeEmail VARCHAR(255)
+AS
+BEGIN
+	SELECT *
+	FROM Payment 
+	Where EmployeeEmail = @employeeEmail;
+END
+
+
+
+GO
+CREATE OR ALTER PROCEDURE GetEmployeeFiveLatestPayments
+@employeeEmail VARCHAR(255)
+AS
+BEGIN
+	SELECT TOP 5 *
+	FROM Payment 
+	WHERE EmployeeEmail = @employeeEmail
+	ORDER BY EndDate DESC;
+END
+
+
 
 -- Data Insert
 GO
