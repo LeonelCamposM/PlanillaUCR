@@ -62,6 +62,12 @@ else
 
 	if (!_empty)
 	{
+		<MudSelect T="string" Label="Coffee" Variant="Variant.Outlined"	TextChanged = "DoStuff">
+			<MudSelectItem Value="@("Cappuccino")" />
+			<MudSelectItem Value="@("Cafe Latte")" />
+			<MudSelectItem Value="@("Espresso")" />
+		</MudSelect>
+		<br>
 		<MudTable Items="@_templateTempSummaryTable" Striped="true" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading">
 			<ColGroup>
 				<col style="width: 50%;" />
@@ -351,4 +357,10 @@ else
 			};
 		});
 	}
+
+	void DoStuff(string selected)
+	{
+		ShowSnackNotification(selected, Severity.Success);
+	}
+	
 }
