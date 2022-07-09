@@ -26,7 +26,7 @@
 @inject ISubscriptionService SuscriptionService
 @inject ITaxCalculatorService TaxCalculatorService
 @inject IPaymentCalculatorService PaymentCalculatorService
-@page "/Last_Pay/{email}/{projectName}"
+@page "/Last_Pay/{email}"
 
 @if(_loading) 
 {
@@ -49,7 +49,7 @@
     if (!_empty)
     {   
         <MudText Align="Align.Center" Typo="Typo.h6">
-            Reporte de últimos pagos
+            Reporte de último pago en @projectName
         </MudText>
         <br />
         <MudSimpleTable Style="overflow-x: auto;">
@@ -150,7 +150,6 @@
 @code {
     [Parameter]
     public string email { get; set; }
-    [Parameter]
     public string projectName { get; set; }
 
     // Tables
@@ -184,6 +183,7 @@
         }
 
         _lastPay = _lastEmployeePayments.FirstOrDefault();
+        projectName = _lastPay.ProjectName;
         await LoadPage();
     }
 
@@ -288,6 +288,7 @@
     private  async Task OnPaymentSelect(string selected) {
         _selectedPayment = selected;
         string project = selected.Split(": ")[0];
+        projectName = project;
         string date = selected.Split(": ")[1];
         _lastPay = _lastEmployeePayments.Where(e => e.ProjectName == project && e.EndDate.ToShortDateString().Equals(date)).FirstOrDefault();
         await LoadPage();
