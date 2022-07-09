@@ -28,5 +28,10 @@ namespace Application.Payments.Implementations
         { 
             return await _paymentRepository.GetProjectPayments(payment);
         }
+
+        public async Task<IList<Payment>> GetAllPaymentsStartAndEndDates(string employerEmail, string projectName)
+        {
+            return await _paymentRepository.GetAllPaymentsStartAndEndDates(employerEmail, projectName);
+        }
     }
 }

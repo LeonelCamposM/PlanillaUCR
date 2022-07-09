@@ -4,16 +4,12 @@
 @using Application.Agreements
 @using Domain.Agreements.Entities
 @using Application.People
-@using Domain.Payments.Entities
 @using Domain.People.Entities
 @using Domain.Employees.Entities
 @using Application.Employees
 @using Application.Employers
 @using Domain.Employers.Entities
 @using Domain.Employers.DTOs
-@using Application.AgreementTypes
-@using Domain.AgreementTypes.Entities
-@using Domain.AgreementTypes.DTOs
 @using Domain.Projects.DTOs
 @using Domain.Projects.Entities
 @using Application.Projects
@@ -24,15 +20,25 @@
 @using Application.ContextMenu
 @using Application.LegalDeductions
 @using Domain.LegalDeductions.Entities
+@using Application.Subscriptions
+@using Domain.Subscriptions.Entities
+@using Application.Subscribes
+@using Domain.Subscribes.Entities
+@using Presentation.Payments.Models
+@using Domain.Payments.Entities
+@using Application.Payments
 
 @inject IProjectService ProjectService
 @inject ISnackbar Snackbar
 @inject IAgreementService AgreementService
-@inject IAgreementTypeService AgreementTypeService
 @inject IEmployeeService EmployeeService
 @inject IContextMenuService ContextMenuService
 @inject IDialogService DialogService
 @inject ILegalDeductionService LegalDeductionService
+@inject ISubscriptionService SubscriptionService
+@inject ISubscribeService SubscribeService
+@inject IPaymentService PaymentService
+
 @inject NavigationManager nav
 
 @if(_loading) {
@@ -54,32 +60,34 @@
 
         if(!_empty)
         {
-            <MudTable @ref="@_table" Items="@_templateTableTempList" Striped="true" Bordered="true" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading">
+            <MudTable Items="@_templateTempSalariesTable" Striped="true" Bordered="true" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading">
                         <HeaderContent>
+                            @* Add a final temp table with these attributes in it. 
+                            Total has to be the last item to be calculate*@
                             <MudTh Style="text-align:justify-all">Total gastos empleador</MudTh>
-                            <MudTh Style="text-align:justify-all"> ₡ 1 000 000 </MudTh>
+                            <MudTh Style="text-align:justify-all"> _totalFinal </MudTh>
                         </HeaderContent>
-                        <RowTemplate>
-                        <MudTd DataLabel="Total gastos empleador" Style="text-align:justify-all">@context.Name</MudTd>
-                        <MudTd DataLabel="₡ 1 000 000" Style="text-align:justify-all">@context.Amount</MudTd>
-                        </RowTemplate>
             </MudTable>
         <br>
-        ShowSnackNotification("Mensaje entre la tabla 1 y 2", Severity.Success);
-        <MudTable @ref="@_table" Items="@_templateTableTempList" RowsPerPage="4" Striped="true" Bordered="true" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading">
+
+        @*Remember to change variable name to *@
+
+        <MudTable @ref="@_table" Items="@_templateTempSalariesTable" RowsPerPage="4" Striped="true" Bordered="true" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading">
                         <HeaderContent>
                             <MudTh Style="text-align:justify-all">Desglose salario</MudTh>
                             <MudTh Style="text-align:justify-all"> Monto </MudTh>
                         </HeaderContent>
                         <RowTemplate>
-                        <MudTd DataLabel="Desglose salario" Style="text-align:justify-all"> Salario empleado por hora</MudTd>
-                        <MudTd DataLabel="Monto" Style="text-align:justify-all"> ₡ 1 000 000 </MudTd>
+                        <MudTd DataLabel="Desglose salario" Style="text-align:justify-all"> @context.Name</MudTd>
+                        <MudTd DataLabel="Monto" Style="text-align:justify-all"> @context.Amount </MudTd>
 
                         </RowTemplate>
             </MudTable>
-                <br>
+        <br>
 
-            <MudTable @ref="@_table" Items="@_templateTableTempList" Striped="true" Bordered="true" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading"> 
+        @* Solution? Task delayTask = fillOutBenefitsTable(); *@
+
+        <MudTable @ref="@_table" Items="@_templateTempDeductionsTable" Striped="true" Bordered="true" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading"> 
                         <HeaderContent>
                             <MudTh Style="text-align:justify-all">Desglose aporte del patrono</MudTh>
                             <MudTh Style="text-align:justify-all"> Monto </MudTh>
@@ -90,8 +98,8 @@
                         </RowTemplate>
             </MudTable>
                 <br>
-
-            <MudTable @ref="@_table" Items="@_templateTableTempList" Striped="true" Bordered="true" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading">
+           
+            <MudTable @ref="@_table" Items="@_templateTempBenefitsTable" Striped="true" Bordered="true" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading">
                         <HeaderContent>
                             <MudTh Style="text-align:justify-all">Desglose beneficios</MudTh>
                             <MudTh Style="text-align:justify-all"> Monto </MudTh>
@@ -130,24 +138,27 @@
     private DialogOptions _dialogOptions = new() { FullWidth = true };
 
 
-
     private IEnumerable<Payment> _paymentList = new List<Payment>();
     private IEnumerable<Agreement> _agreementList = new List<Agreement>();
     private IEnumerable<Person> _hiredEmployees = new List<Person>();
     private IEnumerable<LegalDeduction> _deductionList = new List<LegalDeduction>();
+    private IEnumerable<Subscription> _benefitList = new List<Subscription>();
 
+    // Try to make this generic. Issues with async/await
 
+    private IList<ReportePlanillasTemplateTable> _templateTempSalariesTable = new List<ReportePlanillasTemplateTable>();
+    private IList<ReportePlanillasTemplateTable> _templateTempBenefitsTable = new List<ReportePlanillasTemplateTable>();
+    private IList<ReportePlanillasTemplateTable> _templateTempDeductionsTable = new List<ReportePlanillasTemplateTable>();
+    private IList<ReportePlanillasTemplateTable> _templateTempFinalTable = new List<ReportePlanillasTemplateTable>();
 
-    private IList<ReportePlanillasTemplateTable> _templateTableTempList = new List<ReportePlanillasTemplateTable>();
     private IList<ReportePlanillasTemplateTable> _templateTableFinalList = new List<ReportePlanillasTemplateTable>();
+    IList<Payment> _paidEmployees;
 
     private double _totalDeductions;
-    private double _totalSalaries = 10000.0;
+    private double _totalSalaries; // Just to try out the concept
     private double _totalBenefits;
-    private double _totalFinal; @* Look for a better name*@
-
-
-
+    private double _totalFinal = 9999.0; 
+    @* Look for a better name *@
 
 
     private MudTable<ReportePlanillasTemplateTable> _table;
@@ -159,20 +170,65 @@
     {
         ContextMenuService.SetProjectsContext(true, true, projectName, employerEmail, false);
         _empty = false;
+        _agreementList = await AgreementService.GetProjectAgreements(projectName, employerEmail);
         // Payment _payment = new Payment("", _projectInfo.EmployerEmail, _projectInfo.ProjectName, 0, _projectInfo.LastPaymentDate, _nextPay);
         //IList<Payment> _paidEmployees = 
-        // _paymentList = await PaymentService.GetProjectPayments(_payment);
+        _paymentList = await PaymentService.GetAllPaymentsStartAndEndDates(employerEmail, projectName);
+        var startDate = _paymentList.GroupBy( e => e.StartDate);
+        var endDate = _paymentList.GroupBy( e => e.EndDate);
+        DateTime start = new DateTime(2022,06,01);
+        DateTime end = new DateTime(2022, 06, 14);
+        Payment _payment = new Payment("", employerEmail, projectName, 0, start, end);
+        _paidEmployees = await PaymentService.GetProjectPayments(_payment);
+
+        fillOutSalariesTable();
+
         _deductionList = await LegalDeductionService.GetAllAsync();
         fillOutDeductionsTable();
+        _benefitList = await SubscriptionService.GetBenefitsByProject(employerEmail, projectName);
+        await fillOutBenefitsTable();   
         //_projects = await ProjectService.GetEmployerProyects(employerEmail);
         //_agreements = await AgreementService.GetAllAgreementsByProjectAndEmployer(projectName, employerEmail);
         //_agreementType = await AgreementTypeService.GetAllAgreementTypes();
         //_hiredEmployees = await EmployeeService.GetProjectEmployees(projectName, employerEmail);
         //PopulateJoinAttribute();
-        //CheckJoinLenght();
+
+        getAllTotals();
         _loading = false;
     }
 
+    private IEnumerable<ReportePlanillasTemplateTable> JoinAgreementAndPayment() 
+    { 
+        var _tempJoinedTable = from A in _agreementList
+                               join P in _paidEmployees on new { A.EmployerEmail, A.ProjectName, A.EmployeeEmail} equals 
+                               new {P.EmployerEmail, P.ProjectName, P.EmployeeEmail} into joinedTables
+                               from J in joinedTables.DefaultIfEmpty()group J by new
+                               {
+                                   A.ContractType
+                               }
+                                      into grp
+                               select new ReportePlanillasTemplateTable
+                                        {
+                                            Name = grp.Key.ContractType,
+                                            Amount = grp.Sum(e=>e.GrossSalary)
+                                        };
+        return _tempJoinedTable;
+    }
+
+
+    private void fillOutSalariesTable()
+    {
+        var myTempTable = JoinAgreementAndPayment();
+        double salarieCost = 0.0;
+        string salarieName;
+        foreach (var salarie in myTempTable)
+        {
+            salarieCost = salarie.Amount;
+            salarieName = salarie.Name;
+            _templateTempSalariesTable.Add(salarie);
+            _totalSalaries += salarieCost;
+        }
+    }
 
     private void fillOutDeductionsTable()
     {
@@ -183,41 +239,25 @@
             deductionCost = _totalSalaries * deduction.Cost;
             deductionName = deduction.DeductionName + ": " + Math.Round(deduction.Cost * 100, 2) + "%";
             ReportePlanillasTemplateTable myTempTable = new ReportePlanillasTemplateTable(deductionName, deductionCost);
-            _templateTableTempList.Add(myTempTable);
+            _templateTempDeductionsTable.Add(myTempTable);
             _totalDeductions += deductionCost;
         }
-
     }
-    /*
-    private void JoinAgreementAndPayment() 
-    { 
-        _myJoin = from P in _projects
-                  join A in _agreements on P.ProjectName equals A.ProjectName
-                  join Pe in _hiredEmployees on A.EmployeeEmail equals Pe.Email
-                  
-                  select new HiredEmployeesJoinedTables
-                    {
-                        PaymentInterval = P.PaymentInterval,
-                        EmployeeEmail = A.EmployeeEmail,
-                        ContractType = A.ContractType,
-                        ContractStartDate = (DateTime) A.ContractStartDate,
-                        ContractFinishDate = (DateTime) A.ContractFinishDate,
-                        MountPerHour = A.MountPerHour,
-                        Name = Pe.Name,
-                        LastName1 = Pe.LastName1,
-                        LastName2 =  Pe.LastName2
-                    };
-    }
-    
 
-    private void CheckJoinLenght()
+    private async Task fillOutBenefitsTable()
     {
-        if (_myJoin.Length() == 0)
+        double benefitsCost = 0.0;
+        foreach (var benefit in _benefitList)
         {
-            _empty = true;
+            IEnumerable<Subscribe> tempList = await SubscribeService.GetEmployeesBySubscription(employerEmail, projectName, benefit.SubscriptionName);
+            benefitsCost = benefit.Cost * tempList.Length();
+
+            ReportePlanillasTemplateTable myTempTable = new ReportePlanillasTemplateTable(benefit.SubscriptionName, benefitsCost);
+            _templateTempBenefitsTable.Add(myTempTable);
+            _totalBenefits += benefitsCost;
         }
     }
-    */
+
     private void OpenDialog(string employeeEmail)
     {
         _visible = true;
@@ -227,27 +267,13 @@
     private void CloseDialog()
     {
         _visible = false;
-    } 
-    
-    private async Task FireEmployee()
-    {
-        bool chekedJustificationLength = true; // CheckJustificationLength();
-
-        if (chekedJustificationLength)
-        {
-            CloseDialog();
-            //await AgreementService.DesactivateAgreement(_employeeEmailToBeDeleted, _employerEmailToBeDeleted, _projectNameToBeDeleted, _justificationToBeDeleted);
-            //ShowSnackNotification("El empleado con el email " + _employeeEmailToBeDeleted + " ha sido eliminado del proyecto", Severity.Success);
-            await Task.Delay(3500); // Time in miliseconds
-            nav.NavigateTo($"/View_Project_Employees/{employerEmail}/{projectName}", true);
-        }
-        else
-        {
-            CloseDialog();
-        }
     }
 
-    void ShowSnackNotification(string message, Severity severity)
+    private void getAllTotals()
+    {
+        _totalFinal = _totalBenefits + _totalDeductions + _totalSalaries;
+    }
+    private void ShowSnackNotification(string message, Severity severity)
     {
         Snackbar.Configuration.SnackbarVariant = Variant.Filled;
         Snackbar.Configuration.PreventDuplicates = false;
@@ -264,5 +290,4 @@
             };
         });
     }
-
 }
