@@ -28,7 +28,7 @@
 @inject ISubscriptionService SuscriptionService
 @inject ITaxCalculatorService TaxCalculatorService
 @inject IPaymentCalculatorService PaymentCalculatorService
-@page "/Dashboard/{email}/"
+@page "/Dashboard/{email}/fghfg"
 
 @if(_loading) 
 {
@@ -129,7 +129,7 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        _lastestPay = await PaymentService.GetEmployeeLastestPayment(email);
+       // _lastestPay = await PaymentService.GetEmployeeLastestPayment(email);
         if (_lastestPay != null)
         {
             _latestPayment = await GetLatestPayment();
