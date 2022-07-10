@@ -2,7 +2,7 @@
 using Xunit;
 using Application.TaxCalculator.Implementations;
 
-namespace Tests.Infrastructure
+namespace Tests.Application
 {
     public class TaxCalculatorTest
     {
