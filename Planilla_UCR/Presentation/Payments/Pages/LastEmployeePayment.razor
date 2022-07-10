@@ -121,25 +121,26 @@
                             
                     </RowTemplate>
             </MudTable>
-            <br />
-            <br />
-
-            <MudTable @ref="@_tableDeductions" Items="@_deductions" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading">
-                <ToolBarContent>
-                        <MudText Align="Align.Center" Typo="Typo.h6">Deducciones voluntarias:</MudText>
-                        <MudSpacer /> 
-                </ToolBarContent> 
-                <HeaderContent>
-                    <MudTh>Nombre</MudTh>
-                    <MudTh>Monto</MudTh>
-                </HeaderContent>
-
-                <RowTemplate>
-                        <MudTd DataLabel="Nombre">@context.SubscriptionName</MudTd>
-                        <MudTd DataLabel="Costo">@_cultureCR.NumberFormat.CurrencySymbol @CostFormat(context.Cost)</MudTd>
-                </RowTemplate>
-            </MudTable>
         }
+        <br />
+        <br />
+
+        <MudTable @ref="@_tableDeductions" Items="@_deductions" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading">
+            <ToolBarContent>
+                    <MudText Align="Align.Center" Typo="Typo.h6">Deducciones voluntarias:</MudText>
+                    <MudSpacer /> 
+            </ToolBarContent> 
+            <HeaderContent>
+                <MudTh>Nombre</MudTh>
+                <MudTh>Monto</MudTh>
+            </HeaderContent>
+
+            <RowTemplate>
+                    <MudTd DataLabel="Nombre">@context.SubscriptionName</MudTd>
+                    <MudTd DataLabel="Costo">@_cultureCR.NumberFormat.CurrencySymbol @CostFormat(context.Cost)</MudTd>
+            </RowTemplate>
+        </MudTable>
+       
     }else
     {
         <MudText Align="Align.Center" Typo="Typo.h6">
@@ -314,7 +315,16 @@
                 deduction.Cost = deduction.Cost;
             }               
         }
-        EmailService.SendLastPayEmail(emailObject, rows, _deductions, emailLegalDeductions);
+        if (_agreement.ContractType == "Servicios profesionales")
+        {
+            emailLegalDeductions.Clear();
+            emailLegalDeductions.Add(new LegalDeduction("No aplica ",0.0));
+            EmailService.SendLastPayEmail(emailObject, rows, _deductions, emailLegalDeductions);
+        }
+        else
+        {
+            EmailService.SendLastPayEmail(emailObject, rows, _deductions, emailLegalDeductions);
+        }
         Snackbar.Add("Reporte enviado a "+email, Severity.Success);   
     }
 }
