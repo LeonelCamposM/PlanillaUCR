@@ -15,6 +15,7 @@
 @using Application.People
 @using Application.TaxCalculator
 @using Application.PaymentCalculator;
+@using Application.Email;
 
 @inject IPaymentService PaymentService
 @inject IContextMenuService ContextMenuService
@@ -26,6 +27,8 @@
 @inject ISubscriptionService SuscriptionService
 @inject ITaxCalculatorService TaxCalculatorService
 @inject IPaymentCalculatorService PaymentCalculatorService
+@inject IEmailServices EmailService
+@inject ISnackbar Snackbar
 @page "/Last_Pay/{email}"
 
 @if(_loading) 
@@ -49,7 +52,7 @@
     if (!_empty)
     {   
         <MudText Align="Align.Center" Typo="Typo.h6">
-            Reporte de último pago en @projectName
+            Reporte de último pago en @projectName el @date
         </MudText>
         <br />
         <MudSimpleTable Style="overflow-x: auto;">
@@ -67,7 +70,7 @@
                     </MudSelect>
             </MudItem>
             &nbsp;&nbsp;
-            <MudButton Variant="Variant.Filled" Color="Color.Primary">
+            <MudButton OnClick= "SendEmail" Variant="Variant.Filled" Color="Color.Primary">
                     <MudText Class="ms-2">Enviar por correo</MudText>
             </MudButton>
             </MudToolBar>
@@ -167,6 +170,7 @@
     private bool _payTaxes = false;
     private string _selectedPayment = string.Empty;
     private IList<string> _paymentIDS = new List<string>();
+    private string date =string.Empty;
 
     // Payment data 
     private Payment _lastPay;
@@ -184,6 +188,7 @@
 
         _lastPay = _lastEmployeePayments.FirstOrDefault();
         projectName = _lastPay.ProjectName;
+        date = _lastPay.EndDate.ToShortDateString();
         await LoadPage();
     }
 
@@ -237,8 +242,6 @@
         return netSalary;
     }
 
-
-
     private void CalculateTotalAmountDeductions()
     {
         double totalDeductions = 0;
@@ -289,9 +292,30 @@
         _selectedPayment = selected;
         string project = selected.Split(": ")[0];
         projectName = project;
-        string date = selected.Split(": ")[1];
-        _lastPay = _lastEmployeePayments.Where(e => e.ProjectName == project && e.EndDate.ToShortDateString().Equals(date)).FirstOrDefault();
+        string selectedDate = selected.Split(": ")[1];
+        _lastPay = _lastEmployeePayments.Where(e => e.ProjectName == project && e.EndDate.ToShortDateString().Equals(selectedDate)).FirstOrDefault();
+        projectName = _lastPay.ProjectName;
+        date = _lastPay.EndDate.ToShortDateString();
         await LoadPage();
         await InvokeAsync(StateHasChanged);
+    }
+
+    private void  SendEmail()
+    {
+        EmailObject emailObject = new EmailObject("","","","",email);
+        IList<LegalDeduction> emailLegalDeductions = _legalDeductions.Where(e=> e.DeductionName == e.DeductionName).ToList();
+        foreach (LegalDeduction deduction in emailLegalDeductions)
+        {
+            if(!deduction.DeductionName.Equals("Total"))
+            {
+                deduction.Cost = TaxCalculatorService.GetTaxAmount(deduction.DeductionName, _lastPay.GrossSalary);
+            }
+            else
+            {
+                deduction.Cost = deduction.Cost;
+            }               
+        }
+        EmailService.SendLastPayEmail(emailObject, rows, _deductions, emailLegalDeductions);
+        Snackbar.Add("Reporte enviado a "+email, Severity.Success);   
     }
 }
