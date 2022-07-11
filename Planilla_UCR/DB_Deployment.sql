@@ -1165,30 +1165,9 @@ VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Vanidosa',153600, '2022/06/15', '2
 
 
 -- Leonel Demo Insert
-
-INSERT INTO Person
-VALUES('naye@ucr.ac.cr',
-'Nasheri',
-'Azofeifa',
-'Porras',
-83355349,
-'CR4024756765',
-'Alajuela, Costa Rica',
-'89433965',
-1
-)
-
-INSERT INTO Person
-VALUES('david@ucr.ac.cr',
-'David',
-'Hidalgo',
-'Castro',
-83355346,
-'CR4024242342',
-'Alajuela, Costa Rica',
-'89433965',
-1
-)
+INSERT INTO Person VALUES
+('naye@ucr.ac.cr', 'Nayeri', 'Azofeifa','Porras', 83355349,'CR4024756765','Alajuela, Costa Rica','89433965',1),
+('david@ucr.ac.cr','David','Hidalgo','Castro',83355346,'CR4024242342','Alajuela, Costa Rica','89433965',1)
 
 INSERT INTO Employee
 VALUES('naye@ucr.ac.cr')
@@ -1196,7 +1175,6 @@ VALUES('naye@ucr.ac.cr')
 INSERT INTO Employer
 VALUES('david@ucr.ac.cr')
 
--- David Projects
 INSERT INTO Project VALUES
 ('david@ucr.ac.cr','Dulces david', 'Emprendimiento de dulces',15000,10,'Quincenal',1,'2022/06/15'),
 ('david@ucr.ac.cr','La zapatera','Emprendimiento de zapatos',15000,10,'Mensual',1,'2022/06/30'),
@@ -1220,6 +1198,24 @@ INSERT INTO ReportOfHours VALUES
 ('david@ucr.ac.cr', 'Taller Hidalgo','naye@ucr.ac.cr', '2022-06-2',4.0 ,0),
 ('david@ucr.ac.cr', 'Taller Hidalgo','naye@ucr.ac.cr', '2022-06-4',5.0 ,0),
 ('david@ucr.ac.cr', 'Taller Hidalgo','naye@ucr.ac.cr', '2022-06-6',8.0 ,0)
+
+INSERT INTO Subscription VALUES
+('david@ucr.ac.cr','Dulces david', 'Ayuda voluntaria', 'AYA','',12000,0,1),
+('david@ucr.ac.cr','Dulces david', 'Ahorro dentista', 'AYA','',12000,0,1),
+('david@ucr.ac.cr','Taller Hidalgo', 'Ahorro marchamo', 'AYA','',12000,0,1),
+('david@ucr.ac.cr','Taller Hidalgo', 'Ayuda voluntaria', 'AYA','',12000,0,1),
+('david@ucr.ac.cr','Cryptomonedas', 'Ahorro pago luz', 'AYA','',12000,0,1),
+('david@ucr.ac.cr','Cryptomonedas', 'Fondo de pensiones', 'AYA','',12000,0,1),
+('david@ucr.ac.cr','La zapatera', 'Fondo de pensiones', 'AYA','',12000,0,1)
+
+INSERT INTO Subscribes (EmployerEmail, ProjectName, SubscriptionName, EmployeeEmail, Cost, StartDate) VALUES
+('david@ucr.ac.cr','Dulces david','Ayuda voluntaria','naye@ucr.ac.cr',25000,'2022-06-1'),
+('david@ucr.ac.cr','Dulces david','Ahorro dentista','naye@ucr.ac.cr',10000,'2022-06-1'),
+('david@ucr.ac.cr','Taller Hidalgo','Ahorro marchamo','naye@ucr.ac.cr',10000,'2022-06-1'),
+('david@ucr.ac.cr','Taller Hidalgo','Ayuda voluntaria','naye@ucr.ac.cr',25000,'2022-06-1'),
+('david@ucr.ac.cr','Cryptomonedas','Fondo de pensiones','naye@ucr.ac.cr',10000,'2022-06-1'),
+('david@ucr.ac.cr','Cryptomonedas','Ahorro pago luz','naye@ucr.ac.cr',25000,'2022-06-1'),
+('david@ucr.ac.cr','La zapatera','Fondo de pensiones','naye@ucr.ac.cr',10000,'2022-06-1')
 
 -- 8 * 30 * 4000 = 96,000
 INSERT INTO Payment
