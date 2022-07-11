@@ -59,16 +59,14 @@ else
 	<MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
 	<MudPaper Height="15px" Width="100%" Outlined="false" Class="border-none" Elevation="0">
 	</MudPaper>
-	if (!_empty)
-	{
-		<MudGrid>		
+			<MudGrid>		
 			<MudItem xs="10" sm="12">
 				<MudPaper  Height="75px" Width="100%" Outlined="false" Class="border-none pa-4" Elevation="0">
 					<MudText Align="Align.Center" Typo="Typo.h6">Contrato 4: Reporte Planilla</MudText>
 				</MudPaper>
 			</MudItem> 
 		 <MudItem xs="4">
-			<MudSelect T="string" @bind-Value="projectName" Label="Nombre de proyecto" Variant="Variant.Outlined"	TextChanged = "DoStuff">
+			<MudSelect T="string" @bind-Value="_myProjectName" Label="Nombre de proyecto" Variant="Variant.Outlined" TextChanged = "fillOutAllTablesByProject">
 				@foreach (var project in _projects)
 				{
 					<MudSelectItem T="string" Value="@project.ProjectName">@project.ProjectName</MudSelectItem>
@@ -76,18 +74,21 @@ else
 			</MudSelect>
 		</MudItem>
 		 <MudItem xs="4">
-			<MudTextField @bind-Value="employerEmail" Label="Nombre del empleado" Variant="Variant.Outlined" ReadOnly="true" >
+			<MudTextField @bind-Value="employerEmail" Label="Correo empleador" Variant="Variant.Outlined" ReadOnly="true" >
 			</MudTextField>
 		</MudItem>
 			<MudItem xs="4">
-			<MudSelect T="string" Label="Fecha de pago" Variant="Variant.Outlined" TextChanged = "DoStuff">
+			<MudSelect T="string"  @bind-Value="myEndDate" Label="Periodo de pago" Variant="Variant.Outlined" TextChanged = "fillOutAllTablesByDates">
 				@foreach (var project in _projectDates)
 				{
-					<MudSelectItem Value="@project.EndDate"> Periodo: @project.StartDate - @project.EndDate</MudSelectItem>
+					<MudSelectItem Value="@project.EndDate" > @project.StartDate - @project.EndDate</MudSelectItem>
 				}
 			</MudSelect>
-		</MudItem>
+			</MudItem>
 		</MudGrid>
+	if (!_empty)
+	{
+
 		<br>
 		<MudTable Items="@_templateTempSummaryTable" Striped="true" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading">
 			<ColGroup>
@@ -167,23 +168,34 @@ else
 				</MudTFootRow>
 			</FooterContent>
 		</MudTable>
-	}
-	<br>
-	<MudButton Variant="Variant.Filled" @onclick="@(e => OpenDialog())" Color="Color.Primary">
-		<MudText>
-			Exportar
-		</MudText>
-	</MudButton>
-	<MudDialog @bind-IsVisible="_visible" Options="_dialogOptions">
-		<TitleContent>
-			<MudText Typo="Typo.h6" Style="text-align:center">
-				Se ha enviado el reporte a su correo electrónico: @employerEmail
+		<br>
+		<MudButton Variant="Variant.Filled" @onclick="@(e => OpenDialog())" Color="Color.Primary">
+			<MudText>
+				Exportar
 			</MudText>
-		</TitleContent>
-		<DialogActions>
-			<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="CloseDialog" Class="px-10">Aceptar</MudButton>
-		</DialogActions>
-	</MudDialog>
+		</MudButton>
+		<MudDialog @bind-IsVisible="_visible" Options="_dialogOptions">
+			<TitleContent>
+				<MudText Typo="Typo.h6" Style="text-align:center">
+					Se ha enviado el reporte a su correo electrónico: @employerEmail
+				</MudText>
+			</TitleContent>
+			<DialogActions>
+				<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="CloseDialog" Class="px-10">Aceptar</MudButton>
+			</DialogActions>
+		</MudDialog>
+	} else
+	{
+		<br>
+		<MudPaper Height="320px" Width="100%" Outlined="true" Class="pa-32" Elevation="25">
+
+			<MudPaper Height="90px" Width="100%" Outlined="false" Class="border-none" Elevation="0">
+			</MudPaper>
+			<br />
+			<MudText Align="Align.Center" Typo="Typo.h5">No existen reportes en el proyecto @projectName</MudText>
+			<br />
+		</MudPaper>
+	}
 }
 
 @code {
@@ -202,7 +214,6 @@ else
 	private IEnumerable<Subscription> _benefitList = new List<Subscription>();
 	private IEnumerable<Project> _projects = new List<Project>();
 
-	// Try to make this generic. Issues with async/await
 
 	private IList<ReportePlanillasTemplateTable> _templateTempSalariesTable = new List<ReportePlanillasTemplateTable>();
 	private IList<ReportePlanillasTemplateTable> _templateTempBenefitsTable = new List<ReportePlanillasTemplateTable>();
@@ -223,42 +234,108 @@ else
 	private bool _empty = true;
 	private bool _visible = false;
 
+
+	private bool _triggerLoad = false;
+
 	private IEnumerable<PaymentStartEndDates> _projectDates = new List<PaymentStartEndDates>();
+
+	private string myEndDate;
+	private string _myProjectName;
 
 	protected override async Task OnInitializedAsync()
 	{
-		ContextMenuService.SetProjectsContext(true, true, projectName, employerEmail, false);
-		_empty = false;
+		_myProjectName = projectName;
+		await InitializeAllLists();
+		getProjectPaymentDates();
+		if (_projectDates.Length() == 0){
+			myEndDate = _projectDates.FirstOrDefault().EndDate;
+		} 
+		_loading = false;
+		_triggerLoad = true;
+	}
 
-		_agreementList = await AgreementService.GetProjectAgreements(projectName, employerEmail);
-		_paymentList = await PaymentService.GetAllPaymentsStartAndEndDates(employerEmail, projectName);
-		_projectDates = (from P in _paymentList
-							group P by new { P.StartDate, P.EndDate } into grp
-							select new PaymentStartEndDates
-							 {
-								 StartDate = grp.Key.StartDate.ToShortDateString(),
-								 EndDate = grp.Key.EndDate.ToShortDateString()
-							 });
+	private async Task InitializeAllLists() {
+		_agreementList = await AgreementService.GetProjectAgreements(_myProjectName, employerEmail);
+		_paymentList = await PaymentService.GetAllPaymentsStartAndEndDates(employerEmail, _myProjectName);
+		_projects = await ProjectService.GetEmployerProyects(employerEmail);
+	}
+	private async Task fillOutAllTablesByProject(string myProject)
+	{
+		if (_triggerLoad)
+		{
+			_triggerLoad = false;
+			_myProjectName = myProject;
+			await InitializeAllLists();
 
+			getProjectPaymentDates();
+			if (_projectDates.Length() == 0){
+				_empty = true;
+			} else
+			{
+				DateTime startDate = DateTime.Parse(_projectDates.FirstOrDefault().StartDate);
+				DateTime endDate = DateTime.Parse(_projectDates.FirstOrDefault().EndDate);
+				await fillOutAllTables(startDate, endDate);
+				_empty = false;
+			}
+			_triggerLoad = true;
 
-		DateTime start = DateTime.Parse(_projectDates.FirstOrDefault().StartDate);
-		DateTime end = DateTime.Parse(_projectDates.FirstOrDefault().EndDate);
-		
-		Payment _payment = new Payment("", employerEmail, projectName, 0, start, end);
+		}
+	}
+
+	private async Task fillOutAllTablesByDates(string endDateString)
+	{
+		if (_triggerLoad)
+		{
+			_triggerLoad = false;
+
+			await InitializeAllLists();
+
+			getProjectPaymentDates();
+			if (_projectDates.Length() == 0)
+			{
+				_empty = true;
+			}
+			else {
+				string startDateString = returnStartDate(endDateString);
+				DateTime startDate = DateTime.Parse(startDateString);
+				DateTime endDate = DateTime.Parse(endDateString);
+				await fillOutAllTables(startDate, endDate);
+				_empty = false;
+			}
+			_triggerLoad = true;
+		}
+
+	}
+
+	private async Task fillOutAllTables(DateTime startDate, DateTime endDate) {
+		ContextMenuService.SetProjectsContext(true, true, _myProjectName, employerEmail, false);
+
+		clearAllTables();
+		Payment _payment = new Payment("", employerEmail, _myProjectName, 0, startDate, endDate);
 		_paidEmployees = await PaymentService.GetProjectPayments(_payment);
 		fillOutSalariesTable();
 
 		_deductionList = await LegalDeductionService.GetAllAsync();
 		fillOutDeductionsTable();
 
-		_benefitList = await SubscriptionService.GetBenefitsByProject(employerEmail, projectName);
+		_benefitList = await SubscriptionService.GetBenefitsByProject(employerEmail, _myProjectName);
 		await fillOutBenefitsTable();
 
 		fillOutSumaryTable();
-
-		_loading = false;
-		_projects = await ProjectService.GetEmployerProyects(employerEmail);
 	}
+
+	private void getProjectPaymentDates()
+	{
+		_projectDates = (from P in _paymentList
+							group P by new { P.StartDate, P.EndDate } into grp
+							select new PaymentStartEndDates
+						{
+							StartDate = grp.Key.StartDate.ToShortDateString(),
+							EndDate = grp.Key.EndDate.ToShortDateString()
+						}).Take(10);
+	}
+
+
 
 	private IEnumerable<ReportePlanillasTemplateTable> JoinAgreementAndPayment()
 	{
@@ -272,10 +349,10 @@ else
 										}
 											into grp
 										select new ReportePlanillasTemplateTable
-								   {
-									   Name = grp.Key.ContractType,
-									   Amount = grp.Sum(e => e.GrossSalary)
-								   };
+										{
+											Name = grp.Key.ContractType,
+											Amount = grp.Sum(e => e.GrossSalary)
+										};
 		return _tempJoinedTable;
 	}
 
@@ -310,11 +387,12 @@ else
 
 	private async Task fillOutBenefitsTable()
 	{
+		string date = "28/12/2019";
+		DateTime myDateTime = new DateTime ();
 		double benefitsCost;
 		foreach (var benefit in _benefitList)
 		{
-			IEnumerable<Subscribe> tempList = await SubscribeService.GetEmployeesBySubscription(employerEmail, projectName, benefit.SubscriptionName);
-			benefitsCost = benefit.Cost * tempList.Length();
+			IEnumerable<Subscribe> tempList = await SubscribeService.GetEmployeesBySubscription(employerEmail, _myProjectName, benefit.SubscriptionName);			benefitsCost = benefit.Cost * tempList.Length();
 			ReportePlanillasTemplateTable myTempTable = new ReportePlanillasTemplateTable(benefit.SubscriptionName, benefitsCost);
 			_templateTempBenefitsTable.Add(myTempTable);
 			_totalBenefits += benefitsCost;
@@ -386,9 +464,28 @@ else
 		});
 	}
 
-	void DoStuff(string selected)
-	{
-		ShowSnackNotification(selected, Severity.Success);
+	string returnStartDate(string selected) {
+		DateTime myDateTime = Convert.ToDateTime(selected);
+		string myString = selected;
+		var startDate = _projectDates.Where(e => e.EndDate == selected);
+
+
+		ShowSnackNotification(startDate.FirstOrDefault().StartDate, Severity.Success);
+		ShowSnackNotification(startDate.FirstOrDefault().EndDate, Severity.Success);
+		return startDate.FirstOrDefault().EndDate;
 	}
-	
+
+	private void clearAllTables()
+	{
+		_templateTempSalariesTable.Clear();
+		_templateTempBenefitsTable.Clear();
+		_templateTempDeductionsTable.Clear(); 
+		_templateTempSummaryTable.Clear(); 
+		_templateTableToBeEmailed.Clear(); 
+		_totalDeductions = 0;
+		_totalSalaries = 0;
+		_totalBenefits = 0;
+		_finalAmountToPay = 0;
+	}
 }
+
