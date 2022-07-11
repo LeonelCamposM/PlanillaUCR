@@ -1,0 +1,158 @@
+﻿@page "/Projects_Historical_Payments/{email}"
+
+@using Application.Agreements
+@using Domain.Agreements.Entities
+@using Application.Projects
+@using Domain.Projects.Entities
+@using Domain.Payments.Entities
+@using Application.Payments
+@using Domain.People.Entities
+@using Application.People
+@using Domain.Employees.Entities
+@using Application.Employees
+@using Domain.ReportOfHours.Entities
+@using Application.ReportOfHours
+@using Domain.Subscribes.Entities
+@using Domain.Subscriptions.Entities
+@using Application.Subscribes
+@using Presentation.Employers.Models
+@using System.Globalization
+@using Application.PaymentCalculator;
+
+@inject IAgreementService AgreementService
+@inject IProjectService ProjectService
+@inject IPaymentService PaymentService
+@inject IPersonService PersonService
+@inject IReportOfHoursService ReportHoursService
+@inject ISubscribeService SubscribeService
+@inject IPaymentCalculatorService PaymentCalculatorService
+@inject ISnackbar Snackbar
+@inject NavigationManager nav
+
+
+@{
+    List<BreadcrumbItem> _items = new List<BreadcrumbItem>
+    {
+        new BreadcrumbItem("Inicio", href: ""),
+        new BreadcrumbItem("Histórico pagos por proyecto",  href: null, disabled: true),
+    };
+}
+
+@if (_loading) {
+    <MudPaper  Height="220px" Width="100%" Outlined="false" Class="border-none pa-4" Elevation="0">
+        <MudText Align="Align.Center" Typo="Typo.h6">
+            <MudProgressCircular Color="Color.Primary" Style="height:70px;width:70px;" Indeterminate="true" />
+        </MudText>
+
+    </MudPaper>
+} else
+{
+    <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
+    <MudGrid>
+            <MudItem xs="12" Class="d-flex justify-center align-center">
+                <MudItem xs="4">
+                     <MudText Align="Align.Center" Typo="Typo.h6" GutterBottom="true">Reporte histórico de pagos</MudText>
+                </MudItem>
+             </MudItem>
+    </MudGrid>
+    @if (_empty)
+    {
+        <MudPaper  Height="220px" Width="100%" Outlined="true" Class="pa-32" Elevation="25">  
+            <MudToolBar>
+                <MudItem xs="2">
+                    <MudSelect Dense="true" T="string" Label="Proyecto" Variant="Variant.Outlined">
+                    </MudSelect>
+                </MudItem>
+                
+                <MudItem xs="2">
+                    <MudSelect Dense="true" T="string" Label="Tipo contrato" Variant="Variant.Outlined">
+                    </MudSelect>
+                </MudItem>
+            </MudToolBar> 
+            <MudPaper Height="60px" Width="100%" Outlined="false" Class="border-none" Elevation="0"> 
+            </MudPaper>
+            <br />
+            <MudText Align="Align.Center" Typo="Typo.h5">Todavía no hay pagos en ninguno de sus proyectos</MudText>
+            <br />
+        </MudPaper>
+    }
+    else
+    {
+        <MudTable @ref="_mudTable" Items="@_projectsPaymentsList" RowsPerPage="10" Hover="false" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="Color.Info">
+            <ToolBarContent>
+                <MudItem xs="2">
+                    <MudSelect Dense="true" T="string" Label="Proyecto" Variant="Variant.Outlined">
+                    </MudSelect>
+                </MudItem>
+                
+                <MudItem xs="2">
+                    <MudSelect Dense="true" T="string" Label="Tipo contrato" Variant="Variant.Outlined">
+                    </MudSelect>
+                </MudItem>
+            </ToolBarContent>
+            <HeaderContent>
+                <MudTh>Proyecto</MudTh>
+                <MudTh>Frecuencia de pago</MudTh>
+                <MudTh>Fecha de pago</MudTh>
+                <MudTh>Salario Bruto</MudTh>
+                <MudTh>Beneficios</MudTh>
+                <MudTh>Cargas Sociales Empleador</MudTh>
+                <MudTh>Deducciones Obligatorias Empleado</MudTh>
+                <MudTh>Deducciones Voluntarias Empleado</MudTh>
+                <MudTh>Costo Empleador</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Proyecto">@context.ProjectName</MudTd>
+                <MudTd DataLabel="Frecuencia de pago">@context.PaymentFrecuency</MudTd>
+                <MudTd DataLabel="Fecha de pago">@context.PaymentDate.ToShortDateString()</MudTd>
+                <MudTd DataLabel="Salario Bruto"> @CostFormat(context.GrossSalary) </MudTd>
+                <MudTd DataLabel="Beneficios"> @CostFormat(context.Benefits) </MudTd>
+                <MudTd DataLabel="Cargas Sociales Empleador"> @CostFormat(context.EmployerCharges) </MudTd>
+                <MudTd DataLabel="Deducciones Obligatorias Empleado"> @CostFormat(context.ObligatoryDeductions) </MudTd>
+                <MudTd DataLabel="Deducciones Voluntarias Empleado">  @CostFormat(context.VoluntaryDeductions) </MudTd>
+                <MudTd DataLabel="Costo Empleador"> @CostFormat(context.EmployerCost) </MudTd>
+            </RowTemplate>
+            <PagerContent>
+                <MudPagination SelectedChanged="PageChanged" Count="@((_mudTable.GetFilteredItemsCount() + _mudTable.RowsPerPage - 1) / _mudTable.RowsPerPage)" Color="Color.Primary" Class="pa-4"/>
+            </PagerContent>
+        </MudTable>        <br>
+        <MudToolBar DisableGutters="true" Class="gap-4">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary">Exportar Excel</MudButton>
+        </MudToolBar>
+    }
+}
+
+@code {
+    [Parameter]
+    public string email { get; set; }
+    private bool _loading = true;
+    private bool _empty = true;
+    private IList<ProjectHistorical> _projectsPaymentsList = new List<ProjectHistorical>();
+    private MudTable<ProjectHistorical> _mudTable;
+    public string searchString1 = "";
+    public CultureInfo cultureCR = CultureInfo.GetCultureInfo("es-CR");
+
+    protected override async Task OnParametersSetAsync()
+    {
+        ProjectHistorical projectHistorical = new ProjectHistorical("Fabrica de chocolates", "Quincenal", DateTime.Now, 350000.0, 0, 0, 30000.0, 0, 350000);
+        _projectsPaymentsList.Add(projectHistorical);
+        _loading = false;
+        _empty = false;
+    }
+
+    private async Task GetProjectsPayments()
+    {
+       //IList<Payment> payments = PaymentService.
+    }
+
+    private void PageChanged(int i)
+    {
+        _mudTable.NavigateTo(i - 1);
+    }
+
+    private string CostFormat(double cost)
+    {
+        string formatedCost = string.Format("{0:N}", cost);
+        return formatedCost;
+    }
+}
