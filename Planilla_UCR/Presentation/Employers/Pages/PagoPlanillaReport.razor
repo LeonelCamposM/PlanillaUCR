@@ -300,7 +300,7 @@ else
 			}
 			else {
 				myEndDate = _projectDates.FirstOrDefault().EndDate;
-				string startDateString = returnStartDate(endDateString);
+				string startDateString = returnStartDate(endDateString); // Found u
 				DateTime startDate = DateTime.Parse(startDateString);
 				DateTime endDate = DateTime.Parse(endDateString);
 				await fillOutAllTables(startDate, endDate);
@@ -474,7 +474,7 @@ else
 
 		ShowSnackNotification(startDate.FirstOrDefault().StartDate, Severity.Success);
 		ShowSnackNotification(startDate.FirstOrDefault().EndDate, Severity.Success);
-		return startDate.FirstOrDefault().EndDate;
+		return startDate.FirstOrDefault().StartDate;
 	}
 
 	private void clearAllTables()
