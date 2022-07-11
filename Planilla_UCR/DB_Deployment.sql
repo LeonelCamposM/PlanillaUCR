@@ -595,6 +595,15 @@ BEGIN
 	WHERE ReportOfHours.EmployeeEmail = @EmployeeEmail AND ReportOfHours.EmployerEmail = @EmployerEmail AND ReportOfHours.ProjectName = @ProjectName AND ReportOfHours.ReportDate = @ReportDate;
 END
 
+-- Index
+CREATE INDEX idx_AgreementEmployerEmail_ProjectName
+ON Agreement(EmployerEmail, ProjectName)
+
+CREATE INDEX idx_AgreementEmployeeEmail_IsEnabled
+ON Agreement(EmployeeEmail,IsEnabled)
+	
+
+
 -- Data Insert
 GO
 INSERT INTO Person
