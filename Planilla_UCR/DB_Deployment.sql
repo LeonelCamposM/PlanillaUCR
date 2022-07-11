@@ -4,7 +4,6 @@ CREATE DATABASE DB_Planilla
 GO
 USE DB_Planilla
 
-
 -- Tables
 CREATE TABLE Person(
 	Email varchar(255) NOT NULL primary key,
@@ -83,6 +82,7 @@ CREATE TABLE ReportOfHours(
 	EmployeeEmail varchar(255) NOT NULL,
 	ReportDate date NOT NULL,
 	ReportHours float NOT NULL,
+	Approved int NOT NULL,
 	PRIMARY KEY(EmployerEmail, ProjectName, EmployeeEmail, ReportDate),
 	FOREIGN KEY(EmployerEmail, ProjectName) REFERENCES Project(EmployerEmail, ProjectName) ON UPDATE CASCADE,
 	FOREIGN KEY(EmployeeEmail) REFERENCES Employee(Email)
@@ -117,31 +117,6 @@ CREATE TABLE Payment(
 	PRIMARY KEY(EmployeeEmail,EmployerEmail,ProjectName, StartDate, EndDate),
 	FOREIGN KEY(EmployerEmail, ProjectName) REFERENCES Project(EmployerEmail, ProjectName) ON UPDATE CASCADE,
 	FOREIGN KEY(EmployeeEmail) REFERENCES Employee(Email)
-);
-
-CREATE TABLE PaymentContainsSubscription(
-	EmployeeEmail varchar(255) NOT NULL,
-	EmployerEmail varchar(255) NOT NULL,
-	ProjectName varchar(255) NOT NULL,
-	StartDate date NOT NULL,
-	EndDate date NOT NULL,
-	SubscriptionName varchar(255) NOT NULL,
-	PRIMARY KEY(EmployeeEmail,EmployerEmail,ProjectName, StartDate, EndDate, SubscriptionName),
-	FOREIGN KEY(EmployeeEmail, EmployerEmail,ProjectName, StartDate, EndDate) REFERENCES Payment(EmployeeEmail, EmployerEmail, ProjectName, StartDate, EndDate) ON UPDATE CASCADE,
-	FOREIGN KEY(EmployerEmail, ProjectName, SubscriptionName) REFERENCES Subscription(EmployerEmail, ProjectName, SubscriptionName) 
-);
-
-
-CREATE TABLE Applies(
-	EmployeeEmail varchar(255) NOT NULL,
-	EmployerEmail varchar(255) NOT NULL,
-	ProjectName varchar(255) NOT NULL,
-	StartDate date NOT NULL,
-	EndDate date NOT NULL,
-	DeductionName varchar(255) NOT NULL,
-	PRIMARY KEY(EmployeeEmail,EmployerEmail,ProjectName, StartDate, EndDate, DeductionName),
-	FOREIGN KEY(EmployeeEmail, EmployerEmail,ProjectName, StartDate, EndDate) REFERENCES Payment(EmployeeEmail, EmployerEmail, ProjectName, StartDate, EndDate) ON UPDATE CASCADE,
-	FOREIGN KEY(DeductionName) REFERENCES LegalDeduction(DeductionName)
 );
 
 -- Suscription Stored Procedures
@@ -477,18 +452,19 @@ AS
 BEGIN
 	SELECT P.Email, P.Name, P.LastName1, P.LastName2, P.SSN, P.BankAccount, P.Adress, P.PhoneNumber, P.IsEnabled
 	FROM Employee JOIN  Person AS P ON Employee.Email = P.Email left JOIN Agreement as A ON A.EmployeeEmail = Employee.Email
-	Where A.ProjectName IS NULL OR A.ProjectName != @projectName
+	Where A.ProjectName IS NULL OR A.ProjectName != @projectName OR A.IsEnabled <= 1
 	Group by P.Email, P.Name, P.LastName1, P.LastName2, P.SSN, P.BankAccount, P.Adress, P.PhoneNumber, P.IsEnabled
 END
 
 GO
-CREATE OR ALTER PROCEDURE [dbo].[GetProjectEmployees]
-@projectName VARCHAR(255)
+CREATE OR ALTER PROCEDURE [dbo].[GetProjectEmployees](
+@projectName VARCHAR(255),
+@employerEmail VARCHAR(255))
 AS
 BEGIN
 	SELECT P.Email, P.Name, P.LastName1, P.LastName2, P.SSN, P.BankAccount, P.Adress, P.PhoneNumber, P.IsEnabled
 	FROM Agreement as A JOIN  Person as P ON A.EmployeeEmail = P.Email
-	Where A.ProjectName = @projectName
+	Where A.ProjectName = @projectName AND A.IsEnabled = 1 AND A.EmployerEmail = @employerEmail
 END
 
 GO
@@ -499,7 +475,6 @@ BEGIN
 END
 
 -- AgreementType Stored procedures
-
 
 GO
 CREATE OR ALTER PROCEDURE GetAllAgreementTypes
@@ -533,7 +508,6 @@ BEGIN
 	WHERE A.ProjectName = @Project AND A.EmployerEmail = @EmployerEmail AND A.IsEnabled = 1 AND A.ContractFinishDate > GETDATE()
 END
 
-
 GO
 CREATE OR ALTER PROCEDURE DesactivateAgreement(
 @EmployeeEmail varchar(255), 
@@ -543,8 +517,8 @@ CREATE OR ALTER PROCEDURE DesactivateAgreement(
 AS
 BEGIN
 	UPDATE Agreement
-	SET Agreement.IsEnabled = 0, Agreement.Justification = @Justification, Agreement.ContractFinishDate = GETDATE()
-	WHERE Agreement.EmployeeEmail = @EmployeeEmail AND Agreement.EmployerEmail = @EmployerEmail AND Agreement.ProjectName = @ProjectName AND Agreement.IsEnabled = 1;
+	SET Agreement.IsEnabled = -1, Agreement.Justification = @Justification, Agreement.ContractFinishDate = GETDATE()
+	WHERE Agreement.EmployeeEmail = @EmployeeEmail AND Agreement.EmployerEmail = @EmployerEmail AND Agreement.ProjectName = @ProjectName;
 END
 
 GO
@@ -562,6 +536,63 @@ BEGIN
 	A.EmployerEmail = @EmployerEmail AND
 	A.ProjectName = @ProjectName AND
 	A.ContractType = @ContractType
+END
+
+--Payments stored procedures 
+GO
+CREATE OR ALTER PROCEDURE GetEmployeePayments
+@employeeEmail VARCHAR(255)
+AS
+BEGIN
+	SELECT *
+	FROM Payment 
+	Where EmployeeEmail = @employeeEmail;
+END
+
+
+GO
+CREATE OR ALTER PROCEDURE CheckIfAgreementIsDesactivated(
+@EmployeeEmail varchar(255), 
+@EmployerEmail varchar(255),
+@ProjectName varchar(255))
+AS
+BEGIN
+	Select *
+	From Agreement as A
+	Where A.EmployeeEmail = @EmployeeEmail AND A.EmployerEmail = @EmployerEmail AND A.ProjectName = @ProjectName AND A.IsEnabled = -1 
+END
+
+GO
+CREATE OR ALTER PROCEDURE UpdateAgreementStatus(
+@EmployeeEmail varchar(255), 
+@EmployerEmail varchar(255),
+@ProjectName varchar(255),
+@ContractStartDate date,
+@ContractFinishDate date,
+@ContractType varchar(255),
+@MountPerHour int)
+AS
+BEGIN
+	UPDATE Agreement
+	SET Agreement.ContractStartDate = @ContractStartDate, Agreement.ContractType = @ContractType, 
+	Agreement.MountPerHour = @MountPerHour, Agreement.ContractFinishDate = @ContractFinishDate,
+	Agreement.IsEnabled = 1, Agreement.Justification = ''
+	WHERE Agreement.EmployeeEmail = @EmployeeEmail AND Agreement.EmployerEmail = @EmployerEmail AND Agreement.ProjectName = @ProjectName and Agreement.IsEnabled <= 0;
+END
+
+--- Report Hours Stored Procedures
+GO
+CREATE OR ALTER PROCEDURE ApproveHoursReport(
+@EmployeeEmail varchar(255), 
+@EmployerEmail varchar(255),
+@ProjectName varchar(255),
+@ReportDate varchar(255) 
+)
+AS
+BEGIN
+	UPDATE ReportOfHours
+	SET ReportOfHours.Approved = 1
+	WHERE ReportOfHours.EmployeeEmail = @EmployeeEmail AND ReportOfHours.EmployerEmail = @EmployerEmail AND ReportOfHours.ProjectName = @ProjectName AND ReportOfHours.ReportDate = @ReportDate;
 END
 
 -- Data Insert
@@ -650,7 +681,6 @@ VALUES('nayeri.azofeifa@ucr.ac.cr',
 1
 )
 
-
 INSERT INTO Employer
 VALUES('leonel@ucr.ac.cr')
 
@@ -658,7 +688,7 @@ INSERT INTO Employer
 VALUES('nyazofeifa3003@gmail.com')
 
 INSERT INTO Employer
-VALUES('naye@ucr.ac.cr')
+VALUES('wendy@ucr.ac.cr')
 
 INSERT INTO Employee
 VALUES('mau@ucr.ac.cr')
@@ -674,63 +704,185 @@ VALUES('nayeri.azofeifa@ucr.ac.cr')
 
 INSERT INTO Project
 VALUES('leonel@ucr.ac.cr',
-'Proyecto 1',
+'Fabrica de chocolates',
 'Emprendimiento de chocolates',
 15000,
 10,
 'Quincenal',
 1,
-'2022-06-01'
+'2022-06-14'
 )
 
 INSERT INTO Project
 VALUES('leonel@ucr.ac.cr',
-'Proyecto 3',
+'Dulces artesanales',
 'Emprendimiento de confites',
 22000,
 7,
 'Quincenal',
 1,
-'2022-06-01'
+'2022-06-28'
 )
 
 INSERT INTO Project
 VALUES('leonel@ucr.ac.cr',
-'Proyecto 4',
+'Armario Vintage',
 'Emprendimiento de camisetas',
 40000,
 12,
-'Mensual',
+'Quincenal',
 1,
-'2022-06-01'
+'2022-06-28'
 )
 
 INSERT INTO Project
 VALUES('leonel@ucr.ac.cr',
-'Proyecto 5',
+'Fragancias Doradas',
 'Emprendimiento de perfumes',
 20000,
 5,
-'Mensual',
+'Quincenal',
 1,
-'2022-06-01'
+'2022-06-28'
 )
 
 INSERT INTO Project
-VALUES('nyazofeifa3003@gmail.com',
-'Patatas',
+VALUES('wendy@ucr.ac.cr',
+'Fabrica de chocolates',
 'Emprendimiento de comida',
 20000,
 5,
 'Mensual',
 1,
-'2022-06-01'
+'2022-06-14'
+)
+
+INSERT INTO Project
+VALUES('leonel@ucr.ac.cr',
+'Kaites',
+'Emprendimiento de zapatos',
+22000,
+7,
+'Quincenal',
+1,
+'2022-06-28'
+)
+
+INSERT INTO Project
+VALUES('leonel@ucr.ac.cr',
+'Peluches felices',
+'Emprendimiento de peluches',
+22000,
+7,
+'Quincenal',
+1,
+'2022-06-28'
+)
+
+INSERT INTO Project
+VALUES('leonel@ucr.ac.cr',
+'CarmelArt',
+'Emprendimiento artesanal',
+22000,
+7,
+'Quincenal',
+1,
+'2022-06-28'
+)
+
+INSERT INTO Project
+VALUES('leonel@ucr.ac.cr',
+'Tech Solutions',
+'Emprendimiento tecnológico',
+22000,
+7,
+'Quincenal',
+1,
+'2022-06-28'
+)
+
+INSERT INTO Project
+VALUES('leonel@ucr.ac.cr',
+'La Hilita',
+'Emprendimiento de costura',
+22000,
+7,
+'Quincenal',
+1,
+'2022-06-28'
+)
+
+
+INSERT INTO Project
+VALUES('leonel@ucr.ac.cr',
+'Vanidosa',
+'Salón de belleza',
+22000,
+7,
+'Quincenal',
+1,
+'2022-06-28'
+)
+
+INSERT INTO Project
+VALUES('leonel@ucr.ac.cr',
+'Super Praga',
+'Pulperia',
+22000,
+7,
+'Quincenal',
+1,
+'2022-06-28'
+)
+
+INSERT INTO Project
+VALUES('leonel@ucr.ac.cr',
+'Asian Bay',
+'Chino',
+22000,
+7,
+'Quincenal',
+1,
+'2022-06-28'
+)
+
+INSERT INTO Project
+VALUES('leonel@ucr.ac.cr',
+'El pueblo',
+'Pulperia',
+22000,
+7,
+'Quincenal',
+1,
+'2022-06-28'
+)
+
+INSERT INTO Project
+VALUES('leonel@ucr.ac.cr',
+'Trendy Purse',
+'Emprendimiento de bolsos',
+22000,
+7,
+'Quincenal',
+1,
+'2022-06-28'
+)
+
+INSERT INTO Subscription
+VALUES('leonel@ucr.ac.cr',
+'Fabrica de chocolates',
+'Deducción Ejemplo',
+'Ejemplo',
+'Ejemplo',
+200000,
+0,
+1
 )
 
 
 INSERT INTO Subscription
 VALUES('leonel@ucr.ac.cr',
-'Proyecto 1',
+'Fabrica de chocolates',
 'Fondo de pensiones',
 'CCSS',
 'Contribuición voluntaria para el fondo de pensiones.',
@@ -741,7 +893,7 @@ VALUES('leonel@ucr.ac.cr',
 
 INSERT INTO Subscription
 VALUES('leonel@ucr.ac.cr',
-'Proyecto 1',
+'Fabrica de chocolates',
 'Ayudemos a los niños',
 'Hospital de los niños',
 'Cuota voluntaria para ayudar a los más necesitados.',
@@ -752,7 +904,7 @@ VALUES('leonel@ucr.ac.cr',
 
 INSERT INTO Subscription
 VALUES('leonel@ucr.ac.cr',
-'Proyecto 1',
+'Fabrica de chocolates',
 'Rescate de perros',
 'Refugio de perros',
 'Cuota voluntaria para ayudar a los más necesitados.',
@@ -763,7 +915,7 @@ VALUES('leonel@ucr.ac.cr',
 
 INSERT INTO Subscription
 VALUES('leonel@ucr.ac.cr',
-'Proyecto 1',
+'Fabrica de chocolates',
 'Gym',
 'Golden Gym',
 'Gimnasio equipado con todo lo necesario.',
@@ -774,7 +926,7 @@ VALUES('leonel@ucr.ac.cr',
 
 INSERT INTO Subscription
 VALUES('leonel@ucr.ac.cr',
-'Proyecto 1',
+'Fabrica de chocolates',
 'Piscina',
 'Aquanautas',
 'Piscinas temperadas, ubicadas en San Pedro.',
@@ -785,7 +937,7 @@ VALUES('leonel@ucr.ac.cr',
 
 INSERT INTO Subscription
 VALUES('leonel@ucr.ac.cr',
-'Proyecto 1',
+'Fabrica de chocolates',
 'Starbucks descuento',
 'Starbucks',
 'Descuento en un starbucks',
@@ -796,11 +948,45 @@ VALUES('leonel@ucr.ac.cr',
 
 INSERT INTO Subscription
 VALUES('leonel@ucr.ac.cr',
-'Proyecto 1',
+'Dulces artesanales',
 'Apple del futuro',
 'Apple',
 'Subscripción futura',
 55000,
+0,
+1
+)
+
+
+INSERT INTO Subscription
+VALUES('leonel@ucr.ac.cr',
+'Dulces artesanales',
+'Gym',
+'Golden Gym',
+'Gimnasio equipado con todo lo necesario.',
+25000,
+1,
+1
+)
+
+INSERT INTO Subscription
+VALUES('leonel@ucr.ac.cr',
+'Dulces artesanales',
+'Piscina',
+'Aquanautas',
+'Piscinas temperadas, ubicadas en San Pedro.',
+12000,
+1,
+1
+)
+
+INSERT INTO Subscription
+VALUES('leonel@ucr.ac.cr',
+'Dulces artesanales',
+'Starbucks descuento',
+'Starbucks',
+'Descuento en un starbucks',
+12000,
 0,
 1
 )
@@ -815,30 +1001,70 @@ INSERT INTO AgreementType
 VALUES('Medio tiempo', 1600)
 
 INSERT INTO Agreement
-VALUES('jeremy@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Proyecto 1','2022-06-1','Tiempo completo', 1600, '2026-06-1', 1, '')
+VALUES('jeremy@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Fabrica de chocolates','2022-06-1','Tiempo completo', 1600, '2026-06-1', 1, '')
 
 INSERT INTO Agreement
-VALUES('mau@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Proyecto 1','2022-06-1','Servicios profesionales', 2000, '2026-06-1', 1, '')
+VALUES('jeremy@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Dulces artesanales','2022-06-1','Servicios profesionales', 2000, '2026-06-1', 1, '')
 
 INSERT INTO Agreement
-VALUES('naye@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Proyecto 1','2022-06-1','Medio tiempo', 1600, '2026-06-1', 1, '')
+VALUES('jeremy@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Armario Vintage','2022-06-1','Medio tiempo', 1600, '2026-06-1', 1, '')
 
 INSERT INTO Agreement
-VALUES('naye@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Proyecto 3','2022-06-1','Medio tiempo', 1600, '2026-06-1', 1, '')
+VALUES('jeremy@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Fragancias Doradas','2022-06-1','Tiempo completo', 1600, '2026-06-1', 1, '')
+
+INSERT INTO Agreement
+VALUES('mau@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Fabrica de chocolates','2022-06-1','Servicios profesionales', 2000, '2026-06-1', 1, '')
+
+INSERT INTO Agreement
+VALUES('naye@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Fabrica de chocolates','2022-06-1','Medio tiempo', 1600, '2026-06-1', 1, '')
+
+INSERT INTO Agreement
+VALUES('naye@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Dulces artesanales','2022-06-1','Medio tiempo', 1600, '2026-06-1', 1, '')
+
+INSERT INTO Agreement
+VALUES('jeremy@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Kaites','2022-06-1','Tiempo completo', 1600, '2026-06-1', 1, '')
+
+INSERT INTO Agreement
+VALUES('jeremy@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Peluches felices','2022-06-1','Tiempo completo', 1600, '2026-06-1', 1, '')
+
+INSERT INTO Agreement
+VALUES('jeremy@ucr.ac.cr', 'leonel@ucr.ac.cr', 'CarmelArt','2022-06-1','Tiempo completo', 1600, '2026-06-1', 1, '')
+
+INSERT INTO Agreement
+VALUES('jeremy@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Tech Solutions','2022-06-1','Tiempo completo', 1600, '2026-06-1', 1, '')
+
+INSERT INTO Agreement
+VALUES('jeremy@ucr.ac.cr', 'leonel@ucr.ac.cr', 'La Hilita','2022-06-1','Tiempo completo', 1600, '2026-06-1', 1, '')
+
+INSERT INTO Agreement
+VALUES('jeremy@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Vanidosa','2022-06-1','Tiempo completo', 1600, '2026-06-1', 1, '')
+
+INSERT INTO Agreement
+VALUES('jeremy@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Super Praga','2022-06-1','Tiempo completo', 1600, '2026-06-1', 1, '')
+
+INSERT INTO Agreement
+VALUES('jeremy@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Asian Bay','2022-06-1','Tiempo completo', 1600, '2026-06-1', 1, '')
+
+INSERT INTO Agreement
+VALUES('jeremy@ucr.ac.cr', 'leonel@ucr.ac.cr', 'El pueblo','2022-06-1','Tiempo completo', 1600, '2026-06-1', 1, '')
+
+INSERT INTO Agreement
+VALUES('jeremy@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Trendy Purse','2022-06-1','Tiempo completo', 1600, '2026-06-1', 1, '')
+
 
 INSERT INTO ReportOfHours
-VALUES('leonel@ucr.ac.cr', 'Proyecto 1','mau@ucr.ac.cr', '2022-6-2',4)
+VALUES('leonel@ucr.ac.cr', 'Fabrica de chocolates','mau@ucr.ac.cr', '2022-06-15',4.0 ,0)
 
 INSERT INTO ReportOfHours
-VALUES('leonel@ucr.ac.cr', 'Proyecto 1','mau@ucr.ac.cr', '2022-6-5',5)
+VALUES('leonel@ucr.ac.cr', 'Fabrica de chocolates','mau@ucr.ac.cr', '2022-06-17',5.0 ,0)
 
 INSERT INTO ReportOfHours
-VALUES('leonel@ucr.ac.cr', 'Proyecto 1','mau@ucr.ac.cr', '2022-6-12',8)
+VALUES('leonel@ucr.ac.cr', 'Fabrica de chocolates','mau@ucr.ac.cr', '2022-06-20',8.0 ,0)
 
 
 INSERT INTO Subscribes (EmployerEmail, ProjectName, SubscriptionName, EmployeeEmail, Cost, StartDate)
 VALUES('leonel@ucr.ac.cr',
-'Proyecto 1',
+'Fabrica de chocolates',
 'Ayudemos a los niños',
 'jeremy@ucr.ac.cr',
 25000,
@@ -847,7 +1073,16 @@ VALUES('leonel@ucr.ac.cr',
 
 INSERT INTO Subscribes (EmployerEmail, ProjectName, SubscriptionName, EmployeeEmail, Cost, StartDate)
 VALUES('leonel@ucr.ac.cr',
-'Proyecto 1',
+'Fabrica de chocolates',
+'Gym',
+'jeremy@ucr.ac.cr',
+12000,
+'2022-06-2'
+)
+
+INSERT INTO Subscribes (EmployerEmail, ProjectName, SubscriptionName, EmployeeEmail, Cost, StartDate)
+VALUES('leonel@ucr.ac.cr',
+'Dulces artesanales',
 'Gym',
 'jeremy@ucr.ac.cr',
 12000,
@@ -863,3 +1098,98 @@ INSERT INTO LegalDeduction (DeductionName, Cost)
 VALUES('Hacienda',
 48000.3
 )
+
+--select * from Agreement order by ProjectName
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Armario Vintage',153600, '2022-06-01', '2022-06-14')
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Armario Vintage',153600, '2022/06/15', '2022/06/28')
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Asian Bay',153600, '2022/06/1', '2022/06/14')
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Asian Bay',153600, '2022/06/15', '2022/06/28')
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','CarmelArt',153600, '2022/06/01', '2022/06/14')
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','CarmelArt',153600, '2022/06/15', '2022/06/28')
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Dulces artesanales',153600, '2022/06/01', '2022/06/14')
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Dulces artesanales',153600, '2022/06/15', '2022/06/28')
+
+INSERT INTO Payment
+VALUES('naye@ucr.ac.cr','leonel@ucr.ac.cr','Dulces artesanales',75000, '2022/06/01', '2022/06/14')
+
+INSERT INTO Payment
+VALUES('naye@ucr.ac.cr','leonel@ucr.ac.cr','Dulces artesanales',75000, '2022/06/15', '2022/06/28')
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','El pueblo',153600, '2022/06/01', '2022/06/14')
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','El pueblo',153600, '2022/06/15', '2022/06/28')
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Fabrica de chocolates',153600, '2022/06/01', '2022/06/14')
+
+INSERT INTO Payment
+VALUES('naye@ucr.ac.cr','leonel@ucr.ac.cr','Fabrica de chocolates',75000, '2022/06/01', '2022/06/14')
+
+INSERT INTO Payment
+VALUES('mau@ucr.ac.cr','leonel@ucr.ac.cr','Fabrica de chocolates',100000, '2022/06/01', '2022/06/14')
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Fragancias Doradas',153600, '2022/06/01', '2022/06/14')
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Fragancias Doradas',153600, '2022/06/15', '2022/06/28')
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Kaites',153600, '2022/06/01', '2022/06/14')
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Kaites',153600, '2022/06/15', '2022/06/28')
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','La Hilita',153600, '2022/06/01', '2022/06/14')
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','La Hilita',153600, '2022/06/15', '2022/06/28')
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Peluches felices',153600, '2022/06/01', '2022/06/14')
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Peluches felices',153600, '2022/06/15', '2022/06/28')
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Super Praga',153600, '2022/06/01', '2022/06/14')
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Super Praga',153600, '2022/06/15', '2022/06/28')
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Tech Solutions',153600, '2022/06/01', '2022/06/14')
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Tech Solutions',153600, '2022/06/15', '2022/06/28')
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Trendy Purse',153600, '2022/06/01', '2022/06/14')
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Trendy Purse',153600, '2022/06/15', '2022/06/28')
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Vanidosa',153600, '2022/06/01', '2022/06/14')
+
+INSERT INTO Payment
+VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Vanidosa',153600, '2022/06/15', '2022/06/28')
