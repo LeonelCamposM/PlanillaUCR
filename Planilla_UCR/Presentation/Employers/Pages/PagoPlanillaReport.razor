@@ -247,7 +247,7 @@ else
 		_myProjectName = projectName;
 		await InitializeAllLists();
 		getProjectPaymentDates();
-		if (_projectDates.Length() == 0){
+		if (_projectDates.Length() != 0){
 			myEndDate = _projectDates.FirstOrDefault().EndDate;
 		} 
 		_loading = false;
@@ -270,8 +270,10 @@ else
 			getProjectPaymentDates();
 			if (_projectDates.Length() == 0){
 				_empty = true;
+				myEndDate = string.Empty;
 			} else
 			{
+				myEndDate = _projectDates.FirstOrDefault().EndDate;
 				DateTime startDate = DateTime.Parse(_projectDates.FirstOrDefault().StartDate);
 				DateTime endDate = DateTime.Parse(_projectDates.FirstOrDefault().EndDate);
 				await fillOutAllTables(startDate, endDate);
@@ -294,8 +296,10 @@ else
 			if (_projectDates.Length() == 0)
 			{
 				_empty = true;
+				myEndDate = string.Empty;
 			}
 			else {
+				myEndDate = _projectDates.FirstOrDefault().EndDate;
 				string startDateString = returnStartDate(endDateString);
 				DateTime startDate = DateTime.Parse(startDateString);
 				DateTime endDate = DateTime.Parse(endDateString);
@@ -334,8 +338,6 @@ else
 							EndDate = grp.Key.EndDate.ToShortDateString()
 						}).Take(10);
 	}
-
-
 
 	private IEnumerable<ReportePlanillasTemplateTable> JoinAgreementAndPayment()
 	{
