@@ -118,6 +118,14 @@ CREATE TABLE Payment(
 	FOREIGN KEY(EmployerEmail, ProjectName) REFERENCES Project(EmployerEmail, ProjectName) ON UPDATE CASCADE,
 	FOREIGN KEY(EmployeeEmail) REFERENCES Employee(Email)
 );
+-- Triggers
+
+CREATE INDEX idx_AgreementEmployerEmail_ProjectName
+ON Agreement(EmployerEmail, ProjectName)
+
+CREATE INDEX idx_AgreementEmployeeEmail_IsEnabled
+ON Agreement(EmployeeEmail,IsEnabled)
+	
 
 -- Suscription Stored Procedures
 GO

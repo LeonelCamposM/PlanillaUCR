@@ -312,7 +312,7 @@ else
 	}
 
 	private async Task fillOutAllTables(DateTime startDate, DateTime endDate) {
-		ContextMenuService.SetProjectsContext(true, true, _myProjectName, employerEmail, false);
+		ContextMenuService.SetProjectsContext(true, true, _myProjectName, employerEmail, false, true);
 
 		clearAllTables();
 		Payment _payment = new Payment("", employerEmail, _myProjectName, 0, startDate, endDate);
