@@ -40,6 +40,21 @@ namespace Infrastructure.Payments.Repositories
             && e.ProjectName == payment.ProjectName && e.StartDate == payment.StartDate && e.EndDate == payment.EndDate).ToListAsync();
             return payments;
         }
+
+        public async Task<IEnumerable<Payment>> GetEmployeePayments(string email)
+        {
+            var employeePaymentList = await _dbContext.Payments.FromSqlRaw("EXEC GetEmployeePayments @employeeEmail",
+                 new SqlParameter("employeeEmail", email)).ToListAsync();
+            return employeePaymentList;
+        }
+
+        public async Task<IEnumerable<Payment>> GetLastEmployeePayments(string email)
+        {
+            IList<Payment> employeePaymentList = await _dbContext.Payments.Where(e=> 
+            e.EmployeeEmail == email).OrderByDescending(pay => pay.EndDate).Take(10).ToListAsync();
+
+            return employeePaymentList;
+        }
         public async Task<IList<Payment>> GetAllPaymentsStartAndEndDates(string employerEmail, string projectName) {
             SqlParameter myEmployerEmail = new SqlParameter("@employerEmail", employerEmail);
             SqlParameter myProjectName = new SqlParameter("@projectName", projectName);

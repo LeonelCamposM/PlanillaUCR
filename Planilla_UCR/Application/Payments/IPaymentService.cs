@@ -9,6 +9,8 @@ namespace Application.Payments
         Task AddPayment(Payment newPayment);
         Task<Payment?> GetEmployeeLastPayment(string employeeEmail, string employerEmail, string projectName);
         Task<IList<Payment>> GetProjectPayments(Payment payment);
+        Task<IEnumerable<Payment>> GetEmployeePayments(string email);
+        Task<IEnumerable<Payment>> GetLastEmployeePayments(string email);
         Task<IList<Payment>> GetAllPaymentsStartAndEndDates(string employerEmail, string projectName);
 
     }
