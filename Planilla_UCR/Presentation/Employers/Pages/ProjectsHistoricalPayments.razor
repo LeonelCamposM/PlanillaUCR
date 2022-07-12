@@ -62,7 +62,7 @@
                 </MudItem>
                 
                 <MudItem xs="2">
-                    <MudSelect Dense="true" T="string" Label="Tipo contrato" Variant="Variant.Outlined">
+                    <MudSelect Dense="true" T="string" Label="Fecha de Pago" Variant="Variant.Outlined">
                     </MudSelect>
                 </MudItem>
             </MudToolBar> 
@@ -75,15 +75,27 @@
     }
     else
     {
-        <MudTable @ref="_mudTable" Items="@_projectsPaymentsList" RowsPerPage="10" Hover="false" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="Color.Info">
+        <MudTable @ref="_mudTable" Items="@_projectsPaymentsList" RowsPerPage="10" Hover="false" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="Color.Info" Filter="new Func<ProjectHistorical,bool>(FiltersFunc)">
             <ToolBarContent>
                 <MudItem xs="2">
-                    <MudSelect Dense="true" T="string" Label="Proyecto" Variant="Variant.Outlined">
+                    <MudSelect Dense="true" T="string" Label="Proyecto" Variant="Variant.Outlined" TextChanged="OnProjectNameSelect">>
+                    <MudSelectItem Value="@(" ")"/>
+                    @foreach (var state in _paymentsProjectNames) {
+                        <MudSelectItem T="string" Value="@state">
+                            @state
+                        </MudSelectItem>
+                    }   
                     </MudSelect>
                 </MudItem>
                 
                 <MudItem xs="2">
-                    <MudSelect Dense="true" T="string" Label="Tipo contrato" Variant="Variant.Outlined">
+                    <MudSelect Dense="true" T="string" Label="Fecha de Pago" Variant="Variant.Outlined" TextChanged="OnPaymentDateSelect">>
+                    <MudSelectItem Value="@(" ")"/>
+                    @foreach (var state in _paymentsDates) {
+                        <MudSelectItem T="string" Value="@state">
+                            @state
+                        </MudSelectItem>
+                    }   
                     </MudSelect>
                 </MudItem>
             </ToolBarContent>
@@ -130,11 +142,18 @@
     private IEnumerable<ProjectHistorical> _joinPayments = new List<ProjectHistorical>();
     private IEnumerable<LegalDeduction> _legalDeductions = new List<LegalDeduction>();
     private MudTable<ProjectHistorical> _mudTable;
+    private IList<String> _paymentsDates = new List<String>();
+    private IList<String> _paymentsProjectNames = new List<String>();
+    string projectNameFilter = "";
+    string contracTypeFilter = "";
+    string paymentDateFilter = "";
     public CultureInfo cultureCR = CultureInfo.GetCultureInfo("es-CR");
 
     protected override async Task OnParametersSetAsync()
     {
         await GetProjectsPayments();
+        _paymentsProjectNames = GetProyectName();
+        _paymentsDates = GetPaymentDate();
         _loading = false;
     }
 
@@ -261,5 +280,54 @@
     {
         string formatedCost = string.Format("{0:N}", cost);
         return formatedCost;
+    }
+
+    private IList<String> GetProyectName()
+    {
+        foreach (ProjectHistorical payment in _projectsPaymentsList)
+        { 
+            if (!_paymentsProjectNames.Contains(payment.ProjectName))
+            {
+                _paymentsProjectNames.Add(payment.ProjectName);
+            }
+        }
+        _paymentsProjectNames = _paymentsProjectNames.ToList();
+        return _paymentsProjectNames;
+    }
+
+    private IList<String> GetPaymentDate()
+    {
+        foreach (ProjectHistorical payment in _projectsPaymentsList)
+        {
+            if (!_paymentsDates.Contains(payment.EndDate.ToShortDateString()))
+            {
+                _paymentsDates.Add(payment.EndDate.ToShortDateString());
+            }
+        }
+        _paymentsDates =  _paymentsDates.Reverse().ToList();
+        return _paymentsDates;
+    }
+
+    private void OnProjectNameSelect(string selected) {
+        projectNameFilter = selected;
+    }
+
+    private void OnPaymentDateSelect(string selected) {
+        paymentDateFilter = selected; 
+    }
+
+    private bool FiltersFunc(ProjectHistorical element) => FilterFunc(element, projectNameFilter, paymentDateFilter);
+
+    private bool FilterFunc(ProjectHistorical element, string searchString1, string searchString2)
+    {
+        bool projectNameBool = (element.ProjectName.Equals(searchString1));
+        bool paymentDateBool = (element.EndDate.ToShortDateString().Contains(searchString2, StringComparison.OrdinalIgnoreCase));
+        if((projectNameBool && paymentDateBool) || (projectNameBool && string.IsNullOrWhiteSpace(searchString2)))
+            return true;
+        if((projectNameBool && paymentDateBool) || (paymentDateBool && string.IsNullOrWhiteSpace(searchString1)))
+            return true;
+        if(string.IsNullOrWhiteSpace(searchString1) && string.IsNullOrWhiteSpace(searchString2))
+            return true;  
+        return false;
     }
 }
