@@ -4,10 +4,12 @@ namespace Presentation.Employers.Models
 {
     internal class ProjectHistorical
     {
-
+        public string EmployerEmail { get; set; }
+        public string EmployeeEmail { get; set; }
         public string ProjectName { get; set; }
         public string PaymentFrecuency { get; set; }
-        public DateTime PaymentDate { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
         public double GrossSalary { get; set; }
         public double Benefits { get; set; }
         public double EmployerCharges { get; set; }
@@ -17,9 +19,12 @@ namespace Presentation.Employers.Models
 
         public ProjectHistorical()
         {
+            EmployerEmail = String.Empty;
+            EmployeeEmail = String.Empty;
             ProjectName = String.Empty;
             PaymentFrecuency = String.Empty;
-            PaymentDate = DateTime.Now;
+            StartDate = DateTime.Now;
+            EndDate = DateTime.Now;
             GrossSalary = 0;
             Benefits = 0;
             EmployerCharges = 0;
@@ -28,13 +33,17 @@ namespace Presentation.Employers.Models
             EmployerCost = 0;
         }
 
-        public ProjectHistorical(string projectName, string paymentFrecuency,
-            DateTime paymentDate, double grossSalary, double benefits, double employerCharges,
+        public ProjectHistorical(string employerEmail, string employeeEmail,
+            string projectName, string paymentFrecuency, DateTime startDate,
+            DateTime endDate, double grossSalary, double benefits, double employerCharges,
             double obligatoryDeductions, double voluntaryDeductions, double employerCost)
         {
+            EmployerEmail = employerEmail;
+            EmployeeEmail = employeeEmail;
             ProjectName = projectName;
             PaymentFrecuency = paymentFrecuency;
-            PaymentDate = paymentDate;
+            StartDate = startDate;
+            EndDate = endDate;
             GrossSalary = grossSalary;
             Benefits = benefits;
             EmployerCharges = employerCharges;

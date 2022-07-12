@@ -1,31 +1,28 @@
 ﻿@page "/Projects_Historical_Payments/{email}"
 
-@using Application.Agreements
-@using Domain.Agreements.Entities
+@using System.Globalization
 @using Application.Projects
 @using Domain.Projects.Entities
 @using Domain.Payments.Entities
 @using Application.Payments
-@using Domain.People.Entities
-@using Application.People
-@using Domain.Employees.Entities
-@using Application.Employees
-@using Domain.ReportOfHours.Entities
-@using Application.ReportOfHours
 @using Domain.Subscribes.Entities
 @using Domain.Subscriptions.Entities
 @using Application.Subscribes
 @using Presentation.Employers.Models
-@using System.Globalization
 @using Application.PaymentCalculator;
+@using Application.LegalDeductions
+@using Application.TaxCalculator
+@using Domain.LegalDeductions.Entities
+@using Application.Agreements
+@using Domain.Agreements.Entities
 
-@inject IAgreementService AgreementService
+@inject ILegalDeductionService LegalDeductionService
 @inject IProjectService ProjectService
 @inject IPaymentService PaymentService
-@inject IPersonService PersonService
-@inject IReportOfHoursService ReportHoursService
 @inject ISubscribeService SubscribeService
+@inject IAgreementService AgreementService
 @inject IPaymentCalculatorService PaymentCalculatorService
+@inject ITaxCalculatorService TaxCalculatorService
 @inject ISnackbar Snackbar
 @inject NavigationManager nav
 
@@ -104,7 +101,7 @@
             <RowTemplate>
                 <MudTd DataLabel="Proyecto">@context.ProjectName</MudTd>
                 <MudTd DataLabel="Frecuencia de pago">@context.PaymentFrecuency</MudTd>
-                <MudTd DataLabel="Fecha de pago">@context.PaymentDate.ToShortDateString()</MudTd>
+                <MudTd DataLabel="Fecha de pago">@context.EndDate.ToShortDateString()</MudTd>
                 <MudTd DataLabel="Salario Bruto"> @CostFormat(context.GrossSalary) </MudTd>
                 <MudTd DataLabel="Beneficios"> @CostFormat(context.Benefits) </MudTd>
                 <MudTd DataLabel="Cargas Sociales Empleador"> @CostFormat(context.EmployerCharges) </MudTd>
@@ -128,21 +125,129 @@
     private bool _loading = true;
     private bool _empty = true;
     private IList<ProjectHistorical> _projectsPaymentsList = new List<ProjectHistorical>();
+    private IList<Project> _projects = new List<Project>();
+    private IList<ProjectHistorical> _projectsPayment = new List<ProjectHistorical>();
+    private IEnumerable<ProjectHistorical> _joinPayments = new List<ProjectHistorical>();
+    private IEnumerable<LegalDeduction> _legalDeductions = new List<LegalDeduction>();
     private MudTable<ProjectHistorical> _mudTable;
     public string searchString1 = "";
     public CultureInfo cultureCR = CultureInfo.GetCultureInfo("es-CR");
 
     protected override async Task OnParametersSetAsync()
     {
-        ProjectHistorical projectHistorical = new ProjectHistorical("Fabrica de chocolates", "Quincenal", DateTime.Now, 350000.0, 0, 0, 30000.0, 0, 350000);
-        _projectsPaymentsList.Add(projectHistorical);
+        //ProjectHistorical projectHistorical = new ProjectHistorical("", "", "Fabrica de chocolates", "Quincenal", DateTime.Now, DateTime.Now, 350000.0, 0, 0, 30000.0, 0, 350000);
+        //_projectsPaymentsList.Add(projectHistorical);
+        await GetProjectsPayments();
         _loading = false;
-        _empty = false;
     }
 
     private async Task GetProjectsPayments()
     {
-       //IList<Payment> payments = PaymentService.
+        IList<Payment> payments = (await PaymentService.GetEmployerPayments(email)).ToList();
+        _projects = (await ProjectService.GetEmployerProyects(email)).ToList();
+        _joinPayments = from _payment in payments
+                        join _project in _projects on _payment.ProjectName equals _project.ProjectName
+                        select new ProjectHistorical
+                      {
+                            EmployeeEmail = _payment.EmployeeEmail,
+                            EmployerEmail = _payment.EmployerEmail,
+                            ProjectName = _payment.ProjectName,
+                            PaymentFrecuency = _project.PaymentInterval,
+                            StartDate = (DateTime) _payment.StartDate,
+                            EndDate = (DateTime) _payment.EndDate,
+                            GrossSalary = _payment.GrossSalary,
+                            Benefits = 0,
+                            EmployerCharges = 0,
+                            ObligatoryDeductions = 0,
+                            VoluntaryDeductions = 0,
+                            EmployerCost = 0
+                        };
+        _projectsPayment = _joinPayments.ToList();
+        await GetEmployeeSubscriptions();
+        //await InvokeAsync(StateHasChanged);
+        //_projectsPaymentsList = _projectsPayment;
+        _empty = false;
+    }
+
+    private async Task GetEmployeeSubscriptions()
+    {
+        foreach (ProjectHistorical projectHistorical in _projectsPayment)
+        {
+            double netSalary = projectHistorical.GrossSalary;
+            Agreement _agreement = new Agreement(projectHistorical.EmployeeEmail,
+                projectHistorical.EmployerEmail, projectHistorical.ProjectName, null, "", 0, null, 1, "");
+            _agreement = await AgreementService.GetContractee(_agreement);
+            projectHistorical.Benefits = Convert.ToDouble(await GetEmployeeBenefits(projectHistorical));
+            if (_agreement.ContractType != "Servicios profesionales")
+            {
+                double obligatoryCost = Convert.ToDouble(await GetEmployeeObligatoryDeductions(projectHistorical));
+                netSalary -= obligatoryCost;
+                projectHistorical.ObligatoryDeductions = obligatoryCost;
+            }
+            projectHistorical.VoluntaryDeductions = Convert.ToDouble(await GetEmployeeVoluntaryDeductions(projectHistorical, netSalary));
+            projectHistorical.EmployerCost = projectHistorical.GrossSalary + projectHistorical.Benefits + projectHistorical.EmployerCharges;
+        }
+
+        var listaFinal = (from P in _projectsPayment orderby P.ProjectName
+                          group P by new { P.EmployerEmail, P.ProjectName, P.StartDate, P.EndDate, P.PaymentFrecuency } into grp
+                          select new ProjectHistorical
+                              {
+                                  EmployerEmail = grp.Key.EmployerEmail,
+                                  ProjectName = grp.Key.ProjectName,
+                                  StartDate = grp.Key.StartDate,
+                                  PaymentFrecuency = grp.Key.PaymentFrecuency,
+                                  EndDate = grp.Key.EndDate,
+                                  GrossSalary = grp.Sum(e => e.GrossSalary),
+                                  Benefits = grp.Sum(e=> e.Benefits),
+                                  ObligatoryDeductions =  grp.Sum(e=> e.ObligatoryDeductions),
+                                  VoluntaryDeductions = grp.Sum(e=> e.VoluntaryDeductions),
+                                  EmployerCharges = grp.Sum(e=> e.EmployerCharges),
+                                  EmployerCost = grp.Sum(e=> e.EmployerCost)
+                              });
+        _projectsPaymentsList = listaFinal.ToList();
+    }
+
+    private async Task<double> GetEmployeeBenefits(ProjectHistorical projectHistorical)
+    {
+        double benefitsCost = 0;
+        Subscribe searchSubscribe= new Subscribe(projectHistorical.EmployeeEmail,
+            projectHistorical.EmployerEmail, projectHistorical.ProjectName, "",
+            0.0, projectHistorical.StartDate,  projectHistorical.EndDate);
+        IList<Subscription> benefits = (await SubscribeService.GetSubscriptionCostsByDate(searchSubscribe)).ToList();
+        benefits = benefits.Where(e => e.TypeSubscription == 1).ToList();
+        foreach (Subscription benefit in benefits)
+        {
+            benefitsCost += benefit.Cost;
+        }
+        return benefitsCost;
+    }
+
+    private async Task<double> GetEmployeeObligatoryDeductions(ProjectHistorical projectHistorical)
+    {
+        double obligatoryCost = 0;
+        _legalDeductions = await LegalDeductionService.GetAllAsync();
+        foreach (var item in _legalDeductions)
+        {
+            obligatoryCost += TaxCalculatorService.GetTaxAmount(item.DeductionName, projectHistorical.GrossSalary);
+        }
+        return obligatoryCost;
+    }
+
+    private async Task<double> GetEmployeeVoluntaryDeductions(ProjectHistorical projectHistorical, double netSalary)
+    {
+        Subscribe searchSubscribe= new Subscribe(projectHistorical.EmployeeEmail,
+            projectHistorical.EmployerEmail, projectHistorical.ProjectName, "",
+            0.0, projectHistorical.StartDate,  projectHistorical.EndDate);
+        IList<Subscription> deductions = (await SubscribeService.GetSubscriptionCostsByDate(searchSubscribe)).ToList();
+        deductions = deductions.Where(e => e.TypeSubscription == 0).ToList();
+        IList<Subscription> _deductionsNotPaid = PaymentCalculatorService.ApplyDeductions(netSalary, deductions);
+        deductions = deductions.Except(_deductionsNotPaid).ToList();
+        double deductionsMountToPay = PaymentCalculatorService.DeductionsCost(deductions);
+        if (deductionsMountToPay > netSalary)
+        {
+            deductionsMountToPay = netSalary;
+        }
+        return deductionsMountToPay;
     }
 
     private void PageChanged(int i)
