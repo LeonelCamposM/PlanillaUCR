@@ -27,6 +27,7 @@
 @using Presentation.Payments.Models
 @using Domain.Payments.Entities
 @using Application.Payments
+@using System.Globalization
 
 @inject IProjectService ProjectService
 @inject ISnackbar Snackbar
@@ -59,36 +60,35 @@ else
 	<MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
 	<MudPaper Height="15px" Width="100%" Outlined="false" Class="border-none" Elevation="0">
 	</MudPaper>
-			<MudGrid>		
-			<MudItem xs="10" sm="12">
-				<MudPaper  Height="75px" Width="100%" Outlined="false" Class="border-none pa-4" Elevation="0">
-					<MudText Align="Align.Center" Typo="Typo.h6">Contrato 4: Reporte Planilla</MudText>
-				</MudPaper>
-			</MudItem> 
-		 <MudItem xs="4">
-			<MudSelect T="string" @bind-Value="_myProjectName" Label="Nombre de proyecto" Variant="Variant.Outlined" TextChanged = "FillOutAllTablesByProject">
+	<MudGrid>
+		<MudItem xs="10" sm="12">
+			<MudPaper Height="75px" Width="100%" Outlined="false" Class="border-none pa-4" Elevation="0">
+				<MudText Align="Align.Center" Typo="Typo.h6">Reporte 4: Reporte Planilla</MudText>
+			</MudPaper>
+		</MudItem>
+		<MudItem xs="4">
+			<MudSelect T="string" @bind-Value="_myProjectName" Label="Nombre de proyecto" Variant="Variant.Outlined" TextChanged="FillOutAllTablesByProject">
 				@foreach (var project in _projects)
 				{
 					<MudSelectItem T="string" Value="@project.ProjectName">@project.ProjectName</MudSelectItem>
 				}
 			</MudSelect>
 		</MudItem>
-		 <MudItem xs="4">
-			<MudTextField @bind-Value="employerEmail" Label="Correo empleador" Variant="Variant.Outlined" ReadOnly="true" >
+		<MudItem xs="4">
+			<MudTextField @bind-Value="employerEmail" Label="Correo empleador" Variant="Variant.Outlined" ReadOnly="true">
 			</MudTextField>
 		</MudItem>
-			<MudItem xs="4">
-			<MudSelect T="string"  @bind-Value="_myEndDate" Label="Periodo de pago" Variant="Variant.Outlined" TextChanged = "FillOutAllTablesByDates">
+		<MudItem xs="4">
+			<MudSelect T="string" @bind-Value="_myEndDate" Label="Periodo de pago" Variant="Variant.Outlined" TextChanged="FillOutAllTablesByDates">
 				@foreach (var project in _projectDates)
 				{
-					<MudSelectItem Value="@project.EndDate" > @project.StartDate - @project.EndDate</MudSelectItem>
+					<MudSelectItem Value="@project.EndDate"> @project.StartDate - @project.EndDate</MudSelectItem>
 				}
 			</MudSelect>
-			</MudItem>
-		</MudGrid>
+		</MudItem>
+	</MudGrid>
 	if (!_empty)
 	{
-
 		<br>
 		<MudTable Items="@_templateTempSummaryTable" Striped="true" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading">
 			<ColGroup>
@@ -101,9 +101,10 @@ else
 			</HeaderContent>
 			<RowTemplate>
 				<MudTd DataLabel="Desglose salario" Style="text-align:justify-all"> @context.Name</MudTd>
-				<MudTd DataLabel="Monto" Style="text-align:justify-all"> @context.Amount </MudTd>
+				<MudTd DataLabel="Monto" Style="text-align:justify-all"> @ParseToCRC(@context.Amount) </MudTd>
 			</RowTemplate>
 		</MudTable>
+
 		<br>
 
 		<MudTable @ref="@_table" Items="@_templateTempSalariesTable" RowsPerPage="4" Striped="true" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" CustomFooter="true">
@@ -117,16 +118,18 @@ else
 			</HeaderContent>
 			<RowTemplate>
 				<MudTd DataLabel="Desglose salario" Style="text-align:justify-all"> @context.Name</MudTd>
-				<MudTd DataLabel="Monto" Style="text-align:justify-all"> @context.Amount </MudTd>
+				<MudTd DataLabel="Monto" Style="text-align:justify-all"> @ParseToCRC(@context.Amount) </MudTd>
 			</RowTemplate>
 			<FooterContent>
 				<MudTFootRow>
 					<MudTh>Total</MudTh>
-					<MudTd Style="text-align:justify-all"> @_templateTempSalariesTable.Sum((e) => e.Amount)</MudTd>
+					<MudTd Style="text-align:justify-all"> @ParseToCRC(@_templateTempSalariesTable.Sum((e) => e.Amount))</MudTd>
 				</MudTFootRow>
 			</FooterContent>
 		</MudTable>
+
 		<br>
+
 		<MudTable @ref="@_table" Items="@_templateTempDeductionsTable" Striped="true" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" CustomFooter="true">
 			<ColGroup>
 				<col style="width: 50%;" />
@@ -138,16 +141,18 @@ else
 			</HeaderContent>
 			<RowTemplate>
 				<MudTd DataLabel="Desglose salario" Style="text-align:justify-all">@context.Name </MudTd>
-				<MudTd DataLabel="Monto" Style="text-align:justify-all">@context.Amount</MudTd>
+				<MudTd DataLabel="Monto" Style="text-align:justify-all">@ParseToCRC(@context.Amount)</MudTd>
 			</RowTemplate>
 			<FooterContent>
 				<MudTFootRow>
 					<MudTh>Total </MudTh>
-					<MudTd Style="text-align:justify-all">@_templateTempDeductionsTable.Sum((e) => e.Amount)</MudTd>
+					<MudTd Style="text-align:justify-all">@ParseToCRC(@_templateTempDeductionsTable.Sum((e) => e.Amount))</MudTd>
 				</MudTFootRow>
 			</FooterContent>
 		</MudTable>
+
 		<br>
+
 		<MudTable @ref="@_table" Items="@_templateTempBenefitsTable" Striped="true" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" CustomFooter="true">
 			<ColGroup>
 				<col style="width: 50%;" />
@@ -159,16 +164,18 @@ else
 			</HeaderContent>
 			<RowTemplate>
 				<MudTd DataLabel="Desglose salario" Style="text-align:justify-all">@context.Name</MudTd>
-				<MudTd DataLabel="Monto" Style="text-align:justify-all">@context.Amount</MudTd>
+				<MudTd DataLabel="Monto" Style="text-align:justify-all">@ParseToCRC(@context.Amount)</MudTd>
 			</RowTemplate>
 			<FooterContent>
 				<MudTFootRow>
 					<MudTh>Total</MudTh>
-					<MudTd Style="text-align:justify-all">@_templateTempBenefitsTable.Sum((e) => e.Amount)</MudTd>
+					<MudTd Style="text-align:justify-all">@ParseToCRC(@_templateTempBenefitsTable.Sum((e) => e.Amount))</MudTd>
 				</MudTFootRow>
 			</FooterContent>
 		</MudTable>
+
 		<br>
+
 		<MudButton Variant="Variant.Filled" @onclick="@(e => OpenDialog())" Color="Color.Primary">
 			<MudText>
 				Exportar
@@ -184,16 +191,17 @@ else
 				<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="CloseDialog" Class="px-10">Aceptar</MudButton>
 			</DialogActions>
 		</MudDialog>
-	} else
+	}
+	else
 	{
 		<br>
-		<MudPaper Height="320px" Width="100%" Outlined="true" Class="pa-32" Elevation="25">
 
+		<MudPaper Height="320px" Width="100%" Outlined="true" Class="pa-32" Elevation="25">
 			<MudPaper Height="110px" Width="100%" Outlined="false" Class="border-none" Elevation="0">
 			</MudPaper>
-			<br />
-			<MudText Align="Align.Center" Typo="Typo.h5">No existen reportes en el proyecto @projectName</MudText>
-			<br />
+				<br />
+				<MudText Align="Align.Center" Typo="Typo.h5">No existen reportes en el proyecto @projectName</MudText>
+				<br />
 		</MudPaper>
 	}
 }
@@ -221,7 +229,7 @@ else
 	private double _totalDeductions = 0.0;
 	private double _totalSalaries = 0.0;
 	private double _totalBenefits = 0.0;
-	private double _finalAmountToPay  = 0.0;
+	private double _finalAmountToPay = 0.0;
 	private bool _loading = true;
 	private bool _empty = true;
 	private bool _visible = false;
@@ -229,23 +237,32 @@ else
 	private string _myEndDate;
 	private string _myProjectName;
 
+
+	private CultureInfo _cultureCR = CultureInfo.GetCultureInfo("es-CR");
+
+	private double _lastPay = 100.0;
+
 	protected override async Task OnInitializedAsync()
 	{
 		_myProjectName = projectName;
 		InitializeDatesField();
 		_loading = false;
 		_eventLoaded = true;
+		string a = _cultureCR.NumberFormat.CurrencySymbol + CostFormat(_lastPay);
+		ShowSnackNotification(a, Severity.Success);
 	}
 
 	private void InitializeDatesField()
 	{
 		_projectDates = GetProjectPaymentDates();
-		if (_projectDates.Length() != 0){
+		if (_projectDates.Length() != 0)
+		{
 			_myEndDate = _projectDates.FirstOrDefault().EndDate;
-		} 
+		}
 	}
 
-	private async Task InitializeAllLists() {
+	private async Task InitializeAllLists()
+	{
 		_agreementList = await AgreementService.GetProjectAgreements(_myProjectName, employerEmail);
 		_paymentList = await PaymentService.GetAllPaymentsStartAndEndDates(employerEmail, _myProjectName);
 		_projects = await ProjectService.GetEmployerProyects(employerEmail);
@@ -260,7 +277,7 @@ else
 		{
 			_myProjectName = myProject;
 			await InitializeTablesFields();
-			isValid = CheckProjectDatesLenght();	
+			isValid = CheckProjectDatesLenght();
 			if (isValid)
 			{
 				_myEndDate = _projectDates.FirstOrDefault().EndDate;
@@ -312,7 +329,8 @@ else
 		return isValid;
 	}
 
-	private async Task FillOutAllTables(DateTime startDate, DateTime endDate) {
+	private async Task FillOutAllTables(DateTime startDate, DateTime endDate)
+	{
 		ContextMenuService.SetProjectsContext(true, true, _myProjectName, employerEmail, false, true);
 		ClearAll();
 		await InitializePaidEmployees(startDate, endDate);
@@ -333,11 +351,11 @@ else
 		var paymentDates = (from P in _paymentList
 							group P by new { P.StartDate, P.EndDate } into grp
 							select new PaymentStartEndDates
-							{
-								StartDate = grp.Key.StartDate.ToShortDateString(),
-								EndDate = grp.Key.EndDate.ToShortDateString()
-							}).Take(10);
-		return paymentDates;			
+								{
+									StartDate = grp.Key.StartDate.ToShortDateString(),
+									EndDate = grp.Key.EndDate.ToShortDateString()
+								}).Take(10);
+		return paymentDates;
 	}
 
 	private IEnumerable<ReportePlanillasTemplateTable> JoinAgreementAndPayment()
@@ -352,10 +370,10 @@ else
 										}
 											into grp
 										select new ReportePlanillasTemplateTable
-										{
-											Name = grp.Key.ContractType,
-											Amount = grp.Sum(e => e.GrossSalary)
-										};
+								   {
+									   Name = grp.Key.ContractType,
+									   Amount = grp.Sum(e => e.GrossSalary)
+								   };
 		return _tempJoinedTable;
 	}
 
@@ -464,7 +482,8 @@ else
 		});
 	}
 
-	string GetStartDate(string endDate) {
+	string GetStartDate(string endDate)
+	{
 		var dates = _projectDates.Where(e => e.EndDate == endDate);
 		return dates.FirstOrDefault().StartDate;
 	}
@@ -473,13 +492,24 @@ else
 	{
 		_templateTempSalariesTable.Clear();
 		_templateTempBenefitsTable.Clear();
-		_templateTempDeductionsTable.Clear(); 
-		_templateTempSummaryTable.Clear(); 
-		_templateTableToBeEmailed.Clear(); 
+		_templateTempDeductionsTable.Clear();
+		_templateTempSummaryTable.Clear();
+		_templateTableToBeEmailed.Clear();
 		_totalDeductions = 0.0;
 		_totalSalaries = 0.0;
 		_totalBenefits = 0.0;
 		_finalAmountToPay = 0.0;
+	}
+
+	private string ParseToCRC(double amount)
+	{
+		return _cultureCR.NumberFormat.CurrencySymbol + CostFormat(amount);
+	}
+
+	private string CostFormat(double cost)
+	{
+		string formatedCost = string.Format("{0:N}", cost);
+		return formatedCost;
 	}
 }
 
