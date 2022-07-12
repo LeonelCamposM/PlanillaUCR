@@ -1,5 +1,6 @@
 ﻿@page "/Reports/{employerEmail}/{projectName}"
 
+@using Application.Email
 @using Domain.Agreements.DTOs
 @using Application.Agreements
 @using Domain.Agreements.Entities
@@ -510,6 +511,11 @@ else
 	{
 		string formatedCost = string.Format("{0:N}", cost);
 		return formatedCost;
+	}
+
+	private void SendEmail()
+	{
+		EmailObject emailObject = new EmailObject("","","","",employerEmail);
 	}
 }
 

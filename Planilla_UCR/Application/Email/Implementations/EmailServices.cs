@@ -87,5 +87,9 @@ namespace Application.Email.Implementations
 
             _emailSender.SendMail(emailData.Destiny, "Último pago", htmlContent);
         }
+        public void SendReportePlanillaEmail(EmailObject emailData, IList<string> report)
+        {
+
+        }
     }
 }
