@@ -130,13 +130,10 @@
     private IEnumerable<ProjectHistorical> _joinPayments = new List<ProjectHistorical>();
     private IEnumerable<LegalDeduction> _legalDeductions = new List<LegalDeduction>();
     private MudTable<ProjectHistorical> _mudTable;
-    public string searchString1 = "";
     public CultureInfo cultureCR = CultureInfo.GetCultureInfo("es-CR");
 
     protected override async Task OnParametersSetAsync()
     {
-        //ProjectHistorical projectHistorical = new ProjectHistorical("", "", "Fabrica de chocolates", "Quincenal", DateTime.Now, DateTime.Now, 350000.0, 0, 0, 30000.0, 0, 350000);
-        //_projectsPaymentsList.Add(projectHistorical);
         await GetProjectsPayments();
         _loading = false;
     }
@@ -164,9 +161,11 @@
                         };
         _projectsPayment = _joinPayments.ToList();
         await GetEmployeeSubscriptions();
-        //await InvokeAsync(StateHasChanged);
-        //_projectsPaymentsList = _projectsPayment;
-        _empty = false;
+        GetFinalList();
+        if (_projectsPaymentsList.Length() > 0)
+        {
+            _empty = false;
+        }
     }
 
     private async Task GetEmployeeSubscriptions()
@@ -187,8 +186,11 @@
             projectHistorical.VoluntaryDeductions = Convert.ToDouble(await GetEmployeeVoluntaryDeductions(projectHistorical, netSalary));
             projectHistorical.EmployerCost = projectHistorical.GrossSalary + projectHistorical.Benefits + projectHistorical.EmployerCharges;
         }
+    }
 
-        var listaFinal = (from P in _projectsPayment orderby P.ProjectName
+    private void GetFinalList()
+    {
+        var finalList = (from P in _projectsPayment orderby P.ProjectName
                           group P by new { P.EmployerEmail, P.ProjectName, P.StartDate, P.EndDate, P.PaymentFrecuency } into grp
                           select new ProjectHistorical
                               {
@@ -204,7 +206,7 @@
                                   EmployerCharges = grp.Sum(e=> e.EmployerCharges),
                                   EmployerCost = grp.Sum(e=> e.EmployerCost)
                               });
-        _projectsPaymentsList = listaFinal.ToList();
+        _projectsPaymentsList = finalList.ToList();
     }
 
     private async Task<double> GetEmployeeBenefits(ProjectHistorical projectHistorical)
