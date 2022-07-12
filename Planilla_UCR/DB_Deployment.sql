@@ -1176,11 +1176,11 @@ INSERT INTO Employer
 VALUES('david@ucr.ac.cr')
 
 INSERT INTO Project VALUES
-('david@ucr.ac.cr','Dulces david', 'Emprendimiento de dulces',15000,10,'Quincenal',1,'2022/06/15'),
-('david@ucr.ac.cr','La zapatera','Emprendimiento de zapatos',15000,10,'Mensual',1,'2022/06/30'),
-('david@ucr.ac.cr', 'Taller Hidalgo','Taller de motos',15000,10,'Semanal',1,'2022-06-1'),
-('david@ucr.ac.cr','El camino', 'Emprendimiento de tours', 15000, 10, 'Bisemanal', 1, '2022/06/14'),
-('david@ucr.ac.cr','Cryptomonedas','Emprendimiento de cryptomonedas',15000,10,'Mensual',1,'2022/06/30')
+('david@ucr.ac.cr','Dulces david', 'Emprendimiento de dulces',15000,10,'Quincenal',1,'2022/06/1'),
+('david@ucr.ac.cr','La zapatera','Emprendimiento de zapatos',15000,10,'Mensual',1,'2022/06/1'),
+('david@ucr.ac.cr', 'Taller Hidalgo','Taller de motos',15000,10,'Semanal',1,'2022/06/1'),
+('david@ucr.ac.cr','El camino', 'Emprendimiento de tours', 15000, 10, 'Bisemanal', 1, '2022/06/1'),
+('david@ucr.ac.cr','Cryptomonedas','Emprendimiento de cryptomonedas',15000,10,'Mensual',1,'2022/06/1')
 
 INSERT INTO AgreementType VALUES
 ('Tiempo completo', 4000),
@@ -1217,19 +1217,19 @@ INSERT INTO Subscribes (EmployerEmail, ProjectName, SubscriptionName, EmployeeEm
 ('david@ucr.ac.cr','Cryptomonedas','Ahorro pago luz','naye@ucr.ac.cr',25000,'2022-06-1'),
 ('david@ucr.ac.cr','La zapatera','Fondo de pensiones','naye@ucr.ac.cr',10000,'2022-06-1')
 
--- 8 * 30 * 4000 = 96,000
-INSERT INTO Payment
-VALUES('naye@ucr.ac.cr','david@ucr.ac.cr','La zapatera',960000, '2022/06/01', '2022/06/30')
+---- 8 * 30 * 4000 = 96,000
+--INSERT INTO Payment
+--VALUES('naye@ucr.ac.cr','david@ucr.ac.cr','La zapatera',960000, '2022/06/01', '2022/06/30')
 
--- 8 * 30 * 16000 = 3,840,000
-INSERT INTO Payment
-VALUES('naye@ucr.ac.cr','david@ucr.ac.cr','Cryptomonedas',3840000, '2022/06/01', '2022/06/30')
+---- 8 * 30 * 16000 = 3,840,000
+--INSERT INTO Payment
+--VALUES('naye@ucr.ac.cr','david@ucr.ac.cr','Cryptomonedas',3840000, '2022/06/01', '2022/06/30')
 
--- 4 * 15 * 1600 = 96,000
-INSERT INTO Payment 
-VALUES('naye@ucr.ac.cr','david@ucr.ac.cr','Dulces david', 96000, '2022/06/01', '2022/06/15')
+---- 4 * 15 * 1600 = 96,000
+--INSERT INTO Payment 
+--VALUES('naye@ucr.ac.cr','david@ucr.ac.cr','Dulces david', 96000, '2022/06/01', '2022/06/15')
 
--- 4 * 14 * 1600 = 89,600
-INSERT INTO Payment 
-VALUES('naye@ucr.ac.cr','david@ucr.ac.cr','El camino', 89600, '2022/06/01', '2022/06/14')
+---- 4 * 14 * 1600 = 89,600
+--INSERT INTO Payment 
+--VALUES('naye@ucr.ac.cr','david@ucr.ac.cr','El camino', 89600, '2022/06/01', '2022/06/14')
 
