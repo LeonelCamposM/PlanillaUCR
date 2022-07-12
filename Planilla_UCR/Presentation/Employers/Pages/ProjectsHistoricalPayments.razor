@@ -15,7 +15,9 @@
 @using Domain.LegalDeductions.Entities
 @using Application.Agreements
 @using Domain.Agreements.Entities
+@using Presentation.Employers.XLS
 
+@inject IJSRuntime js
 @inject ILegalDeductionService LegalDeductionService
 @inject IProjectService ProjectService
 @inject IPaymentService PaymentService
@@ -126,7 +128,7 @@
             </PagerContent>
         </MudTable>        <br>
         <MudToolBar DisableGutters="true" Class="gap-4">
-            <MudButton Variant="Variant.Filled" Color="Color.Primary">Exportar Excel</MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ClickExportXLS">Exportar Excel</MudButton>
         </MudToolBar>
     }
 }
@@ -144,10 +146,11 @@
     private MudTable<ProjectHistorical> _mudTable;
     private IList<String> _paymentsDates = new List<String>();
     private IList<String> _paymentsProjectNames = new List<String>();
-    string projectNameFilter = "";
-    string contracTypeFilter = "";
-    string paymentDateFilter = "";
+    private ProjectHistorical[] _paymentsHistoryExcel;
     public CultureInfo cultureCR = CultureInfo.GetCultureInfo("es-CR");
+    public string projectNameFilter = "";
+    public string contracTypeFilter = "";
+    public string paymentDateFilter = "";
 
     protected override async Task OnParametersSetAsync()
     {
@@ -329,5 +332,17 @@
         if(string.IsNullOrWhiteSpace(searchString1) && string.IsNullOrWhiteSpace(searchString2))
             return true;  
         return false;
+    }
+
+    private async void ClickExportXLS()
+    {
+        GetExcelContent();
+        var xls = new Excel();
+        await xls.GenerateExcelReport2Async(js, _paymentsHistoryExcel, "Reporte histórico pagos por proyecto.xlsx");
+    }
+
+    private void GetExcelContent()
+    {
+        _paymentsHistoryExcel = _projectsPaymentsList.ToArray();
     }
 }

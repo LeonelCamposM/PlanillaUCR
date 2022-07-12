@@ -2,7 +2,7 @@
 
 namespace Presentation.Employers.Models
 {
-    internal class ProjectHistorical
+    public class ProjectHistorical
     {
         public string EmployerEmail { get; set; }
         public string EmployeeEmail { get; set; }
