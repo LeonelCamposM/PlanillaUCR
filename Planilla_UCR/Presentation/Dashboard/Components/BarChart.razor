@@ -1,0 +1,140 @@
+﻿@using ChartJs.Blazor
+@using ChartJs.Blazor.BarChart
+@using ChartJs.Blazor.Common
+@using ChartJs.Blazor.Common.Axes
+@using ChartJs.Blazor.Common.Axes.Ticks
+@using ChartJs.Blazor.Common.Enums
+@using ChartJs.Blazor.Util
+
+@if (_isLoading)
+{
+  <MudPaper  Height="220px" Width="100%" Outlined="false" Class="border-none pa-4" Elevation="0">
+         <MudText Align="Align.Center" Typo="Typo.h6">
+              <MudProgressCircular Color="Color.Primary" Style="height:70px;width:70px;" Indeterminate="true" />
+        </MudText>
+  </MudPaper>
+}
+else
+{
+    if (data != null && totalValues() > 0)
+    {
+        <MudGrid Justify="Justify.Center">
+            <MudText Typo="Typo.body2">Total de publicaciones: @totalValues() </MudText>
+        </MudGrid>
+        <Chart Config="_configBarChart"></Chart>
+    }
+    else
+    {
+        <MudItem xs="12">
+            <MudAlert Severity="Severity.Info">No hay resultados para mostrar</MudAlert>
+        </MudItem>
+        <Chart Config="_configBarChart"></Chart>
+    }
+}
+
+@code {
+    [Parameter]
+    public int? total { get; set; }
+    [Parameter]
+    public Dictionary<string, int>? data { get; set; }
+    [Parameter]
+    public string? xAxis { get; set; }
+
+    private int? totalvalues;
+    private BarConfig _configBarChart;
+    private bool _isLoading = true;
+    string name = "nombre";
+
+    private void ConfigurationBarChart()
+    {
+        _configBarChart = new BarConfig();
+        {
+            _configBarChart.Options = new BarOptions
+            {
+                Legend = new Legend
+                {
+                    Display = false
+                },
+                Title = new OptionsTitle
+                {
+                    Display = true,
+                    Text = name
+
+                },
+                Responsive = true,
+                Scales = new BarScales
+                {
+                    YAxes = new List<CartesianAxis>
+{
+                    new LinearCartesianAxis{
+                        ScaleLabel = new ScaleLabel("eje y")
+                        {
+                            Display = true
+                        },
+                        Ticks = new LinearCartesianTicks {
+
+                            BeginAtZero = true,
+                            Precision = 0,
+
+                        }
+                    }
+                },
+                    XAxes = new List<CartesianAxis>
+{
+                    new CategoryAxis {
+                        ScaleLabel = new ScaleLabel("eje x")
+                        {
+                                Display = true
+                        },
+                        Ticks = new CategoryTicks()
+                        {
+                            Display = true,
+                        },
+                        Display = AxisDisplay.True
+                    }
+                }
+                }
+            };
+        };
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        ConfigurationBarChart();
+        fillBarChart(data);
+        _isLoading = false;
+    }
+
+    public void fillBarChart(IDictionary<string, int> data)
+    {
+        foreach (string item in data.Keys)
+        {
+            _configBarChart.Data.Labels.Add(item);
+        }
+
+        BarDataset<int> datasetYears = new BarDataset<int>(data.Values)
+        {
+            BackgroundColor = ColorUtil.ColorHexString(255, 205, 86), // yellow
+            Label = "",
+        };
+        _configBarChart.Data.Datasets.Add(datasetYears);
+    }
+
+    private int? totalValues()
+    {
+        int? totalPublication = 0;
+        if (total != null)
+        {
+            totalPublication = total;
+        }
+        else
+        {
+            foreach (var item in data.Keys)
+            {
+                totalPublication += data[item];
+            }
+        }
+
+        return totalPublication;
+    }
+}

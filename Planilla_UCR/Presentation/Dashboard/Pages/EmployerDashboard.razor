@@ -1,0 +1,28 @@
+﻿@using System.Text
+@using ChartJs.Blazor.BarChart
+@using ChartJs.Blazor.PieChart
+@using Presentation.Dashboard.Components
+
+@inject NavigationManager NavigationManager
+@page "/da"
+
+<MudGrid>
+    <MudItem xs="6">
+        <MudPaper Class="pa-3" Elevation="3">
+                <PieChart total="_data.Count()" data="@_data"></PieChart>
+                <BarChart total="_data.Count()" data="@_data"></BarChart>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+
+@code {
+    private bool _isLoading = true;
+    Dictionary<string, int>? _data = new Dictionary<string, int>
+    {
+        {"csv", 1},
+        {"html", 2},
+        {"html1", 3},
+        {"html2", 4},
+        {"html3", 5}
+    };
+}
