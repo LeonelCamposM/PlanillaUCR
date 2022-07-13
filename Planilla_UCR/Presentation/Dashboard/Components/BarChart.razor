@@ -10,7 +10,7 @@
  
 @code {
     [Parameter]
-    public Dictionary<string, int>? data { get; set; }
+    public Dictionary<string, double>? data { get; set; }
     [Parameter]
     public string title { get; set; }
 
@@ -75,16 +75,16 @@
         FillBarChart(data);
     }
 
-    public void FillBarChart(IDictionary<string, int> data)
+    public void FillBarChart(IDictionary<string, double> data)
     {
         foreach (string item in data.Keys)
         {
             _configBarChart.Data.Labels.Add(item);
         }
 
-        BarDataset<int> dataset= new BarDataset<int>(data.Values)
+        BarDataset<double> dataset= new BarDataset<double>(data.Values)
         {
-            BackgroundColor = ColorUtil.ColorHexString(255, 205, 86), 
+            BackgroundColor = ColorUtil.ColorHexString(0, 156, 140), 
             Label = "",
         };
         _configBarChart.Data.Datasets.Add(dataset);

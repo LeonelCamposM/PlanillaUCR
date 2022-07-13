@@ -66,7 +66,7 @@
     </MudItem>
     <MudItem xs="6">
     <MudPaper Height="380px" Class="pa-3" Elevation="3">
-        <PieChart title="Costo último pago" data="@_data"></PieChart>
+        <PieChart title="Costo último pago" data="@data"></PieChart>
     </MudPaper>
     </MudItem>
     
@@ -75,7 +75,15 @@
 @code {
     private bool _isLoading = true;
     private MudTable<string> _tableLegalDeductions;
-    Dictionary<string, int>? _data = new Dictionary<string, int>
+    Dictionary<string,double>? _data = new Dictionary<string, double>
+    {
+        {"csv", 1},
+        {"html", 2},
+        {"html1", 3},
+        {"html2", 4},
+        {"html3", 5}
+    };
+    Dictionary<string,int>? data = new Dictionary<string, int>
     {
         {"csv", 1},
         {"html", 2},

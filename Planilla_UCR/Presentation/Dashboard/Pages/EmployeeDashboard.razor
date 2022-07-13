@@ -57,15 +57,14 @@
              </MudItem>
         </MudGrid>
         <br>
-         <MudItem xs="12" Class="d-flex justify-center align-center">
-             <MudItem xs="7">
-             
-              
-            
+         <MudGrid>
+             <MudItem xs="6">
+                <MudPaper Class="pa-3" Height="380px" Elevation="3">
+                    <BarChart title="Salario neto" data="@_dataNetSalary"></BarChart>
+                </MudPaper>
              </MudItem>
-              <MudItem xs="1">
-             </MudItem>
-            <MudItem xs="5">
+          
+            <MudItem xs="6">
             <MudTable @ref="@_tablePaymentHistory" Items="@_payments" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading">
                 <HeaderContent>
                     <MudTh>Proyecto</MudTh>
@@ -85,8 +84,21 @@
                 </RowTemplate>
             </MudTable>
             </MudItem>
-            <br>
-         </MudItem>
+         </MudGrid>
+          <br>
+         <MudGrid>
+             <MudItem xs="6">
+                <MudPaper Class="pa-3" Height="380px" Elevation="3">
+                    <BarChart title="Deducciones voluntarias" data="@_dataVoluntaryDeductions"></BarChart>
+                </MudPaper>
+             </MudItem>
+            
+            <MudItem xs="6">
+                <MudPaper Class="pa-3" Height="380px" Elevation="3">
+                        <BarChart title="Deducciones legales" data="@_dataLegalDeductions"></BarChart>
+                </MudPaper>
+            </MudItem>
+         </MudGrid>
     }else
     {
         <MudText Align="Align.Center" Typo="Typo.h6">
@@ -94,98 +106,10 @@
         </MudText>
     }
 }
-<br>
-<br>
-
-<MudGrid>
-    <MudItem xs="6">
-        <MudPaper Class="pa-3" Height="380px" Elevation="3">
-            <BarChart title="Cantidad de empleados" data="@_data"></BarChart>
-        </MudPaper>
-    </MudItem>
-    <MudItem xs="6">
-        <MudPaper  Class="border-none" Elevation="0">
-            <MudTable Height="250px" Class="border-none" @ref="@_tableLegalDeductions" RowsPerPage="3"  Items="@list" Breakpoint="Breakpoint.Sm" Elevation="3">
-                <ToolBarContent>
-                        <MudText Align="Align.Center" Typo="Typo.h6">Pagos pendientes </MudText>
-                        <MudSpacer />
-                </ToolBarContent> 
-                <HeaderContent>
-                    <MudTh>Proyecto</MudTh>
-                    <MudTh>Fecha</MudTh>
-                    <MudTh>Acciones</MudTh>
-
-                </HeaderContent>
-
-                <RowTemplate>
-                        <MudTd DataLabel="Nombre">@context</MudTd>
-                        <MudTd DataLabel="Monto">@context</MudTd>
-                        <MudTd DataLabel="Acciones">
-                            <MudButton Size="Size.Small" Variant="Variant.Filled" Color="Color.Primary"> Pagar</MudButton>    
-                        </MudTd>
-                </RowTemplate>
-                <PagerContent>
-                        <MudPagination SelectedChanged="PageChanged" Count="@((_tableLegalDeductions.GetFilteredItemsCount() + _tableLegalDeductions.RowsPerPage - 1) / _tableLegalDeductions.RowsPerPage)" Color="Color.Primary" Class="pa-4"/>
-                </PagerContent>
-            </MudTable>
-        </MudPaper>
-    </MudItem>
-
-
-
-    <MudItem xs="6">
-        <MudPaper  Class="border-none" Elevation="0">
-            <MudTable Height="250px" @ref="@_tableLegalDeductions" RowsPerPage="3" Items="@list" Breakpoint="Breakpoint.Sm" Elevation="3">
-                <ToolBarContent>
-                        <MudText Align="Align.Center" Typo="Typo.h6">Último pago </MudText>
-                        <MudSpacer />
-                </ToolBarContent> 
-                <HeaderContent>
-                    <MudTh>Proyecto</MudTh>
-                    <MudTh>Fecha</MudTh>
-                    <MudTh>Monto</MudTh>
-
-                </HeaderContent>
-
-                <RowTemplate>
-                        <MudTd DataLabel="Proyecto">@context</MudTd>
-                        <MudTd DataLabel="Fecha">@context</MudTd>
-                        <MudTd DataLabel="Monto">@context</MudTd>
-                </RowTemplate>
-                <PagerContent>
-                        <MudPagination SelectedChanged="PageChanged" Count="@((_tableLegalDeductions.GetFilteredItemsCount() + _tableLegalDeductions.RowsPerPage - 1) / _tableLegalDeductions.RowsPerPage)" Color="Color.Primary" Class="pa-4"/>
-                </PagerContent>
-            </MudTable>
-        </MudPaper>
-    </MudItem>
-    <MudItem xs="6">
-    <MudPaper Height="380px" Class="pa-3" Elevation="3">
-        <PieChart title="Costo último pago" data="@_data"></PieChart>
-    </MudPaper>
-    </MudItem>
-    
-</MudGrid>
 
 @code {
-    private bool _isLoading = true;
-    private MudTable<string> _tableLegalDeductions;
-    Dictionary<string, int>? _data = new Dictionary<string, int>
-    {
-        {"csv", 1},
-        {"html", 2},
-        {"html1", 3},
-        {"html2", 4},
-        {"html3", 5}
-    };
-    List<string> list = new List<string>(){
-        {"csv"},
-        {"html"},
-        {"html1"},
-        {"html2"},
-        {"html3"}
-    };
-
-     [Parameter]
+  
+    [Parameter]
     public string email { get; set; }
 
     private bool _loading = true;
@@ -193,13 +117,13 @@
     private bool _payTaxes = false;
 
     private MudTable<PaymentHistoryModel>  _tablePaymentHistory;
-
+   
     private IList<PaymentHistoryModel> _payments = new List<PaymentHistoryModel>();
     private IList<Payment> _paymentsList = new List<Payment>();
     private IList<Subscription> _deductions = new List<Subscription>();
     private IEnumerable<PaymentHistoryModel> _paymentsHistory = new List<PaymentHistoryModel>();
     private IEnumerable<LegalDeduction> _legalDeductions = new List<LegalDeduction>();
-
+    private IList<String> _paymentsProjectNames = new List<String>();
     private IList<Double> _paymentsLegalDeductionsCost = new List<Double>();
     private IList<Double> _paymentsNetSalaryCost = new List<Double>();
     private IList<Double> _paymentsVoluntaryDeductionsCost = new List<Double>();
@@ -210,17 +134,22 @@
     private double _costLegalDeductions;
     private double _costNetSalary;
 
+    public string[] projectNameLabels;
+    public double[] costNetSalary;
+    public double[] costVoluntaryDeductions;
+    public double[] costLegalDeductions;
+
+     Dictionary<string, double>? _dataNetSalary = new Dictionary<string,double>();
+     Dictionary<string, double>? _dataVoluntaryDeductions = new Dictionary<string,double>();
+     Dictionary<string, double>? _dataLegalDeductions = new Dictionary<string,double>();
+
     protected override async Task OnParametersSetAsync()
     {
         _paymentsList = (IList<Payment>) await PaymentService.GetEmployeeLastestPayments(email);
         _paymentsHistory = await GetLatestPayments();
-        //GetProyectNames();
-        //dataSize = _paymentsProjectNames.Length();
-        //costNetSalary =_paymentsNetSalaryCost.ToArray();
-        //costVoluntaryDeductions =_paymentsVoluntaryDeductionsCost.ToArray();
-        //costLegalDeductions =_paymentsLegalDeductionsCost.ToArray();
+        GetBarChartData();
         _loading = false;
-          
+
     }
 
     private async Task<IList<PaymentHistoryModel>> GetLatestPayments()
@@ -295,22 +224,27 @@
         return netSalary;
     }
 
+    private void GetBarChartData()
+    {
+        foreach (Payment payment in _paymentsList)
+        {
+            _paymentsProjectNames.Add(payment.ProjectName);
+        }
+        projectNameLabels = _paymentsProjectNames.ToArray();
+        costNetSalary =_paymentsNetSalaryCost.ToArray();
+        costVoluntaryDeductions =_paymentsVoluntaryDeductionsCost.ToArray();
+        costLegalDeductions =_paymentsLegalDeductionsCost.ToArray();
+        for (int i=0; i<projectNameLabels.Length; i++)
+        {
+            _dataNetSalary.Add(projectNameLabels[i], costNetSalary[i]);
+            _dataVoluntaryDeductions.Add(projectNameLabels[i], costVoluntaryDeductions[i]);
+            _dataLegalDeductions.Add(projectNameLabels[i], costLegalDeductions[i]);
+        }
+    }
+
     private string CostFormat(double cost)
     {
         string formatedCost = string.Format("{0:N}", cost);
         return formatedCost;
-    }
-
-
-
-
-
-
-
-
-
-    private void PageChanged(int i)
-    {
-        _tableLegalDeductions.NavigateTo(i - 1);
     }
 }
