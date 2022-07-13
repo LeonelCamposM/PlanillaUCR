@@ -55,5 +55,13 @@ namespace Infrastructure.Payments.Repositories
 
             return employeePaymentList;
         }
+
+        public async Task<IEnumerable<Payment>> GetLastEmployerPayments(string email)
+        {
+            IList<Payment> employerPaymentList = await _dbContext.Payments.Where(e =>
+            e.EmployerEmail == email).OrderByDescending(pay => pay.EndDate).Take(10).ToListAsync();
+
+            return employerPaymentList;
+        }
     }
 }

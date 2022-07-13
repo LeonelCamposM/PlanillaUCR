@@ -1,15 +1,27 @@
 ﻿@using System.Text
 @using ChartJs.Blazor.BarChart
 @using ChartJs.Blazor.PieChart
+@using ChartJs.Blazor.Util
+@using Domain.Payments.Entities
 @using Presentation.Dashboard.Components
+@using System.Globalization
+@using Application.Payments
 
 @inject NavigationManager NavigationManager
+@inject IPaymentService PaymentService
 @page "/da"
 
+@if (_loading)
+{
+    <MudText>loading</MudText>
+}
+else
+{
+    
 <MudGrid>
     <MudItem xs="6">
         <MudPaper Class="pa-3" Height="380px" Elevation="3">
-            <BarChart title="Cantidad de empleados" data="@_data"></BarChart>
+            <BarChart colorList="colorslist" title="Cantidad de empleados" data="@_data"></BarChart>
         </MudPaper>
     </MudItem>
     <MudItem xs="6">
@@ -27,8 +39,8 @@
                 </HeaderContent>
 
                 <RowTemplate>
-                        <MudTd DataLabel="Nombre">@context</MudTd>
-                        <MudTd DataLabel="Monto">@context</MudTd>
+                        <MudTd DataLabel="Proyecto">@context</MudTd>
+                        <MudTd DataLabel="Fecha">@context </MudTd>
                         <MudTd DataLabel="Acciones">
                             <MudButton Size="Size.Small" Variant="Variant.Filled" Color="Color.Primary"> Pagar</MudButton>    
                         </MudTd>
@@ -41,9 +53,9 @@
     </MudItem>
     <MudItem xs="6">
         <MudPaper  Class="border-none" Elevation="0">
-            <MudTable Height="250px" @ref="@_tableLegalDeductions" RowsPerPage="3" Items="@list" Breakpoint="Breakpoint.Sm" Elevation="3">
+            <MudTable Height="250px" @ref="@_tableEmployerPayments" RowsPerPage="3" Items="@_lastEmployerPayments" Breakpoint="Breakpoint.Sm" Elevation="3">
                 <ToolBarContent>
-                        <MudText Align="Align.Center" Typo="Typo.h6">Último pago </MudText>
+                        <MudText Align="Align.Center" Typo="Typo.h6">Últimos pagos </MudText>
                         <MudSpacer />
                 </ToolBarContent> 
                 <HeaderContent>
@@ -54,35 +66,41 @@
                 </HeaderContent>
 
                 <RowTemplate>
-                        <MudTd DataLabel="Proyecto">@context</MudTd>
-                        <MudTd DataLabel="Fecha">@context</MudTd>
-                        <MudTd DataLabel="Monto">@context</MudTd>
+                        <MudTd DataLabel="Proyecto">@context.ProjectName</MudTd>
+                        <MudTd DataLabel="Fecha">@context.EndDate.ToShortDateString()</MudTd>
+                        <MudTd DataLabel="Monto"> @_cultureCR.NumberFormat.CurrencySymbol @CostFormat(@context.GrossSalary) </MudTd>
                 </RowTemplate>
                 <PagerContent>
-                        <MudPagination SelectedChanged="PageChanged" Count="@((_tableLegalDeductions.GetFilteredItemsCount() + _tableLegalDeductions.RowsPerPage - 1) / _tableLegalDeductions.RowsPerPage)" Color="Color.Primary" Class="pa-4"/>
+                        <MudPagination SelectedChanged="PageChangedLastPays" Count="@((_tableEmployerPayments.GetFilteredItemsCount() + _tableEmployerPayments.RowsPerPage - 1) / _tableEmployerPayments.RowsPerPage)" Color="Color.Primary" Class="pa-4"/>
                 </PagerContent>
             </MudTable>
         </MudPaper>
     </MudItem>
     <MudItem xs="6">
     <MudPaper Height="380px" Class="pa-3" Elevation="3">
-        <PieChart title="Costo último pago" data="@_data"></PieChart>
+        <PieChart colorList="colorslist" title="Costo total por proyecto" data="@_data"></PieChart>
     </MudPaper>
     </MudItem>
     
 </MudGrid>
+    
+}
 
 @code {
     private bool _isLoading = true;
     private MudTable<string> _tableLegalDeductions;
-    Dictionary<string, int>? _data = new Dictionary<string, int>
+    private MudTable<Payment> _tableEmployerPayments;
+    Dictionary<string, double>? _data = new Dictionary<string, double>();
+    private bool _loading = true;
+    IList<string> colorslist = new List<string>()
     {
-        {"csv", 1},
-        {"html", 2},
-        {"html1", 3},
-        {"html2", 4},
-        {"html3", 5}
+        {ColorUtil.ColorHexString(2, 109, 126)},
+        {ColorUtil.ColorHexString(59, 113, 151)},
+        {ColorUtil.ColorHexString(0, 147, 147)},
+        {ColorUtil.ColorHexString(68, 162, 154)},
+        {ColorUtil.ColorHexString(61, 153, 132)},
     };
+
     List<string> list = new List<string>(){
         {"csv"},
         {"html"},
@@ -90,9 +108,42 @@
         {"html2"},
         {"html3"}
     };
+    private CultureInfo _cultureCR = CultureInfo.GetCultureInfo("es-CR");
+    private IList<Payment> _lastEmployerPayments;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _lastEmployerPayments = (IList<Payment>) await PaymentService.GetLastEmployerPayments("david@ucr.ac.cr");
+        //IList<Payment> projects = _lastEmployerPayments.GroupBy(e=> e.ProjectName);
+        var groupByFirstLetterQuery = 
+                        from student in _lastEmployerPayments
+                        group student by student.ProjectName;
+
+
+        foreach (var group in groupByFirstLetterQuery){
+            double cost = 0;
+            foreach (var payment in group){
+                cost += payment.GrossSalary;
+            }
+            _data.Add(group.FirstOrDefault().ProjectName, cost);
+        }
+        _loading = false;
+
+    }
 
     private void PageChanged(int i)
     {
         _tableLegalDeductions.NavigateTo(i - 1);
+    }
+
+    private void PageChangedLastPays(int i)
+    {
+        _tableEmployerPayments.NavigateTo(i - 1);
+    }
+
+    private string CostFormat(double cost)
+    {
+        string formatedCost = string.Format("{0:N}", cost);
+        return formatedCost;
     }
 }
