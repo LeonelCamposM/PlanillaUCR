@@ -114,7 +114,7 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        ContextService.SetProjectsContext(true,true, projectName, email, ContextService.GetHoursEmployeeContext());
+        ContextService.SetProjectsContext(true,true, projectName, email, ContextService.GetHoursEmployeeContext(), ContextService.GetReportsContext());
         _employees = await AgreementService.GetProjectAgreements(ContextService.GetProjectsContext(), email);
         await GetProjectInfo();
         GetNextPay();
@@ -219,7 +219,7 @@
         Payment _lastPay = await PaymentService.GetEmployeeLastPayment(employeeEmail, email, projectName);
         if (_lastPay == null)
         {
-            _workedDays = _nextPay.Day - startDate.Day;
+            _workedDays = (_nextPay - startDate).Days;
         }
         int _workedWeeks = _workedDays / 7;
         _workedDays -= _workedWeeks;
