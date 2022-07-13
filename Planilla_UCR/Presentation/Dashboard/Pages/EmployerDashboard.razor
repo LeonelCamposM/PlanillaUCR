@@ -8,15 +8,73 @@
 
 <MudGrid>
     <MudItem xs="6">
-        <MudPaper Class="pa-3" Elevation="3">
-                <PieChart total="_data.Count()" data="@_data"></PieChart>
-                <BarChart total="_data.Count()" data="@_data"></BarChart>
+        <MudPaper Class="pa-3" Height="380px" Elevation="3">
+            <BarChart title="Cantidad de empleados" data="@_data"></BarChart>
         </MudPaper>
     </MudItem>
+    <MudItem xs="6">
+        <MudPaper  Class="border-none" Elevation="0">
+            <MudTable Height="250px" Class="border-none" @ref="@_tableLegalDeductions" RowsPerPage="3"  Items="@list" Breakpoint="Breakpoint.Sm" Elevation="3">
+                <ToolBarContent>
+                        <MudText Align="Align.Center" Typo="Typo.h6">Pagos pendientes </MudText>
+                        <MudSpacer />
+                </ToolBarContent> 
+                <HeaderContent>
+                    <MudTh>Proyecto</MudTh>
+                    <MudTh>Fecha</MudTh>
+                    <MudTh>Acciones</MudTh>
+
+                </HeaderContent>
+
+                <RowTemplate>
+                        <MudTd DataLabel="Nombre">@context</MudTd>
+                        <MudTd DataLabel="Monto">@context</MudTd>
+                        <MudTd DataLabel="Acciones">
+                            <MudButton Size="Size.Small" Variant="Variant.Filled" Color="Color.Primary"> Pagar</MudButton>    
+                        </MudTd>
+                </RowTemplate>
+                <PagerContent>
+                        <MudPagination SelectedChanged="PageChanged" Count="@((_tableLegalDeductions.GetFilteredItemsCount() + _tableLegalDeductions.RowsPerPage - 1) / _tableLegalDeductions.RowsPerPage)" Color="Color.Primary" Class="pa-4"/>
+                </PagerContent>
+            </MudTable>
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="6">
+        <MudPaper  Class="border-none" Elevation="0">
+            <MudTable Height="250px" @ref="@_tableLegalDeductions" RowsPerPage="3" Items="@list" Breakpoint="Breakpoint.Sm" Elevation="3">
+                <ToolBarContent>
+                        <MudText Align="Align.Center" Typo="Typo.h6">Último pago </MudText>
+                        <MudSpacer />
+                </ToolBarContent> 
+                <HeaderContent>
+                    <MudTh>Proyecto</MudTh>
+                    <MudTh>Fecha</MudTh>
+                    <MudTh>Monto</MudTh>
+
+                </HeaderContent>
+
+                <RowTemplate>
+                        <MudTd DataLabel="Proyecto">@context</MudTd>
+                        <MudTd DataLabel="Fecha">@context</MudTd>
+                        <MudTd DataLabel="Monto">@context</MudTd>
+                </RowTemplate>
+                <PagerContent>
+                        <MudPagination SelectedChanged="PageChanged" Count="@((_tableLegalDeductions.GetFilteredItemsCount() + _tableLegalDeductions.RowsPerPage - 1) / _tableLegalDeductions.RowsPerPage)" Color="Color.Primary" Class="pa-4"/>
+                </PagerContent>
+            </MudTable>
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="6">
+    <MudPaper Height="380px" Class="pa-3" Elevation="3">
+        <PieChart title="Costo último pago" data="@_data"></PieChart>
+    </MudPaper>
+    </MudItem>
+    
 </MudGrid>
 
 @code {
     private bool _isLoading = true;
+    private MudTable<string> _tableLegalDeductions;
     Dictionary<string, int>? _data = new Dictionary<string, int>
     {
         {"csv", 1},
@@ -25,4 +83,16 @@
         {"html2", 4},
         {"html3", 5}
     };
+    List<string> list = new List<string>(){
+        {"csv"},
+        {"html"},
+        {"html1"},
+        {"html2"},
+        {"html3"}
+    };
+
+    private void PageChanged(int i)
+    {
+        _tableLegalDeductions.NavigateTo(i - 1);
+    }
 }

@@ -3,37 +3,14 @@
 @using ChartJs.Blazor.PieChart
 @using ChartJs.Blazor.Util
 
-@if (_isLoading)
-{
-   <MudPaper  Height="220px" Width="100%" Outlined="false" Class="border-none pa-4" Elevation="0">
-         <MudText Align="Align.Center" Typo="Typo.h6">
-              <MudProgressCircular Color="Color.Primary" Style="height:70px;width:70px;" Indeterminate="true" />
-        </MudText>
-    </MudPaper>
-}
-else
-{
-    if (data != null && data.Count > 0)
-    {
-        <MudGrid Justify="Justify.Center">
-            <MudText Typo="Typo.body2">Total de publicaciones: @total </MudText>
-        </MudGrid>
-        <Chart Config="_configPieChart"></Chart>
-    }
-    else
-    {
-        <MudItem xs="12">
-            <MudAlert Severity="Severity.Info">No hay resultados para mostrar</MudAlert>
-        </MudItem>
-        <Chart Config="_configPieChart"></Chart>
-    }
-}
+<Chart Height="200" Config="_configPieChart"></Chart>
 
 @code {
     [Parameter]
-    public int? total { get; set; }
-    [Parameter]
     public Dictionary<string, int>? data { get; set; }
+
+    [Parameter]
+    public string title { get; set; }
 
     private PieConfig _configPieChart;
     private bool _isLoading = true;
@@ -41,43 +18,28 @@ else
     private void ConfigurationPieChart()
     {
         _configPieChart = new PieConfig();
-
         _configPieChart.Options = new PieOptions
         {
             Responsive = true,
             Title = new OptionsTitle
             {
                 Display = true,
-                Text = "Cantidad de publicaciones por tipo de publicación"
+                Text = title
             }
         };
     }
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        _isLoading = false;
         ConfigurationPieChart();
-        fillPieChart();
- 
+        FillPieChart();
     }
 
-    private void fillPieChart()
+    private void FillPieChart()
     {
         foreach (string item in data.Keys)
         {
-            if (item.Equals("Conference"))
-            {
-                _configPieChart.Data.Labels.Add("Conferencia");
-            }
-            else if (item.Equals("Journal"))
-            {
-                _configPieChart.Data.Labels.Add("Revista");
-            }
-            else
-            {
-                _configPieChart.Data.Labels.Add(item);
-            }
-
+            _configPieChart.Data.Labels.Add(item);
         }
 
         PieDataset<int> dataset = new PieDataset<int>(data.Values)
@@ -88,7 +50,6 @@ else
                 ColorUtil.ColorHexString(109,192,103), //green
             }
         };
-
         _configPieChart.Data.Datasets.Add(dataset);
     }
 }
