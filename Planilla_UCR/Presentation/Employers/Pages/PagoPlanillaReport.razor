@@ -30,6 +30,7 @@
 @using Application.Payments
 @using System.Globalization
 
+
 @inject IProjectService ProjectService
 @inject ISnackbar Snackbar
 @inject IAgreementService AgreementService
@@ -40,7 +41,7 @@
 @inject ISubscriptionService SubscriptionService
 @inject ISubscribeService SubscribeService
 @inject IPaymentService PaymentService
-
+@inject IEmailServices EmailService
 @inject NavigationManager nav
 
 @if (_loading)
@@ -219,7 +220,6 @@ else
 	private IList<ReportePlanillasTemplateTable> _templateTempBenefitsTable = new List<ReportePlanillasTemplateTable>();
 	private IList<ReportePlanillasTemplateTable> _templateTempDeductionsTable = new List<ReportePlanillasTemplateTable>();
 	private IList<ReportePlanillasTemplateTable> _templateTempSummaryTable = new List<ReportePlanillasTemplateTable>();
-	private IList<ReportePlanillasTemplateTable> _templateTableToBeEmailed = new List<ReportePlanillasTemplateTable>();
 	private IEnumerable<PaymentStartEndDates> _projectDates = new List<PaymentStartEndDates>();
 	private IList<Payment> _paidEmployees = new List<Payment>();
 	private IEnumerable<Payment> _paymentList = new List<Payment>();
@@ -250,7 +250,6 @@ else
 		_loading = false;
 		_eventLoaded = true;
 		string a = _cultureCR.NumberFormat.CurrencySymbol + CostFormat(_lastPay);
-		ShowSnackNotification(a, Severity.Success);
 	}
 
 	private void InitializeDatesField()
@@ -426,6 +425,7 @@ else
 
 	private void CloseDialog()
 	{
+		SendEmail();
 		_visible = false;
 	}
 
@@ -442,47 +442,6 @@ else
 		_templateTempSummaryTable.Add(myTempTable);
 	}
 
-	private void FillOutTableToBeSendEmail()
-	{
-		foreach (var summary in _templateTempSummaryTable)
-		{
-			ReportePlanillasTemplateTable myTempTable = new ReportePlanillasTemplateTable(summary.Name, summary.Amount);
-			_templateTableToBeEmailed.Add(myTempTable);
-		}
-		foreach (var salarie in _templateTempSalariesTable)
-		{
-			ReportePlanillasTemplateTable myTempTable = new ReportePlanillasTemplateTable(salarie.Name, salarie.Amount);
-			_templateTableToBeEmailed.Add(myTempTable);
-		}
-		foreach (var benefit in _templateTempBenefitsTable)
-		{
-			ReportePlanillasTemplateTable myTempTable = new ReportePlanillasTemplateTable(benefit.Name, benefit.Amount);
-			_templateTableToBeEmailed.Add(myTempTable);
-		}
-		foreach (var deduction in _templateTempDeductionsTable)
-		{
-			ReportePlanillasTemplateTable myTempTable = new ReportePlanillasTemplateTable(deduction.Name, deduction.Amount);
-			_templateTableToBeEmailed.Add(myTempTable);
-		}
-	}
-	private void ShowSnackNotification(string message, Severity severity)
-	{
-		Snackbar.Configuration.SnackbarVariant = Variant.Filled;
-		Snackbar.Configuration.PreventDuplicates = false;
-		Snackbar.Configuration.MaxDisplayedSnackbars = 2;
-		Snackbar.Configuration.VisibleStateDuration = 3000;
-		Snackbar.Configuration.NewestOnTop = true;
-		Snackbar.Add($"{message}", severity, config =>
-		{
-			config.RequireInteraction = false;
-			config.ShowCloseIcon = true;
-			config.Onclick = snackbar =>
-			{
-				return Task.CompletedTask;
-			};
-		});
-	}
-
 	string GetStartDate(string endDate)
 	{
 		var dates = _projectDates.Where(e => e.EndDate == endDate);
@@ -495,7 +454,6 @@ else
 		_templateTempBenefitsTable.Clear();
 		_templateTempDeductionsTable.Clear();
 		_templateTempSummaryTable.Clear();
-		_templateTableToBeEmailed.Clear();
 		_totalDeductions = 0.0;
 		_totalSalaries = 0.0;
 		_totalBenefits = 0.0;
@@ -516,6 +474,34 @@ else
 	private void SendEmail()
 	{
 		EmailObject emailObject = new EmailObject("","","","",employerEmail);
+		IList<LegalDeduction> summaryTableToBeSend = new List<LegalDeduction>();
+		IList<LegalDeduction> salariesTableToBeSend = new List<LegalDeduction>();
+		IList<LegalDeduction> deductionsTableToBeSend = new List<LegalDeduction>();
+		IList<LegalDeduction> benefitsTableToBeSend = new List<LegalDeduction>();
+
+		foreach (var item in _templateTempSalariesTable)
+		{
+			salariesTableToBeSend.Add(new LegalDeduction(item.Name, item.Amount));
+		}
+
+		foreach (var item in _templateTempBenefitsTable)
+		{
+			benefitsTableToBeSend.Add(new LegalDeduction(item.Name, item.Amount));
+		}	
+
+		foreach (var item in _templateTempDeductionsTable)
+		{
+			deductionsTableToBeSend.Add(new LegalDeduction(item.Name, item.Amount));
+		}
+		summaryTableToBeSend.Add(new LegalDeduction(_myProjectName, 0.0));
+		summaryTableToBeSend.Add(new LegalDeduction(employerEmail, 0.0));
+		summaryTableToBeSend.Add(new LegalDeduction(_myEndDate, 0.0));
+		foreach (var item in _templateTempSummaryTable)
+		{
+			summaryTableToBeSend.Add(new LegalDeduction(item.Name, item.Amount));
+		}
+		EmailService.SendReportePlanillaEmail(emailObject, summaryTableToBeSend, salariesTableToBeSend, deductionsTableToBeSend, benefitsTableToBeSend);
+
 	}
 }
 

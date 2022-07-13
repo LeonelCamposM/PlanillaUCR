@@ -21,5 +21,9 @@ namespace Presentation.Employers.Models
             this.Name = Name;
             this.Amount = Amount;
         }
+        public string ToMyString() {
+            string returnedString = this.Name + this.Amount.ToString();
+            return returnedString;
+        }
     }
 }

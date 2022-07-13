@@ -12,7 +12,7 @@ namespace Application.Email
         public void SendFiredEmployeeEmail(EmailObject emailData);
 
         public void SendLastPayEmail(EmailObject emailData, IList<string> rows, IList<Subscription> deductions, IList<LegalDeduction> legalDeductions);
-        public void SendReportePlanillaEmail(EmailObject emailData, IList<string> report);
+        public void SendReportePlanillaEmail(EmailObject emailData, IList<LegalDeduction> summaryTable, IList<LegalDeduction> salariesTable, IList<LegalDeduction> deductionTable, IList<LegalDeduction> benefitsTable);
 
     }
 }
