@@ -167,7 +167,7 @@
         _joinPayments = from _payment in payments
                         join _project in _projects on _payment.ProjectName equals _project.ProjectName
                         select new ProjectHistorical
-                      {
+                        {
                             EmployeeEmail = _payment.EmployeeEmail,
                             EmployerEmail = _payment.EmployerEmail,
                             ProjectName = _payment.ProjectName,
@@ -205,9 +205,15 @@
                 netSalary -= obligatoryCost;
                 projectHistorical.ObligatoryDeductions = obligatoryCost;
             }
+            projectHistorical.EmployerCharges = GetEmployerSocialCharges(projectHistorical);
             projectHistorical.VoluntaryDeductions = Convert.ToDouble(await GetEmployeeVoluntaryDeductions(projectHistorical, netSalary));
-            projectHistorical.EmployerCost = projectHistorical.GrossSalary + projectHistorical.Benefits + projectHistorical.EmployerCharges;
+            projectHistorical.EmployerCost = projectHistorical.GrossSalary + projectHistorical.Benefits + projectHistorical.EmployerCharges + projectHistorical.EmployerCharges;
         }
+    }
+
+    private double GetEmployerSocialCharges(ProjectHistorical projectHistorical)
+    {
+        return TaxCalculatorService.GetEmployerSocialCharges(projectHistorical.GrossSalary);
     }
 
     private void GetFinalList()
@@ -311,11 +317,13 @@
         return _paymentsDates;
     }
 
-    private void OnProjectNameSelect(string selected) {
+    private void OnProjectNameSelect(string selected) 
+    {
         projectNameFilter = selected;
     }
 
-    private void OnPaymentDateSelect(string selected) {
+    private void OnPaymentDateSelect(string selected) 
+    {
         paymentDateFilter = selected; 
     }
 
