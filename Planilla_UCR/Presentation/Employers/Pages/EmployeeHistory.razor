@@ -52,7 +52,51 @@ else
         <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
         
 
-        <MudTable Style="pt-6" @ref="@_table" Items="@_paymentsHistory" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_emptyHistory" LoadingProgressColor="Color.Primary">  
+        <MudTable Style="pt-6" @ref="@_table" Items="@_paymentsHistory" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_emptyHistory" LoadingProgressColor="Color.Primary" Filter="new Func<EmployeeHistoryList,bool>(FiltersFunc)">  
+
+            <ToolBarContent>
+                <MudItem xs="2">
+                <MudSelect Dense="true" T="string" Label="Proyecto" Variant="Variant.Outlined" TextChanged="OnProjectNameSelect">
+                    <MudSelectItem Value="@(" ")"/>
+                    @foreach (var state in _paymentsProjectNames) {
+                        <MudSelectItem T="string" Value="@state">
+                            @state
+                        </MudSelectItem>
+                    }   
+                </MudSelect>
+                </MudItem>
+                
+                <MudItem xs="2">
+                <MudSelect Dense="true" T="string" Label="Tipo contrato" Variant="Variant.Outlined"  TextChanged="OnContractTypeSelect">
+                    <MudSelectItem Value="@(" ")"/>
+                    <MudSelectItem Value="@("Medio tiempo")"/>
+                    <MudSelectItem Value="@("Servicios profesionales")"/>
+                    <MudSelectItem Value="@("Tiempo completo")"/>
+                </MudSelect>
+                </MudItem>
+                
+                <MudItem xs="2">
+                <MudSelect Dense="true" T="string" Label="Fecha" Variant="Variant.Outlined"  TextChanged="OnPaymentDateSelect">
+                     <MudSelectItem Value="@(" ")"/>
+                    @foreach (var state in _paymentsDates) {
+                        <MudSelectItem T="string" Value="@state">
+                            @state
+                        </MudSelectItem>
+                    }   
+                </MudSelect>
+                </MudItem>
+
+                <MudItem xs="2">
+                <MudSelect Dense="true" T="string" Label="Cédula" Variant="Variant.Outlined"  TextChanged="GetEmployeeSsn">
+                     <MudSelectItem Value="@(" ")"/>
+                    @foreach (var state in _paymentsSsn) {
+                        <MudSelectItem T="int" Value="@state">
+                            @state
+                        </MudSelectItem>
+                    }   
+                </MudSelect>
+                </MudItem>
+            </ToolBarContent> 
 
             <ColGroup>
                 <col style="width: 50%;" />
@@ -66,6 +110,7 @@ else
                 <col style="width: 60px;" />
                 <col style="width: 60px;" />
             </ColGroup>
+
             <ToolBarContent>
                 <MudText Align="Align.Center" Typo="Typo.h6">Histórico de empleados</MudText>
                 <MudSpacer></MudSpacer>
@@ -113,53 +158,151 @@ else
 @code {
     private bool _emptyHistory = true; 
     private bool _loading = true; 
+    private string _projectNameFilter = "";
+    private string _contracTypeFilter = "";
+    private string _paymentDateFilter = "";
+    private int _ssnFilter = 0;
     private IEnumerable<Person> _people;
-    private IEnumerable<Project> _projects;
     private IEnumerable<Agreement> _agreements;
     private IEnumerable<Payment> _payment;
-    private MudTable<EmployeeHistoryList> _table;
     private IEnumerable<EmployeeHistoryList> _paymentsHistory = new List<EmployeeHistoryList>();
+    private IList<String> _paymentsDates = new List<String>();
+    private IList<String> _paymentsProjectNames = new List<String>();
+    private IList<int> _paymentsSsn = new List<int>();
+    private MudTable<EmployeeHistoryList> _table;
+    private EmployeeHistoryList[] _paymentsHistoryExcel;
+
     private CultureInfo _cultureCR = CultureInfo.GetCultureInfo("es-CR");
 
-    private EmployeeHistoryList[] _paymentsHistoryExcel;
 
     [Parameter] public string employerEmail { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-         _emptyHistory = false;
-        _payment = await PaymentService.GetEmployerPayments(employerEmail);
+        _agreements = await AgreementService.GetEmployerAgreements(employerEmail);
+        _emptyHistory = false;
 
-        if(_payment.Length() > 0) 
+        if(_agreements.Length() > 0) 
         {
             _emptyHistory = false;
-            _agreements = await AgreementService.GetEmployerAgreements(employerEmail);
+            _payment = await PaymentService.GetEmployerPayments(employerEmail);
             _people = await PersonService.GetAllPeopleAsync();
-            _projects = await ProjectService.GetEmployerProyects(employerEmail);
             CreateEmployeeHistory();
+
+            _paymentsDates = await GetPaymentDate();
+            _paymentsProjectNames = await GetProyectName();
+            _paymentsSsn = await GetEmployeeSsn();
         }
         _loading = false;
         await InvokeAsync(StateHasChanged);
 
     }  
-    
+
+    private async Task<IList<String>> GetPaymentDate()
+    {
+        IList<Payment> paymentsList = _payment.ToList();
+        foreach (Payment payment in paymentsList)
+        {
+            if (!_paymentsDates.Contains(payment.EndDate.ToShortDateString()))
+            {
+                _paymentsDates.Add(payment.EndDate.ToShortDateString());
+            }
+        }
+        _paymentsDates =  _paymentsDates.Reverse().Take(10).ToList();
+        return _paymentsDates;
+    }
+
+    private async Task<IList<String>> GetProyectName()
+    {
+        IList<Payment> paymentsList = _payment.ToList();
+        foreach (Payment payment in paymentsList)
+        { 
+            if (!_paymentsProjectNames.Contains(payment.ProjectName))
+            {
+                _paymentsProjectNames.Add(payment.ProjectName);
+            }
+        }
+        _paymentsProjectNames = _paymentsProjectNames.Reverse().Take(10).ToList();
+        return _paymentsProjectNames;
+    }
+
+    private async Task<IList<int>> GetEmployeeSsn()
+    {
+        IList<Person> personList = _people.ToList();
+        foreach (Person person in personList)
+        { 
+            if (!_paymentsSsn.Contains(person.Ssn))
+            {
+                _paymentsSsn.Add(person.Ssn);
+            }
+        }
+        _paymentsSsn = _paymentsSsn.Reverse().Take(10).ToList();
+        return _paymentsSsn;
+    }
+
+
     void CreateEmployeeHistory()
     {
         _paymentsHistory = from Pa in _payment
-                     join Pe in _people on Pa.EmployeeEmail equals Pe.Email 
-                     join P in _projects on Pa.ProjectName equals P.ProjectName
-                     join A in _agreements on Pe.Email equals A.EmployeeEmail
-                     where P.IsEnabled == 1 && P.EmployerEmail == A.EmployerEmail
-                     select new EmployeeHistoryList
+                           join Pe in _people on Pa.EmployeeEmail equals Pe.Email 
+                           join A in _agreements on Pe.Email equals A.EmployeeEmail
+                           where A.IsEnabled == 1 && Pa.EmployerEmail == A.EmployerEmail
+                           select new EmployeeHistoryList
                      {
-                        ProjectName = P.ProjectName,
+                        ProjectName = Pa.ProjectName,
                         EmployeeName = Pe.Name,
                         EmployeeLastName1 = Pe.LastName1,
                         EmployeeLastName2 = Pe.LastName2,
                         Ssn = Pe.Ssn,
                         ContractType = A.ContractType,
-                        GrossSalary = Pa.GrossSalary
+                        GrossSalary = Pa.GrossSalary,
+                        PaymentDate = Pa.StartDate.ToString(),
                      };
+    }
+
+    private void OnProjectNameSelect(string selected) {
+        _projectNameFilter = selected;
+    }
+
+    private void OnContractTypeSelect(string selected) {
+        _contracTypeFilter = selected;
+    }
+
+    private void OnPaymentDateSelect(string selected) {
+        _paymentDateFilter = selected; 
+    }
+
+    private void OnSsnSelect(int selected) {
+        _ssnFilter = selected; 
+    }
+
+    private bool FiltersFunc(EmployeeHistoryList element) => 
+        FilterFunc(element, _projectNameFilter,_contracTypeFilter, _paymentDateFilter, _ssnFilter);
+
+    private bool FilterFunc(EmployeeHistoryList element, string searchString1,
+    string searchString2, string searchString3, int searchInt)
+    {
+        bool projectNameBool = (element.ProjectName.Equals(searchString1));
+        bool contractTypeBool = (element.ContractType.Contains(searchString2, StringComparison.OrdinalIgnoreCase));
+        bool paymentDateBool = (element.PaymentDate.Contains(searchString3, StringComparison.OrdinalIgnoreCase));
+        bool ssnBool = (element.Ssn.Equals(searchInt));
+        
+        if ((projectNameBool && contractTypeBool && paymentDateBool) || ((projectNameBool && contractTypeBool) && string.IsNullOrWhiteSpace(searchString3)))
+            return true;
+
+        if ((projectNameBool && contractTypeBool && paymentDateBool) || ((projectNameBool && paymentDateBool) && string.IsNullOrWhiteSpace(searchString2)))
+            return true;
+
+        if ((projectNameBool && contractTypeBool && paymentDateBool) || ((contractTypeBool && paymentDateBool) && string.IsNullOrWhiteSpace(searchString1)))
+            return true;
+
+        if ((string.IsNullOrWhiteSpace(searchString1) && string.IsNullOrWhiteSpace(searchString2) && string.IsNullOrWhiteSpace(searchString3)))
+            return true;  
+
+        if ((projectNameBool && contractTypeBool && paymentDateBool) || ((projectNameBool && contractTypeBool) && string.IsNullOrWhiteSpace(searchInt.ToString())))
+            return true;
+
+        return false;
     }
 
 
