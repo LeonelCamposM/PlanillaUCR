@@ -3,12 +3,19 @@
 @using ChartJs.Blazor.PieChart
 @using ChartJs.Blazor.Util
 @using Domain.Payments.Entities
+@using Domain.Projects.Entities
 @using Presentation.Dashboard.Components
 @using System.Globalization
 @using Application.Payments
+@using Application.Agreements 
+@using Domain.Agreements.Entities 
+@using Application.Projects
+@using Presentation.Payments.Models
 
 @inject NavigationManager NavigationManager
 @inject IPaymentService PaymentService
+@inject IAgreementService AgreementService
+@inject IProjectService ProjectService
 @page "/da"
 
 @if (_loading)
@@ -21,14 +28,15 @@ else
 <MudGrid>
     <MudItem xs="6">
         <MudPaper Class="pa-3" Height="380px" Elevation="3">
-            <BarChart colorList="colorslist" title="Cantidad de empleados" data="@_data"></BarChart>
+            <MudText Align="Align.Left" Typo="Typo.h6">Cantidad de empleados </MudText>
+            <BarChart colorList="colorslist" title="" data="@_data2"></BarChart>
         </MudPaper>
     </MudItem>
     <MudItem xs="6">
         <MudPaper  Class="border-none" Elevation="0">
-            <MudTable Height="250px" Class="border-none" @ref="@_tableLegalDeductions" RowsPerPage="3"  Items="@list" Breakpoint="Breakpoint.Sm" Elevation="3">
+            <MudTable Height="250px" Class="border-none" @ref="@_tableLegalDeductions" RowsPerPage="3"  Items="@_projectsList" Breakpoint="Breakpoint.Sm" Elevation="3">
                 <ToolBarContent>
-                        <MudText Align="Align.Center" Typo="Typo.h6">Pagos pendientes </MudText>
+                        <MudText Align="Align.Left" Typo="Typo.h6">Pagos pendientes </MudText>
                         <MudSpacer />
                 </ToolBarContent> 
                 <HeaderContent>
@@ -39,8 +47,8 @@ else
                 </HeaderContent>
 
                 <RowTemplate>
-                        <MudTd DataLabel="Proyecto">@context</MudTd>
-                        <MudTd DataLabel="Fecha">@context </MudTd>
+                        <MudTd DataLabel="Proyecto">@context.ProjectName</MudTd>
+                        <MudTd DataLabel="Fecha">@context.LastPaymentDate.ToShortDateString() </MudTd>
                         <MudTd DataLabel="Acciones">
                             <MudButton Size="Size.Small" Variant="Variant.Filled" Color="Color.Primary"> Pagar</MudButton>    
                         </MudTd>
@@ -55,7 +63,7 @@ else
         <MudPaper  Class="border-none" Elevation="0">
             <MudTable Height="250px" @ref="@_tableEmployerPayments" RowsPerPage="3" Items="@_lastEmployerPayments" Breakpoint="Breakpoint.Sm" Elevation="3">
                 <ToolBarContent>
-                        <MudText Align="Align.Center" Typo="Typo.h6">Últimos pagos </MudText>
+                        <MudText Align="Align.Left" Typo="Typo.h6">Últimos pagos </MudText>
                         <MudSpacer />
                 </ToolBarContent> 
                 <HeaderContent>
@@ -78,7 +86,8 @@ else
     </MudItem>
     <MudItem xs="6">
     <MudPaper Height="380px" Class="pa-3" Elevation="3">
-        <PieChart colorList="colorslist" title="Costo total por proyecto" data="@_data"></PieChart>
+        <MudText Align="Align.Left" Typo="Typo.h6">Costo total por proyecto </MudText>
+        <PieChart colorList="colorslist" title="" data="@_data"></PieChart>
     </MudPaper>
     </MudItem>
     
@@ -87,11 +96,15 @@ else
 }
 
 @code {
+    public string email { get; set; } = "david@ucr.ac.cr";
     private bool _isLoading = true;
-    private MudTable<string> _tableLegalDeductions;
+    private MudTable<ProjectModel> _tableLegalDeductions;
     private MudTable<Payment> _tableEmployerPayments;
     Dictionary<string, double>? _data = new Dictionary<string, double>();
+    Dictionary<string, double>? _data2 = new Dictionary<string, double>();
     private bool _loading = true;
+    private IList<Project> _projects = new List<Project>();
+    private DateTime _nextPay = DateTime.Now;
     IList<string> colorslist = new List<string>()
     {
         {ColorUtil.ColorHexString(2, 109, 126)},
@@ -110,10 +123,11 @@ else
     };
     private CultureInfo _cultureCR = CultureInfo.GetCultureInfo("es-CR");
     private IList<Payment> _lastEmployerPayments;
+    private IList<ProjectModel> _projectsList = new List<ProjectModel>();
 
     protected override async Task OnParametersSetAsync()
     {
-        _lastEmployerPayments = (IList<Payment>) await PaymentService.GetLastEmployerPayments("david@ucr.ac.cr");
+        _lastEmployerPayments = (IList<Payment>) await PaymentService.GetLastEmployerPayments(email);
         //IList<Payment> projects = _lastEmployerPayments.GroupBy(e=> e.ProjectName);
         var groupByFirstLetterQuery = 
                         from student in _lastEmployerPayments
@@ -127,8 +141,19 @@ else
             }
             _data.Add(group.FirstOrDefault().ProjectName, cost);
         }
-        _loading = false;
 
+        IList<Agreement> agreements = (IList<Agreement>) await AgreementService.GetEmployerAgreements(email);
+         var groupByFirstLetterQuery2 = 
+                        from student in agreements
+                        group student by student.ProjectName;
+
+        foreach (var group in groupByFirstLetterQuery2){
+            _data2.Add(group.FirstOrDefault().ProjectName, group.Count());
+        }
+
+        _projects = (IList<Project>) await ProjectService.GetEmployerProyects(email);
+         await GetProjectsToPay();
+        _loading = false;
     }
 
     private void PageChanged(int i)
@@ -145,5 +170,80 @@ else
     {
         string formatedCost = string.Format("{0:N}", cost);
         return formatedCost;
+    }
+
+    private async Task GetProjectsToPay()
+    {
+        foreach (Project _project in _projects)
+        {
+            var _daysInterval = GetDaysInterval(_project.PaymentInterval, _project.LastPaymentDate);
+            if (_project.LastPaymentDate.AddDays(_daysInterval) <= _nextPay)
+            {
+                ProjectModel _projectModel = new ProjectModel(_project.ProjectName, _project.EmployerEmail,
+                    _project.PaymentInterval, _project.LastPaymentDate,
+                    GetDaysInterval(_project.PaymentInterval, _project.LastPaymentDate), 0, new List<EmployeeAgreement>());
+                _projectsList.Add(_projectModel);
+            }
+        }
+    }
+
+    public int GetDaysInterval(string paymentInterval, DateTime lastPaymentDate)
+    {
+        int _days = 0;
+
+        switch (paymentInterval)
+        {
+            case "Semanal":
+                {
+                    _days = 7;
+                }break;
+            case "Bisemanal":
+                {
+                    _days = 15;
+                }break;
+            case "Quincenal":
+                {
+                    _days = fortnightDays(lastPaymentDate);
+                }break;
+            case "Mensual": 
+                {
+                    DateTime nextMonth = lastPaymentDate.AddMonths(1);
+                    TimeSpan t = nextMonth - lastPaymentDate;
+                    _days = t.Days;
+                }break;
+
+        }
+        return _days;
+    }
+
+    private int fortnightDays(DateTime lastPaymentDate)
+    {
+        int _days = 0;
+        if (lastPaymentDate.Day == 14)
+        {
+            _days = 14;
+        }
+        else
+        {
+            if (lastPaymentDate.Day == 28)
+            {
+                DateTime nextFortnight = lastPaymentDate.AddMonths(1);
+                nextFortnight = nextFortnight.AddDays(-14);
+                TimeSpan t = nextFortnight - lastPaymentDate;
+                _days = t.Days;
+            }
+            else
+            {
+                if (lastPaymentDate.Day < 14)
+                {
+                    _days = 14 - lastPaymentDate.Day;
+                }
+                else
+                {
+                    _days = 28 - lastPaymentDate.Day;
+                }
+            }
+        }
+        return _days;
     }
 }
