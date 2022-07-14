@@ -64,7 +64,7 @@ namespace Infrastructure.Payments.Repositories
             return employerPaymentList;
         }
 
-        public async Task<IEnumerable<Payment>> GetEmployeeLastestPayments(string email)
+        public async Task<IEnumerable<Payment>> GetEmployeeLatestPayments(string email)
         {
             var employeePaymentList = await _dbContext.Payments.FromSqlRaw("EXEC GetEmployeeFiveLatestPayments @employeeEmail",
                  new SqlParameter("employeeEmail", email)).ToListAsync();

@@ -13,7 +13,7 @@ using LanguageExt;
 
 namespace Tests.Application
 {
-    public class EmployeeLastestPaymentsServiceTest
+    public class EmployeeLatestPaymentsServiceTest
     {
         List<Payment> paymentsList = new List<Payment>
         {
@@ -27,20 +27,20 @@ namespace Tests.Application
         private string _employeeEmail = "mau@ucr.ac.cr";
 
         [Fact]
-        public async Task GetEmployeeLastestPayment()
+        public async Task GetEmployeeLatestPayment()
         {
 
             //arrange
             var mockPaymentRepository = new Mock<IPaymentRepository>();
             var paymentService = new PaymentService(mockPaymentRepository.Object);
-            mockPaymentRepository.Setup(repo => repo.GetEmployeeLastestPayments("mau@ucr.ac.cr")).ReturnsAsync(paymentsList.Where(
+            mockPaymentRepository.Setup(repo => repo.GetEmployeeLatestPayments("mau@ucr.ac.cr")).ReturnsAsync(paymentsList.Where(
                 e => e.EmployerEmail == _employeeEmail));
 
             //act
-            var lastestPaymentTest = paymentService.GetEmployeeLastestPayments(_employeeEmail);
+            var lastestPaymentTest = paymentService.GetEmployeeLatestPayments(_employeeEmail);
 
             //assert
-            mockPaymentRepository.Verify(repo => repo.GetEmployeeLastestPayments(_employeeEmail), Times.Once);
+            mockPaymentRepository.Verify(repo => repo.GetEmployeeLatestPayments(_employeeEmail), Times.Once);
             lastestPaymentTest.Count().Should().Equals(5);
         }
     }
