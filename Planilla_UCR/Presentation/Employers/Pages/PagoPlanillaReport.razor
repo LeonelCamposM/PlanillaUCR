@@ -1,4 +1,4 @@
-﻿@page "/Reports/{employerEmail}/{projectName}"
+﻿@page "/{employerEmail}/{projectName}"
 
 @using Application.Email
 @using Domain.Agreements.DTOs
@@ -29,7 +29,7 @@
 @using Domain.Payments.Entities
 @using Application.Payments
 @using System.Globalization
-
+@using Application.TaxCalculator
 
 @inject IProjectService ProjectService
 @inject ISnackbar Snackbar
@@ -42,6 +42,7 @@
 @inject ISubscribeService SubscribeService
 @inject IPaymentService PaymentService
 @inject IEmailServices EmailService
+@inject ITaxCalculatorService TaxCalculatorService
 @inject NavigationManager nav
 
 @if (_loading)
@@ -56,16 +57,18 @@ else
 {
 	List<BreadcrumbItem> _items = new List<BreadcrumbItem>
 		{
-			new BreadcrumbItem("Reportes", href: $"/Reports/{employerEmail}/{projectName}"),
-			new BreadcrumbItem("Pago planilla",  href: null, disabled: true)
+			new BreadcrumbItem("Inicio", href: ""),
+			new BreadcrumbItem("Proyectos", href: $"/Projects/{employerEmail}"),
+			new BreadcrumbItem("Desglose de pagos", href: null, disabled: true)		
 		};
+
 	<MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
 	<MudPaper Height="15px" Width="100%" Outlined="false" Class="border-none" Elevation="0">
 	</MudPaper>
 	<MudGrid>
 		<MudItem xs="10" sm="12">
 			<MudPaper Height="75px" Width="100%" Outlined="false" Class="border-none pa-4" Elevation="0">
-				<MudText Align="Align.Center" Typo="Typo.h6">Reporte 4: Reporte Planilla</MudText>
+				<MudText Align="Align.Center" Typo="Typo.h6">Desglose de pagos</MudText>
 			</MudPaper>
 		</MudItem>
 		<MudItem xs="4">
@@ -103,7 +106,7 @@ else
 			</HeaderContent>
 			<RowTemplate>
 				<MudTd DataLabel="Desglose salario" Style="text-align:justify-all"> @context.Name</MudTd>
-				<MudTd DataLabel="Monto" Style="text-align:justify-all"> @ParseToCRC(@context.Amount) </MudTd>
+				<MudTd DataLabel="Monto" Style="font-weight:bold"> @ParseToCRC(@context.Amount) </MudTd>
 			</RowTemplate>
 		</MudTable>
 
@@ -125,7 +128,7 @@ else
 			<FooterContent>
 				<MudTFootRow>
 					<MudTh>Total</MudTh>
-					<MudTd Style="text-align:justify-all"> @ParseToCRC(@_templateTempSalariesTable.Sum((e) => e.Amount))</MudTd>
+					<MudTd Style="font-weight:bold"> @ParseToCRC(@_templateTempSalariesTable.Sum((e) => e.Amount))</MudTd>
 				</MudTFootRow>
 			</FooterContent>
 		</MudTable>
@@ -148,7 +151,7 @@ else
 			<FooterContent>
 				<MudTFootRow>
 					<MudTh>Total </MudTh>
-					<MudTd Style="text-align:justify-all">@ParseToCRC(@_templateTempDeductionsTable.Sum((e) => e.Amount))</MudTd>
+					<MudTd Style="font-weight:bold">@ParseToCRC(@_templateTempDeductionsTable.Sum((e) => e.Amount))</MudTd>
 				</MudTFootRow>
 			</FooterContent>
 		</MudTable>
@@ -171,7 +174,7 @@ else
 			<FooterContent>
 				<MudTFootRow>
 					<MudTh>Total</MudTh>
-					<MudTd Style="text-align:justify-all">@ParseToCRC(@_templateTempBenefitsTable.Sum((e) => e.Amount))</MudTd>
+					<MudTd Style="font-weight:bold">@ParseToCRC(@_templateTempBenefitsTable.Sum((e) => e.Amount))</MudTd>
 				</MudTFootRow>
 			</FooterContent>
 		</MudTable>
@@ -227,6 +230,7 @@ else
 	private IEnumerable<LegalDeduction> _deductionList = new List<LegalDeduction>();
 	private IEnumerable<Subscription> _benefitList = new List<Subscription>();
 	private IEnumerable<Project> _projects = new List<Project>();
+	private CultureInfo _cultureCR = CultureInfo.GetCultureInfo("es-CR");
 	private double _totalDeductions = 0.0;
 	private double _totalSalaries = 0.0;
 	private double _totalBenefits = 0.0;
@@ -238,18 +242,12 @@ else
 	private string _myEndDate;
 	private string _myProjectName;
 
-
-	private CultureInfo _cultureCR = CultureInfo.GetCultureInfo("es-CR");
-
-	private double _lastPay = 100.0;
-
 	protected override async Task OnInitializedAsync()
 	{
 		_myProjectName = projectName;
 		InitializeDatesField();
 		_loading = false;
 		_eventLoaded = true;
-		string a = _cultureCR.NumberFormat.CurrencySymbol + CostFormat(_lastPay);
 	}
 
 	private void InitializeDatesField()
