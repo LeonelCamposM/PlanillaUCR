@@ -13,8 +13,11 @@
     public Dictionary<string, double>? data { get; set; }
     [Parameter]
     public string title { get; set; }
+    [Parameter]
+    public IList<string> colorList { get; set; }
 
     private BarConfig _configBarChart;
+
 
     private void ConfigurationBarChart()
     {
@@ -82,9 +85,14 @@
             _configBarChart.Data.Labels.Add(item);
         }
 
+        string []colors = new string[data.Length()];
+        for (var i = 0; i < data.Length(); i++)
+        {
+            colors[i] = colorList[i%colorList.Length()];
+        }
         BarDataset<double> dataset= new BarDataset<double>(data.Values)
         {
-            BackgroundColor = ColorUtil.ColorHexString(0, 156, 140), 
+            BackgroundColor = colors, 
             Label = "",
         };
         _configBarChart.Data.Datasets.Add(dataset);
