@@ -227,7 +227,6 @@ else
 	private IList<Payment> _paidEmployees = new List<Payment>();
 	private IEnumerable<Payment> _paymentList = new List<Payment>();
 	private IEnumerable<Agreement> _agreementList = new List<Agreement>();
-	private IEnumerable<LegalDeduction> _deductionList = new List<LegalDeduction>();
 	private IEnumerable<Subscription> _benefitList = new List<Subscription>();
 	private IEnumerable<Project> _projects = new List<Project>();
 	private CultureInfo _cultureCR = CultureInfo.GetCultureInfo("es-CR");
@@ -264,7 +263,6 @@ else
 		_agreementList = await AgreementService.GetProjectAgreements(_myProjectName, employerEmail);
 		_paymentList = await PaymentService.GetAllPaymentsStartAndEndDates(employerEmail, _myProjectName);
 		_projects = await ProjectService.GetEmployerProyects(employerEmail);
-		_deductionList = await LegalDeductionService.GetAllAsync();
 		_benefitList = await SubscriptionService.GetBenefitsByProject(employerEmail, _myProjectName);
 	}
 
@@ -391,16 +389,18 @@ else
 
 	private void FillOutDeductionsTable()
 	{
-		double deductionCost;
-		string deductionName;
-		foreach (var deduction in _deductionList)
-		{
-			deductionCost = Math.Round(_totalSalaries * deduction.Cost, 2);
-			deductionName = deduction.DeductionName + ": " + Math.Round(deduction.Cost * 100, 2) + "%";
-			ReportePlanillasTemplateTable myTempTable = new ReportePlanillasTemplateTable(deductionName, deductionCost);
-			_templateTempDeductionsTable.Add(myTempTable);
-			_totalDeductions += deductionCost;
-		}
+		string deductionName = "CCSS (14.50%)";
+		double deductionCost = Math.Round(TaxCalculatorService.GetCSSSEmployerTaxes(_totalSalaries),2);
+		_totalDeductions += deductionCost;
+		_templateTempDeductionsTable.Add(new ReportePlanillasTemplateTable(deductionName, deductionCost));
+		deductionName = "Otras instituciones (7.25%)";
+		deductionCost = Math.Round(TaxCalculatorService.GetOtherInstitutionsEmployerTaxes(_totalSalaries),2);
+		_totalDeductions += deductionCost;
+		_templateTempDeductionsTable.Add(new ReportePlanillasTemplateTable(deductionName, deductionCost));
+		deductionName = "Ley de protección al trabajador (4.75%)";
+		deductionCost = Math.Round(TaxCalculatorService.GetWorkerWarrantiesEmployerTaxes(_totalSalaries),2);
+		_totalDeductions += deductionCost;
+		_templateTempDeductionsTable.Add(new ReportePlanillasTemplateTable(deductionName, deductionCost));
 	}
 
 	private async Task FillOutBenefitsTable()
