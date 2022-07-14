@@ -1,11 +1,19 @@
 ﻿@page "/Reports/{employerEmail}/Employee_History"
+@using Application.PaymentCalculator
 @using Domain.Agreements.Entities
 @using Domain.People.Entities
 @using Domain.Projects.Entities
 @using Domain.Payments.Entities
+@using Domain.LegalDeductions.Entities
+@using Domain.Subscribes.Entities
+@using Domain.Subscriptions.Entities
+@using Application.Subscriptions
+@using Application.Subscribes
+@using Application.LegalDeductions
 @using Application.Agreements
 @using Application.People
 @using Application.Projects
+@using Application.TaxCalculator
 @using Application.Payments
 @using Presentation.Employers.Models
 @using Presentation.Employers.XLS
@@ -22,15 +30,12 @@
 @inject IProjectService ProjectService
 @inject IAgreementService AgreementService
 @inject IPaymentService PaymentService
+@inject ISubscribeService SubscribeService
+@inject ISubscriptionService SubscriptionService
+@inject ILegalDeductionService LegalDeductionService
+@inject ITaxCalculatorService TaxCalculatorService
+@inject IPaymentCalculatorService PaymentCalculatorService
 
-@{
-    List<BreadcrumbItem> _items = new List<BreadcrumbItem>
-    {
-        new BreadcrumbItem("Inicio", href: ""),
-        new BreadcrumbItem("Histórico de empleados",  href: null, disabled: true),
-
-    };
-}
 
 @if (_loading)
 {
@@ -42,16 +47,26 @@
 }
 else
 {
-    @if (_emptyHistory)
+    List<BreadcrumbItem> _items = new List<BreadcrumbItem>
     {
-        <MudText Typo="Typo.h6" Align="Align.Center">No existen registros de pagos para ningún empleado.
-        </MudText>
-    }
-    else
-    {
-        <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
-        
+        new BreadcrumbItem("Inicio", href: ""),
+        new BreadcrumbItem("Histórico de empleados",  href: null, disabled: true),
 
+    };
+    <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
+    <MudPaper Height="60px" Width="100%" Outlined="false" Class="border-none" Elevation="0"> 
+    </MudPaper>
+    if (!_emptyHistory)
+    {
+
+        <MudGrid>
+            <MudItem xs="12" Class="d-flex justify-center align-center">
+                <MudItem xs="4">
+                        <MudText Align="Align.Center" Typo="Typo.h6" GutterBottom="true">Reporte histórico de pagos a empleados</MudText>
+                </MudItem>
+                </MudItem>
+        </MudGrid>
+        <br>
         <MudTable Style="pt-6" @ref="@_table" Items="@_paymentsHistory" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_emptyHistory" LoadingProgressColor="Color.Primary" Filter="new Func<EmployeeHistoryList,bool>(FiltersFunc)">  
 
             <ToolBarContent>
@@ -77,7 +92,7 @@ else
                 
                 <MudItem xs="2">
                 <MudSelect Dense="true" T="string" Label="Fecha" Variant="Variant.Outlined"  TextChanged="OnPaymentDateSelect">
-                     <MudSelectItem Value="@(" ")"/>
+                        <MudSelectItem Value="@(" ")"/>
                     @foreach (var state in _paymentsDates) {
                         <MudSelectItem T="string" Value="@state">
                             @state
@@ -88,9 +103,9 @@ else
 
                 <MudItem xs="2">
                 <MudSelect Dense="true" T="string" Label="Cédula" Variant="Variant.Outlined"  TextChanged="GetEmployeeSsn">
-                     <MudSelectItem Value="@(" ")"/>
+                        <MudSelectItem Value="@(" ")"/>
                     @foreach (var state in _paymentsSsn) {
-                        <MudSelectItem T="int" Value="@state">
+                        <MudSelectItem T="string" Value="@state">
                             @state
                         </MudSelectItem>
                     }   
@@ -99,7 +114,7 @@ else
             </ToolBarContent> 
 
             <ColGroup>
-                <col style="width: 50%;" />
+                <col style="width: 80px;" />
                 <col style="width: 60px;" />
                 <col style="width: 60px;" />
                 <col style="width: 60px;" />
@@ -110,11 +125,6 @@ else
                 <col style="width: 60px;" />
                 <col style="width: 60px;" />
             </ColGroup>
-
-            <ToolBarContent>
-                <MudText Align="Align.Center" Typo="Typo.h6">Histórico de empleados</MudText>
-                <MudSpacer></MudSpacer>
-            </ToolBarContent>
 
             <HeaderContent>
                 <MudTh Style="text-align:justify-all">Nombre</MudTh>
@@ -147,35 +157,46 @@ else
                     <MudPagination SelectedChanged="PageChanged" Count="@((_table.GetFilteredItemsCount() + _table.RowsPerPage - 1) / _table.RowsPerPage)" Color="Color.Primary" Class="pa-4"/>
             </PagerContent>
         </MudTable>
-         <br>
+            <br>
         <MudButton OnClick="ClickExportXLS" Variant="Variant.Filled" Color="Color.Primary">
                 <MudText>Exportar excel</MudText>
         </MudButton>
-    }    
+    }
+    else
+    {
+        <MudText Align="Align.Center" Typo="Typo.h6">
+            No existen registros de pagos para ningún empleado.
+        </MudText>
+    }
     
 }
 
 @code {
     private bool _emptyHistory = true; 
     private bool _loading = true; 
+
     private string _projectNameFilter = "";
     private string _contracTypeFilter = "";
     private string _paymentDateFilter = "";
-    private int _ssnFilter = 0;
+    private string _ssnFilter = "";
+
     private IEnumerable<Person> _people;
     private IEnumerable<Agreement> _agreements;
     private IEnumerable<Payment> _payment;
+    private IEnumerable<Project> _projects;
     private IEnumerable<EmployeeHistoryList> _paymentsHistory = new List<EmployeeHistoryList>();
+    private IEnumerable<LegalDeduction> _legalDeductions = new List<LegalDeduction>();
     private IList<String> _paymentsDates = new List<String>();
     private IList<String> _paymentsProjectNames = new List<String>();
-    private IList<int> _paymentsSsn = new List<int>();
+    private IList<String> _paymentsSsn = new List<String>();
     private MudTable<EmployeeHistoryList> _table;
     private EmployeeHistoryList[] _paymentsHistoryExcel;
 
     private CultureInfo _cultureCR = CultureInfo.GetCultureInfo("es-CR");
 
-
     [Parameter] public string employerEmail { get; set; }
+
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -187,21 +208,136 @@ else
             _emptyHistory = false;
             _payment = await PaymentService.GetEmployerPayments(employerEmail);
             _people = await PersonService.GetAllPeopleAsync();
+            _projects = await ProjectService.GetEmployerProyects(employerEmail);
             CreateEmployeeHistory();
+
+            GetAllGrossySalaries();
+            await GetAllLegalDeductions();
+            System.Diagnostics.Debug.WriteLine($"valor oficial: {_paymentsHistory.ElementAt(0).MandatoryEmployeeDeductions}");
+
+            await GetAllVoluntaryDeductions();
+            GetTotalCostForEmployee();
 
             _paymentsDates = await GetPaymentDate();
             _paymentsProjectNames = await GetProyectName();
             _paymentsSsn = await GetEmployeeSsn();
         }
+
         _loading = false;
         await InvokeAsync(StateHasChanged);
 
     }  
 
+    private void CreateEmployeeHistory()
+    {
+        _paymentsHistory = from Pe in _people
+                           join A in _agreements on Pe.Email equals A.EmployeeEmail 
+                           join P in _projects on A.ProjectName equals P.ProjectName 
+                           where A.IsEnabled == 1 
+                           select new EmployeeHistoryList
+                                 {
+                                    ProjectName = A.ProjectName,
+                                    EmployeeName = Pe.Name,
+                                    EmployeeLastName1 = Pe.LastName1,
+                                    EmployeeLastName2 = Pe.LastName2,
+                                    EmployeeEmail = A.EmployeeEmail,
+                                    Ssn = Pe.Ssn,
+                                    ContractType = A.ContractType,
+
+                                 };
+    }
+
+    private void GetAllGrossySalaries()
+    {
+        double totalGrossSalary = 0.0;
+        IList<EmployeeHistoryList> temporalList = new List<EmployeeHistoryList>();
+        temporalList = _paymentsHistory.ToList();
+        foreach (EmployeeHistoryList person in temporalList)
+        {
+            foreach (Payment pay in _payment) 
+            {
+                if (pay.EmployeeEmail == person.EmployeeEmail)
+                {
+                    totalGrossSalary += pay.GrossSalary;
+                }
+            }
+
+            person.GrossSalary = totalGrossSalary;
+            totalGrossSalary = 0.0;
+        }
+        _paymentsHistory = temporalList.AsEnumerable();
+    }
+
+    private async Task GetAllLegalDeductions()
+    {
+        double costLegalDeductions = 0.0;
+        IList<EmployeeHistoryList> temporalList = new List<EmployeeHistoryList>();
+        temporalList = _paymentsHistory.ToList();
+        
+        _legalDeductions = await LegalDeductionService.GetAllAsync();
+
+        foreach (EmployeeHistoryList person in temporalList)
+        {
+            foreach (Payment pay in _payment) 
+            {
+                if (!person.ContractType.Equals("Servicios profesionales"))
+                {
+                    if (pay.EmployeeEmail == person.EmployeeEmail)
+                    {
+                        foreach (var item in _legalDeductions)
+                        {
+                            costLegalDeductions += TaxCalculatorService.GetTaxAmount(item.DeductionName, pay.GrossSalary);
+                        }
+                        person.MandatoryEmployeeDeductions = costLegalDeductions;
+                    }
+                }
+            }
+            costLegalDeductions = 0.0;
+        }
+        _paymentsHistory = temporalList.AsEnumerable();
+         System.Diagnostics.Debug.WriteLine($"valor : {_paymentsHistory.ElementAt(0).MandatoryEmployeeDeductions}");
+
+    }
+
+    private async Task GetAllVoluntaryDeductions()
+    {
+        double costVoluntaryDeductions = 0.0;
+
+        IList<EmployeeHistoryList> temporalList = new List<EmployeeHistoryList>();
+        temporalList = _paymentsHistory.ToList();
+
+        foreach (EmployeeHistoryList person in temporalList)
+        {
+            foreach (Payment pay in _payment) 
+            {
+                if (pay.EmployeeEmail == person.EmployeeEmail)
+                {
+                     Subscribe searchSubscribe= new Subscribe(pay.EmployeeEmail,pay.EmployerEmail, pay.ProjectName, "", 0.0, pay.StartDate, pay.EndDate);
+                     IList<Subscription> subscriptions = (await SubscribeService.GetSubscriptionCostsByDate(searchSubscribe)).ToList();
+                     
+                     costVoluntaryDeductions += PaymentCalculatorService.DeductionsCost(subscriptions);
+                }
+
+            }
+            person.VoluntaryDeductions = costVoluntaryDeductions;
+        }
+        _paymentsHistory = temporalList.AsEnumerable();
+    }
+
+    private void GetTotalCostForEmployee()
+    {
+        foreach (EmployeeHistoryList person in _paymentsHistory)
+        {
+            person.EmployeeCost = person.GrossSalary + person.TotalBenefits + person.EmployerSocialCharges + 
+                                  person.MandatoryEmployeeDeductions + person.VoluntaryDeductions;
+        }
+    }
+
+
+    //filter
     private async Task<IList<String>> GetPaymentDate()
     {
-        IList<Payment> paymentsList = _payment.ToList();
-        foreach (Payment payment in paymentsList)
+        foreach (Payment payment in _payment)
         {
             if (!_paymentsDates.Contains(payment.EndDate.ToShortDateString()))
             {
@@ -214,8 +350,8 @@ else
 
     private async Task<IList<String>> GetProyectName()
     {
-        IList<Payment> paymentsList = _payment.ToList();
-        foreach (Payment payment in paymentsList)
+        IList<EmployeeHistoryList> paymentsList = _paymentsHistory.ToList();
+        foreach (EmployeeHistoryList payment in paymentsList)
         { 
             if (!_paymentsProjectNames.Contains(payment.ProjectName))
             {
@@ -226,38 +362,18 @@ else
         return _paymentsProjectNames;
     }
 
-    private async Task<IList<int>> GetEmployeeSsn()
+    private async Task<IList<String>> GetEmployeeSsn()
     {
-        IList<Person> personList = _people.ToList();
-        foreach (Person person in personList)
+        IList<EmployeeHistoryList> paymentsList = _paymentsHistory.ToList();
+        foreach (EmployeeHistoryList person in paymentsList)
         { 
-            if (!_paymentsSsn.Contains(person.Ssn))
+            if (!_paymentsSsn.Contains(person.Ssn.ToString()))
             {
-                _paymentsSsn.Add(person.Ssn);
+                _paymentsSsn.Add(person.Ssn.ToString());
             }
         }
         _paymentsSsn = _paymentsSsn.Reverse().Take(10).ToList();
         return _paymentsSsn;
-    }
-
-
-    void CreateEmployeeHistory()
-    {
-        _paymentsHistory = from Pa in _payment
-                           join Pe in _people on Pa.EmployeeEmail equals Pe.Email 
-                           join A in _agreements on Pe.Email equals A.EmployeeEmail
-                           where A.IsEnabled == 1 && Pa.EmployerEmail == A.EmployerEmail
-                           select new EmployeeHistoryList
-                     {
-                        ProjectName = Pa.ProjectName,
-                        EmployeeName = Pe.Name,
-                        EmployeeLastName1 = Pe.LastName1,
-                        EmployeeLastName2 = Pe.LastName2,
-                        Ssn = Pe.Ssn,
-                        ContractType = A.ContractType,
-                        GrossSalary = Pa.GrossSalary,
-                        PaymentDate = Pa.StartDate.ToString(),
-                     };
     }
 
     private void OnProjectNameSelect(string selected) {
@@ -272,7 +388,7 @@ else
         _paymentDateFilter = selected; 
     }
 
-    private void OnSsnSelect(int selected) {
+    private void OnSsnSelect(string selected) {
         _ssnFilter = selected; 
     }
 
@@ -280,12 +396,12 @@ else
         FilterFunc(element, _projectNameFilter,_contracTypeFilter, _paymentDateFilter, _ssnFilter);
 
     private bool FilterFunc(EmployeeHistoryList element, string searchString1,
-    string searchString2, string searchString3, int searchInt)
+    string searchString2, string searchString3, string searchString4)
     {
         bool projectNameBool = (element.ProjectName.Equals(searchString1));
         bool contractTypeBool = (element.ContractType.Contains(searchString2, StringComparison.OrdinalIgnoreCase));
         bool paymentDateBool = (element.PaymentDate.Contains(searchString3, StringComparison.OrdinalIgnoreCase));
-        bool ssnBool = (element.Ssn.Equals(searchInt));
+        bool ssnBool = (element.Ssn.Equals(searchString4));
         
         if ((projectNameBool && contractTypeBool && paymentDateBool) || ((projectNameBool && contractTypeBool) && string.IsNullOrWhiteSpace(searchString3)))
             return true;
@@ -299,20 +415,14 @@ else
         if ((string.IsNullOrWhiteSpace(searchString1) && string.IsNullOrWhiteSpace(searchString2) && string.IsNullOrWhiteSpace(searchString3)))
             return true;  
 
-        if ((projectNameBool && contractTypeBool && paymentDateBool) || ((projectNameBool && contractTypeBool) && string.IsNullOrWhiteSpace(searchInt.ToString())))
+        if ((projectNameBool && contractTypeBool && paymentDateBool) || ((projectNameBool && contractTypeBool) && string.IsNullOrWhiteSpace(searchString4)))
             return true;
 
         return false;
     }
 
-
-
-    private void PageChanged(int i)
-    {
-        _table.NavigateTo(i - 1);
-    }
-
-    private async void ClickExportXLS()
+    //Excel
+    private async Task ClickExportXLS()
     {
         GetExcelContent();
         var xls = new Excel();
@@ -321,6 +431,11 @@ else
 
     private void GetExcelContent()
     {
-        _paymentsHistoryExcel = _paymentsHistoryExcel.ToArray();
+        _paymentsHistoryExcel = _paymentsHistory.ToArray();
+    }
+    
+    private void PageChanged(int i)
+    {
+        _table.NavigateTo(i - 1);
     }
 }
