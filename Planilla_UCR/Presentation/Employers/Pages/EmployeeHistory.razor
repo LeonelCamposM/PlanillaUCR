@@ -145,12 +145,12 @@ else
                 <MudTd DataLabel="projectName" Style="text-align:justify-all">@row.ProjectName</MudTd>
                 <MudTd DataLabel="ssn" Style="text-align:justify-all">@row.Ssn</MudTd>
                 <MudTd DataLabel="contractType" Style="text-align:justify-all">@row.ContractType</MudTd>
-                <MudTd DataLabel="grossSalary" Style="text-align:justify-right">₡@row.GrossSalary</MudTd>
-                <MudTd DataLabel="totalBenefits" Style="text-align:right">₡@row.TotalBenefits</MudTd>
-                <MudTd DataLabel="employerSocialCharges" Style="text-align:right" >₡@row.EmployerSocialCharges</MudTd>
-                <MudTd DataLabel="mandatoryEmployeeDeductions" Style="text-align:right" >₡@row.MandatoryEmployeeDeductions</MudTd>
-                <MudTd DataLabel="voluntaryDeductions" Style="text-align:right" >₡@row.VoluntaryDeductions</MudTd>
-                <MudTd DataLabel="employeeCost" Style="text-align:right" >₡@row.EmployeeCost</MudTd>
+                <MudTd DataLabel="grossSalary" Style="text-align:justify-right">@ParseToCRC(@row.GrossSalary)</MudTd>
+                <MudTd DataLabel="totalBenefits" Style="text-align:right">@ParseToCRC(@row.TotalBenefits)</MudTd>
+                <MudTd DataLabel="employerSocialCharges" Style="text-align:right" >@ParseToCRC(@row.EmployerSocialCharges)</MudTd>
+                <MudTd DataLabel="mandatoryEmployeeDeductions" Style="text-align:right" >@ParseToCRC(@row.MandatoryEmployeeDeductions)</MudTd>
+                <MudTd DataLabel="voluntaryDeductions" Style="text-align:right" >@ParseToCRC(@row.VoluntaryDeductions)</MudTd>
+                <MudTd DataLabel="employeeCost" Style="text-align:right" >@ParseToCRC(@row.EmployeeCost)</MudTd>
             </RowTemplate>
 
             <PagerContent>
@@ -323,6 +323,18 @@ else
         }
         _paymentsHistory = temporalList.AsEnumerable();
     }
+
+
+    private string ParseToCRC(double amount)
+	{
+		return _cultureCR.NumberFormat.CurrencySymbol + CostFormat(amount);
+	}
+
+	private string CostFormat(double cost)
+	{
+		string formatedCost = string.Format("{0:N}", cost);
+		return formatedCost;
+	}
 
     private void GetTotalCostForEmployee()
     {
