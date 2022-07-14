@@ -16,6 +16,7 @@
 @using System.Text
 @using ChartJs.Blazor.BarChart
 @using ChartJs.Blazor.PieChart
+@using ChartJs.Blazor.Util
 @using Presentation.Dashboard.Components
 @inject IPaymentService PaymentService
 @inject IAgreementService AgreementService
@@ -60,7 +61,7 @@
          <MudGrid>
              <MudItem xs="6">
                 <MudPaper Class="pa-3" Height="380px" Elevation="3">
-                    <BarChart title="Salario neto" data="@_dataNetSalary"></BarChart>
+                    <BarChart colorList="colorslist" title="Salario neto" data="@_dataNetSalary"></BarChart>
                 </MudPaper>
              </MudItem>
           
@@ -89,13 +90,13 @@
          <MudGrid>
              <MudItem xs="6">
                 <MudPaper Class="pa-3" Height="380px" Elevation="3">
-                    <BarChart title="Deducciones voluntarias" data="@_dataVoluntaryDeductions"></BarChart>
+                    <BarChart colorList="colorslist" title="Deducciones voluntarias" data="@_dataVoluntaryDeductions"></BarChart>
                 </MudPaper>
              </MudItem>
             
             <MudItem xs="6">
                 <MudPaper Class="pa-3" Height="380px" Elevation="3">
-                        <BarChart title="Deducciones legales" data="@_dataLegalDeductions"></BarChart>
+                        <BarChart  colorList="colorslist" title="Deducciones legales" data="@_dataLegalDeductions"></BarChart>
                 </MudPaper>
             </MudItem>
          </MudGrid>
@@ -142,6 +143,15 @@
      Dictionary<string, double>? _dataNetSalary = new Dictionary<string,double>();
      Dictionary<string, double>? _dataVoluntaryDeductions = new Dictionary<string,double>();
      Dictionary<string, double>? _dataLegalDeductions = new Dictionary<string,double>();
+
+    IList<string> colorslist = new List<string>()
+    {
+        {ColorUtil.ColorHexString(2, 109, 126)},
+        {ColorUtil.ColorHexString(59, 113, 151)},
+        {ColorUtil.ColorHexString(0, 147, 147)},
+        {ColorUtil.ColorHexString(68, 162, 154)},
+        {ColorUtil.ColorHexString(61, 153, 132)},
+    };
 
     protected override async Task OnParametersSetAsync()
     {

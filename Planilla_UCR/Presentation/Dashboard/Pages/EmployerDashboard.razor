@@ -6,6 +6,8 @@
 @using Presentation.Dashboard.Components
 @using System.Globalization
 @using Application.Payments
+@using Application.Agreements 
+@using Domain.Agreements.Entities 
 
 @inject NavigationManager NavigationManager
 @inject IPaymentService PaymentService
@@ -79,7 +81,6 @@ else
     <MudItem xs="6">
     <MudPaper Height="380px" Class="pa-3" Elevation="3">
         <PieChart colorList="colorslist" title="Costo total por proyecto" data="@_data"></PieChart>
-        <PieChart title="Costo último pago" data="@data"></PieChart>
     </MudPaper>
     </MudItem>
     
@@ -94,15 +95,6 @@ else
     Dictionary<string, double>? _data = new Dictionary<string, double>();
     private bool _loading = true;
     IList<string> colorslist = new List<string>()
-    Dictionary<string,double>? _data = new Dictionary<string, double>
-    {
-        {"csv", 1},
-        {"html", 2},
-        {"html1", 3},
-        {"html2", 4},
-        {"html3", 5}
-    };
-    Dictionary<string,int>? data = new Dictionary<string, int>
     {
         {ColorUtil.ColorHexString(2, 109, 126)},
         {ColorUtil.ColorHexString(59, 113, 151)},
@@ -137,6 +129,8 @@ else
             }
             _data.Add(group.FirstOrDefault().ProjectName, cost);
         }
+
+        //GetEmployerAgreements
         _loading = false;
 
     }
