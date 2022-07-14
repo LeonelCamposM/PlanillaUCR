@@ -24,7 +24,7 @@
 @inject ISubscribeService SubscribeService
 @inject ISubscriptionService SuscriptionService
 @inject IPaymentCalculatorService PaymentCalculatorService
-@inject NavigationManager NavigationManager
+@inject NavigationManager nav
 @page "/Dashboard/{email}/"
 
 @if(_loading) 
@@ -62,12 +62,13 @@
              </MudItem>
           
             <MudItem xs="6">
-            <MudTable @ref="@_tablePaymentHistory" Items="@_payments" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading">
+            <MudTable @ref="@_tablePaymentHistory" Items="@_payments" Hover="true" RowsPerPage="3" Breakpoint="Breakpoint.Sm" Loading="@_loading">
                 <HeaderContent>
                     <MudTh>Proyecto</MudTh>
                     <MudTh>Fecha de pago</MudTh>
                     <MudTh>Salario neto</MudTh>
-                    <MudTh><MudLink Color="Color.Primary" Underline="Underline.Always" Href="@($"/{email}/Payment_History")"> Ver más </MudLink></MudTh>
+                    <MudTh><MudButton Size="Size.Small" OnClick="GoToHistoryPayments" Variant="Variant.Filled" 
+                        Color="Color.Primary"> Detalles</MudButton> </MudTh>
                 </HeaderContent>
                 <RowTemplate Context="row">
                     <MudTd DataLabel="Proyecto">@row.ProjectName</MudTd> 
@@ -75,10 +76,12 @@
                     <MudTd DataLabel="Salario neto">@row.NetSalary</MudTd>
                      
                     <MudTd DataLabel="Ver más" >
-                        <MudLink Color="Color.Primary" Underline="Underline.Always" Href="@($"/Last_Pay/{email}/")">ver más </MudLink>
+                       <MudButton Size="Size.Small" OnClick="GoToPaymentDetails" Variant="Variant.Filled" Color="Color.Primary"> Detalles</MudButton>
                     </MudTd>
-                    
                 </RowTemplate>
+                <PagerContent>
+                        <MudPagination SelectedChanged="PageChanged" Count="@((_tablePaymentHistory.GetFilteredItemsCount() + _tablePaymentHistory.RowsPerPage - 1) / _tablePaymentHistory.RowsPerPage)" Color="Color.Primary" Class="pa-4"/>
+                </PagerContent>
             </MudTable>
             </MudItem>
          </MudGrid>
@@ -249,5 +252,20 @@
     {
         string formatedCost = string.Format("{0:N}", cost);
         return formatedCost;
+    }
+
+    private void PageChanged(int i)
+    {
+        _tablePaymentHistory.NavigateTo(i - 1);
+    }
+
+    private void GoToHistoryPayments()
+    {
+        nav.NavigateTo($"/{email}/Payment_History");
+    }
+
+    private void GoToPaymentDetails()
+    {
+        nav.NavigateTo($"/Last_Pay/{email}/");
     }
 }
