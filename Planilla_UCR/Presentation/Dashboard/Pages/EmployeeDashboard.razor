@@ -3,7 +3,6 @@
 @using Domain.Subscribes.Entities
 @using Domain.LegalDeductions.Entities
 @using Domain.Subscriptions.Entities
-
 @using Application.Payments
 @using Application.Agreements
 @using Application.LegalDeductions
@@ -11,13 +10,13 @@
 @using Application.Subscribes
 @using Application.Subscriptions
 @using Application.PaymentCalculator;
-
+@using Presentation.Dashboard.Components
 @using Presentation.Employees.Models
 @using System.Text
 @using ChartJs.Blazor.BarChart
 @using ChartJs.Blazor.PieChart
 @using ChartJs.Blazor.Util
-@using Presentation.Dashboard.Components
+@using System.Globalization
 @inject IPaymentService PaymentService
 @inject IAgreementService AgreementService
 @inject ILegalDeductionService LegalDeductionService
@@ -35,7 +34,6 @@
          <MudText Align="Align.Center" Typo="Typo.h6">
               <MudProgressCircular Color="Color.Primary" Style="height:70px;width:70px;" Indeterminate="true" />
         </MudText>
-       
     </MudPaper>
 } else 
 {
@@ -43,7 +41,7 @@
     {
        new BreadcrumbItem("Inicio", href: ""),
        new BreadcrumbItem("Proyectos", href: $"/Projects/{email}"),
-       new BreadcrumbItem("Dashboard último pago", href: null, disabled: true)
+       new BreadcrumbItem("Dashboard mi salario", href: null, disabled: true)
     }; 
     <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
     <MudPaper Height="60px" Width="100%" Outlined="false" Class="border-none" Elevation="0"> 
@@ -112,13 +110,10 @@
   
     [Parameter]
     public string email { get; set; }
-
     private bool _loading = true;
     private bool _empty = true;
     private bool _payTaxes = false;
-
     private MudTable<PaymentHistoryModel>  _tablePaymentHistory;
-   
     private IList<PaymentHistoryModel> _payments = new List<PaymentHistoryModel>();
     private IList<Payment> _paymentsList = new List<Payment>();
     private IList<Subscription> _deductions = new List<Subscription>();
@@ -128,21 +123,18 @@
     private IList<Double> _paymentsLegalDeductionsCost = new List<Double>();
     private IList<Double> _paymentsNetSalaryCost = new List<Double>();
     private IList<Double> _paymentsVoluntaryDeductionsCost = new List<Double>();
-
     private Agreement _agreement;
-
     private double _costVoluntaryDeductions;
     private double _costLegalDeductions;
     private double _costNetSalary;
-
     public string[] projectNameLabels;
     public double[] costNetSalary;
     public double[] costVoluntaryDeductions;
     public double[] costLegalDeductions;
-
-     Dictionary<string, double>? _dataNetSalary = new Dictionary<string,double>();
-     Dictionary<string, double>? _dataVoluntaryDeductions = new Dictionary<string,double>();
-     Dictionary<string, double>? _dataLegalDeductions = new Dictionary<string,double>();
+    Dictionary<string, double>? _dataNetSalary = new Dictionary<string,double>();
+    Dictionary<string, double>? _dataVoluntaryDeductions = new Dictionary<string,double>();
+    Dictionary<string, double>? _dataLegalDeductions = new Dictionary<string,double>();
+    private CultureInfo _cultureCR = CultureInfo.GetCultureInfo("es-CR");
 
     IList<string> colorslist = new List<string>()
     {
@@ -168,12 +160,15 @@
             await GetContractType(payment.EmployerEmail, payment.ProjectName);
             _costLegalDeductions = await GetLegalDeductions(payment.GrossSalary);
             _paymentsLegalDeductionsCost.Add(_costLegalDeductions);
-            _costNetSalary = await GetNetSalary(payment.GrossSalary,payment.EmployerEmail, payment.ProjectName, payment.StartDate,payment.EndDate);
+            _costNetSalary = await GetNetSalary(payment.GrossSalary,payment.EmployerEmail,
+                payment.ProjectName, payment.StartDate,payment.EndDate);
             _paymentsNetSalaryCost.Add(_costNetSalary);
             _paymentsVoluntaryDeductionsCost.Add(_costVoluntaryDeductions);
             PaymentHistoryModel _paymentHistoryModel = new PaymentHistoryModel(payment.ProjectName,  _agreement.ContractType,
-                payment.EndDate.ToShortDateString(), CostFormat(payment.GrossSalary),CostFormat(_costLegalDeductions),
-               CostFormat(_costVoluntaryDeductions), CostFormat(_costNetSalary));
+                payment.EndDate.ToShortDateString(), _cultureCR.NumberFormat.CurrencySymbol+CostFormat(payment.GrossSalary),
+                _cultureCR.NumberFormat.CurrencySymbol+CostFormat(_costLegalDeductions),
+               _cultureCR.NumberFormat.CurrencySymbol+CostFormat(_costVoluntaryDeductions), 
+               _cultureCR.NumberFormat.CurrencySymbol+CostFormat(_costNetSalary));
             _payments.Add(_paymentHistoryModel);
         }
         if (_payments.Length() > 0){
