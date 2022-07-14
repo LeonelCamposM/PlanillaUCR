@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Presentation.Employers.Models
 {
-    internal class EmployeeHistoryList
+    public class EmployeeHistoryList
     {
         public string EmployeeName { get; set; }
         public string EmployeeLastName1 { get; set; }
@@ -20,6 +17,7 @@ namespace Presentation.Employers.Models
         public double MandatoryEmployeeDeductions { get; set; }
         public double VoluntaryDeductions { get; set; }
         public double EmployeeCost { get; set; }
+        public string PaymentDate { get; set; }
 
         public EmployeeHistoryList()
         {
@@ -35,11 +33,13 @@ namespace Presentation.Employers.Models
             this.MandatoryEmployeeDeductions = 0.0;
             this.VoluntaryDeductions = 0.0;
             this.EmployeeCost = 0.0;
+            this.PaymentDate = "";
         }
 
         public EmployeeHistoryList(string employeeName, string employeeLastName1, string employeeLastName2, string projectName, 
                                    string contractType, double grossSalary, double totalBenefits, double employerSocialCharges,
-                                   double mandatoryEmployeeDeductions, double voluntaryDeductions,double employeeCost, int ssn)
+                                   double mandatoryEmployeeDeductions, double voluntaryDeductions,double employeeCost, int ssn,
+                                   string paymenDate)
         {
             this.EmployeeName = employeeName;
             this.EmployeeLastName1 = employeeLastName1;
@@ -53,6 +53,7 @@ namespace Presentation.Employers.Models
             this.MandatoryEmployeeDeductions = mandatoryEmployeeDeductions;
             this.VoluntaryDeductions = voluntaryDeductions;
             this.EmployeeCost = employeeCost;
+            this.PaymentDate = paymenDate;
         }
         
     }
