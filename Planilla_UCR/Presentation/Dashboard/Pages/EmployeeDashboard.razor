@@ -77,11 +77,11 @@
                     <MudTd DataLabel="Proyecto">@row.ProjectName</MudTd> 
                     <MudTd DataLabel="Fecha pago">@row.PaymentDate</MudTd>
                     <MudTd DataLabel="Salario neto">@row.NetSalary</MudTd>
-                     @*
+                     
                     <MudTd DataLabel="Ver más" >
-                        <MudLink Color="Color.Primary" Underline="Underline.Always" Href="@($"/Last_Pay/{email}/{@row.ProjectName}")">ver más </MudLink>
+                        <MudLink Color="Color.Primary" Underline="Underline.Always" Href="@($"/Last_Pay/{email}/")">ver más </MudLink>
                     </MudTd>
-                    *@
+                    
                 </RowTemplate>
             </MudTable>
             </MudItem>
