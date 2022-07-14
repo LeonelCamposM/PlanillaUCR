@@ -56,6 +56,12 @@ namespace Infrastructure.Payments.Repositories
             return employeePaymentList;
         }
 
+        public async Task<IEnumerable<Payment>> GetEmployerPayments(string email)
+        {
+            var employerPaymentList = await _dbContext.Payments.Where(e => e.EmployerEmail == email).ToListAsync();
+            return employerPaymentList;
+        }
+
         public async Task<IEnumerable<Payment>> GetLastEmployerPayments(string email)
         {
             IList<Payment> employerPaymentList = await _dbContext.Payments.Where(e =>
