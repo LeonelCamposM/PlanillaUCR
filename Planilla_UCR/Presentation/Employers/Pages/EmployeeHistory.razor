@@ -8,6 +8,10 @@
 @using Application.Projects
 @using Application.Payments
 @using Presentation.Employers.Models
+@using Presentation.Employers.XLS
+
+@using System.IO
+@inject IJSRuntime js
 @using System.Globalization
 
 
@@ -48,7 +52,7 @@ else
         <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
         
 
-        <MudTable Style="pt-6" @ref="@_table" Items="@_joinTable" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_emptyHistory" LoadingProgressColor="Color.Primary">  
+        <MudTable Style="pt-6" @ref="@_table" Items="@_paymentsHistory" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_emptyHistory" LoadingProgressColor="Color.Primary">  
 
             <ColGroup>
                 <col style="width: 50%;" />
@@ -98,6 +102,10 @@ else
                     <MudPagination SelectedChanged="PageChanged" Count="@((_table.GetFilteredItemsCount() + _table.RowsPerPage - 1) / _table.RowsPerPage)" Color="Color.Primary" Class="pa-4"/>
             </PagerContent>
         </MudTable>
+         <br>
+        <MudButton OnClick="ClickExportXLS" Variant="Variant.Filled" Color="Color.Primary">
+                <MudText>Exportar excel</MudText>
+        </MudButton>
     }    
     
 }
@@ -110,8 +118,10 @@ else
     private IEnumerable<Agreement> _agreements;
     private IEnumerable<Payment> _payment;
     private MudTable<EmployeeHistoryList> _table;
-    private IEnumerable<EmployeeHistoryList> _joinTable = new List<EmployeeHistoryList>();
+    private IEnumerable<EmployeeHistoryList> _paymentsHistory = new List<EmployeeHistoryList>();
     private CultureInfo _cultureCR = CultureInfo.GetCultureInfo("es-CR");
+
+    private EmployeeHistoryList[] _paymentsHistoryExcel;
 
     [Parameter] public string employerEmail { get; set; }
 
@@ -135,7 +145,7 @@ else
     
     void CreateEmployeeHistory()
     {
-        _joinTable = from Pa in _payment
+        _paymentsHistory = from Pa in _payment
                      join Pe in _people on Pa.EmployeeEmail equals Pe.Email 
                      join P in _projects on Pa.ProjectName equals P.ProjectName
                      join A in _agreements on Pe.Email equals A.EmployeeEmail
@@ -152,8 +162,22 @@ else
                      };
     }
 
+
+
     private void PageChanged(int i)
     {
         _table.NavigateTo(i - 1);
+    }
+
+    private async void ClickExportXLS()
+    {
+        GetExcelContent();
+        var xls = new Excel();
+        await xls.GenerateExcelReport5Async(js, _paymentsHistoryExcel, "Reporte histórico de mis pagos.xlsx");
+    }
+
+    private void GetExcelContent()
+    {
+        _paymentsHistoryExcel = _paymentsHistoryExcel.ToArray();
     }
 }
