@@ -219,7 +219,7 @@
         _legalDeductions = await LegalDeductionService.GetAllAsync();
         foreach (var item in _legalDeductions)
         {
-            legalDeductionsCost += TaxCalculatorService.GetTaxAmount(item.DeductionName, grossSalary);
+            legalDeductionsCost +=1 /*TaxCalculatorService.GetTaxAmount(item.DeductionName, grossSalary)*/;
         }
         return legalDeductionsCost;
     }
