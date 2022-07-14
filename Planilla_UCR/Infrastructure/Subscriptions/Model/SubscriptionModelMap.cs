@@ -11,11 +11,9 @@ namespace Infrastructure.Subscriptions.Model
 
             builder.Property(p => p.SubscriptionName);
 
-
             builder.Property(p => p.SubscriptionDescription);
 
             builder.Property(p => p.Cost);
-
 
             builder.Property(p => p.TypeSubscription);
 

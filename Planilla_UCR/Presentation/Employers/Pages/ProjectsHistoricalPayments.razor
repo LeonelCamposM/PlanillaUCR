@@ -207,7 +207,7 @@
             }
             projectHistorical.EmployerCharges = GetEmployerSocialCharges(projectHistorical);
             projectHistorical.VoluntaryDeductions = Convert.ToDouble(await GetEmployeeVoluntaryDeductions(projectHistorical, netSalary));
-            projectHistorical.EmployerCost = projectHistorical.GrossSalary + projectHistorical.Benefits + projectHistorical.EmployerCharges + projectHistorical.EmployerCharges;
+            projectHistorical.EmployerCost = projectHistorical.GrossSalary + projectHistorical.Benefits +  projectHistorical.EmployerCharges;
         }
     }
 
