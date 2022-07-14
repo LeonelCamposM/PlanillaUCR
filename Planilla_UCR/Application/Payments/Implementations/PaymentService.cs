@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Application.Payments.Implementations
 {
-    internal class PaymentService : IPaymentService
+    public class PaymentService : IPaymentService
     {
         private readonly IPaymentRepository _paymentRepository;
 
