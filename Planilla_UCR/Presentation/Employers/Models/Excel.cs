@@ -14,14 +14,15 @@ namespace Presentation.Employers.XLS
 
             await js.InvokeVoidAsync("jsSaveAsFile", filename, XLSStream);
         }
-    }
 
-    public async Task GenerateExcelReport5Async(IJSRuntime js, EmployeeHistoryList[] data, string filename = "Reporte histórico del pago de mis empleados.xlsx")
-    {
-        var report5 = new HistoricalEmployeePaymentsExcel();
-        string XLSStream = report5.Edition(data);
 
-        await js.InvokeVoidAsync("jsSaveAsFile", filename, XLSStream);
+        public async Task GenerateExcelReport5Async(IJSRuntime js, EmployeeHistoryList[] data, string filename = "Reporte histórico del pago de mis empleados.xlsx")
+        {
+            var report5 = new HistoricalEmployeePaymentsExcel();
+            string XLSStream = report5.Edition(data);
+
+            await js.InvokeVoidAsync("jsSaveAsFile", filename, XLSStream);
+        }
     }
 
 }

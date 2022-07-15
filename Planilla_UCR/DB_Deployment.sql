@@ -613,6 +613,12 @@ BEGIN
 	ORDER BY EndDate DESC;
 END
 
+-- Index
+CREATE INDEX idx_AgreementEmployerEmail_ProjectName
+ON Agreement(EmployerEmail, ProjectName)
+
+CREATE INDEX idx_AgreementEmployeeEmail_IsEnabled
+ON Agreement(EmployeeEmail,IsEnabled)
 
 
 -- Data Insert

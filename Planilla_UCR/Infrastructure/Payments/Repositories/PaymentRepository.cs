@@ -34,18 +34,12 @@ namespace Infrastructure.Payments.Repositories
             await _dbContext.SaveEntitiesAsync();
         }
 
-        public async Task<IList<Payment>> GetProjectPayments(Payment payment) 
+        public async Task<IList<Payment>> GetProjectPayments(Payment payment)
         {
             IList<Payment> payments = await _dbContext.Payments.Where(e => e.EmployerEmail == payment.EmployerEmail
             && e.ProjectName == payment.ProjectName && e.StartDate == payment.StartDate && e.EndDate == payment.EndDate).ToListAsync();
             return payments;
         }
-        public async Task<IList<Payment>> GetEmployerPayments(string email)
-        {
-            IList<Payment> payments = await _dbContext.Payments.Where(e => e.EmployerEmail == email).ToListAsync();
-            return payments;
-        }
-
 
         public async Task<IEnumerable<Payment>> GetEmployeePayments(string email)
         {
@@ -56,7 +50,7 @@ namespace Infrastructure.Payments.Repositories
 
         public async Task<IEnumerable<Payment>> GetLastEmployeePayments(string email)
         {
-            IList<Payment> employeePaymentList = await _dbContext.Payments.Where(e=> 
+            IList<Payment> employeePaymentList = await _dbContext.Payments.Where(e =>
             e.EmployeeEmail == email).OrderByDescending(pay => pay.EndDate).Take(10).ToListAsync();
 
             return employeePaymentList;
