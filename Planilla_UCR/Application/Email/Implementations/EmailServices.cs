@@ -87,7 +87,7 @@ namespace Application.Email.Implementations
             _emailSender.SendMail(emailData.Destiny, "Último pago", htmlContent);
         }
 
-        public void SendReportePlanillaEmail(EmailObject emailData, IList<LegalDeduction> summaryTable, IList<LegalDeduction> salariesTable, IList<LegalDeduction> deductionTable, IList<LegalDeduction> benefitsTable)
+        public void SendPaymentBreakdownEmail(EmailObject emailData, IList<LegalDeduction> summaryTable, IList<LegalDeduction> salariesTable, IList<LegalDeduction> deductionTable, IList<LegalDeduction> benefitsTable)
         {
             string projectName = summaryTable.ElementAtOrDefault(0).DeductionName;
             string date = summaryTable.ElementAtOrDefault(2).DeductionName;
