@@ -3,6 +3,8 @@
 @using Domain.Subscriptions.Entities
 @using Application.Subscribes
 @using Domain.Subscribes.Entities
+@using Application.Projects
+@using Domain.Projects.Entities
 @using Presentation.Core.Components
 @using Presentation.Benefits.Components
 @using System.Globalization
@@ -10,6 +12,7 @@
 @inject ISnackbar Snackbar
 @inject ISubscriptionService SubscriptionService
 @inject ISubscribeService SubscribeService
+@inject IProjectService ProjectService
 
 @{List<BreadcrumbItem> _items = new List<BreadcrumbItem>
     {
@@ -125,6 +128,7 @@ else
     private string _providerName = "";
     private string _sDescription = "";
     private IList<Subscribe> _employees = new List<Subscribe>();
+    private Project _project = new Project("","","",0,0,"",1);
     public Subscription subscription = new Subscription("","","","","",0.0,1,1);
     MudForm form;
     SnackHandler snackHandler = new SnackHandler();
@@ -137,6 +141,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         subscription = await SubscriptionService.GetSubscription(employerEmail, projectName, subscriptionName);
+        _project = await ProjectService.GetProject(employerEmail, projectName);
         if (subscription != null)
         {
             _newName = subscription.SubscriptionName;
@@ -225,5 +230,13 @@ else
     {
         _employees = (await SubscribeService.GetEmployeesBySubscription
             (subscription.EmployerEmail, subscription.ProjectName, subscription.SubscriptionName)).ToList();
+        _employees.GroupBy(e=> e.EmployeeEmail);
+        foreach (Subscribe subscribe in _employees)
+        {
+            if (subscribe.Cost > _project.MaximumAmountForBenefits)
+            {
+                //Mandar correo o quitarle el beneficio.
+            }
+        }
     }
 }
