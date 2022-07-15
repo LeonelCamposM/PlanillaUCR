@@ -61,7 +61,7 @@ else
 
         <MudGrid>
             <MudItem xs="12" Class="d-flex justify-center align-center">
-                <MudItem xs="4">
+                <MudItem xs="8">
                         <MudText Align="Align.Center" Typo="Typo.h6" GutterBottom="true">Reporte histórico de pagos a empleados</MudText>
                 </MudItem>
                 </MudItem>
@@ -213,10 +213,9 @@ else
 
             GetAllGrossySalaries();
             await GetAllLegalDeductions();
-            System.Diagnostics.Debug.WriteLine($"valor oficial: {_paymentsHistory.ElementAt(0).MandatoryEmployeeDeductions}");
-
             await GetAllVoluntaryDeductions();
             await GetAllBenefits();
+            GetTotalSocialCharges();
             GetTotalCostForEmployee();
 
             _paymentsDates = await GetPaymentDate();
@@ -232,29 +231,28 @@ else
     private void CreateEmployeeHistory()
     {
         _paymentsHistory = from Pe in _people
-                           join A in _agreements on Pe.Email equals A.EmployeeEmail 
-                           join P in _projects on A.ProjectName equals P.ProjectName 
-                           where A.IsEnabled == 1 
-                           select new EmployeeHistoryList
-                                 {
-                                    ProjectName = A.ProjectName,
-                                    EmployeeName = Pe.Name,
-                                    EmployeeLastName1 = Pe.LastName1,
-                                    EmployeeLastName2 = Pe.LastName2,
-                                    EmployeeEmail = A.EmployeeEmail,
-                                    Ssn = Pe.Ssn,
-                                    ContractType = A.ContractType,
-
-                                 };
+                            join A in _agreements on Pe.Email equals A.EmployeeEmail 
+                            join P in _projects on A.ProjectName equals P.ProjectName 
+                            where A.IsEnabled == 1 
+                            select new EmployeeHistoryList
+                            {
+                                ProjectName = A.ProjectName,
+                                EmployeeName = Pe.Name,
+                                EmployeeLastName1 = Pe.LastName1,
+                                EmployeeLastName2 = Pe.LastName2,
+                                EmployeeEmail = A.EmployeeEmail,
+                                Ssn = Pe.Ssn,
+                                ContractType = A.ContractType,
+                            };
     }
 
     private void GetAllGrossySalaries()
     {
-        double totalGrossSalary = 0.0;
         IList<EmployeeHistoryList> temporalList = new List<EmployeeHistoryList>();
         temporalList = _paymentsHistory.ToList();
         foreach (EmployeeHistoryList person in temporalList)
         {
+            double totalGrossSalary = 0.0;
             foreach (Payment pay in _payment) 
             {
                 if (pay.EmployeeEmail == person.EmployeeEmail)
@@ -271,7 +269,6 @@ else
 
     private async Task GetAllLegalDeductions()
     {
-        double costLegalDeductions = 0.0;
         IList<EmployeeHistoryList> temporalList = new List<EmployeeHistoryList>();
         temporalList = _paymentsHistory.ToList();
 
@@ -279,6 +276,7 @@ else
 
         foreach (EmployeeHistoryList person in temporalList)
         {
+            double costLegalDeductions = 0.0;
             foreach (Payment pay in _payment) 
             {
                 if (!person.ContractType.Equals("Servicios profesionales"))
@@ -293,22 +291,18 @@ else
                     }
                 }
             }
-            costLegalDeductions = 0.0;
         }
         _paymentsHistory = temporalList.AsEnumerable();
-        System.Diagnostics.Debug.WriteLine($"valor : {_paymentsHistory.ElementAt(0).MandatoryEmployeeDeductions}");
-
     }
 
     private async Task GetAllVoluntaryDeductions()
     {
-        double costVoluntaryDeductions = 0.0;
-
         IList<EmployeeHistoryList> temporalList = new List<EmployeeHistoryList>();
         temporalList = _paymentsHistory.ToList();
 
         foreach (EmployeeHistoryList person in temporalList)
         {
+            double costVoluntaryDeductions = 0.0;
             foreach (Payment pay in _payment) 
             {
                 if (pay.EmployeeEmail == person.EmployeeEmail)
@@ -327,7 +321,6 @@ else
 
     private async Task GetAllBenefits()
     {
-
         IList<Subscription> benefits;
         IList<EmployeeHistoryList> temporalList = new List<EmployeeHistoryList>();
         temporalList = _paymentsHistory.ToList();
@@ -344,40 +337,30 @@ else
                 }
 
             }
-            System.Diagnostics.Debug.WriteLine($"valor oficial: {costBenefits}");
             person.TotalBenefits = costBenefits;
         }
         _paymentsHistory = temporalList.AsEnumerable();
     }
 
-    private string ParseToCRC(double amount)
-    {
-        return _cultureCR.NumberFormat.CurrencySymbol + CostFormat(amount);
-    }
 
-    private string CostFormat(double cost)
-    {
-        string formatedCost = string.Format("{0:N}", cost);
-        return formatedCost;
-    }
 
     private void GetTotalSocialCharges()
     {
-        double totalSocialCharges = 0.0;
         IList<EmployeeHistoryList> temporalList = new List<EmployeeHistoryList>();
         temporalList = _paymentsHistory.ToList();
 
         foreach (EmployeeHistoryList person in temporalList)
         {
-           //string deductionName = "CCSS (14.50%)";         
-           //double deductionCost = Math.Round(TaxCalculatorService.GetCSSSEmployerTaxes(person.GrossSalary),2);         
-           //totalSocialCharges += deductionCost;         
-           //deductionName = "Otras instituciones (7.25%)";         
-           //deductionCost = Math.Round(TaxCalculatorService.GetOtherInstitutionsEmployerTaxes(person.GrossSalary),2);         
-           //totalSocialCharges += deductionCost;         
-           //deductionName = "Ley de protección al trabajador (4.75%)";         
-           //deductionCost = Math.Round(TaxCalculatorService.GetWorkerWarrantiesEmployerTaxes(person.GrossSalary),2);         
-           //totalSocialCharges += deductionCost;
+           double totalSocialCharges = 0.0;
+           string deductionName = "CCSS (14.50%)";         
+           double deductionCost = Math.Round(TaxCalculatorService.GetCSSSEmployerTaxes(person.GrossSalary),2);         
+           totalSocialCharges += deductionCost;         
+           deductionName = "Otras instituciones (7.25%)";         
+           deductionCost = Math.Round(TaxCalculatorService.GetOtherInstitutionsEmployerTaxes(person.GrossSalary),2);         
+           totalSocialCharges += deductionCost;         
+           deductionName = "Ley de protección al trabajador (4.75%)";         
+           deductionCost = Math.Round(TaxCalculatorService.GetWorkerWarrantiesEmployerTaxes(person.GrossSalary),2);         
+           totalSocialCharges += deductionCost;
 
            person.EmployerSocialCharges = totalSocialCharges;
            _paymentsHistory = temporalList.AsEnumerable();
@@ -393,6 +376,16 @@ else
         }
     }
 
+    private string ParseToCRC(double amount)
+    {
+        return _cultureCR.NumberFormat.CurrencySymbol + CostFormat(amount);
+    }
+
+    private string CostFormat(double cost)
+    {
+        string formatedCost = string.Format("{0:N}", cost);
+        return formatedCost;
+    }
 
     //filter
     private async Task<IList<String>> GetPaymentDate()
