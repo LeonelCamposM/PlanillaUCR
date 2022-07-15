@@ -1,12 +1,15 @@
 ﻿@page "/Projects/{employerEmail}/{projectName}/Benefits/{subscriptionName}"
 @using Application.Subscriptions
 @using Domain.Subscriptions.Entities
+@using Application.Subscribes
+@using Domain.Subscribes.Entities
 @using Presentation.Core.Components
 @using Presentation.Benefits.Components
 @using System.Globalization
 @inject NavigationManager nav
 @inject ISnackbar Snackbar
 @inject ISubscriptionService SubscriptionService
+@inject ISubscribeService SubscribeService
 
 @{List<BreadcrumbItem> _items = new List<BreadcrumbItem>
     {
@@ -121,6 +124,7 @@ else
     private double? _tempCost;
     private string _providerName = "";
     private string _sDescription = "";
+    private IList<Subscribe> _employees = new List<Subscribe>();
     public Subscription subscription = new Subscription("","","","","",0.0,1,1);
     MudForm form;
     SnackHandler snackHandler = new SnackHandler();
@@ -143,7 +147,7 @@ else
         }
     }
 
-    async Task SaveBenefit()
+    private async Task SaveBenefit()
     {
         snackHandler._saving = true;
         await form.Validate();
@@ -158,12 +162,13 @@ else
             ShowSnackNotification("Beneficio " + subscription.SubscriptionName + " modificada", Severity.Success);
             subscription.SubscriptionName = _newName;
             subscriptionName = _newName;
+            await GetAffectedEmployees(subscription);
             DisableForm();
         }
         snackHandler._saving = false;
     }
 
-    async Task<bool> ValidName()
+    private async Task<bool> ValidName()
     {
         bool valid = true;
         Subscription tempSubscription = await SubscriptionService.GetSubscription(employerEmail, projectName, _newName);
@@ -176,7 +181,7 @@ else
         return valid;
     }
 
-    void ShowSnackNotification(string message, Severity severity)
+    private void ShowSnackNotification(string message, Severity severity)
     {
         Snackbar.Configuration.SnackbarVariant = Variant.Filled;
         Snackbar.Configuration.PreventDuplicates = false;
@@ -198,7 +203,7 @@ else
         nav.NavigateTo($"/Projects/{employerEmail}/{projectName}/Benefits");
     }
 
-      private void EnableForm()
+    private void EnableForm()
     {
         _disabled = false;
         _newName = subscription.SubscriptionName;
@@ -214,5 +219,11 @@ else
         _tempCost = subscription.Cost;
         _providerName =subscription.ProviderName;
         _sDescription = subscription.SubscriptionDescription;
+    }
+
+    private async Task GetAffectedEmployees(Subscription subscription)
+    {
+        _employees = (await SubscribeService.GetEmployeesBySubscription
+            (subscription.EmployerEmail, subscription.ProjectName, subscription.SubscriptionName)).ToList();
     }
 }
