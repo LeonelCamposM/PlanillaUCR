@@ -4,6 +4,9 @@
 @using ChartJs.Blazor.Util
 @using Domain.Payments.Entities
 @using Domain.Projects.Entities
+@using Domain.ReportOfHours.Entities
+@using Domain.Subscribes.Entities
+@using Domain.Subscriptions.Entities
 @using Presentation.Dashboard.Components
 @using System.Globalization
 @using Application.Payments
@@ -11,12 +14,19 @@
 @using Domain.Agreements.Entities 
 @using Application.Projects
 @using Presentation.Payments.Models
+@using Application.ReportOfHours
+@using Application.PaymentCalculator;
+@using Application.Subscribes
 
 @inject NavigationManager NavigationManager
 @inject IPaymentService PaymentService
 @inject IAgreementService AgreementService
 @inject IProjectService ProjectService
-@page "/da"
+@inject IReportOfHoursService ReportHoursService
+@inject IPaymentCalculatorService PaymentCalculatorServices
+@inject ISubscribeService SubscribeService
+
+@page "/DashboardEmployer/{email}"
 
 @if (_loading)
 {
@@ -91,20 +101,23 @@ else
     </MudPaper>
     </MudItem>
     
-</MudGrid>
-    
+</MudGrid>   
 }
 
 @code {
-    public string email { get; set; } = "david@ucr.ac.cr";
+    [Parameter]
+    public string email { get; set; }
     private bool _isLoading = true;
     private MudTable<ProjectModel> _tableLegalDeductions;
     private MudTable<Payment> _tableEmployerPayments;
     Dictionary<string, double>? _data = new Dictionary<string, double>();
     Dictionary<string, double>? _data2 = new Dictionary<string, double>();
     private bool _loading = true;
+
     private IList<Project> _projects = new List<Project>();
     private DateTime _nextPay = DateTime.Now;
+    private IList<ProjectModel> _projectsToDelete = new List<ProjectModel>();
+
     IList<string> colorslist = new List<string>()
     {
         {ColorUtil.ColorHexString(2, 109, 126)},
@@ -114,13 +127,6 @@ else
         {ColorUtil.ColorHexString(61, 153, 132)},
     };
 
-    List<string> list = new List<string>(){
-        {"csv"},
-        {"html"},
-        {"html1"},
-        {"html2"},
-        {"html3"}
-    };
     private CultureInfo _cultureCR = CultureInfo.GetCultureInfo("es-CR");
     private IList<Payment> _lastEmployerPayments;
     private IList<ProjectModel> _projectsList = new List<ProjectModel>();
@@ -128,7 +134,6 @@ else
     protected override async Task OnParametersSetAsync()
     {
         _lastEmployerPayments = (IList<Payment>) await PaymentService.GetLastEmployerPayments(email);
-        //IList<Payment> projects = _lastEmployerPayments.GroupBy(e=> e.ProjectName);
         var groupByFirstLetterQuery = 
                         from student in _lastEmployerPayments
                         group student by student.ProjectName;
@@ -143,16 +148,19 @@ else
         }
 
         IList<Agreement> agreements = (IList<Agreement>) await AgreementService.GetEmployerAgreements(email);
-         var groupByFirstLetterQuery2 = 
-                        from student in agreements
-                        group student by student.ProjectName;
+        var groupByFirstLetterQuery2 = 
+                       from student in agreements
+                       group student by student.ProjectName;
 
         foreach (var group in groupByFirstLetterQuery2){
             _data2.Add(group.FirstOrDefault().ProjectName, group.Count());
         }
 
         _projects = (IList<Project>) await ProjectService.GetEmployerProyects(email);
-         await GetProjectsToPay();
+        ApprovePayment paymentManager = new ApprovePayment(_projects, _projectsList, _projectsToDelete);
+        await paymentManager.GetProjectsToPay();
+        await GetProjectsMountToPay(paymentManager);
+        _projectsList = paymentManager._projectsList;
         _loading = false;
     }
 
@@ -172,78 +180,48 @@ else
         return formatedCost;
     }
 
-    private async Task GetProjectsToPay()
+    private async Task GetProjectsMountToPay(ApprovePayment paymentManager)
     {
-        foreach (Project _project in _projects)
+        foreach (ProjectModel _pModel in paymentManager._projectsList)
         {
-            var _daysInterval = GetDaysInterval(_project.PaymentInterval, _project.LastPaymentDate);
-            if (_project.LastPaymentDate.AddDays(_daysInterval) <= _nextPay)
+            IList<Agreement> _employees = await AgreementService.GetProjectAgreements(_pModel.ProjectName, _pModel.EmployerEmail);
+
+            Payment _payment = new Payment("", _pModel.EmployerEmail, _pModel.ProjectName, 0,
+                _pModel.LastPaymentDate, _pModel.LastPaymentDate.AddDays(_pModel.DayInterval));
+            IList<Payment> _paidEmployees = await PaymentService.GetProjectPayments(_payment);
+
+            foreach (Agreement _employeeAgreement in _employees)
             {
-                ProjectModel _projectModel = new ProjectModel(_project.ProjectName, _project.EmployerEmail,
-                    _project.PaymentInterval, _project.LastPaymentDate,
-                    GetDaysInterval(_project.PaymentInterval, _project.LastPaymentDate), 0, new List<EmployeeAgreement>());
-                _projectsList.Add(_projectModel);
-            }
-        }
-    }
+                if (_paidEmployees.Where(e => e.EmployeeEmail == _employeeAgreement.EmployeeEmail).Length() == 0)
+                {
+                    double _mountToPay = 0;
+                    
 
-    public int GetDaysInterval(string paymentInterval, DateTime lastPaymentDate)
-    {
-        int _days = 0;
+                    Subscribe searchSubscribe = new Subscribe(_employeeAgreement.EmployeeEmail, _employeeAgreement.EmployerEmail, _employeeAgreement.ProjectName, "", 0.0, _pModel.LastPaymentDate, _pModel.LastPaymentDate.AddDays(_pModel.DayInterval));
+                    IEnumerable<Subscription> subscriptions = await SubscribeService.GetSubscribes(searchSubscribe);
 
-        switch (paymentInterval)
-        {
-            case "Semanal":
-                {
-                    _days = 7;
-                }break;
-            case "Bisemanal":
-                {
-                    _days = 15;
-                }break;
-            case "Quincenal":
-                {
-                    _days = fortnightDays(lastPaymentDate);
-                }break;
-            case "Mensual": 
-                {
-                    DateTime nextMonth = lastPaymentDate.AddMonths(1);
-                    TimeSpan t = nextMonth - lastPaymentDate;
-                    _days = t.Days;
-                }break;
+                    HoursReport _report = new HoursReport();
+                    _report.EmployeeEmail = _employeeAgreement.EmployeeEmail;
+                    _report.ReportDate = _pModel.LastPaymentDate;
+                    IList<HoursReport> reports = await ReportHoursService.GetEmployeeReports(_report, _pModel.LastPaymentDate.AddDays(_pModel.DayInterval));
 
-        }
-        return _days;
-    }
 
-    private int fortnightDays(DateTime lastPaymentDate)
-    {
-        int _days = 0;
-        if (lastPaymentDate.Day == 14)
-        {
-            _days = 14;
-        }
-        else
-        {
-            if (lastPaymentDate.Day == 28)
-            {
-                DateTime nextFortnight = lastPaymentDate.AddMonths(1);
-                nextFortnight = nextFortnight.AddDays(-14);
-                TimeSpan t = nextFortnight - lastPaymentDate;
-                _days = t.Days;
-            }
-            else
-            {
-                if (lastPaymentDate.Day < 14)
-                {
-                    _days = 14 - lastPaymentDate.Day;
-                }
-                else
-                {
-                    _days = 28 - lastPaymentDate.Day;
+                    _mountToPay = await paymentManager.GetSalary(_employeeAgreement, _pModel.DayInterval, _pModel.LastPaymentDate, subscriptions, reports);
+                    _pModel.MountToPay += _mountToPay;
+                    EmployeeAgreement projectEmployee = new EmployeeAgreement();
+                    projectEmployee.EmployeeEmail = _employeeAgreement.EmployeeEmail;
+                    projectEmployee.MountToPay = _mountToPay;
+                    _pModel.EmployeeList.Add(projectEmployee);
                 }
             }
+            if (_pModel.MountToPay == 0)
+            {
+                _projectsToDelete.Add(_pModel);
+            }
         }
-        return _days;
+        foreach (ProjectModel toDelete in _projectsToDelete)
+        {
+            paymentManager._projectsList.Remove(toDelete);
+        }
     }
 }
