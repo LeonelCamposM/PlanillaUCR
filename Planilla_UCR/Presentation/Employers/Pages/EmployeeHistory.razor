@@ -216,6 +216,7 @@ else
             System.Diagnostics.Debug.WriteLine($"valor oficial: {_paymentsHistory.ElementAt(0).MandatoryEmployeeDeductions}");
 
             await GetAllVoluntaryDeductions();
+            await GetAllBenefits();
             GetTotalCostForEmployee();
 
             _paymentsDates = await GetPaymentDate();
@@ -273,7 +274,7 @@ else
         double costLegalDeductions = 0.0;
         IList<EmployeeHistoryList> temporalList = new List<EmployeeHistoryList>();
         temporalList = _paymentsHistory.ToList();
-        
+
         _legalDeductions = await LegalDeductionService.GetAllAsync();
 
         foreach (EmployeeHistoryList person in temporalList)
@@ -295,7 +296,7 @@ else
             costLegalDeductions = 0.0;
         }
         _paymentsHistory = temporalList.AsEnumerable();
-         System.Diagnostics.Debug.WriteLine($"valor : {_paymentsHistory.ElementAt(0).MandatoryEmployeeDeductions}");
+        System.Diagnostics.Debug.WriteLine($"valor : {_paymentsHistory.ElementAt(0).MandatoryEmployeeDeductions}");
 
     }
 
@@ -312,10 +313,10 @@ else
             {
                 if (pay.EmployeeEmail == person.EmployeeEmail)
                 {
-                     Subscribe searchSubscribe= new Subscribe(pay.EmployeeEmail,pay.EmployerEmail, pay.ProjectName, "", 0.0, pay.StartDate, pay.EndDate);
-                     IList<Subscription> subscriptions = (await SubscribeService.GetSubscriptionCostsByDate(searchSubscribe)).ToList();
-                     
-                     costVoluntaryDeductions += PaymentCalculatorService.DeductionsCost(subscriptions);
+                    Subscribe searchSubscribe= new Subscribe(pay.EmployeeEmail,pay.EmployerEmail, pay.ProjectName, "", 0.0, pay.StartDate, pay.EndDate);
+                    IList<Subscription> subscriptions = (await SubscribeService.GetSubscriptionCostsByDate(searchSubscribe)).ToList();
+
+                    costVoluntaryDeductions += PaymentCalculatorService.DeductionsCost(subscriptions);
                 }
 
             }
@@ -324,6 +325,30 @@ else
         _paymentsHistory = temporalList.AsEnumerable();
     }
 
+    private async Task GetAllBenefits()
+    {
+        
+        IList<Subscription> benefits;
+        IList<EmployeeHistoryList> temporalList = new List<EmployeeHistoryList>();
+        temporalList = _paymentsHistory.ToList();
+
+        foreach (EmployeeHistoryList person in temporalList)
+        {
+            double costBenefits = 0.0;
+            foreach (Payment pay in _payment) 
+            {
+                if (pay.EmployeeEmail == person.EmployeeEmail)
+                {
+                    benefits = (IList<Subscription>) await SubscriptionService.GetBenefitsByEmployee(pay.EmployeeEmail, pay.ProjectName);
+                    costBenefits += PaymentCalculatorService.DeductionsCost(benefits);
+                }
+
+            }
+            System.Diagnostics.Debug.WriteLine($"valor oficial: {costBenefits}");
+            person.TotalBenefits = costBenefits;
+        }
+        _paymentsHistory = temporalList.AsEnumerable();
+    }
 
     private string ParseToCRC(double amount)
 	{
