@@ -73,7 +73,8 @@ else
                 <MudItem xs="2">
                 <MudSelect Dense="true" T="string" Label="Proyecto" Variant="Variant.Outlined" TextChanged="OnProjectNameSelect">
                     <MudSelectItem Value="@(" ")"/>
-                    @foreach (var state in _paymentsProjectNames) {
+                    @foreach (var state in _paymentsProjectNames) 
+                    {
                         <MudSelectItem T="string" Value="@state">
                             @state
                         </MudSelectItem>
@@ -93,7 +94,8 @@ else
                 <MudItem xs="2">
                 <MudSelect Dense="true" T="string" Label="Fecha" Variant="Variant.Outlined"  TextChanged="OnPaymentDateSelect">
                         <MudSelectItem Value="@(" ")"/>
-                    @foreach (var state in _paymentsDates) {
+                    @foreach (var state in _paymentsDates) 
+                    {
                         <MudSelectItem T="string" Value="@state">
                             @state
                         </MudSelectItem>
@@ -104,7 +106,8 @@ else
                 <MudItem xs="2">
                 <MudSelect Dense="true" T="string" Label="Cédula" Variant="Variant.Outlined"  TextChanged="GetEmployeeSsn">
                         <MudSelectItem Value="@(" ")"/>
-                    @foreach (var state in _paymentsSsn) {
+                    @foreach (var state in _paymentsSsn) 
+                    {
                         <MudSelectItem T="string" Value="@state">
                             @state
                         </MudSelectItem>
@@ -210,31 +213,20 @@ else
             _people = await PersonService.GetAllPeopleAsync();
             _projects = await ProjectService.GetEmployerProyects(employerEmail);
             CreateEmployeeHistory();
-
-            GetAllGrossySalaries();
-            await GetAllLegalDeductions();
-            await GetAllVoluntaryDeductions();
-            await GetAllBenefits();
-            GetTotalSocialCharges();
-            GetTotalCostForEmployee();
-
-            _paymentsDates = await GetPaymentDate();
-            _paymentsProjectNames = await GetProyectName();
-            _paymentsSsn = await GetEmployeeSsn();
+            await FillColumns();
+            await ActivateFilters();
         }
-
         _loading = false;
         await InvokeAsync(StateHasChanged);
-
     }  
 
     private void CreateEmployeeHistory()
     {
         _paymentsHistory = from Pe in _people
-                            join A in _agreements on Pe.Email equals A.EmployeeEmail 
-                            join P in _projects on A.ProjectName equals P.ProjectName 
-                            where A.IsEnabled == 1 
-                            select new EmployeeHistoryList
+                           join A in _agreements on Pe.Email equals A.EmployeeEmail 
+                           join P in _projects on A.ProjectName equals P.ProjectName 
+                           where A.IsEnabled == 1 
+                           select new EmployeeHistoryList
                             {
                                 ProjectName = A.ProjectName,
                                 EmployeeName = Pe.Name,
@@ -246,10 +238,19 @@ else
                             };
     }
 
+    private async Task FillColumns()
+    {
+        GetAllGrossySalaries();
+        await GetAllLegalDeductions();
+        await GetAllVoluntaryDeductions();
+        await GetAllBenefits();
+        GetTotalSocialCharges();
+        GetTotalCostForEmployee();
+    }
+
     private void GetAllGrossySalaries()
     {
-        IList<EmployeeHistoryList> temporalList = new List<EmployeeHistoryList>();
-        temporalList = _paymentsHistory.ToList();
+        IList<EmployeeHistoryList> temporalList = _paymentsHistory.ToList();
         foreach (EmployeeHistoryList person in temporalList)
         {
             double totalGrossSalary = 0.0;
@@ -258,9 +259,9 @@ else
                 if (pay.EmployeeEmail == person.EmployeeEmail)
                 {
                     totalGrossSalary += pay.GrossSalary;
+                    person.PaymentDate = pay.EndDate.ToShortDateString();
                 }
             }
-
             person.GrossSalary = totalGrossSalary;
             totalGrossSalary = 0.0;
         }
@@ -269,9 +270,7 @@ else
 
     private async Task GetAllLegalDeductions()
     {
-        IList<EmployeeHistoryList> temporalList = new List<EmployeeHistoryList>();
-        temporalList = _paymentsHistory.ToList();
-
+        IList<EmployeeHistoryList> temporalList = _paymentsHistory.ToList();
         _legalDeductions = await LegalDeductionService.GetAllAsync();
 
         foreach (EmployeeHistoryList person in temporalList)
@@ -279,16 +278,14 @@ else
             double costLegalDeductions = 0.0;
             foreach (Payment pay in _payment) 
             {
-                if (!person.ContractType.Equals("Servicios profesionales"))
+                if (!person.ContractType.Equals("Servicios profesionales") && pay.EmployeeEmail == person.EmployeeEmail)
                 {
-                    if (pay.EmployeeEmail == person.EmployeeEmail)
+
+                    foreach (var item in _legalDeductions)
                     {
-                        foreach (var item in _legalDeductions)
-                        {
-                            costLegalDeductions += TaxCalculatorService.GetTaxAmount(item.DeductionName, pay.GrossSalary);
-                        }
-                        person.MandatoryEmployeeDeductions = costLegalDeductions;
+                        costLegalDeductions += TaxCalculatorService.GetTaxAmount(item.DeductionName, pay.GrossSalary);
                     }
+                    person.MandatoryEmployeeDeductions = costLegalDeductions;
                 }
             }
         }
@@ -297,8 +294,7 @@ else
 
     private async Task GetAllVoluntaryDeductions()
     {
-        IList<EmployeeHistoryList> temporalList = new List<EmployeeHistoryList>();
-        temporalList = _paymentsHistory.ToList();
+        IList<EmployeeHistoryList> temporalList = _paymentsHistory.ToList();
 
         foreach (EmployeeHistoryList person in temporalList)
         {
@@ -322,8 +318,7 @@ else
     private async Task GetAllBenefits()
     {
         IList<Subscription> benefits;
-        IList<EmployeeHistoryList> temporalList = new List<EmployeeHistoryList>();
-        temporalList = _paymentsHistory.ToList();
+        IList<EmployeeHistoryList> temporalList = _paymentsHistory.ToList();
 
         foreach (EmployeeHistoryList person in temporalList)
         {
@@ -346,8 +341,7 @@ else
 
     private void GetTotalSocialCharges()
     {
-        IList<EmployeeHistoryList> temporalList = new List<EmployeeHistoryList>();
-        temporalList = _paymentsHistory.ToList();
+        IList<EmployeeHistoryList> temporalList = _paymentsHistory.ToList();
 
         foreach (EmployeeHistoryList person in temporalList)
         {
@@ -388,13 +382,21 @@ else
     }
 
     //filter
+
+    private async Task ActivateFilters()
+    {
+        _paymentsDates = await GetPaymentDate();
+        _paymentsProjectNames = await GetProyectName();
+        _paymentsSsn = await GetEmployeeSsn();
+    }
+
     private async Task<IList<String>> GetPaymentDate()
     {
-        foreach (Payment payment in _payment)
+        foreach (EmployeeHistoryList history in _paymentsHistory)
         {
-            if (!_paymentsDates.Contains(payment.EndDate.ToShortDateString()))
+            if (!_paymentsDates.Contains(history.PaymentDate))
             {
-                _paymentsDates.Add(payment.EndDate.ToShortDateString());
+                _paymentsDates.Add(history.PaymentDate);
             }
         }
         _paymentsDates =  _paymentsDates.Reverse().Take(10).ToList();
@@ -403,12 +405,11 @@ else
 
     private async Task<IList<String>> GetProyectName()
     {
-        IList<EmployeeHistoryList> paymentsList = _paymentsHistory.ToList();
-        foreach (EmployeeHistoryList payment in paymentsList)
+        foreach (EmployeeHistoryList history in _paymentsHistory)
         { 
-            if (!_paymentsProjectNames.Contains(payment.ProjectName))
+            if (!_paymentsProjectNames.Contains(history.ProjectName))
             {
-                _paymentsProjectNames.Add(payment.ProjectName);
+                _paymentsProjectNames.Add(history.ProjectName);
             }
         }
         _paymentsProjectNames = _paymentsProjectNames.Reverse().Take(10).ToList();
@@ -417,8 +418,7 @@ else
 
     private async Task<IList<String>> GetEmployeeSsn()
     {
-        IList<EmployeeHistoryList> paymentsList = _paymentsHistory.ToList();
-        foreach (EmployeeHistoryList person in paymentsList)
+        foreach (EmployeeHistoryList person in _paymentsHistory)
         { 
             if (!_paymentsSsn.Contains(person.Ssn.ToString()))
             {
