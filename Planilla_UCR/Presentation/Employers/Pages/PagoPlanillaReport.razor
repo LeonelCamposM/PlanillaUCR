@@ -481,16 +481,20 @@ else
 		{
 			salariesTableToBeSend.Add(new LegalDeduction(item.Name, item.Amount));
 		}
+		salariesTableToBeSend.Add(new LegalDeduction("Total", _templateTempSalariesTable.Sum(e=>e.Amount)));
 
 		foreach (var item in _templateTempBenefitsTable)
 		{
 			benefitsTableToBeSend.Add(new LegalDeduction(item.Name, item.Amount));
 		}	
+		benefitsTableToBeSend.Add(new LegalDeduction("Total", _templateTempBenefitsTable.Sum(e=>e.Amount)));
 
 		foreach (var item in _templateTempDeductionsTable)
 		{
 			deductionsTableToBeSend.Add(new LegalDeduction(item.Name, item.Amount));
 		}
+		deductionsTableToBeSend.Add(new LegalDeduction("Total", _templateTempDeductionsTable.Sum(e=>e.Amount)));
+
 		summaryTableToBeSend.Add(new LegalDeduction(_myProjectName, 0.0));
 		summaryTableToBeSend.Add(new LegalDeduction(employerEmail, 0.0));
 		summaryTableToBeSend.Add(new LegalDeduction(_myEndDate, 0.0));

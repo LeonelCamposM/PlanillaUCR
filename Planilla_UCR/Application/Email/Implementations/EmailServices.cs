@@ -116,6 +116,7 @@ namespace Application.Email.Implementations
                 salaries += "<td>" + "₡" + string.Format("{0:N}", salary.Cost) + " </td>";
                 salaries += "</tr>";
             }
+
             htmlContent = htmlContent.Replace("[salaries]", salaries);
 
 
