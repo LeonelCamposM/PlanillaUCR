@@ -327,7 +327,7 @@ else
 
     private async Task GetAllBenefits()
     {
-        
+
         IList<Subscription> benefits;
         IList<EmployeeHistoryList> temporalList = new List<EmployeeHistoryList>();
         temporalList = _paymentsHistory.ToList();
@@ -351,15 +351,38 @@ else
     }
 
     private string ParseToCRC(double amount)
-	{
-		return _cultureCR.NumberFormat.CurrencySymbol + CostFormat(amount);
-	}
+    {
+        return _cultureCR.NumberFormat.CurrencySymbol + CostFormat(amount);
+    }
 
-	private string CostFormat(double cost)
-	{
-		string formatedCost = string.Format("{0:N}", cost);
-		return formatedCost;
-	}
+    private string CostFormat(double cost)
+    {
+        string formatedCost = string.Format("{0:N}", cost);
+        return formatedCost;
+    }
+
+    private void GetTotalSocialCharges()
+    {
+        double totalSocialCharges = 0.0;
+        IList<EmployeeHistoryList> temporalList = new List<EmployeeHistoryList>();
+        temporalList = _paymentsHistory.ToList();
+
+        foreach (EmployeeHistoryList person in temporalList)
+        {
+           //string deductionName = "CCSS (14.50%)";         
+           //double deductionCost = Math.Round(TaxCalculatorService.GetCSSSEmployerTaxes(person.GrossSalary),2);         
+           //totalSocialCharges += deductionCost;         
+           //deductionName = "Otras instituciones (7.25%)";         
+           //deductionCost = Math.Round(TaxCalculatorService.GetOtherInstitutionsEmployerTaxes(person.GrossSalary),2);         
+           //totalSocialCharges += deductionCost;         
+           //deductionName = "Ley de protección al trabajador (4.75%)";         
+           //deductionCost = Math.Round(TaxCalculatorService.GetWorkerWarrantiesEmployerTaxes(person.GrossSalary),2);         
+           //totalSocialCharges += deductionCost;
+
+           person.EmployerSocialCharges = totalSocialCharges;
+           _paymentsHistory = temporalList.AsEnumerable();
+        }
+    }
 
     private void GetTotalCostForEmployee()
     {
