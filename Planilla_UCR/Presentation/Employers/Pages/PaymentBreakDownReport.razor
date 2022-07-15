@@ -481,38 +481,57 @@ else
 	private void SendEmail()
 	{
 		EmailObject emailObject = new EmailObject("","","","",employerEmail);
-		IList<LegalDeduction> summaryTableToBeSend = new List<LegalDeduction>();
-		IList<LegalDeduction> salariesTableToBeSend = new List<LegalDeduction>();
-		IList<LegalDeduction> deductionsTableToBeSend = new List<LegalDeduction>();
-		IList<LegalDeduction> benefitsTableToBeSend = new List<LegalDeduction>();
+		IList<LegalDeduction> summaryTableToBeSend = FillOutSummaryToBeSend();
+		IList<LegalDeduction> salariesTableToBeSend = FillOutSalariesToBeSend();
+		IList<LegalDeduction> deductionsTableToBeSend = FillOutDeductionToBeSend();
+		IList<LegalDeduction> benefitsTableToBeSend = FillOutBenefitsToBeSend();
+		EmailService.SendPaymentBreakdownEmail(emailObject, summaryTableToBeSend, salariesTableToBeSend, deductionsTableToBeSend, benefitsTableToBeSend);
+	}
 
+	private IList<LegalDeduction> FillOutSalariesToBeSend()
+	{
+		IList<LegalDeduction> myTable = new List<LegalDeduction>();;
 		foreach (var item in _templateTempSalariesTable)
 		{
-			salariesTableToBeSend.Add(new LegalDeduction(item.Name, item.Amount));
+			myTable.Add(new LegalDeduction(item.Name, item.Amount));
 		}
-		salariesTableToBeSend.Add(new LegalDeduction("Total", _templateTempSalariesTable.Sum(e=>e.Amount)));
+		myTable.Add(new LegalDeduction("Total", _templateTempSalariesTable.Sum(e=>e.Amount)));
+		return myTable;
+	}
 
+	private IList<LegalDeduction> FillOutBenefitsToBeSend()
+	{
+		IList<LegalDeduction> myTable = new List<LegalDeduction>();;
 		foreach (var item in _templateTempBenefitsTable)
 		{
-			benefitsTableToBeSend.Add(new LegalDeduction(item.Name, item.Amount));
+			myTable.Add(new LegalDeduction(item.Name, item.Amount));
 		}	
-		benefitsTableToBeSend.Add(new LegalDeduction("Total", _templateTempBenefitsTable.Sum(e=>e.Amount)));
+		myTable.Add(new LegalDeduction("Total", _templateTempBenefitsTable.Sum(e=>e.Amount)));
+		return myTable;
+	}
 
+	private IList<LegalDeduction> FillOutDeductionToBeSend()
+	{
+		IList<LegalDeduction> myTable = new List<LegalDeduction>();;
 		foreach (var item in _templateTempDeductionsTable)
 		{
-			deductionsTableToBeSend.Add(new LegalDeduction(item.Name, item.Amount));
+			myTable.Add(new LegalDeduction(item.Name, item.Amount));
 		}
-		deductionsTableToBeSend.Add(new LegalDeduction("Total", _templateTempDeductionsTable.Sum(e=>e.Amount)));
+		myTable.Add(new LegalDeduction("Total", _templateTempDeductionsTable.Sum(e=>e.Amount)));
+		return myTable;
+	}
 
-		summaryTableToBeSend.Add(new LegalDeduction(_myProjectName, 0.0));
-		summaryTableToBeSend.Add(new LegalDeduction(employerEmail, 0.0));
-		summaryTableToBeSend.Add(new LegalDeduction(_myEndDate, 0.0));
+	private IList<LegalDeduction> FillOutSummaryToBeSend()
+	{
+		IList<LegalDeduction> myTable = new List<LegalDeduction>();;
+		myTable.Add(new LegalDeduction(_myProjectName, 0.0));
+		myTable.Add(new LegalDeduction(employerEmail, 0.0));
+		myTable.Add(new LegalDeduction(_myEndDate, 0.0));
 		foreach (var item in _templateTempSummaryTable)
 		{
-			summaryTableToBeSend.Add(new LegalDeduction(item.Name, item.Amount));
+			myTable.Add(new LegalDeduction(item.Name, item.Amount));
 		}
-		EmailService.SendReportePlanillaEmail(emailObject, summaryTableToBeSend, salariesTableToBeSend, deductionsTableToBeSend, benefitsTableToBeSend);
-
+		return myTable;
 	}
 }
 
