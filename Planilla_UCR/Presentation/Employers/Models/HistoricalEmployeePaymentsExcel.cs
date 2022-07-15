@@ -12,8 +12,9 @@ namespace Presentation.Employers.XLS
         {
             MemoryStream XLSStream = new();
             var workBook = new XLWorkbook();
-            string[] headings = {"Nombre", "Proyecto", "Cédula", "Tipo empleado","Salario bruto","Beneficios","Mis cargas sociales","Deducciones obligatorias",
-            "Deducciones voluntarias","Costo total"};
+            string[] headings = {"Nombre", "Primer apellido","Segundo apellido","Proyecto", "Cédula", 
+                "Tipo empleado","Salario bruto","Beneficios","Mis cargas sociales","Deducciones obligatorias",
+                "Deducciones voluntarias","Costo total"};
             var workSheet = workBook.Worksheets.Add("Hoja 1");
             for (int i = 1; i <= headings.Length; i++)
             {
