@@ -442,7 +442,7 @@ AS
 BEGIN
 	SELECT Person.Email, Person.Name, Person.LastName1, Person.LastName2, Person.SSN, Person.BankAccount, 
 	Person.Adress, Person.PhoneNumber, Person.IsEnabled
-	FROM  Person WHERE Person.Email = @EmailPerson AND Person.IsEnabled=1
+	FROM  Person WHERE Person.Email = @EmailPerson
 END
 
 --Employer Stored Procedures
@@ -683,6 +683,18 @@ VALUES('wendy@ucr.ac.cr',
 'CR40324350012',
 'Alajuela, Costa Rica',
 '83355226',
+1
+)
+
+INSERT INTO Person
+VALUES('nayeriazofeifa3003@gmail.com',
+'Nayeri',
+'Azofeifa',
+'Porras',
+118070615,
+'CR4024',
+'Alajuela, Costa Rica',
+'89433965',
 1
 )
 
