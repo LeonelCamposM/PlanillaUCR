@@ -32,16 +32,26 @@
 
 @if (_loading)
 {
-    <MudText>loading</MudText>
+    <MudPaper  Height="220px" Width="100%" Outlined="false" Class="border-none pa-4" Elevation="0">
+         <MudText Align="Align.Center" Typo="Typo.h6">
+              <MudProgressCircular Color="Color.Primary" Style="height:70px;width:70px;" Indeterminate="true" />
+         </MudText>
+    </MudPaper>
 }
 else
 {
-    
 <MudGrid>
     <MudItem xs="6">
         <MudPaper Class="pa-3" Height="380px" Elevation="3">
-            <MudText Align="Align.Left" Typo="Typo.h6">Cantidad de empleados </MudText>
-            <BarChart colorList="colorslist" title="" data="@_data2"></BarChart>
+            <MudText Align="Align.Left" Typo="Typo.h6">Cantidad de empleados por proyecto</MudText>
+
+            <MudText Align="Align.Left" Typo="Typo.body1">
+               <MudIcon  Style="@($"color: #026d7e")" Icon= "@Icons.Filled.Circle"/> Servicios Profesionales  
+               <MudIcon  Style="@($"color: #3b7197")" Icon= "@Icons.Filled.Circle"/> Medio tiempo
+               <MudIcon  Style="@($"color: #009393")" Icon= "@Icons.Filled.Circle"/> Tiempo completo  
+           </MudText> 
+           
+            <MultiBarChart colorList="colorslist" title="" data="@profesionalData" data2="@midTimeData" data3="@fullTimeData"></MultiBarChart>
         </MudPaper>
     </MudItem>
     <MudItem xs="6">
@@ -99,6 +109,9 @@ else
     <MudItem xs="6">
     <MudPaper Height="380px" Class="pa-3" Elevation="3">
         <MudText Align="Align.Left" Typo="Typo.h6">Costo total por proyecto </MudText>
+        <MudText Align="Align.Left" Typo="Typo.body1">
+               Total invertido en proyectos: @_cultureCR.NumberFormat.CurrencySymbol @CostFormat(@totalCost)
+        </MudText> 
         <PieChart colorList="colorslist" title="" data="@_data"></PieChart>
     </MudPaper>
     </MudItem>
@@ -112,14 +125,18 @@ else
     private bool _isLoading = true;
     private MudTable<ProjectModel> _tableLegalDeductions;
     private MudTable<Payment> _tableEmployerPayments;
-    Dictionary<string, double>? _data = new Dictionary<string, double>();
-    Dictionary<string, double>? _data2 = new Dictionary<string, double>();
+    Dictionary<string, double> _data = new Dictionary<string, double>();
+    Dictionary<string, double> profesionalData = new Dictionary<string, double>();
+
+    Dictionary<string, double> midTimeData = new Dictionary<string, double>();
+    Dictionary<string, double> fullTimeData = new Dictionary<string, double>();
     private bool _loading = true;
     private IList<String> _paymentsProjectNames = new List<String>();
 
     private IList<Project> _projects = new List<Project>();
     private DateTime _nextPay = DateTime.Now;
     private IList<ProjectModel> _projectsToDelete = new List<ProjectModel>();
+    private double totalCost { get; set; }
 
     IList<string> colorslist = new List<string>()
     {
@@ -139,35 +156,12 @@ else
     {
 
         _lastEmployerPayments = (IList<Payment>) await PaymentService.GetLastEmployerPayments(email);
-        var groupByFirstLetterQuery = 
+        var employerProjects = 
                         from student in _lastEmployerPayments
                         group student by student.ProjectName;
 
-
-        foreach (var group in groupByFirstLetterQuery){
-            double cost = 0;
-            foreach (var payment in group){
-                cost += payment.GrossSalary;
-            }
-            _data.Add(group.FirstOrDefault().ProjectName, cost);
-        }
-
-        IList<Agreement> agreements = (IList<Agreement>) await AgreementService.GetEmployerAgreements(email);
-        var groupByFirstLetterQuery2 = 
-                       from student in agreements
-                       group student by student.ProjectName;
-
-        foreach (var group in groupByFirstLetterQuery2){
-            _data2.Add(group.FirstOrDefault().ProjectName, group.Count());
-        }
-
-        _projects = (IList<Project>) await ProjectService.GetEmployerProyects(email);
-        ApprovePayment paymentManager = new ApprovePayment(_projects, _projectsList, _projectsToDelete);
-        await paymentManager.GetProjectsToPay();
-        await GetProjectsMountToPay(paymentManager);
-        _projectsList = paymentManager._projectsList;
-
-        await GetEmployerCost();
+        await LoadPieChart(employerProjects);
+        await LoadPaymentTable();
         _loading = false;
     }
 
@@ -236,10 +230,6 @@ else
     {
         foreach (Payment payment in _lastEmployerPayments)
         {
-            Agreement _agreement = new Agreement(payment.EmployeeEmail,
-                payment.EmployerEmail, payment.ProjectName, null, "", 0, null, 1, "");
-            _agreement = await AgreementService.GetContractee(_agreement);
-
             double cost = payment.GrossSalary;
             cost += GetEmployerSocialCharges(payment);
             cost += Convert.ToDouble(await GetEmployeeBenefits(payment));
@@ -265,5 +255,55 @@ else
             benefitsCost += benefit.Cost;
         }
         return benefitsCost;
+    }
+
+    private async Task GetProjectEmployeesCount(IList<Agreement> agreements)
+    {
+        var employerProjects = 
+                    from project in agreements
+                    group project by project.ProjectName;
+
+        foreach(var project in employerProjects)
+        {
+            string projectName = project.FirstOrDefault().ProjectName;
+            IList<Agreement> profesionalCount = agreements.Where(e => e.ContractType.Equals("Servicios profesionales") && e.ProjectName.Equals(projectName)).ToList();
+            IList<Agreement> midTimeCount = agreements.Where(e => e.ContractType.Equals("Medio tiempo") && e.ProjectName.Equals(projectName)).ToList();
+            IList<Agreement> fullTimeCount = agreements.Where(e => e.ContractType.Equals("Tiempo completo") && e.ProjectName.Equals(projectName)).ToList();
+
+            profesionalData.Add(projectName, profesionalCount.Length());
+            midTimeData.Add(projectName, midTimeCount.Length());
+            fullTimeData.Add(projectName, fullTimeCount.Length());
+        }
+    }
+
+    private async Task LoadPieChart(IEnumerable<IGrouping<string, Payment>>  employerProjects)
+    {
+        totalCost = 0;
+        foreach (var group in employerProjects){
+            double cost = 0;
+            foreach (var payment in group){
+                cost += payment.GrossSalary;
+                cost += GetEmployerSocialCharges(payment);
+                cost += Convert.ToDouble(await GetEmployeeBenefits(payment));
+            }
+            totalCost += cost;
+            _data.Add(group.FirstOrDefault().ProjectName, cost);
+        }
+
+    }
+
+    private async Task LoadPaymentTable()
+    {
+        IList<Agreement> agreements = (IList<Agreement>) await AgreementService.GetEmployerAgreements(email);
+        var groupByFirstLetterQuery2 = 
+                       from student in agreements
+                       group student by student.ProjectName;
+
+        _projects = (IList<Project>) await ProjectService.GetEmployerProyects(email);
+        ApprovePayment paymentManager = new ApprovePayment(_projects, _projectsList, _projectsToDelete);
+        await paymentManager.GetProjectsToPay();
+        await GetProjectsMountToPay(paymentManager);
+        _projectsList = paymentManager._projectsList;
+        await GetProjectEmployeesCount(agreements);
     }
 }
