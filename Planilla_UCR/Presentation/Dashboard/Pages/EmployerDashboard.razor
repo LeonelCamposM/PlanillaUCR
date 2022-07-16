@@ -162,6 +162,7 @@ else
 
         await LoadPieChart(employerProjects);
         await LoadPaymentTable();
+        await GetEmployerCost();
         _loading = false;
     }
 
@@ -257,7 +258,7 @@ else
         return benefitsCost;
     }
 
-    private async Task GetProjectEmployeesCount(IList<Agreement> agreements)
+    private void GetProjectEmployeesCount(IList<Agreement> agreements)
     {
         var employerProjects = 
                     from project in agreements
@@ -295,15 +296,11 @@ else
     private async Task LoadPaymentTable()
     {
         IList<Agreement> agreements = (IList<Agreement>) await AgreementService.GetEmployerAgreements(email);
-        var groupByFirstLetterQuery2 = 
-                       from student in agreements
-                       group student by student.ProjectName;
-
         _projects = (IList<Project>) await ProjectService.GetEmployerProyects(email);
         ApprovePayment paymentManager = new ApprovePayment(_projects, _projectsList, _projectsToDelete);
         await paymentManager.GetProjectsToPay();
         await GetProjectsMountToPay(paymentManager);
         _projectsList = paymentManager._projectsList;
-        await GetProjectEmployeesCount(agreements);
+        GetProjectEmployeesCount(agreements);
     }
 }
