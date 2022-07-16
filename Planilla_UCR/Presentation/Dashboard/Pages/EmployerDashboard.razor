@@ -72,7 +72,7 @@ else
                         <MudTd DataLabel="Proyecto">@context.ProjectName</MudTd>
                         <MudTd DataLabel="Fecha">@context.LastPaymentDate.ToShortDateString() </MudTd>
                         <MudTd DataLabel="Acciones">
-                            <MudButton Size="Size.Small" Variant="Variant.Filled" Color="Color.Primary"> Pagar</MudButton>    
+                            <MudButton Size="Size.Small" @onclick="@(e => GoToPay(@context.ProjectName))" Variant="Variant.Filled" Color="Color.Primary"> Pagar</MudButton>    
                         </MudTd>
                 </RowTemplate>
                 <PagerContent>
@@ -155,14 +155,16 @@ else
     protected override async Task OnParametersSetAsync()
     {
 
-        _lastEmployerPayments = (IList<Payment>) await PaymentService.GetLastEmployerPayments(email);
+        _lastEmployerPayments = (IList<Payment>) await PaymentService.GetEmployerPayments(email);
         var employerProjects = 
-                        from student in _lastEmployerPayments
-                        group student by student.ProjectName;
+                        from payment in _lastEmployerPayments
+                        group payment by payment.ProjectName;
 
         await LoadPieChart(employerProjects);
         await LoadPaymentTable();
         await GetEmployerCost();
+        _tablelastEmployerPayments = _tablelastEmployerPayments.OrderByDescending(pay => pay.EndDate).ToList();
+        GetTotalPaymentsAmount();
         _loading = false;
     }
 
@@ -302,5 +304,29 @@ else
         await GetProjectsMountToPay(paymentManager);
         _projectsList = paymentManager._projectsList;
         GetProjectEmployeesCount(agreements);
+    }
+
+    private void GetTotalPaymentsAmount()
+    {
+        var employerTotalPaymentsAmount = _tablelastEmployerPayments.GroupBy(x => new { x.ProjectName, x.EndDate }).ToList();
+
+        IList<Payment> result = new List<Payment>();
+        foreach(var paymentGroup in employerTotalPaymentsAmount){
+            double totalPayCost = 0;
+            Payment tempPayment = null;
+            foreach (var payment in paymentGroup)
+            {
+                totalPayCost += payment.GrossSalary;
+                tempPayment = payment;
+            }
+            tempPayment.GrossSalary = totalPayCost;
+            result.Add(tempPayment);
+        }
+        _tablelastEmployerPayments = result.Take(10).ToList();
+    }
+
+    private void GoToPay(string selectedPay)
+    {
+        NavigationManager.NavigateTo($"/Approve_Payment/{email}/{selectedPay}/");
     }
 }
