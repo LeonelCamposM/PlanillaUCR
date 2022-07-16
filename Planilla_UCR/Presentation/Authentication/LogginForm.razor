@@ -73,7 +73,7 @@
     <MudDialog @bind-IsVisible="visible" Options="dialogOptions">
         <TitleContent>
             <MudText Typo="Typo.h6">
-                <MudIcon Icon="@Icons.Material.Filled.Email" Color="@Color.Primary" Class="mr-2"/> Por favor ingrese el código de confirmación enviado a su email para la reactivación de su email: 
+                <MudIcon Icon="@Icons.Material.Filled.Email" Color="@Color.Primary" Class="mr-2"/> Si desea reactivar su cuenta por favor ingrese el código de confirmación enviado a su email: 
             </MudText>
         </TitleContent>
         <DialogContent>
@@ -83,7 +83,8 @@
             </DialogContent>
         <DialogActions>
             <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AcceptConfirmationCode" Class="px-10">Aceptar</MudButton>
-            <MudButton Variant="Variant.Filled" Color="Color.Transparent" OnClick="ResendConfirmationCode" Class="px-10">Volver a enviar</MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Transparent" OnClick="ResendConfirmationCode" Class="px-10">Reenviar</MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Transparent" OnClick="CloseDialog" Class="px-10">No reactivar</MudButton>
         </DialogActions>
     </MudDialog>
 
@@ -111,9 +112,9 @@
         if (form.IsValid){
             personInfo.Email = accountData.Email;
             personInfo = await PersonService.GetInfoPerson(personInfo);
+            bool emailExist = await AuthenticationService.EmailIsAlreadyRegistered(accountData.Email);
             if (personInfo != null)
             {
-                bool emailExist = await AuthenticationService.EmailIsAlreadyRegistered(accountData.Email);
                 if (emailExist && personInfo.IsEnabled==1)
                 {
                     bool validPassword = await AuthenticationService.SignInRequestAsync(accountData, true);
@@ -124,30 +125,73 @@
                 }
                 if (!emailExist && personInfo.IsEnabled==0)
                 {
-                    ShowSnackNotification("POPUP", Severity.Error);
+                    confirmationCodeEmail = CreateConfirmationCode();
                     OpenDialog();
+                    EmailService.SendConfirmationEmail("El siguiente código es el que tienes que ingresar para verificar tu email:  " + confirmationCodeEmail, accountData.Email);
                 } 
             }
-            else
+            else if (!emailExist)
             {
-               ShowSnackNotification("No posee una cuenta registrada", Severity.Error);
+                ShowSnackNotification("No posee una cuenta registrada", Severity.Error);
             } 
         }
         snackHandler._saving = false;
     }
 
-   
+    private string CreateConfirmationCode()
+    {
+        int confirmationCode = random.Next(100000,999999);
+        string confirmationCodeString = confirmationCode.ToString();
+        return confirmationCodeString;
+    }
 
     async Task ResendConfirmationCode(){
-       
-        ShowSnackNotification("No se ha enviado el nuevo correo, espere por favor", Severity.Error);
-  
+
+        OpenDialog();
+        open = true;
+        if (open)
+        {
+            confirmationCodeEmail = CreateConfirmationCode();
+            EmailService.SendConfirmationEmail("El siguiente código es el que tienes que ingresar para verificar tu email:  " + confirmationCodeEmail, accountData.Email);
+            ShowSnackNotification("Se ha enviado el nuevo correo", Severity.Success);
+            if (confirmationCodeEmployer!=null)
+            {
+                await AcceptConfirmationCode();
+                open = false;
+                CloseDialog();
+            } 
+        }
+        else 
+        {
+            ShowSnackNotification("No se ha enviado el nuevo correo, espere por favor", Severity.Error);
+        }  
     }
 
     async Task AcceptConfirmationCode(){
-       
-        ShowSnackNotification("No coincide el código de confirmación", Severity.Error);
-            
+        OpenDialog();
+        open = true;
+        if (open && confirmationCodeEmployer!=null)
+        {
+            if( ConfirmationCodeMatch(confirmationCodeEmployer, confirmationCodeEmail))
+            {  
+                personInfo.Email = accountData.Email;
+                EmployerService.UpdateEmployer(personInfo.Email);
+                ShowSnackNotification("Coincide el código de confirmación", Severity.Success);
+                personInfo.IsEnabled = 1;
+                await PersonService.CreatePersonAsync(personInfo);
+                await EmployerService.CreateEmployerAsync(personInfo.Email);
+                await AuthenticationService.RegisterRequestAsync(accountData);
+                await AuthorizationService.AssignRole(accountData.Email, "Employer");
+                ShowSnackNotification("Cuenta para "+personInfo.Name+" reactivada", Severity.Success);
+                await AuthenticationService.SignInRequestAsync(accountData, true);
+                open = false;
+                CloseDialog();
+            }
+            else 
+            {
+                ShowSnackNotification("No coincide el código de confirmación", Severity.Error);
+            }      
+        }
     }
 
     bool ConfirmationCodeMatch(string confirmationCodeEmployer, string confirmationCodeString)

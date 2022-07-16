@@ -4,7 +4,6 @@ CREATE DATABASE DB_Planilla
 GO
 USE DB_Planilla
 
-
 -- Tables
 CREATE TABLE Person(
 	Email varchar(255) NOT NULL primary key,
@@ -20,12 +19,12 @@ CREATE TABLE Person(
 
 CREATE TABLE Employee(
 	Email varchar(255) NOT NULL PRIMARY KEY,
-	FOREIGN KEY(Email) REFERENCES Person(Email)
+	FOREIGN KEY(Email) REFERENCES Person(Email) 
 );
 
 CREATE TABLE Employer(
 	Email varchar(255) NOT NULL PRIMARY KEY,
-	FOREIGN KEY(Email) REFERENCES Person(Email)
+	FOREIGN KEY(Email) REFERENCES Person(Email) ON UPDATE CASCADE
 );
 
 CREATE TABLE Project(
@@ -38,7 +37,7 @@ CREATE TABLE Project(
 	IsEnabled int NOT NULL,
 	LastPaymentDate date
 	PRIMARY KEY(EmployerEmail, ProjectName),
-	FOREIGN KEY(EmployerEmail) REFERENCES Employer(Email)
+	FOREIGN KEY(EmployerEmail) REFERENCES Employer(Email) ON UPDATE CASCADE
 );
 
 CREATE TABLE AgreementType(
@@ -457,6 +456,17 @@ BEGIN
 	WHERE Person.Email = @EmployerEmail;
 
 END
+GO
+
+CREATE OR ALTER PROCEDURE DisabledAccountEmployer(
+	@EmployerEmail varchar(255)
+) AS
+BEGIN
+	UPDATE Person
+	SET Email = 'BORRADO*'+ @EmployerEmail
+	WHERE Email = @EmployerEmail
+END
+
 
 -- Employee Stored Procedures
 GO
@@ -1470,4 +1480,3 @@ INSERT INTO Subscribes (EmployerEmail, ProjectName, SubscriptionName, EmployeeEm
 ---- 4 * 14 * 1600 = 89,600
 --INSERT INTO Payment 
 --VALUES('naye@ucr.ac.cr','david@ucr.ac.cr','El camino', 89600, '2022/06/01', '2022/06/14')
-

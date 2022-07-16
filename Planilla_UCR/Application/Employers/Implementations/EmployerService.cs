@@ -29,5 +29,10 @@ namespace Application.Employers.Implementations
             _employerRepository.DeleteEmployer(email);
         }
 
+        public void UpdateEmployer(String email)
+        {
+            _employerRepository.UpdateEmployer(email);
+        }
+
     }
 }
