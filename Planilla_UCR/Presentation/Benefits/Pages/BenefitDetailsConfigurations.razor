@@ -196,6 +196,7 @@ else
             subscription.ProviderName = _providerName;
             subscription.SubscriptionDescription = _sDescription;
             SubscriptionService.ModifySubscription(subscription, _newName);
+            //TODO: Hacer un servicio en Subscribes para que updatee el costo correspondiente.
             ShowSnackNotification("Beneficio " + subscription.SubscriptionName + " modificada", Severity.Success);
             subscription.SubscriptionName = _newName;
             subscriptionName = _newName;
@@ -265,7 +266,11 @@ else
             (subscription.EmployerEmail, subscription.ProjectName, subscription.SubscriptionName)).ToList();
         foreach (Subscribe subscribe in _employees)
         {
-            
+            IList<Subscribe> employeeBenefits = (await SubscribeService.GetBenefitsByEmployee(subscribe.EmployeeEmail, subscribe.ProjectName)).ToList();
+            if (employeeBenefits.Sum(e => e.Cost) > _project.MaximumAmountForBenefits)
+            {
+                _affectedEmployees.Add(subscribe);
+            }
         }
         //var _employeesBenefitsAmount = _employees.GroupBy(e=> e.EmployeeEmail);
         //foreach (var group in _employeesBenefitsAmount)
