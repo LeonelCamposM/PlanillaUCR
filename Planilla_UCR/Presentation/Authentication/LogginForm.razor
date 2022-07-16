@@ -130,7 +130,7 @@
                     EmailService.SendConfirmationEmail("El siguiente código es el que tienes que ingresar para verificar tu email:  " + confirmationCodeEmail, accountData.Email);
                 } 
             }
-            else if (!emailExist)
+            else if (!emailExist && personInfo == null)
             {
                 ShowSnackNotification("No posee una cuenta registrada", Severity.Error);
             } 
