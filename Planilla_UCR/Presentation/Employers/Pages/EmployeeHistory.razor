@@ -104,7 +104,7 @@ else
                 </MudItem>
 
                 <MudItem xs="2">
-                <MudSelect Dense="true" T="string" Label="Cédula" Variant="Variant.Outlined"  TextChanged="GetEmployeeSsn">
+                <MudSelect Dense="true" T="string" Label="Cédula" Variant="Variant.Outlined"  TextChanged="OnSsnSelect">
                         <MudSelectItem Value="@(" ")"/>
                     @foreach (var state in _paymentsSsn) 
                     {
@@ -345,19 +345,19 @@ else
 
         foreach (EmployeeHistoryList person in temporalList)
         {
-           double totalSocialCharges = 0.0;
-           string deductionName = "CCSS (14.50%)";         
-           double deductionCost = Math.Round(TaxCalculatorService.GetCSSSEmployerTaxes(person.GrossSalary),2);         
-           totalSocialCharges += deductionCost;         
-           deductionName = "Otras instituciones (7.25%)";         
-           deductionCost = Math.Round(TaxCalculatorService.GetOtherInstitutionsEmployerTaxes(person.GrossSalary),2);         
-           totalSocialCharges += deductionCost;         
-           deductionName = "Ley de protección al trabajador (4.75%)";         
-           deductionCost = Math.Round(TaxCalculatorService.GetWorkerWarrantiesEmployerTaxes(person.GrossSalary),2);         
-           totalSocialCharges += deductionCost;
+            double totalSocialCharges = 0.0;
+            string deductionName = "CCSS (14.50%)";         
+            double deductionCost = Math.Round(TaxCalculatorService.GetCSSSEmployerTaxes(person.GrossSalary),2);         
+            totalSocialCharges += deductionCost;         
+            deductionName = "Otras instituciones (7.25%)";         
+            deductionCost = Math.Round(TaxCalculatorService.GetOtherInstitutionsEmployerTaxes(person.GrossSalary),2);         
+            totalSocialCharges += deductionCost;         
+            deductionName = "Ley de protección al trabajador (4.75%)";         
+            deductionCost = Math.Round(TaxCalculatorService.GetWorkerWarrantiesEmployerTaxes(person.GrossSalary),2);         
+            totalSocialCharges += deductionCost;
 
-           person.EmployerSocialCharges = totalSocialCharges;
-           _paymentsHistory = temporalList.AsEnumerable();
+            person.EmployerSocialCharges = totalSocialCharges;
+            _paymentsHistory = temporalList.AsEnumerable();
         }
     }
 
@@ -405,7 +405,7 @@ else
 
     private async Task<IList<String>> GetProyectName()
     {
-        foreach (EmployeeHistoryList history in _paymentsHistory)
+        foreach (Agreement history in _agreements)
         { 
             if (!_paymentsProjectNames.Contains(history.ProjectName))
             {
@@ -429,15 +429,18 @@ else
         return _paymentsSsn;
     }
 
-    private void OnProjectNameSelect(string selected) {
+    private void OnProjectNameSelect(string selected) 
+    {
         _projectNameFilter = selected;
     }
 
-    private void OnContractTypeSelect(string selected) {
+    private void OnContractTypeSelect(string selected) 
+    {
         _contracTypeFilter = selected;
     }
 
-    private void OnPaymentDateSelect(string selected) {
+    private void OnPaymentDateSelect(string selected) 
+    {
         _paymentDateFilter = selected; 
     }
 
@@ -448,28 +451,47 @@ else
     private bool FiltersFunc(EmployeeHistoryList element) => 
         FilterFunc(element, _projectNameFilter,_contracTypeFilter, _paymentDateFilter, _ssnFilter);
 
-    private bool FilterFunc(EmployeeHistoryList element, string searchString1,
-    string searchString2, string searchString3, string searchString4)
+    private bool FilterFunc(EmployeeHistoryList element, string stringProjectName, string stringContract, string stringPayment, string stringSsn)
     {
-        bool projectNameBool = (element.ProjectName.Equals(searchString1));
-        bool contractTypeBool = (element.ContractType.Contains(searchString2, StringComparison.OrdinalIgnoreCase));
-        bool paymentDateBool = (element.PaymentDate.Contains(searchString3, StringComparison.OrdinalIgnoreCase));
-        bool ssnBool = (element.Ssn.Equals(searchString4));
+        bool projectNameBool = (element.ProjectName.Equals(stringProjectName));
+        bool contractTypeBool = (element.ContractType.Contains(stringContract, StringComparison.OrdinalIgnoreCase));
+        bool paymentDateBool = (element.PaymentDate.Contains(stringPayment, StringComparison.OrdinalIgnoreCase));
+        string temp = element.Ssn.ToString();
+        bool ssnBool = (temp.Equals(stringSsn));
         
-        if ((projectNameBool && contractTypeBool && paymentDateBool) || ((projectNameBool && contractTypeBool) && string.IsNullOrWhiteSpace(searchString3)))
+        if ((projectNameBool && contractTypeBool && paymentDateBool && ssnBool ) || ((projectNameBool && contractTypeBool) && string.IsNullOrWhiteSpace(stringPayment) && string.IsNullOrWhiteSpace(stringSsn)))
             return true;
 
-        if ((projectNameBool && contractTypeBool && paymentDateBool) || ((projectNameBool && paymentDateBool) && string.IsNullOrWhiteSpace(searchString2)))
+        if ((projectNameBool && contractTypeBool && paymentDateBool && ssnBool) || ((projectNameBool && paymentDateBool) && string.IsNullOrWhiteSpace(stringContract) && string.IsNullOrWhiteSpace(stringSsn)))
             return true;
 
-        if ((projectNameBool && contractTypeBool && paymentDateBool) || ((contractTypeBool && paymentDateBool) && string.IsNullOrWhiteSpace(searchString1)))
+        if ((projectNameBool && contractTypeBool && paymentDateBool && ssnBool) || ((contractTypeBool && paymentDateBool) && string.IsNullOrWhiteSpace(stringProjectName) && string.IsNullOrWhiteSpace(stringSsn)))
             return true;
 
-        if ((string.IsNullOrWhiteSpace(searchString1) && string.IsNullOrWhiteSpace(searchString2) && string.IsNullOrWhiteSpace(searchString3)))
+        if ((projectNameBool && contractTypeBool && paymentDateBool && ssnBool) || ((projectNameBool && ssnBool) &&  string.IsNullOrWhiteSpace(stringContract) && string.IsNullOrWhiteSpace(stringPayment)))
+            return true;
+       
+        if ((projectNameBool && contractTypeBool && paymentDateBool && ssnBool) || ((paymentDateBool && ssnBool) &&  string.IsNullOrWhiteSpace(stringProjectName) && string.IsNullOrWhiteSpace(stringContract)))
+            return true;
+
+        if ((projectNameBool && contractTypeBool && paymentDateBool && ssnBool) || ((contractTypeBool && ssnBool) &&  string.IsNullOrWhiteSpace(stringProjectName) && string.IsNullOrWhiteSpace(stringPayment)))
+            return true;
+
+        if ((projectNameBool && contractTypeBool && paymentDateBool && ssnBool) || ((paymentDateBool && contractTypeBool && ssnBool) &&  string.IsNullOrWhiteSpace(stringProjectName)))
+            return true;
+
+        if ((projectNameBool && contractTypeBool && paymentDateBool && ssnBool) || ((projectNameBool && paymentDateBool && ssnBool) &&  string.IsNullOrWhiteSpace(stringContract)))
+            return true;
+
+        if ((projectNameBool && contractTypeBool && paymentDateBool && ssnBool) || ((projectNameBool && contractTypeBool && ssnBool) && string.IsNullOrWhiteSpace(stringPayment)))
+            return true;
+
+        if ((projectNameBool && contractTypeBool && paymentDateBool && ssnBool) || ((projectNameBool && contractTypeBool  && paymentDateBool) && string.IsNullOrWhiteSpace(stringSsn)))
+            return true;
+
+        if ((string.IsNullOrWhiteSpace(stringProjectName) && string.IsNullOrWhiteSpace(stringContract) && string.IsNullOrWhiteSpace(stringPayment) && string.IsNullOrWhiteSpace(stringSsn)))
             return true;  
 
-        if ((projectNameBool && contractTypeBool && paymentDateBool) || ((projectNameBool && contractTypeBool) && string.IsNullOrWhiteSpace(searchString4)))
-            return true;
 
         return false;
     }
