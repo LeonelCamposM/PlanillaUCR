@@ -7,6 +7,7 @@
 @using Domain.ReportOfHours.Entities
 @using Domain.Subscribes.Entities
 @using Domain.Subscriptions.Entities
+@using Presentation.Core.Components
 @using Presentation.Dashboard.Components
 @using System.Globalization
 @using Application.Payments
@@ -43,15 +44,35 @@ else
 <MudGrid>
     <MudItem xs="6">
         <MudPaper Class="pa-3" Height="380px" Elevation="3">
-            <MudText Align="Align.Left" Typo="Typo.h6">Cantidad de empleados por proyecto</MudText>
+            <MudText Align="Align.Left" Typo="Typo.h6">Cantidad de empleados por proyecto  &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&nbsp;&nbsp;<MudToggleIconButton @bind-Toggled="@barChart" Icon="@Icons.Filled.Fullscreen" Color="@Color.Primary" ToggledIcon="@Icons.Filled.FullscreenExit" Size="Size.Small" ToggledColor="@Color.Secondary" /> </MudText>
 
             <MudText Align="Align.Left" Typo="Typo.body1">
                <MudIcon  Style="@($"color: #026d7e")" Icon= "@Icons.Filled.Circle"/> Servicios Profesionales  
                <MudIcon  Style="@($"color: #3b7197")" Icon= "@Icons.Filled.Circle"/> Medio tiempo
                <MudIcon  Style="@($"color: #009393")" Icon= "@Icons.Filled.Circle"/> Tiempo completo  
            </MudText> 
-           
-            <MultiBarChart colorList="colorslist" title="" data="@profesionalData" data2="@midTimeData" data3="@fullTimeData"></MultiBarChart>
+            @if (barChart)
+            {
+                <Overlay IsOpen="barChart">
+                        <MudPaper Class="d-flex flex-column align-left border-none"  Elevation="0" Outlined="false" Style="max-width: 60vw; width: 60vw; height: 43vw; overflow: auto; max-height: 95vh; ">
+                            <MudText Align="Align.Left" Typo="Typo.h6">Cantidad de empleados por proyecto</MudText>
+
+                            <MudText Align="Align.Left" Typo="Typo.body1">
+                               <MudIcon  Style="@($"color: #026d7e")" Icon= "@Icons.Filled.Circle"/> Servicios Profesionales  
+                               <MudIcon  Style="@($"color: #3b7197")" Icon= "@Icons.Filled.Circle"/> Medio tiempo
+                               <MudIcon  Style="@($"color: #009393")" Icon= "@Icons.Filled.Circle"/> Tiempo completo  
+                           </MudText> 
+                            <MudItem xs="10">
+                            <MultiBarChart colorList="colorslist" title="" data="@profesionalData" data2="@midTimeData" data3="@fullTimeData"></MultiBarChart>
+                            </MudItem>
+                        </MudPaper>
+                        <MudItem xs="12" md="12" Style="width: 100%;" Class="d-flex justify-start">
+                            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ToggleBarChart" Size="Size.Medium">Cerrar</MudButton>
+                        </MudItem>
+                </Overlay>  
+            }else{ 
+                 <MultiBarChart colorList="colorslist" title="" data="@profesionalData" data2="@midTimeData" data3="@fullTimeData"></MultiBarChart>
+            }
         </MudPaper>
     </MudItem>
     <MudItem xs="6">
@@ -108,11 +129,42 @@ else
     </MudItem>
     <MudItem xs="6">
     <MudPaper Height="380px" Class="pa-3" Elevation="3">
-        <MudText Align="Align.Left" Typo="Typo.h6">Costo total por proyecto </MudText>
+        <MudText Align="Align.Left" Typo="Typo.h6">Costo total por proyecto &emsp;&emsp;&emsp; &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<MudToggleIconButton @bind-Toggled="@_isOpen" Icon="@Icons.Filled.Fullscreen" Color="@Color.Primary" ToggledIcon="@Icons.Filled.FullscreenExit" Size="Size.Small" ToggledColor="@Color.Secondary" /> </MudText>
         <MudText Align="Align.Left" Typo="Typo.body1">
                Total invertido en proyectos: @_cultureCR.NumberFormat.CurrencySymbol @CostFormat(@totalCost)
         </MudText> 
-        <PieChart colorList="colorslist" title="" data="@_data"></PieChart>
+        @if (_isOpen)
+        {
+            <Overlay IsOpen="_isOpen">
+                    <MudPaper Class="d-flex flex-column align-left border-none"  Elevation="0" Outlined="false" Style="max-width: 60vw; width: 60vw; height: 43vw; overflow: auto; max-height: 95vh; ">
+                        <MudText Align="Align.Left" Typo="Typo.h6"> &nbsp;&nbsp;&nbsp; Costo total por proyecto</MudText>
+                        <MudText Align="Align.Left" Typo="Typo.body1">
+                             &emsp; Total invertido en proyectos: @_cultureCR.NumberFormat.CurrencySymbol @CostFormat(@totalCost)
+                                @{
+                                    int counter = 0;
+                                    string summary = "";
+                                }
+                              <MudTreeView T="string">
+                                    <MudTreeViewItem Value="@("Total invertido por proyecto")">
+                                        @foreach (var item in _data)
+                                        { 
+                                            <MudTreeViewItem Value="@(item.Key+": "+@_cultureCR.NumberFormat.CurrencySymbol+ CostFormat(item.Value))" />
+                                        }
+                                    </MudTreeViewItem>
+                              </MudTreeView>
+                              </MudText>
+                            
+                         <MudItem xs="10">
+                        <PieChart colorList="colorslist" title="" data="@_data"></PieChart>
+                        </MudItem>
+                    </MudPaper>
+                    <MudItem xs="12" md="12" Style="width: 100%;" Class="d-flex justify-start">
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="TogglePieChart" Size="Size.Medium">Cerrar</MudButton>
+                    </MudItem>
+            </Overlay>  
+        }else{ 
+            <PieChart colorList="colorslist" title="" data="@_data"></PieChart>
+        }
     </MudPaper>
     </MudItem>
     
@@ -123,10 +175,13 @@ else
     [Parameter]
     public string email { get; set; }
     private bool _isLoading = true;
+    private bool _isOpen = false;
+    private bool barChart = false;
     private MudTable<ProjectModel> _tableLegalDeductions;
     private MudTable<Payment> _tableEmployerPayments;
     Dictionary<string, double> _data = new Dictionary<string, double>();
     Dictionary<string, double> profesionalData = new Dictionary<string, double>();
+    private string _summary { get; set; }
 
     Dictionary<string, double> midTimeData = new Dictionary<string, double>();
     Dictionary<string, double> fullTimeData = new Dictionary<string, double>();
@@ -328,5 +383,15 @@ else
     private void GoToPay(string selectedPay)
     {
         NavigationManager.NavigateTo($"/Approve_Payment/{email}/{selectedPay}/");
+    }
+
+    private void TogglePieChart()
+    {
+        _isOpen = !_isOpen;
+    }
+
+    private void ToggleBarChart()
+    {
+        barChart = !barChart;
     }
 }
