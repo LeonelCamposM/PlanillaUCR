@@ -250,16 +250,24 @@ else
 
     private async Task ConfirmDisableProject()
     {
+        EmailObject emailData = new EmailObject("", "", "", "", "");
         if (_justification != "")
         {
             foreach (Person activePerson in _activeEmployees)
             {
-                await AgreementService.DesactivateAgreement(activePerson.Email,personEmail, this.projectName, _justification);
+                //await AgreementService.DesactivateAgreement(activePerson.Email,personEmail, this.projectName, _justification);
+                //emailData.EmployeeName = person.Name + " " + person.LastName1 + " " + person.LastName2;
+                //emailData.EmployerName = PersonService.GetPersonByEmail(personEmail).fi;
+                //emailData.ProjectName = agreement.ProjectName;
+                //emailData.Message = justification;
+                //emailData.Destiny = agreement.EmployeeEmail;
+                //EmailService.SendFiredEmployeeEmail(emailData);
             }
             await DisableProject();
             CloseDialog();
         }
     }
+
 
     private bool FilterFuncEmployer(Project element) => FilterFuncR(element, _searchString);
 
