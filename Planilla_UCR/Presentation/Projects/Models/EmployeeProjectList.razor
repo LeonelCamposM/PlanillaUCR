@@ -109,7 +109,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         await LoadEmployee();
-        ShowDateLapse();
+        ShowDatesLapse();
     }       
 
 
@@ -166,11 +166,12 @@ else
         _table.NavigateTo(i - 1);
     }
 
-    private void ShowDateLapse()
+    private void ShowDatesLapse()
     {
         DateTime myDateTime = GetAgreementsDatesLapse("leonel@ucr.ac.cr", "Armario Vintage");
         int myDiff = CalculateDatesDifference(myDateTime);
         Snackbar.Add("Prueba de concepto con dayDiff: " + myDiff, Severity.Success);
+        EstablishContractLastDay();
     }
 
     private DateTime GetAgreementsDatesLapse(string employerEmail, string projectName)
@@ -190,5 +191,15 @@ else
         DateTime currentLocalTime = DateTime.Now;
         int daysDifference = (currentLocalTime - employeeStartDate).Days;
         return daysDifference;
+    }
+
+    private void EstablishContractLastDay()
+    {
+        DateTime contractEndDate = DateTime.Now;
+        DateTime myDateTime = GetAgreementsDatesLapse("leonel@ucr.ac.cr", "Armario Vintage");
+        int myDiff = CalculateDatesDifference(myDateTime);
+        Snackbar.Add("Prueba de concepto sin AddDays: " + contractEndDate, Severity.Success);
+        contractEndDate = contractEndDate.AddDays(myDiff);
+        Snackbar.Add("Prueba de concepto con AddDays: " + contractEndDate, Severity.Success);
     }
 }
