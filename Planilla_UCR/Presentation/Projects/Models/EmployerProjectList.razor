@@ -112,15 +112,25 @@ else
             </TitleContent>
             <DialogContent>
                 <MudItem xs="12" Class="d-flex justify-center align-center">
-                    <MudTextField @bind-Value="_agreementMessage" Label="Cantidad de contratos activos con los empleados:" 
-                        Lines= "4" Variant="Variant.Outlined" ReadOnly ="true">
+                    <MudTextField @bind-Value="_showMessage" Label="Cantidad de contratos activos con los empleados:" 
+                        Lines= "1" Variant="Variant.Outlined" ReadOnly ="true">
                     </MudTextField>
                 </MudItem>
+
+                <div class="d-flex align-end justify-space-between mud-width-full">
+                     <div class="d-flex flex-column">
+                        <MudItem xs="12" Class="d-flex justify-center align-center">
+                                <MudText><b>*Nota: Si confirma la desactivación de este proyecto se le enviará un correo a cada uno de los empleados 
+                                    que tiene actualmente contratados, indicando la desactivación de este proyecto. </b></MudText>
+                        </MudItem>
+                    </div>
+                </div>
+
                 <MudItem xs="12" Class="d-flex justify-center align-center">
                     <MudTextField Required="true" RequiredError="Incluya una justificación" @bind-Value="_justification" 
-                    Label="Si desea terminar los contratos asociados debe introducir una justificación:" Lines= "6" 
-                    Variant="Variant.Outlined">
-                </MudTextField>
+                    Label="Si desea
+                    terminar los contratos asociados debe introducir una justificación:" Lines= "6" 
+                    Variant="Variant.Outlined"></MudTextField>
                 </MudItem>
             </DialogContent>
             <DialogActions>
@@ -139,7 +149,7 @@ else
     private bool _visible;
     private bool _emptyProject = true;
     private bool _loading = true;
-    private string _agreementMessage = "";
+    private string _showMessage = "";
     private string _justification = "";
     private string _searchString = "";
 
@@ -176,7 +186,7 @@ else
             _emptyProject = false;
         }
         await InvokeAsync(StateHasChanged);
-         _loading = false;
+        _loading = false;
     }
 
     private void SelectActiveProjects()
@@ -212,8 +222,6 @@ else
 
     public int CheckActiveAgreements(int amountOfAgreements)
     {
-        _agreementMessage = "";
-        int size = _agreements.Length();
         foreach (Agreement actualAgreement in _agreements)
         {
             if (actualAgreement.ProjectName == projectName && actualAgreement.ContractFinishDate > DateTime.Now)
@@ -224,14 +232,17 @@ else
                     {
                         amountOfAgreements++;
                         _activeEmployees.Add(actualPerson);
-                        _agreementMessage += "Nombre: " + actualPerson.Name + " " + actualPerson.LastName1 + " " + 
-                                    actualPerson.LastName2 + ". Email: " + actualAgreement.EmployeeEmail + " \n";
                     }
                 }
             }
         }
+
         if (amountOfAgreements > 0)
         {
+            if (amountOfAgreements == 1)
+                _showMessage = $"{amountOfAgreements} contrato activo";
+            else 
+                _showMessage = $"{amountOfAgreements} contratos activos"; 
             OpenDialog();
         }
         return amountOfAgreements;
