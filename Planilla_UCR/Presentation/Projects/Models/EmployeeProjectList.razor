@@ -109,13 +109,14 @@ else
     protected override async Task OnInitializedAsync()
     {
         await LoadEmployee();
+        ShowDateLapse();
     }       
 
-    
+
     private async Task LoadEmployee() 
     {
         _agreements = await AgreementService.GetEmployeeAgreements(personEmail);
-        
+
         if (_agreements.Length() > 0)
         {
             _people = await PersonService.GetAllPeopleAsync();
@@ -163,5 +164,31 @@ else
     private void PageChangedE(int i)
     {
         _table.NavigateTo(i - 1);
+    }
+
+    private void ShowDateLapse()
+    {
+        DateTime myDateTime = GetAgreementsDatesLapse("leonel@ucr.ac.cr", "Armario Vintage");
+        int myDiff = CalculateDatesDifference(myDateTime);
+        Snackbar.Add("Prueba de concepto con dayDiff: " + myDiff, Severity.Success);
+    }
+
+    private DateTime GetAgreementsDatesLapse(string employerEmail, string projectName)
+    {
+        var myQuery = from a in _agreements
+                      where a.EmployeeEmail == personEmail && a.EmployerEmail == employerEmail && a.ProjectName == projectName
+                      select new
+                      {
+                          Date = a.ContractStartDate
+                      };
+        DateTime employeeStartDate = (DateTime) myQuery.FirstOrDefault().Date;
+        return employeeStartDate;
+    }
+
+    private int CalculateDatesDifference(DateTime employeeStartDate)
+    {
+        DateTime currentLocalTime = DateTime.Now;
+        int daysDifference = (currentLocalTime - employeeStartDate).Days;
+        return daysDifference;
     }
 }
