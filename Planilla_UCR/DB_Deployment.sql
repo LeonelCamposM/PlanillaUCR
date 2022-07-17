@@ -579,7 +579,7 @@ BEGIN
 	SET Agreement.ContractStartDate = @ContractStartDate, Agreement.ContractType = @ContractType, 
 	Agreement.MountPerHour = @MountPerHour, Agreement.ContractFinishDate = @ContractFinishDate,
 	Agreement.IsEnabled = 1, Agreement.Justification = ''
-	WHERE Agreement.EmployeeEmail = @EmployeeEmail AND Agreement.EmployerEmail = @EmployerEmail AND Agreement.ProjectName = @ProjectName and Agreement.IsEnabled <= 0;
+	WHERE Agreement.EmployeeEmail = @EmployeeEmail AND Agreement.EmployerEmail = @EmployerEmail AND Agreement.ProjectName = @ProjectName and Agreement.IsEnabled <= 1;
 END
 -- Payment stored procedures
 

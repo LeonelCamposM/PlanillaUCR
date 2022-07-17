@@ -171,7 +171,9 @@ else
         DateTime myDateTime = GetAgreementsDatesLapse("leonel@ucr.ac.cr", "Armario Vintage");
         int myDiff = CalculateDatesDifference(myDateTime);
         Snackbar.Add("Prueba de concepto con dayDiff: " + myDiff, Severity.Success);
-        EstablishContractLastDay();
+        DateTime contractEndDate = SetContractLastDay("leonel@ucr.ac.cr", "Armario Vintage");
+        UpdateEmployeeAgreement("leonel@ucr.ac.cr", "Armario Vintage");
+        Snackbar.Add("Prueba de concepto con AddDays: " + contractEndDate, Severity.Success);
     }
 
     private DateTime GetAgreementsDatesLapse(string employerEmail, string projectName)
@@ -193,13 +195,57 @@ else
         return daysDifference;
     }
 
-    private void EstablishContractLastDay()
+    private DateTime SetContractLastDay(string employerEmail, string projectName)
     {
         DateTime contractEndDate = DateTime.Now;
-        DateTime myDateTime = GetAgreementsDatesLapse("leonel@ucr.ac.cr", "Armario Vintage");
+        DateTime myDateTime = GetAgreementsDatesLapse(employerEmail, projectName);
         int myDiff = CalculateDatesDifference(myDateTime);
-        Snackbar.Add("Prueba de concepto sin AddDays: " + contractEndDate, Severity.Success);
         contractEndDate = contractEndDate.AddDays(myDiff);
-        Snackbar.Add("Prueba de concepto con AddDays: " + contractEndDate, Severity.Success);
+        return contractEndDate;
+    }
+
+    private void UpdateEmployeeAgreement(string employerEmail, string projectName)
+    {
+        IEnumerable<Agreement> myAgreement = RetrieveEmployeeContract(employerEmail, projectName);
+        DateTime endDate = SetContractLastDay(employerEmail, projectName);
+        Agreement employeeAgreement = SetAgreementInfo(myAgreement, endDate);
+        AgreementService.UpdateAgreementStatus(employeeAgreement);
+    }
+
+    private  IEnumerable<Agreement> RetrieveEmployeeContract(string employerEmail, string projectName)
+    {
+        IEnumerable<Agreement> myAgreement = new List<Agreement>();
+        myAgreement = from A in _agreements
+                      where A.IsEnabled == 1 && A.EmployerEmail == employerEmail &&
+                      A.EmployeeEmail == personEmail && A.ProjectName == projectName
+                      select A;
+        return myAgreement;
+    }
+
+    private Agreement SetAgreementInfo(IEnumerable<Agreement> myAgreement, DateTime EndDate)
+    {
+        string myEmployeeEmail = myAgreement.FirstOrDefault().EmployeeEmail;
+        string myEmployerEmail = myAgreement.FirstOrDefault().EmployerEmail;
+        string myProjectName = myAgreement.FirstOrDefault().ProjectName;
+        DateTime? myContractStartDate = myAgreement.FirstOrDefault().ContractStartDate;
+        string myContractType = myAgreement.FirstOrDefault().ContractType;
+        int myMountPerHour = myAgreement.FirstOrDefault().MountPerHour;
+        DateTime? myContractFinishDate = EndDate;
+        int myIsEnabled = myAgreement.FirstOrDefault().IsEnabled;
+        string myJustification = myAgreement.FirstOrDefault().Justification;
+        Agreement employeeAgreement = new Agreement(myEmployeeEmail,myEmployerEmail, myProjectName,
+            myContractStartDate, myContractType, myMountPerHour, myContractFinishDate, myIsEnabled, myJustification);
+        return employeeAgreement;
+    }
+
+
+    private void SendEmailToEmployee()
+    {
+
+    }
+
+    private void SendEmailToEmployer()
+    {
+        
     }
 }
