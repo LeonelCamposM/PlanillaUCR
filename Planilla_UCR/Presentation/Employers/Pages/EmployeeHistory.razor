@@ -17,15 +17,12 @@
 @using Application.Payments
 @using Presentation.Employers.Models
 @using Presentation.Employers.XLS
-
 @using System.IO
-@inject IJSRuntime js
 @using System.Globalization
-
 
 @inject NavigationManager nav
 @inject ISnackbar Snackbar
-
+@inject IJSRuntime js
 @inject IPersonService PersonService
 @inject IProjectService ProjectService
 @inject IAgreementService AgreementService
@@ -35,7 +32,6 @@
 @inject ILegalDeductionService LegalDeductionService
 @inject ITaxCalculatorService TaxCalculatorService
 @inject IPaymentCalculatorService PaymentCalculatorService
-
 
 @if (_loading)
 {
@@ -58,7 +54,6 @@ else
     </MudPaper>
     if (!_emptyHistory)
     {
-
         <MudGrid>
             <MudItem xs="12" Class="d-flex justify-center align-center">
                 <MudItem xs="8">
@@ -67,7 +62,7 @@ else
                 </MudItem>
         </MudGrid>
         <br>
-        <MudTable Style="pt-6" @ref="@_table" Items="@_paymentsHistory" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_emptyHistory" LoadingProgressColor="Color.Primary" Filter="new Func<EmployeeHistoryList,bool>(FiltersFunc)">  
+        <MudTable Style="pt-6" @ref="@_table" Items="@_paymentsHistory" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_emptyHistory" LoadingProgressColor="Color.Primary" Filter="new Func<EmployeeHistoryList,bool>(FiltersFunction)">  
 
             <ToolBarContent>
                 <MudItem xs="2">
@@ -140,7 +135,6 @@ else
                 <MudTh Style="text-align:justify-all">Deducciones obligatorias empleado</MudTh>
                 <MudTh Style="text-align:justify-all">Deducciones voluntarias</MudTh>
                 <MudTh Style="text-align:justify-all">Costo empleador</MudTh>
-
             </HeaderContent>
 
             <RowTemplate Context="row">
@@ -177,7 +171,6 @@ else
 @code {
     private bool _emptyHistory = true; 
     private bool _loading = true; 
-
     private string _projectNameFilter = "";
     private string _contracTypeFilter = "";
     private string _paymentDateFilter = "";
@@ -194,19 +187,15 @@ else
     private IList<String> _paymentsSsn = new List<String>();
     private MudTable<EmployeeHistoryList> _table;
     private EmployeeHistoryList[] _paymentsHistoryExcel;
-
     private CultureInfo _cultureCR = CultureInfo.GetCultureInfo("es-CR");
 
     [Parameter] public string employerEmail { get; set; }
-
-
 
     protected override async Task OnInitializedAsync()
     {
         _agreements = await AgreementService.GetEmployerAgreements(employerEmail);
         _emptyHistory = false;
-
-        if(_agreements.Length() > 0) 
+        if (_agreements.Length() > 0) 
         {
             _emptyHistory = false;
             _payment = await PaymentService.GetEmployerPayments(employerEmail);
@@ -227,7 +216,7 @@ else
                            join P in _projects on A.ProjectName equals P.ProjectName 
                            where A.IsEnabled == 1 
                            select new EmployeeHistoryList
-                            {
+                           {
                                 ProjectName = A.ProjectName,
                                 EmployeeName = Pe.Name,
                                 EmployeeLastName1 = Pe.LastName1,
@@ -235,7 +224,7 @@ else
                                 EmployeeEmail = A.EmployeeEmail,
                                 Ssn = Pe.Ssn,
                                 ContractType = A.ContractType,
-                            };
+                           };
     }
 
     private async Task FillColumns()
@@ -280,7 +269,6 @@ else
             {
                 if (!person.ContractType.Equals("Servicios profesionales") && pay.EmployeeEmail == person.EmployeeEmail)
                 {
-
                     foreach (var item in _legalDeductions)
                     {
                         costLegalDeductions += TaxCalculatorService.GetTaxAmount(item.DeductionName, pay.GrossSalary);
@@ -295,7 +283,6 @@ else
     private async Task GetAllVoluntaryDeductions()
     {
         IList<EmployeeHistoryList> temporalList = _paymentsHistory.ToList();
-
         foreach (EmployeeHistoryList person in temporalList)
         {
             double costVoluntaryDeductions = 0.0;
@@ -305,10 +292,8 @@ else
                 {
                     Subscribe searchSubscribe= new Subscribe(pay.EmployeeEmail,pay.EmployerEmail, pay.ProjectName, "", 0.0, pay.StartDate, pay.EndDate);
                     IList<Subscription> subscriptions = (await SubscribeService.GetSubscriptionCostsByDate(searchSubscribe)).ToList();
-
                     costVoluntaryDeductions += PaymentCalculatorService.DeductionsCost(subscriptions);
                 }
-
             }
             person.VoluntaryDeductions = costVoluntaryDeductions;
         }
@@ -319,7 +304,6 @@ else
     {
         IList<Subscription> benefits;
         IList<EmployeeHistoryList> temporalList = _paymentsHistory.ToList();
-
         foreach (EmployeeHistoryList person in temporalList)
         {
             double costBenefits = 0.0;
@@ -337,12 +321,9 @@ else
         _paymentsHistory = temporalList.AsEnumerable();
     }
 
-
-
     private void GetTotalSocialCharges()
     {
         IList<EmployeeHistoryList> temporalList = _paymentsHistory.ToList();
-
         foreach (EmployeeHistoryList person in temporalList)
         {
             double totalSocialCharges = 0.0;
@@ -355,7 +336,6 @@ else
             deductionName = "Ley de protección al trabajador (4.75%)";         
             deductionCost = Math.Round(TaxCalculatorService.GetWorkerWarrantiesEmployerTaxes(person.GrossSalary),2);         
             totalSocialCharges += deductionCost;
-
             person.EmployerSocialCharges = totalSocialCharges;
             _paymentsHistory = temporalList.AsEnumerable();
         }
@@ -448,52 +428,140 @@ else
         _ssnFilter = selected; 
     }
 
-    private bool FiltersFunc(EmployeeHistoryList element) => 
-        FilterFunc(element, _projectNameFilter,_contracTypeFilter, _paymentDateFilter, _ssnFilter);
+    private bool FiltersFunction(EmployeeHistoryList element) => 
+        FilterFunction(element, _projectNameFilter,_contracTypeFilter, _paymentDateFilter, _ssnFilter);
 
-    private bool FilterFunc(EmployeeHistoryList element, string stringProjectName, string stringContract, string stringPayment, string stringSsn)
+    private bool FilterFunction(EmployeeHistoryList element, string stringProjectName, string stringContract, string stringPayment, string stringSsn)
     {
+        bool results = false;
         bool projectNameBool = (element.ProjectName.Equals(stringProjectName));
         bool contractTypeBool = (element.ContractType.Contains(stringContract, StringComparison.OrdinalIgnoreCase));
         bool paymentDateBool = (element.PaymentDate.Contains(stringPayment, StringComparison.OrdinalIgnoreCase));
         string temp = element.Ssn.ToString();
         bool ssnBool = (temp.Equals(stringSsn));
-        
-        if ((projectNameBool && contractTypeBool && paymentDateBool && ssnBool ) || ((projectNameBool && contractTypeBool) && string.IsNullOrWhiteSpace(stringPayment) && string.IsNullOrWhiteSpace(stringSsn)))
-            return true;
-
-        if ((projectNameBool && contractTypeBool && paymentDateBool && ssnBool) || ((projectNameBool && paymentDateBool) && string.IsNullOrWhiteSpace(stringContract) && string.IsNullOrWhiteSpace(stringSsn)))
-            return true;
-
-        if ((projectNameBool && contractTypeBool && paymentDateBool && ssnBool) || ((contractTypeBool && paymentDateBool) && string.IsNullOrWhiteSpace(stringProjectName) && string.IsNullOrWhiteSpace(stringSsn)))
-            return true;
-
-        if ((projectNameBool && contractTypeBool && paymentDateBool && ssnBool) || ((projectNameBool && ssnBool) &&  string.IsNullOrWhiteSpace(stringContract) && string.IsNullOrWhiteSpace(stringPayment)))
-            return true;
-       
-        if ((projectNameBool && contractTypeBool && paymentDateBool && ssnBool) || ((paymentDateBool && ssnBool) &&  string.IsNullOrWhiteSpace(stringProjectName) && string.IsNullOrWhiteSpace(stringContract)))
-            return true;
-
-        if ((projectNameBool && contractTypeBool && paymentDateBool && ssnBool) || ((contractTypeBool && ssnBool) &&  string.IsNullOrWhiteSpace(stringProjectName) && string.IsNullOrWhiteSpace(stringPayment)))
-            return true;
-
-        if ((projectNameBool && contractTypeBool && paymentDateBool && ssnBool) || ((paymentDateBool && contractTypeBool && ssnBool) &&  string.IsNullOrWhiteSpace(stringProjectName)))
-            return true;
-
-        if ((projectNameBool && contractTypeBool && paymentDateBool && ssnBool) || ((projectNameBool && paymentDateBool && ssnBool) &&  string.IsNullOrWhiteSpace(stringContract)))
-            return true;
-
-        if ((projectNameBool && contractTypeBool && paymentDateBool && ssnBool) || ((projectNameBool && contractTypeBool && ssnBool) && string.IsNullOrWhiteSpace(stringPayment)))
-            return true;
-
-        if ((projectNameBool && contractTypeBool && paymentDateBool && ssnBool) || ((projectNameBool && contractTypeBool  && paymentDateBool) && string.IsNullOrWhiteSpace(stringSsn)))
-            return true;
-
-        if ((string.IsNullOrWhiteSpace(stringProjectName) && string.IsNullOrWhiteSpace(stringContract) && string.IsNullOrWhiteSpace(stringPayment) && string.IsNullOrWhiteSpace(stringSsn)))
-            return true;  
 
 
-        return false;
+        results = FindFilters(projectNameBool, contractTypeBool, paymentDateBool, ssnBool, 
+           stringProjectName, stringContract, stringPayment, stringSsn);
+
+        return results;
+    }
+
+    private bool FindFilters(bool projectNameBool, bool contractTypeBool, bool paymentDateBool,
+    bool ssnBool,string stringProjectName,string stringContract,string stringPayment, string stringSsn)
+    {
+        bool results = false;
+        results = GetFirstConditional(projectNameBool, contractTypeBool, paymentDateBool, ssnBool, 
+           stringProjectName, stringContract, stringPayment, stringSsn);
+        if (!results)
+            results = GetSecondConditional(projectNameBool, contractTypeBool, paymentDateBool, ssnBool, 
+                stringProjectName, stringContract, stringPayment, stringSsn);
+        if (!results)
+            results = GetThirdConditional(projectNameBool, contractTypeBool, paymentDateBool, ssnBool, 
+                stringProjectName, stringContract, stringPayment, stringSsn);
+        if (!results)
+            results = GetFourthConditional(projectNameBool, contractTypeBool, paymentDateBool, ssnBool, 
+                stringProjectName, stringContract, stringPayment, stringSsn);
+        if (!results)
+            results = GetFifthConditional(projectNameBool, contractTypeBool, paymentDateBool, ssnBool, 
+                stringProjectName, stringContract, stringPayment, stringSsn);
+        return results;
+    }
+
+    private bool GetFirstConditional(bool projectNameBool, bool contractTypeBool, bool paymentDateBool,
+    bool ssnBool,string stringProjectName,string stringContract,string stringPayment, string stringSsn)
+    {
+        bool results = false;
+        if ((projectNameBool && contractTypeBool && paymentDateBool && ssnBool) ||
+        ((projectNameBool && contractTypeBool) && string.IsNullOrWhiteSpace(stringPayment)
+        && string.IsNullOrWhiteSpace(stringSsn)))
+        {
+            results = true;
+        }
+        else if ((projectNameBool && contractTypeBool && paymentDateBool && ssnBool) ||
+        ((projectNameBool && paymentDateBool) && string.IsNullOrWhiteSpace(stringContract)
+        && string.IsNullOrWhiteSpace(stringSsn)))
+        {
+            results = true;
+        }
+        return results;
+    }
+
+    private bool GetSecondConditional(bool projectNameBool, bool contractTypeBool, bool paymentDateBool,
+    bool ssnBool,string stringProjectName,string stringContract,string stringPayment, string stringSsn)
+    {
+        bool results = false;
+        if ((projectNameBool && contractTypeBool && paymentDateBool && ssnBool) ||
+        ((contractTypeBool && paymentDateBool) && string.IsNullOrWhiteSpace(stringProjectName)
+        && string.IsNullOrWhiteSpace(stringSsn)))
+        {
+            results = true;
+        }
+        else if ((projectNameBool && contractTypeBool && paymentDateBool && ssnBool) ||
+        ((projectNameBool && ssnBool) && string.IsNullOrWhiteSpace(stringContract)
+        && string.IsNullOrWhiteSpace(stringPayment)))
+        {
+            results = true;
+        }
+        return results;
+    }
+
+    private bool GetThirdConditional(bool projectNameBool, bool contractTypeBool, bool paymentDateBool,
+    bool ssnBool,string stringProjectName,string stringContract,string stringPayment, string stringSsn)
+    {
+        bool results = false;
+        if ((projectNameBool && contractTypeBool && paymentDateBool && ssnBool) || 
+        ((paymentDateBool && ssnBool) &&  string.IsNullOrWhiteSpace(stringProjectName) 
+        && string.IsNullOrWhiteSpace(stringContract)))
+        {
+            results = true;
+        }
+        else if ((projectNameBool && contractTypeBool && paymentDateBool && ssnBool) || 
+        ((contractTypeBool && ssnBool) &&  string.IsNullOrWhiteSpace(stringProjectName) 
+        && string.IsNullOrWhiteSpace(stringPayment)))
+        {
+            results = true;
+        }
+        return results;
+    }
+
+    private bool GetFourthConditional(bool projectNameBool, bool contractTypeBool, bool paymentDateBool,
+    bool ssnBool,string stringProjectName,string stringContract,string stringPayment, string stringSsn)
+    {
+        bool results = false;
+        if ((projectNameBool && contractTypeBool && paymentDateBool && ssnBool) || 
+        ((paymentDateBool && contractTypeBool && ssnBool) &&  string.IsNullOrWhiteSpace(stringProjectName)))
+        {
+            results = true;
+        }
+        else if ((projectNameBool && contractTypeBool && paymentDateBool && ssnBool) || 
+        ((projectNameBool && paymentDateBool && ssnBool) &&  string.IsNullOrWhiteSpace(stringContract)))
+        {
+            results = true;
+        }
+        return results;
+    }
+
+    private bool GetFifthConditional(bool projectNameBool, bool contractTypeBool, bool paymentDateBool,
+    bool ssnBool,string stringProjectName,string stringContract,string stringPayment, string stringSsn)
+    {
+        bool results = false;
+        if ((projectNameBool && contractTypeBool && paymentDateBool && ssnBool) || 
+        ((projectNameBool && contractTypeBool && ssnBool) && string.IsNullOrWhiteSpace(stringPayment)))
+        {
+            results = true;
+        }
+        else if  ((projectNameBool && contractTypeBool && paymentDateBool && ssnBool) || 
+        ((projectNameBool && contractTypeBool  && paymentDateBool) && string.IsNullOrWhiteSpace(stringSsn)))
+        {
+            results = true;
+        } 
+        else if ((string.IsNullOrWhiteSpace(stringProjectName) && string.IsNullOrWhiteSpace(stringContract) 
+        && string.IsNullOrWhiteSpace(stringPayment) && string.IsNullOrWhiteSpace(stringSsn)))
+        {
+            results = true;
+        }
+        return results;
     }
 
     //Excel
