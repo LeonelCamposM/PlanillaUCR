@@ -164,7 +164,6 @@
     protected override async Task OnInitializedAsync()
     {
         personInfo.Email = userEmail;
-        //REVISAR
         personInfo = await PersonService.GetInfoPerson(personInfo);
         if (personInfo.IsEnabled==1 && personInfo != null)
         {
@@ -218,7 +217,6 @@
         foreach(var agreement in agreementsList)
         {
             firedEmployee.Email = agreement.EmployeeEmail;
-            //REVISAR - ME VA A TRAER LOS EMPLEADOS EN IS ENABLED = 0?
             firedEmployee = await PersonService.GetInfoPerson(firedEmployee);
             var firedEmployeeName = firedEmployee.Name + " " + firedEmployee.LastName1;
             var employerName = personInfo.Name+ " " + personInfo.LastName1 + " " + personInfo.LastName2;

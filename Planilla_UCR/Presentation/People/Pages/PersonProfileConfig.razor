@@ -148,7 +148,6 @@
     protected override async Task OnInitializedAsync()
     {
         personInfo.Email = userEmail;
-        //REVISAR
         personInfo = await PersonService.GetInfoPerson(personInfo);
         oldName = personInfo.Name;
         oldLastName1 = personInfo.LastName1;
@@ -237,7 +236,6 @@
         personInfo.BankAccount = oldBankAccount;
         personInfo.Adress = oldAdress;
         personInfo.PhoneNumber = oldPhoneNumber;
-        //REVISAR - CREO QUE SI FUNCIONA
         personInfo = await PersonService.GetInfoPerson(personInfo);
         nav.NavigateTo($"Profile/{userEmail}");
     }
