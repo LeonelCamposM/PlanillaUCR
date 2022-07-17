@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Application.Employers.Implementations
 {
-    internal class EmployerService : IEmployerService
+    public class EmployerService : IEmployerService
     {
         private readonly IEmployerRepository _employerRepository;
 
