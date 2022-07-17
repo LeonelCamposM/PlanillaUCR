@@ -1209,6 +1209,34 @@ VALUES('leonel@ucr.ac.cr', 'Terra Dulce','mau@ucr.ac.cr', '2022-06-17',5.0 ,0)
 INSERT INTO ReportOfHours
 VALUES('leonel@ucr.ac.cr', 'Terra Dulce','mau@ucr.ac.cr', '2022-06-20',8.0 ,0)
 
+----
+INSERT INTO ReportOfHours
+VALUES('leonel@ucr.ac.cr', 'Dulces artesanales','jeremy@ucr.ac.cr', '2022-07-11',8.0 ,0)
+
+INSERT INTO ReportOfHours
+VALUES('leonel@ucr.ac.cr', 'Dulces artesanales','jeremy@ucr.ac.cr', '2022-07-12',5.0 ,0)
+
+INSERT INTO ReportOfHours
+VALUES('leonel@ucr.ac.cr', 'Dulces artesanales','jeremy@ucr.ac.cr', '2022-07-08',8.0 ,0)
+
+INSERT INTO ReportOfHours
+VALUES('leonel@ucr.ac.cr', 'Dulces artesanales','jeremy@ucr.ac.cr', '2022-07-07',7.0 ,0)
+
+INSERT INTO ReportOfHours
+VALUES('leonel@ucr.ac.cr', 'Dulces artesanales','jeremy@ucr.ac.cr', '2022-07-06',6.0 ,0)
+
+INSERT INTO ReportOfHours
+VALUES('leonel@ucr.ac.cr', 'Dulces artesanales','jeremy@ucr.ac.cr', '2022-07-05',8.0 ,0)
+
+INSERT INTO ReportOfHours
+VALUES('leonel@ucr.ac.cr', 'Dulces artesanales','jeremy@ucr.ac.cr', '2022-07-04',3.0 ,0)
+
+INSERT INTO ReportOfHours
+VALUES('leonel@ucr.ac.cr', 'Dulces artesanales','jeremy@ucr.ac.cr', '2022-07-03',9.0 ,0)
+
+INSERT INTO ReportOfHours
+VALUES('leonel@ucr.ac.cr', 'Dulces artesanales','jeremy@ucr.ac.cr', '2022-07-01',8.0 ,0)
+----
 
 INSERT INTO Subscribes (EmployerEmail, ProjectName, SubscriptionName, EmployeeEmail, Cost, StartDate)
 VALUES('leonel@ucr.ac.cr',
