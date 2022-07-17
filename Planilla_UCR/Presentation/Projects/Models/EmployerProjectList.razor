@@ -5,6 +5,7 @@
 @using Application.Projects
 @using Application.Agreements
 @using Application.People
+@using Application.Email
 @using Application.AgreementTypes
 @using Presentation.Core.Components
 @using Presentation.Projects.Models
@@ -15,6 +16,7 @@
 @inject ISnackbar Snackbar
 
 @inject IPersonService PersonService
+@inject IEmailServices EmailService
 @inject IProjectService ProjectService
 @inject IAgreementService AgreementService
 @inject IAgreementTypeService AgreementTypeService
@@ -255,13 +257,19 @@ else
         {
             foreach (Person activePerson in _activeEmployees)
             {
-                //await AgreementService.DesactivateAgreement(activePerson.Email,personEmail, this.projectName, _justification);
-                //emailData.EmployeeName = person.Name + " " + person.LastName1 + " " + person.LastName2;
-                //emailData.EmployerName = PersonService.GetPersonByEmail(personEmail).fi;
-                //emailData.ProjectName = agreement.ProjectName;
-                //emailData.Message = justification;
-                //emailData.Destiny = agreement.EmployeeEmail;
-                //EmailService.SendFiredEmployeeEmail(emailData);
+                foreach (Agreement actualAgreement in _agreements)
+                {
+                    if (actualAgreement.EmployeeEmail == activePerson.Email)
+                    {
+                        await AgreementService.DesactivateAgreement(activePerson.Email, personEmail, this.projectName, _justification);
+                        emailData.EmployeeName = activePerson.Name + " " + activePerson.LastName1 + " " + activePerson.LastName2;
+                        emailData.EmployerName = actualAgreement.EmployerEmail;
+                        emailData.ProjectName = actualAgreement.ProjectName;
+                        emailData.Message = _justification;
+                        emailData.Destiny = actualAgreement.EmployeeEmail;
+                        EmailService.SendFiredEmployeeEmail(emailData);
+                    }
+                }
             }
             await DisableProject();
             CloseDialog();
