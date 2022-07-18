@@ -62,9 +62,9 @@ namespace Application.Agreements.Implementations
         {
             return await _agreementRepository.CheckIfAgreementIsDesactivated(agreement);
         }
-        public void UpdateAgreementStatus(Agreement agreement)
+        public async Task UpdateAgreementStatus(Agreement agreement)
         {
-            _agreementRepository.UpdateAgreementStatus(agreement);
+            await _agreementRepository.UpdateAgreementStatus(agreement);
         }
 
         public async Task<IEnumerable<Agreement>>? GetErasableAgreeements(string employeeEmail)

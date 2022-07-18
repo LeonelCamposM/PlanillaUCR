@@ -110,7 +110,7 @@ namespace Infrastructure.Agreements.Repositories
             return agreementList;
         }
 
-        public void UpdateAgreementStatus(Agreement agreement)
+        public async Task UpdateAgreementStatus(Agreement agreement)
         {
             SqlParameter myEmployeeEmail = new SqlParameter("@EmployeeEmail", agreement.EmployeeEmail);
             SqlParameter myEmployerEmail = new SqlParameter("@EmployerEmail", agreement.EmployerEmail);
@@ -120,7 +120,7 @@ namespace Infrastructure.Agreements.Repositories
             SqlParameter myContractType = new SqlParameter("@ContractType", agreement.ContractType);
             SqlParameter myMountPerHour = new SqlParameter("@MountPerHour", agreement.MountPerHour);
 
-            _dbContext.Agreements.FromSqlRaw("EXEC UpdateAgreementStatus {0},{1},{2},{3},{4},{5},{6}",
+            await _dbContext.Agreements.FromSqlRaw("EXEC UpdateAgreementStatus {0},{1},{2},{3},{4},{5},{6}",
                 myEmployeeEmail, myEmployerEmail, myProjectName, myContractStartDate, myContractFinishDate, myContractType, myMountPerHour).ToListAsync();
         }
 
