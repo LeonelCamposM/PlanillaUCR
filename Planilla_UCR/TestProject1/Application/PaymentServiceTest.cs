@@ -65,5 +65,24 @@ namespace Tests.Application
             //assert
             pendingProjects.Length().Should().Be(3);
         }
+
+        [Fact]
+        public void GetEmployeeLatestPayment()
+        {
+            //arrange
+            string _employeeEmail = "mau@ucr.ac.cr";
+            var mockPaymentRepository = new Mock<IPaymentRepository>();
+            var paymentService = new PaymentService(mockPaymentRepository.Object);
+            mockPaymentRepository.Setup(repo => repo.GetEmployeeLatestPayments("mau@ucr.ac.cr")).ReturnsAsync(paymentsList.Where(
+                e => e.EmployerEmail == _employeeEmail));
+
+            //act
+            var lastestPaymentTest = paymentService.GetEmployeeLatestPayments(_employeeEmail);
+
+            //assert
+            mockPaymentRepository.Verify(repo => repo.GetEmployeeLatestPayments(_employeeEmail), Times.Once);
+            lastestPaymentTest.Count().Should().Equals(5);
+        }
+
     }
 }
