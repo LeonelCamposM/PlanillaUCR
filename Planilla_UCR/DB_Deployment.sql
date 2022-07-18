@@ -463,7 +463,7 @@ CREATE OR ALTER PROCEDURE DisabledAccountEmployer(
 ) AS
 BEGIN
 	UPDATE Person
-	SET Email = 'BORRADO*'+ @EmployerEmail
+	SET Email = 'BORRADO*'+ CAST(GETDATE() AS varchar(20)) +'*'+ @EmployerEmail
 	WHERE Email = @EmployerEmail
 END
 
@@ -761,9 +761,10 @@ VALUES('leonel@ucr.ac.cr',
 '2022-06-14'
 )
 
+
 INSERT INTO Project
 VALUES('nyazofeifa3003@gmail.com',
-'Fábrica de chocolates',
+'Fabrica de chocolates',
 'Emprendimiento de chocolates',
 15000,
 10,
@@ -1197,7 +1198,7 @@ VALUES('jeremy@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Trendy Purse','2022-06-1','Tiemp
 
 
 INSERT INTO Agreement
-VALUES('nayeri.azofeifa@ucr.ac.cr', 'nyazofeifa3003@gmail.com', 'Fábrica de chocolates','2022-06-1','Tiempo completo', 1600, '2026-06-1', 1, '')
+VALUES('nayeri.azofeifa@ucr.ac.cr', 'nyazofeifa3003@gmail.com', 'Fabrica de chocolates','2022-06-1','Tiempo completo', 1600, '2026-06-1', 1, '')
 
 
 INSERT INTO ReportOfHours
