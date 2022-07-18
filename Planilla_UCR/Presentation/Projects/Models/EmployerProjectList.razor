@@ -104,7 +104,7 @@ else
         <MudButton Variant="Variant.Filled" OnClick="GoToCreate" Color="Color.Primary">Crear proyecto</MudButton>
 
                 
-        <MudDialog @bind-IsVisible="_visible" Options="dialogOptions">
+        <MudDialog @bind-IsVisible="_visible" Options="dialogOptions Style="text-align:justify-all">
             <TitleContent>
                 <MudText Typo="Typo.h6" Style="text-align:justify-all" >
                     <MudIcon Icon="@Icons.Material.Filled.Warning" Color="@Color.Primary" Class="mr-2"/> 
@@ -119,11 +119,14 @@ else
                     </MudTextField>
                 </MudItem>
 
-                <div class="d-flex mud-width-full">
+                <div class="d-flex mud-width-full text-align:justify-all">
                      <div class="d-flex flex-column">
-                        <MudItem xs="12" Class="d-flex" Style="text-align:justify-all">
-                                <MudText><b  Style="text-align:justify-all">*Nota: Si confirma la desactivación de este proyecto se le enviará un correo a cada uno de los empleados 
-                                    que tiene actualmente contratados, indicando el motivo de la desactivación de este proyecto. </b></MudText>
+                        <MudItem xs="12" Class=" d-flex text-align:justify-all">
+                                <MudText Class=" d-flex text-align:justify-all"><b Class=" d-flex text-align:justify-all">
+                                    *Nota: Si confirma la desactivación de este proyecto se le enviará un correo a cada uno de los empleados 
+                                    que tiene actualmente contratados, indicando el motivo de la desactivación de este proyecto. 
+                                </b>
+                                </MudText>
                         </MudItem>
                     </div>
                 </div>
