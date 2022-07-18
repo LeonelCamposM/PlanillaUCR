@@ -1,5 +1,5 @@
 ﻿--DB
---SELECT * FROM Subscribes WHERE ProjectName = 'Dulces Artesanales'
+
 CREATE DATABASE DB_Planilla
 GO
 USE DB_Planilla

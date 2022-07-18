@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Application.Subscribes.Implementations
 {
-    internal class SubscribeService : ISubscribeService
+    public class SubscribeService : ISubscribeService
     {
         private readonly ISubscribeRepository _subscribeRepository;
 
