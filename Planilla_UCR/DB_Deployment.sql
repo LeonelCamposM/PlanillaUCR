@@ -4,7 +4,6 @@ CREATE DATABASE DB_Planilla
 GO
 USE DB_Planilla
 
-
 -- Tables
 CREATE TABLE Person(
 	Email varchar(255) NOT NULL primary key,

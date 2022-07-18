@@ -118,7 +118,6 @@ else
 		await LoadEmployee();
 	}
 
-
 	private async Task LoadEmployee()
 	{
 		_agreements = await AgreementService.GetEmployeeAgreements(personEmail);
@@ -218,6 +217,26 @@ else
 		int daysDifference = (currentLocalTime - employeeStartDate).Days;
 		return daysDifference;
 	}
+	
+	private int CalculateDaysLeft(int dayslapsed)
+	{
+		int daysLeft = 0;
+		// 92 and 183 days are approximately 3 and 6 months respectively
+		if (dayslapsed >= 92 && dayslapsed < 183)
+		{
+			daysLeft = 7;
+		}
+
+		else if (dayslapsed >= 183 && dayslapsed < 365)
+		{
+			daysLeft = 15;
+		}
+		else if (dayslapsed >= 365)
+		{
+			daysLeft = 30;
+		}
+		return daysLeft;
+	}
 
 	private DateTime SetContractLastDay(string employerEmail, string projectName)
 	{
@@ -228,15 +247,7 @@ else
 		contractEndDate = contractEndDate.AddDays(myDiff);
 		return contractEndDate;
 	}
-
-	private async Task UpdateEmployeeAgreement(string employerEmail, string projectName)
-	{
-		IEnumerable<Agreement> myAgreement = RetrieveEmployeeContract(employerEmail, projectName);
-		DateTime endDate = SetContractLastDay(employerEmail, projectName);
-		Agreement employeeAgreement = SetAgreementInfo(myAgreement, endDate);
-		await AgreementService.UpdateAgreementStatus(employeeAgreement);
-	}
-
+	
 	private IEnumerable<Agreement> RetrieveEmployeeContract(string employerEmail, string projectName)
 	{
 		IEnumerable<Agreement> myAgreement = new List<Agreement>();
@@ -263,6 +274,14 @@ else
 		return employeeAgreement;
 	}
 
+	private async Task UpdateEmployeeAgreement(string employerEmail, string projectName)
+	{
+		IEnumerable<Agreement> myAgreement = RetrieveEmployeeContract(employerEmail, projectName);
+		DateTime endDate = SetContractLastDay(employerEmail, projectName);
+		Agreement employeeAgreement = SetAgreementInfo(myAgreement, endDate);
+		await AgreementService.UpdateAgreementStatus(employeeAgreement);
+	}
+
 	private async Task CheckToDesactivateAgreements()
 	{
 		IEnumerable<Agreement?> erasableAgreements = await AgreementService.GetErasableAgreeements(personEmail);
@@ -274,26 +293,6 @@ else
 				await AgreementService.DesactivateAgreement(personEmail, agree.EmployerEmail, agree.ProjectName, justification);
 			}
 		}
-	}
-
-	private int CalculateDaysLeft(int dayslapsed)
-	{
-		int daysLeft = 0;
-		// 92 and 183 days are approximately 3 and 6 months respectively
-		if (dayslapsed >= 92 && dayslapsed < 183)
-		{
-			daysLeft = 7;
-		}
-
-		else if (dayslapsed >= 183 && dayslapsed < 365)
-		{
-			daysLeft = 15;
-		}
-		else if (dayslapsed >= 365)
-		{
-			daysLeft = 30;
-		}
-		return daysLeft;
 	}
 
 	private void SendEmailToEmployee()
