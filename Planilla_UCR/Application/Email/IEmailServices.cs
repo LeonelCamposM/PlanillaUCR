@@ -17,10 +17,8 @@ namespace Application.Email
 
         public void SendIncreaseBenefitsEmail(EmailObject emailData);
 
-        public void SendDecreaseBenefitsEmail(string message, string destiny);
-        public void SendOverbenefitsEmployeesEmail(IList<string> summaryEmployeesTable, string destiny);
-
-
-
+        public void SendDecreaseBenefitsEmail(EmailObject emailData);
+        
+        public void SendOverbenefitsEmployeesEmail(IList<string> summaryEmailEmployees, IList<string> summaryNameEmployees, EmailObject emailData);
     }
 }

@@ -151,39 +151,69 @@ namespace Application.Email.Implementations
             string destiny = emailData.Destiny;
             string htmlContent = "<section>" + "<div>" + "<header style = BACKGROUND-COLOR:#00695c>" + "<center>" + "<FONT SIZE=5 COLOR=#FFFFFF>" + "<strong>" + "PlanillaUCR" +
                 "</strong>" + "</FONT>" + "</center>" + "</div>" + "</header>" + "</section>" + "<br>" + "</br>" + "<section>" + "<div>" + "Señor(a): " + employeeName + "<br>" +
-                "</br>" + "</div>" + "</section>" + "<section>" + "<div>" + "Reciba un cordial saludo," + "<br>" + "</br>" + "</div>" + "</section>" + "<section>" + "<div>" +
-                "Yo," + " " + employerName + " a cargo de " + projectName + " me dirijo a usted con todo el respeto que se merece, para comunicarle que desafortunadamente debemos " +
-                " de prescindir de sus servicios en la compañía." + "<section>" + "<div>" + "Queremos dejar en claro que la causa del despido no tiene nada que ver con su " +
-                "comportamiento dentro de la empresa, por el contrario, consideramos que usted es un excelente empleado, cumplidor de su deber y le agradecemos su compromiso. " +
-                "No obstante, nos vimos obligados a tomar esta decisión por " + message + "." + "<br>" + "</br>" + "</div>" + "</section>" + "<section>" + "<div>" + "De antemano " +
-                "agradecemos su comprensión y le agradecemos profundamente todo lo que aportó a la empresa durante el ejercicio de su labor. Asimismo, es importante que tenga en " +
-                "cuenta que le pagaremos todo lo relacionado a nuestras obligaciones." + "</div>" + "<section>" + "<div>" + "No siendo más, nos despedimos de usted con un gran " +
-                "agradecimiento por su labor, y deseando que encuentre un nuevo trabajo acorde a su potencial." + "<br>" + "</br>" + "</div>" + "</section>" + "<section>" + "<div>" +
+                "</br>" + "</div>" + "</section>" + "<section>" + "<div>" + "Reciba un cordial saludo." + "<br>" + "</br>" + "</div>" + "</section>" + "<section>" + "<div>" +
+                "Yo," + " " + employerName + " a cargo de " + projectName + ", me dirijo a usted, para comunicarle que actualmente tenemos mayor cantidad de beneficios disponibles " +
+                "para nuestros trabajadores." + "</br>" + " </div>" +"</section >" + "<section>" + "<div>" + "Decidimos aumentar los beneficios como agradecimiento por su trabajo. " +
+                "Para poder hacer uso de estos beneficios puede dirigirse a nuestra página y seleccionar los beneficios de su preferencia." + "</br>" + " </div>" + "</section >" +
+                "<section>" + "<div>" + "Esperamos que disfrute y le sean de provecho estos nuevos servicios que la compañía ha puesto a su disposición." + "<br>" + "</br>" + "</div>" + "</section>" + 
+                "<section>" + "<div>" + "Estamos muy agradecidos por sus grandes labores. Esperamos seguir creciendo y mejorando para nuestros trabajadores y clientes." + "</div>" + 
+                "<section>" + "<div>" + "Nos despedimos de usted con un gran agradecimiento." + "<br>" + "</br>" + "</div>" + "</section>" + "<section>" + "<div>" +
                 "Cordialmente, " + "<br>" + "</br>" + "</div>" + "</section>" + "<section>" + "<div>" + employerName + "<br>" + "</br>" + "</div>" + "</section>";
-            string subject = "Carta de despido";
+            string subject = "Nuevos beneficios";
             _emailSender.SendMail(destiny, subject, htmlContent);
 
         }
 
-        public void SendDecreaseBenefitsEmail(string message, string destiny)
+        public void SendDecreaseBenefitsEmail(EmailObject emailData)
         {
-
+            string employeeName = emailData.EmployeeName;
+            string employerName = emailData.EmployerName;
+            string projectName = emailData.ProjectName;
+            string message = emailData.Message;
+            string destiny = emailData.Destiny;
+            string htmlContent = "<section>" + "<div>" + "<header style = BACKGROUND-COLOR:#00695c>" + "<center>" + "<FONT SIZE=5 COLOR=#FFFFFF>" + "<strong>" + "PlanillaUCR" +
+                "</strong>" + "</FONT>" + "</center>" + "</div>" + "</header>" + "</section>" + "<br>" + "</br>" + "<section>" + "<div>" + "Señor(a): " + employeeName + "<br>" +
+                "</br>" + "</div>" + "</section>" + "<section>" + "<div>" + "Reciba un cordial saludo." + "<br>" + "</br>" + "</div>" + "</section>" + "<section>" + "<div>" +
+                "Yo," + " " + employerName + " a cargo de " + projectName + " me dirijo a usted, para comunicarle que lamentablemente hemos actualizado el proyecto y ahora " +
+                "tenemos menor cantidad de beneficios disponibles." + "</br>" + "</div>" + "</section>" +
+                "Nos disculpamos por los inconvenientes y le pedimos que por favor se dirija a nuestra página web y se desuscriba de alguno de los beneficios, esto para que se cumpla con " +
+                "el presupuesto máximo definido por la compañía, el tiempo límite para realizar esta acción es " + message +"" + "<br>" + "</br>" + "</div>" + "</section>" + 
+                "<section>" + "<div>" + "De antemano nos disculpamos por todos los inconvenientes que esto le pueda causar." + "<br>" + "</br>" + "</div>" + "</section>" +
+                "<section>" + "<div>" + "Nos despedimos de usted con un gran agradecimiento por su labor."+ "<br>" + "</br>" + "</div>" + "</section>" + "<section>" + "<div>" +
+                "Cordialmente, " + "<br>" + "</br>" + "</div>" + "</section>" + "<section>" + "<div>" + employerName + "<br>" + "</br>" + "</div>" + "</section>";
+            string subject = "Cambio en beneficios";
+            _emailSender.SendMail(destiny, subject, htmlContent);
         }
 
-        public void SendOverbenefitsEmployeesEmail(IList<string> summaryEmployeesTable, string destiny)
+        public void SendOverbenefitsEmployeesEmail(IList<string> _overbenefitEmployeesEmail, IList<string> _overbenefitEmployeesName, EmailObject emailData)
         {
             string employees = string.Empty;
+            string employeeName = emailData.EmployeeName;
+            string employerName = emailData.EmployerName;
+            string projectName = emailData.ProjectName;
+            string message = emailData.Message;
+            string destiny = emailData.Destiny;
             string htmlContent = "<section>" + "<div>" + "<header style = BACKGROUND-COLOR:#00695c>" + "<center>" + "<FONT SIZE=5 COLOR=#FFFFFF>" + "<strong>" + "PlanillaUCR" +
-                "</strong>" + "</FONT>" + "</center>" + "</div>" + "</header>" + "</section>" + "<br>" + "</br>";
-            htmlContent = htmlContent.Replace("[Heading]", "Lista de empleados que exeden los beneficios: ");
-            foreach (string benefit in summaryEmployeesTable)
+                "</strong>" + "</FONT>" + "</center>" + "</div>" + "</header>" + "</section>" + "<br>" + "</br>" + "<section>" + "<div>" + "Señor(a): " + employerName + "<br>" +
+                "</br>" + "</div>" + "</section>" + "<section>" + "<div>" + "En este correo se incluye la lista de empleados que actualmente están excediendo el monto y/o " +
+                "la cantidad de beneficios de " + projectName +". "+ "<br>" + "</br>" + "</div>" + "</section>" + "<section>" + "<div>" + "<strong>" + "<br>" + "</br>" + "<br>" + "</br>" +
+                "Lista de empleados excedidos en beneficios:" + "</strong>" + "</FONT>"+ "<br>" + "</br>" + "</div>" + "</section>"+ 
+                "<section>" + "<div>" + "<table> <center>" + "[Employees]" + "</table>" + "</center>" + "<br>" + "</br>" + "<br>" + "</br>" + "</div>" + "</section>" + "<section>" + "<div>" +
+                "<br>" + "</br>" + "A cada uno de ellos se les envió un correo indicando que deben desuscribirse de alguno de sus beneficios." + 
+                "<section>" + "<div>" + "Favor monitorear que cumplan con la fecha límite." + "<br>" + "</br>" + "</div>" + "</section>";
+
+            string subject = "Empleados excedidos en beneficios";
+
+            for (int i = 0; i < _overbenefitEmployeesEmail.Length(); i++)
             {
                 employees += "<tr>";
-                employees += "<td>" + benefit + "</td>";
+                employees += "<td style= border:1px solid black  border-style:outset>" +"<strong>" + "Nombre: " + "</strong>" + _overbenefitEmployeesName.ElementAt(i) + 
+                    ". - " + "<strong>" + "Email: " + "</strong>"+ _overbenefitEmployeesEmail.ElementAt(i) + "</td>";
                 employees += "</tr>";
             }
-            htmlContent = htmlContent.Replace("[benefits]", employees);
-
+            htmlContent = htmlContent.Replace("[Employees]", employees);
+            System.Diagnostics.Debug.WriteLine($"replace: {employees}");
+            _emailSender.SendMail(destiny, subject, htmlContent);
         }
     }
 }
