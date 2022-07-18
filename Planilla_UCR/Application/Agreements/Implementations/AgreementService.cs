@@ -66,5 +66,10 @@ namespace Application.Agreements.Implementations
         {
             _agreementRepository.UpdateAgreementStatus(agreement);
         }
+
+        public async Task<IEnumerable<Agreement>>? GetErasableAgreeements(string employeeEmail)
+        {
+            return await _agreementRepository.GetErasableAgreeements(employeeEmail);
+        }
     }
 }

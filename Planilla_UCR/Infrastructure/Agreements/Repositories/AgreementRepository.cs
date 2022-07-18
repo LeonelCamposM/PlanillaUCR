@@ -123,5 +123,14 @@ namespace Infrastructure.Agreements.Repositories
             _dbContext.Agreements.FromSqlRaw("EXEC UpdateAgreementStatus {0},{1},{2},{3},{4},{5},{6}",
                 myEmployeeEmail, myEmployerEmail, myProjectName, myContractStartDate, myContractFinishDate, myContractType, myMountPerHour).ToListAsync();
         }
+
+        public async Task<IEnumerable<Agreement?>> GetErasableAgreeements(string employeeAgreements)
+        {
+            SqlParameter myEmployeeEmail = new SqlParameter("@EmployeeEmail", employeeAgreements);
+            var agreementList = await _dbContext.Agreements.FromSqlRaw("EXEC GetErasableAgreeements {0}",
+                myEmployeeEmail).ToListAsync();
+            return agreementList;
+        }
+       
     }
 }

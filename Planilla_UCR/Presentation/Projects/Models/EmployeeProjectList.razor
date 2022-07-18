@@ -108,6 +108,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        await CheckToDesactivateAgreements();
         await LoadEmployee();
         ShowDatesLapse();
     }       
@@ -238,6 +239,23 @@ else
         return employeeAgreement;
     }
 
+    private async Task CheckToDesactivateAgreements()
+    {
+        IEnumerable<Agreement?> erasableAgreements = await AgreementService.GetErasableAgreeements(personEmail);
+        if (erasableAgreements.Length() != 0)
+        {
+            string justification = "Renuncia";
+            foreach (var agre in erasableAgreements)
+            {
+                await AgreementService.DesactivateAgreement(personEmail, agre.EmployerEmail, agre.ProjectName,justification);
+            }
+        }
+    }
+
+    private int CalculateDaysLeft()
+    {
+        return 1;
+    }
 
     private void SendEmailToEmployee()
     {
