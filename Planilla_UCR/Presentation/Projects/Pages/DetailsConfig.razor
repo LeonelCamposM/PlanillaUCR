@@ -4,11 +4,15 @@
 @using Application.Agreements
 @using Application.Subscribes
 @using Application.Email
+@using Application.People
 @using Application.ContextMenu
+@using Application.Subscriptions
 @using Domain.Projects.Entities
 @using Domain.Employers.Entities
 @using Domain.Agreements.Entities
 @using Domain.Subscribes.Entities
+@using Domain.Subscriptions.Entities
+@using Domain.People.Entities
 @using Presentation.Core.Components
 @using Presentation.Projects.Models
 @using System.Globalization
@@ -17,7 +21,9 @@
 @inject IEmailServices EmailService
 @inject IEmployerService EmployerService
 @inject IProjectService ProjectService
+@inject IPersonService PersonService
 @inject IAgreementService AgreementService
+@inject ISubscriptionService SuscriptionService
 @inject ISubscribeService SubscribeService
 @inject IContextMenuService ContextMenuService
 @inject NavigationManager nav
@@ -104,7 +110,7 @@ else
                         <MudItem xs="4">
                             <MudNumericField Immediate="true" Label="Monto máximo para beneficios" Format="N2" Culture="@_cultureCR"
                             ReadOnly="@_disabled" Variant="Variant.Outlined" @bind-Value="_maximumAmountForBenefits" Adornment="Adornment.Start" 
-                            AdornmentText="@_cultureCR.NumberFormat.CurrencySymbol" Required="false" RequiredError="Campo no requerido"/>
+                            AdornmentText="@_cultureCR.NumberFormat.CurrencySymbol" Min=0.0/>
                         </MudItem>
 
                         <MudItem xs="4">
@@ -154,10 +160,13 @@ else
     private bool _loading = true;
     private bool _disabled = true;
     private string _newName = "";
+    private int _maxBenefits = 0;
+    private double _maxBenefitsAmount = 0;
     private double? _maximumAmountForBenefits = 0.0;
     private string _oldDescription = "";
     private string _oldPaymentInterval = "";
     private int _oldMaximumBenefitAmount = 0;
+    private double _oldMaximumAmountForBenefits = 0.0;
     private bool _changesInBenefits = false;
 
     private CultureInfo _cultureCR = CultureInfo.GetCultureInfo("es-CR");
@@ -165,8 +174,11 @@ else
     private Project _projectInfo = new Project("","","",0.0,0,"",1);
     private IEnumerable<Agreement> _agreementElements;
     private IEnumerable<Subscribe> _employeebenefits;
-    private List<string> _employees = new List<string>();
-    private List<string> _overbenefitEmployees = new List<string>();
+    private List<string> _employeesEmail = new List<string>();
+    private List<string> _employeesName = new List<string>();
+    private List<string> _overbenefitEmployeesEmail = new List<string>();
+    private List<string> _overbenefitEmployeesName = new List<string>();
+
     private MudForm _form;
     SnackHandler snackHandler = new SnackHandler();
 
@@ -178,7 +190,7 @@ else
         ContextMenuService.SetProjectsContext(true,true,projectName, personEmail,true, false);
         _projectInfo = await ProjectService.GetProject(personEmail,projectName);
         _agreementElements = await AgreementService.GetEmployerAgreements(personEmail);
-
+        await ValidateAmountOfBenefits();
         if (_projectInfo != null)
         {
             _maximumAmountForBenefits = _projectInfo.MaximumAmountForBenefits;
@@ -186,11 +198,12 @@ else
             _oldDescription = _projectInfo.ProjectDescription;
             _oldPaymentInterval = _projectInfo.PaymentInterval;
             _oldMaximumBenefitAmount = _projectInfo.MaximumBenefitAmount;
+            _oldMaximumAmountForBenefits = _projectInfo.MaximumAmountForBenefits;
             _loading = false;
         }
     }
 
-    async Task ValidProject()
+    private async Task ValidProject()
     {
         snackHandler._saving = true;
         await _form.Validate();
@@ -202,14 +215,14 @@ else
             _valid = await ValidName(); 
         }
 
-        if (_form.IsValid && _valid)
+        if (_form.IsValid && _valid && await ValidateAmountOfBenefits())
         {
-            SaveProject();
+            await SaveProject();
         }
         snackHandler._saving = false;
     }
 
-    void SaveProject()
+    private async Task SaveProject()
     {
 
         snackHandler._saving = false;
@@ -217,12 +230,22 @@ else
         ProjectService.ModifyProject(_projectInfo, _newName);
         _projectInfo.ProjectName = _newName;
         projectName = _newName;
-        ShowSnackNotification(_projectInfo.ProjectName + " modificado exitosamente", Severity.Success);
+
+        if ((_oldMaximumBenefitAmount < _projectInfo.MaximumBenefitAmount ||
+            _oldMaximumAmountForBenefits < _maximumAmountForBenefits))
+            await NotifyMyEmployeesIncrease();
+
+        if ((_oldMaximumBenefitAmount > _projectInfo.MaximumBenefitAmount || 
+            _oldMaximumAmountForBenefits > _maximumAmountForBenefits))
+            await NotifyMyEmployeesDecrease();
+
+        ShowSnackNotification(_projectInfo.ProjectName + " modificado exitosamente.", Severity.Success);
+        ShowSnackNotification("Empleados notificados sobre sus beneficios.", Severity.Info);
         DisableForm();
 
     }
 
-    async Task<bool> ValidName()
+    private async Task<bool> ValidName()
     {
         bool _valid = true;
         _newName = _newName.Trim();
@@ -236,11 +259,30 @@ else
         return _valid;
     }
 
-    private void FindEmployeesOfProject()
+    private async Task<bool> ValidateAmountOfBenefits()
     {
-        foreach (Agreement item in _agreementElements)
+        bool valid = true;
+        IEnumerable < Subscription > benefitsList = await SuscriptionService.GetBenefitsByProject(personEmail, projectName);
+        _maxBenefits = benefitsList.Length();
+        foreach(Subscription actualBenefit in benefitsList)
         {
-            _employees.Add(item.EmployeeEmail);
+            _maxBenefitsAmount += actualBenefit.Cost;
+        }
+        if (_maxBenefitsAmount < _projectInfo.MaximumAmountForBenefits || _maxBenefits < _projectInfo.MaximumBenefitAmount)
+        {
+            valid = false;
+            ShowSnackNotification("Beneficios insuficientes, no puede asignar más beneficios de los existentes", Severity.Warning);
+        }
+        return valid;
+    }
+
+    private async Task FindEmployeesOfProject()
+    {
+        foreach (Agreement actualAgreement in _agreementElements)
+        {
+            _employeesEmail.Add(actualAgreement.EmployeeEmail);
+            Person actualEmployee = await PersonService.GetPerson(actualAgreement.EmployeeEmail);
+            _employeesName.Add(actualEmployee.Name+ " " + actualEmployee.LastName1+ " " + actualEmployee.LastName2);
         }
     }
 
@@ -248,39 +290,69 @@ else
     {
         double totalCost = 0;
         int amountOfBenefits = 0;
-        foreach (string actualEmployee in _employees)
+        for (int i = 0; i < _employeesEmail.Length(); i++) 
         {
-            _employeebenefits = await SubscribeService.GetBenefitsByEmployee(actualEmployee, projectName);
+            _employeebenefits = await SubscribeService.GetBenefitsByEmployee(_employeesEmail.ElementAt(i), projectName);
             amountOfBenefits = _employeebenefits.Length();
             foreach (Subscribe actualSubscribe in _employeebenefits)
             {
                 totalCost += actualSubscribe.Cost;
             }
-            if (totalCost > _projectInfo.MaximumAmountForBenefits || 
+            if (totalCost > _projectInfo.MaximumAmountForBenefits ||
                 amountOfBenefits > _projectInfo.MaximumBenefitAmount)
-                _overbenefitEmployees.Add(actualEmployee);
+            {
+                _overbenefitEmployeesEmail.Add(_employeesEmail.ElementAt(i));
+                _overbenefitEmployeesName.Add(_employeesName.ElementAt(i));
+            }
         }
     }
 
-    private void NotifyMyEmployeesIncrease()
+    private async Task NotifyMyEmployeesIncrease()
     {
-        if ((_oldMaximumBenefitAmount < _projectInfo.MaximumBenefitAmount || 
-            _maximumAmountForBenefits < _projectInfo.MaximumAmountForBenefits))
+
+        Person employer = await PersonService.GetPerson(personEmail);
+        EmailObject emailData = new EmailObject("", "", "", "", "");
+        await FindEmployeesOfProject();
+        for (int i = 0; i < _employeesEmail.Length(); i++) 
         {
-            //Send email too my employees
+            emailData.EmployeeName = _employeesName.ElementAt(i);
+            emailData.EmployerName = employer.Name + " " + employer.LastName1 + " " + employer.LastName2;
+            emailData.ProjectName = projectName;
+            emailData.Message = "";
+            emailData.Destiny = _employeesEmail.ElementAt(i);
+            EmailService.SendIncreaseBenefitsEmail(emailData);
         }
     }
 
     private async Task NotifyMyEmployeesDecrease()
     {
-        if ((_oldMaximumBenefitAmount > _projectInfo.MaximumBenefitAmount || 
-            _maximumAmountForBenefits > _projectInfo.MaximumAmountForBenefits))
+        Person employer = await PersonService.GetPerson(personEmail);
+        await FindEmployeesOfProject();
+        await GetOverbenefitEmployees();
+        for (int i = 0; i < _overbenefitEmployeesEmail.Length(); i++) 
         {
-            await GetOverbenefitEmployees();
-            //Send email too my limits employees
-            // Send Email to employer limits 
-            
+            EmailObject emailData = new EmailObject("", "", "", "", "");
+            emailData.EmployeeName = _overbenefitEmployeesName.ElementAt(i);
+            emailData.EmployerName =  employer.Name + " " + employer.LastName1 + " " + employer.LastName2;
+            emailData.ProjectName = projectName;
+            emailData.Message = "a final del presente mes.";
+            emailData.Destiny = _overbenefitEmployeesEmail.ElementAt(i);
+            EmailService.SendDecreaseBenefitsEmail(emailData);
         }
+        if (_overbenefitEmployeesEmail.Length() > 0)
+            await SendEmployerEmail();
+    }
+
+    public async Task SendEmployerEmail()
+    {
+        EmailObject employerEmailData = new EmailObject("", "", "", "", "");
+        Person employer = await PersonService.GetPerson(personEmail);
+        employerEmailData.EmployeeName = "";
+        employerEmailData.EmployerName = employer.Name + " " + employer.LastName1 + " " + employer.LastName2;
+        employerEmailData.ProjectName = projectName;
+        employerEmailData.Message = "";
+        employerEmailData.Destiny = personEmail;
+        EmailService.SendOverbenefitsEmployeesEmail(_overbenefitEmployeesEmail,_overbenefitEmployeesName,employerEmailData);
     }
 
     public class LimitsValidationForm
@@ -294,6 +366,7 @@ else
 
         [StringLength(600, ErrorMessage = "La descripción es muy grande")]
         public string description { get; set; }
+
     }
 
     void ShowSnackNotification(string message, Severity severity)
