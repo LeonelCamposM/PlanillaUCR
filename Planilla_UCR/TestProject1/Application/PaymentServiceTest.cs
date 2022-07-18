@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Application.Payments.Implementations;
 using Moq;
@@ -10,10 +8,8 @@ using Xunit;
 using Domain.Payments.Repositories;
 using Domain.Payments.Entities;
 using LanguageExt;
-using Tests.PaymentTest;
 using Presentation.Payments.Models;
-using Domain.Agreements.Entities;
-using static Tests.PaymentTest.EmployeeAgreement;
+using Domain.Projects.Entities;
 
 namespace Tests.Application
 {
@@ -28,11 +24,11 @@ namespace Tests.Application
             new Payment("leonel@ucr.ac.cr", "Proyecto 5", "mau@ucr.ac.cr", 86000, DateTime.Now.AddDays(1),DateTime.Now.AddDays(15)),
             new Payment("leonel@ucr.ac.cr", "Proyecto 6", "mau@ucr.ac.cr", 186000, DateTime.Now.AddDays(1), DateTime.Now.AddDays(28)),
         };
-        
+
         private String _employerEmail = "leonel@ucr.ac.cr";
 
         [Fact]
-        public async Task GetEmployerPayments()
+        public void GetEmployerPayments()
         {
 
             //arrange
@@ -48,19 +44,26 @@ namespace Tests.Application
             mockPaymentRepository.Verify(repo => repo.GetEmployerPayments(_employerEmail), Times.Once);
             employerPaymentTest.Count().Should().Equals(5);
         }
-    
-        [Fact]
-        public async Task GetDaysIntervalTest()
-        {
 
+        [Fact]
+        public void GetProjectsToPayTest()
+        {
+            double passedDays = -20;
             //arrange
-            ApprovePayment manager = new ApprovePayment(null, null, null);
+            var paymentService = new PaymentService(null);
+            List<Project> projectList = new List<Project>
+            {
+                new Project("leonel@ucr.ac.cr", "Proyecto 1", " ", 12, 12, "Semanal", 1, DateTime.Now.AddDays(passedDays)),
+                new Project("leonel@ucr.ac.cr", "Proyecto 2", " ", 12, 12, "Mensual", 1, DateTime.Now.AddDays(passedDays)),
+                new Project("leonel@ucr.ac.cr", "Proyecto 3", " ", 12, 12, "Quincenal", 1, DateTime.Now.AddDays(passedDays)),
+                new Project("leonel@ucr.ac.cr", "Proyecto 4", " ", 12, 12, "Bisemanal", 1, DateTime.Now.AddDays(passedDays)),
+            };
 
             //act
-            int days = manager.GetWorkedDays("", new DateTime(2007, 11, 05, 0, 0, 0), 31);
+            IList<ProjectModel> pendingProjects = paymentService.GetProjectsToPay(projectList);
 
             //assert
-            days.Should().Be(27);    
+            pendingProjects.Length().Should().Be(3);
         }
     }
 }

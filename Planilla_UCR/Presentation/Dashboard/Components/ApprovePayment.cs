@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Application.PaymentCalculator.Implementations;
+using Application.Payments.Models;
 
 namespace Presentation.Dashboard.Components
 {
@@ -36,7 +37,7 @@ namespace Presentation.Dashboard.Components
 
         }
 
-        public async Task GetProjectsToPay()
+        public void  GetProjectsToPay()
         {
             foreach (Project _project in _projects)
             {
@@ -50,8 +51,6 @@ namespace Presentation.Dashboard.Components
                     _projectsList.Add(_projectModel);
                 }
             }
-
-
         }
 
         public int GetDaysInterval(string paymentInterval, DateTime lastPaymentDate)

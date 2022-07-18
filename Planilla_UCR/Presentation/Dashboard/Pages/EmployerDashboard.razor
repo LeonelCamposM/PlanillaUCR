@@ -1,4 +1,5 @@
 ﻿@using System.Text
+@using Application.Payments.Models
 @using ChartJs.Blazor.BarChart
 @using ChartJs.Blazor.PieChart
 @using ChartJs.Blazor.Util
@@ -86,7 +87,6 @@ else
                     <MudTh>Proyecto</MudTh>
                     <MudTh>Fecha</MudTh>
                     <MudTh>Acciones</MudTh>
-
                 </HeaderContent>
 
                 <RowTemplate>
@@ -140,10 +140,6 @@ else
                         <MudText Align="Align.Left" Typo="Typo.h6"> &nbsp;&nbsp;&nbsp; Costo total por proyecto</MudText>
                         <MudText Align="Align.Left" Typo="Typo.body1">
                              &emsp; Total invertido en proyectos: @_cultureCR.NumberFormat.CurrencySymbol @CostFormat(@totalCost)
-                                @{
-                                    int counter = 0;
-                                    string summary = "";
-                                }
                               <MudTreeView T="string">
                                     <MudTreeViewItem Value="@("Total invertido por proyecto")">
                                         @foreach (var item in _data)
@@ -190,7 +186,6 @@ else
 
     private IList<Project> _projects = new List<Project>();
     private DateTime _nextPay = DateTime.Now;
-    private IList<ProjectModel> _projectsToDelete = new List<ProjectModel>();
     private double totalCost { get; set; }
 
     IList<string> colorslist = new List<string>()
@@ -239,9 +234,10 @@ else
         return formatedCost;
     }
 
-    private async Task GetProjectsMountToPay(ApprovePayment paymentManager)
+    private async Task GetProjectsMountToPay()
     {
-        foreach (ProjectModel _pModel in paymentManager._projectsList)
+        IList<ProjectModel> projectsToDelete = new List<ProjectModel>();
+        foreach (ProjectModel _pModel in _projectsList)
         {
             IList<Agreement> _employees = await AgreementService.GetProjectAgreements(_pModel.ProjectName, _pModel.EmployerEmail);
 
@@ -254,8 +250,6 @@ else
                 if (_paidEmployees.Where(e => e.EmployeeEmail == _employeeAgreement.EmployeeEmail).Length() == 0)
                 {
                     double _mountToPay = 0;
-
-
                     Subscribe searchSubscribe = new Subscribe(_employeeAgreement.EmployeeEmail, _employeeAgreement.EmployerEmail, _employeeAgreement.ProjectName, "", 0.0, _pModel.LastPaymentDate, _pModel.LastPaymentDate.AddDays(_pModel.DayInterval));
                     IEnumerable<Subscription> subscriptions = await SubscribeService.GetSubscribes(searchSubscribe);
 
@@ -264,8 +258,7 @@ else
                     _report.ReportDate = _pModel.LastPaymentDate;
                     IList<HoursReport> reports = await ReportHoursService.GetEmployeeReports(_report, _pModel.LastPaymentDate.AddDays(_pModel.DayInterval));
 
-
-                    _mountToPay = await paymentManager.GetSalary(_employeeAgreement, _pModel.DayInterval, _pModel.LastPaymentDate, subscriptions, reports);
+                    _mountToPay = PaymentService.GetSalary(_employeeAgreement, _pModel.DayInterval, subscriptions, reports);
                     _pModel.MountToPay += _mountToPay;
                     EmployeeAgreement projectEmployee = new EmployeeAgreement();
                     projectEmployee.EmployeeEmail = _employeeAgreement.EmployeeEmail;
@@ -275,12 +268,12 @@ else
             }
             if (_pModel.MountToPay == 0)
             {
-                _projectsToDelete.Add(_pModel);
+                projectsToDelete.Add(_pModel);
             }
         }
-        foreach (ProjectModel toDelete in _projectsToDelete)
+        foreach (ProjectModel toDelete in projectsToDelete)
         {
-            paymentManager._projectsList.Remove(toDelete);
+            _projectsList.Remove(toDelete);
         }
     }
 
@@ -353,11 +346,10 @@ else
     private async Task LoadPaymentTable()
     {
         IList<Agreement> agreements = (IList<Agreement>) await AgreementService.GetEmployerAgreements(email);
+
         _projects = (IList<Project>) await ProjectService.GetEmployerProyects(email);
-        ApprovePayment paymentManager = new ApprovePayment(_projects, _projectsList, _projectsToDelete);
-        await paymentManager.GetProjectsToPay();
-        await GetProjectsMountToPay(paymentManager);
-        _projectsList = paymentManager._projectsList;
+        _projectsList = PaymentService.GetProjectsToPay(_projects);
+        await GetProjectsMountToPay();
         GetProjectEmployeesCount(agreements);
     }
 
