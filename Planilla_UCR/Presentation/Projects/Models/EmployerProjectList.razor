@@ -256,6 +256,7 @@ else
     private async Task ConfirmDisableProject()
     {
         EmailObject emailData = new EmailObject("", "", "", "", "");
+        Person employerInfo = await PersonService.GetPerson(personEmail);
         if (_justification != "")
         {
             foreach (Person activePerson in _activeEmployees)
@@ -266,7 +267,7 @@ else
                     {
                         await AgreementService.DesactivateAgreement(activePerson.Email, personEmail, this.projectName, _justification);
                         emailData.EmployeeName = activePerson.Name + " " + activePerson.LastName1 + " " + activePerson.LastName2;
-                        emailData.EmployerName = actualAgreement.EmployerEmail;
+                        emailData.EmployerName = employerInfo.Name + " " + employerInfo.LastName1 + " " + employerInfo.LastName2;
                         emailData.ProjectName = actualAgreement.ProjectName;
                         emailData.Message = _justification;
                         emailData.Destiny = actualAgreement.EmployeeEmail;
