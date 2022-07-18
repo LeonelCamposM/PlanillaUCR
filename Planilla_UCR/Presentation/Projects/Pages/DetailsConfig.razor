@@ -244,7 +244,7 @@ else
         }
     }
 
-    private async Task<int> GetOverbenefitEmployees()
+    private async Task GetOverbenefitEmployees()
     {
         double totalCost = 0;
         int amountOfBenefits = 0;
@@ -256,10 +256,10 @@ else
             {
                 totalCost += actualSubscribe.Cost;
             }
-            if (totalCost > _projectInfo.MaximumAmountForBenefits)
+            if (totalCost > _projectInfo.MaximumAmountForBenefits || 
+                amountOfBenefits > _projectInfo.MaximumBenefitAmount)
                 _overbenefitEmployees.Add(actualEmployee);
         }
-        return amountOfBenefits;
     }
 
     private void NotifyMyEmployeesIncrease()
@@ -271,13 +271,15 @@ else
         }
     }
 
-    private void NotifyMyEmployeesDecrease()
+    private async Task NotifyMyEmployeesDecrease()
     {
         if ((_oldMaximumBenefitAmount > _projectInfo.MaximumBenefitAmount || 
             _maximumAmountForBenefits > _projectInfo.MaximumAmountForBenefits))
         {
+            await GetOverbenefitEmployees();
             //Send email too my limits employees
             // Send Email to employer limits 
+            
         }
     }
 
