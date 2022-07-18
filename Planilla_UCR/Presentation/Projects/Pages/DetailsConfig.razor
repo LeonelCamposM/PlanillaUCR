@@ -2,18 +2,23 @@
 @using Application.Projects
 @using Application.Employers
 @using Application.Agreements
+@using Application.Subscribes
+@using Application.Email
+@using Application.ContextMenu
 @using Domain.Projects.Entities
 @using Domain.Employers.Entities
 @using Domain.Agreements.Entities
+@using Domain.Subscribes.Entities
 @using Presentation.Core.Components
 @using Presentation.Projects.Models
 @using System.Globalization
 @using System.ComponentModel.DataAnnotations
-@using Application.ContextMenu
 
+@inject IEmailServices EmailService
 @inject IEmployerService EmployerService
 @inject IProjectService ProjectService
 @inject IAgreementService AgreementService
+@inject ISubscribeService SubscribeService
 @inject IContextMenuService ContextMenuService
 @inject NavigationManager nav
 @inject ISnackbar Snackbar
@@ -148,22 +153,22 @@ else
 @code {
     private bool _loading = true;
     private bool _disabled = true;
-
-    
     private string _newName = "";
     private double? _maximumAmountForBenefits = 0.0;
     private string _oldDescription = "";
     private string _oldPaymentInterval = "";
     private int _oldMaximumBenefitAmount = 0;
-    
+    private bool _changesInBenefits = false;
 
     private CultureInfo _cultureCR = CultureInfo.GetCultureInfo("es-CR");
     private LimitsValidationForm _limits = new LimitsValidationForm();
     private Project _projectInfo = new Project("","","",0.0,0,"",1);
     private IEnumerable<Agreement> _agreementElements;
+    private IEnumerable<Subscribe> _employeebenefits;
+    private List<string> _employees = new List<string>();
+    private List<string> _overbenefitEmployees = new List<string>();
     private MudForm _form;
     SnackHandler snackHandler = new SnackHandler();
-
 
     [Parameter] public string personEmail { get; set; }
     [Parameter] public string projectName { get; set; }
@@ -172,7 +177,7 @@ else
     {
         ContextMenuService.SetProjectsContext(true,true,projectName, personEmail,true, false);
         _projectInfo = await ProjectService.GetProject(personEmail,projectName);
-        _agreementElements = await AgreementService.GetEmployeeAgreements(personEmail);
+        _agreementElements = await AgreementService.GetEmployerAgreements(personEmail);
 
         if (_projectInfo != null)
         {
@@ -229,6 +234,51 @@ else
             DisableForm();
         }
         return _valid;
+    }
+
+    private void FindEmployeesOfProject()
+    {
+        foreach (Agreement item in _agreementElements)
+        {
+            _employees.Add(item.EmployeeEmail);
+        }
+    }
+
+    private async Task<int> GetOverbenefitEmployees()
+    {
+        double totalCost = 0;
+        int amountOfBenefits = 0;
+        foreach (string actualEmployee in _employees)
+        {
+            _employeebenefits = await SubscribeService.GetBenefitsByEmployee(actualEmployee, projectName);
+            amountOfBenefits = _employeebenefits.Length();
+            foreach (Subscribe actualSubscribe in _employeebenefits)
+            {
+                totalCost += actualSubscribe.Cost;
+            }
+            if (totalCost > _projectInfo.MaximumAmountForBenefits)
+                _overbenefitEmployees.Add(actualEmployee);
+        }
+        return amountOfBenefits;
+    }
+
+    private void NotifyMyEmployeesIncrease()
+    {
+        if ((_oldMaximumBenefitAmount < _projectInfo.MaximumBenefitAmount || 
+            _maximumAmountForBenefits < _projectInfo.MaximumAmountForBenefits))
+        {
+            //Send email too my employees
+        }
+    }
+
+    private void NotifyMyEmployeesDecrease()
+    {
+        if ((_oldMaximumBenefitAmount > _projectInfo.MaximumBenefitAmount || 
+            _maximumAmountForBenefits > _projectInfo.MaximumAmountForBenefits))
+        {
+            //Send email too my limits employees
+            // Send Email to employer limits 
+        }
     }
 
     public class LimitsValidationForm
