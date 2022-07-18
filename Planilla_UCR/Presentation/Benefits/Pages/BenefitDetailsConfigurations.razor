@@ -8,11 +8,17 @@
 @using Presentation.Core.Components
 @using Presentation.Benefits.Components
 @using System.Globalization
+@using Domain.People.Entities
+@using Application.People
+@using Application.Email
+
 @inject NavigationManager nav
 @inject ISnackbar Snackbar
 @inject ISubscriptionService SubscriptionService
 @inject ISubscribeService SubscribeService
 @inject IProjectService ProjectService
+@inject IEmailServices EmailService
+@inject IPersonService PersonService
 
 @{List<BreadcrumbItem> _items = new List<BreadcrumbItem>
     {
@@ -196,12 +202,14 @@ else
             subscription.ProviderName = _providerName;
             subscription.SubscriptionDescription = _sDescription;
             SubscriptionService.ModifySubscription(subscription, _newName);
-            //TODO: Hacer un servicio en Subscribes para que updatee el costo correspondiente.
             ShowSnackNotification("Beneficio " + subscription.SubscriptionName + " modificada", Severity.Success);
             subscription.SubscriptionName = _newName;
             subscriptionName = _newName;
             await GetAffectedEmployees(subscription);
-            OpenDialog();
+            if (_affectedEmployees.Length() > 0)
+            {
+                OpenDialog();
+            }
             DisableForm();
         }
         snackHandler._saving = false;
@@ -211,7 +219,7 @@ else
     {
         bool valid = true;
         Subscription tempSubscription = await SubscriptionService.GetSubscription(employerEmail, projectName, _newName);
-        if (tempSubscription != null)
+        if (tempSubscription != null && _newName != subscription.SubscriptionName)
         {
             valid = false;
             ShowSnackNotification("El nombre del beneficio " + _newName + " ya está en uso", Severity.Error);
@@ -264,29 +272,47 @@ else
     {
         _employees = (await SubscribeService.GetEmployeesBySubscription
             (subscription.EmployerEmail, subscription.ProjectName, subscription.SubscriptionName)).ToList();
+        _employees = _employees.Where(e => e.EndDate == null).ToList();
         foreach (Subscribe subscribe in _employees)
         {
+            SubscribeService.DeleteSubscribe(subscribe);
+            Subscribe newSubscribe = new Subscribe(subscribe.EmployeeEmail, subscribe.EmployerEmail, subscribe.ProjectName, subscribe.SubscriptionName, subscription.Cost, DateTime.Now);
+            SubscribeService.AddSubscribe(newSubscribe);
             IList<Subscribe> employeeBenefits = (await SubscribeService.GetBenefitsByEmployee(subscribe.EmployeeEmail, subscribe.ProjectName)).ToList();
             if (employeeBenefits.Sum(e => e.Cost) > _project.MaximumAmountForBenefits)
             {
                 _affectedEmployees.Add(subscribe);
             }
         }
-        //var _employeesBenefitsAmount = _employees.GroupBy(e=> e.EmployeeEmail);
-        //foreach (var group in _employeesBenefitsAmount)
-        //{
-        //    double benefitAmount = 0;
-        //    Subscribe affectedSubscribe = null;
-        //    foreach (var subscribe in group)
-        //    {
-        //        benefitAmount += subscribe.Cost;
-        //        affectedSubscribe = subscribe;
-        //    }
-        //    if (benefitAmount > _project.MaximumAmountForBenefits)
-        //    {
-        //        _affectedEmployees.Add(affectedSubscribe);
-        //        //Mandar correo o quitarle el beneficio.
-        //    }
-        //}
+        await SendEmployeeEmails();
+        await SendEmployerEmail();
+    }
+
+    private async Task SendEmployeeEmails()
+    {
+        Person employer = await PersonService.GetPerson(employerEmail);
+        string employerFullName = employer.Name + " " + employer.LastName1 + " " + employer.LastName2;
+        foreach (Subscribe subscribe in _affectedEmployees)
+        {
+            Person employee = await PersonService.GetPerson(subscribe.EmployeeEmail);
+            string employeeFullName = employee.Name + " " + employee.LastName1 + " " + employee.LastName2;
+            EmailObject newEmail = new EmailObject(employeeFullName, employerFullName, subscribe.ProjectName, "", subscribe.EmployeeEmail);
+            EmailService.SendEmployeeBenefitNotification(newEmail, subscribe.SubscriptionName);
+        }
+    }
+
+    private async Task SendEmployerEmail()
+    {
+        IList<Person> _employeesEmail = new List<Person>();
+        foreach (Subscribe subscribe in _affectedEmployees)
+        {
+            Person employee = await PersonService.GetPerson(subscribe.EmployeeEmail);
+            _employeesEmail.Add(employee);
+            string employeeFullName = employee.Name + " " + employee.LastName1 + " " + employee.LastName2;
+        }
+        Person employer = await PersonService.GetPerson(employerEmail);
+        string employerFullName = employer.Name + " " + employer.LastName1 + " " + employer.LastName2;
+        EmailObject newEmail = new EmailObject("", employerFullName, projectName, "", employerEmail);
+        EmailService.SendEmployerBenefitNotification(newEmail, _employeesEmail, subscription.SubscriptionName);
     }
 }

@@ -1,5 +1,5 @@
 ﻿--DB
-
+--SELECT * FROM Subscribes WHERE ProjectName = 'Dulces Artesanales'
 CREATE DATABASE DB_Planilla
 GO
 USE DB_Planilla
@@ -245,6 +245,21 @@ BEGIN
 		S.ProjectName = C.ProjectName AND
 		S.SubscriptionName = C.SubscriptionName
 	WHERE S.EmployeeEmail = @EmployeeEmail AND C.IsEnabled = 1 AND C.TypeSubscription = 0 AND  S.ProjectName =  @ProjectName AND S.EndDate IS NULL
+END
+
+GO
+CREATE OR ALTER PROCEDURE AddSubscribes(
+	@EmployeeEmail varchar(255),
+	@EmployerEmail varchar(255),
+	@ProjectName varchar(255),
+	@SubscriptionName varchar(255),
+	@Cost float,
+	@StartDate datetime
+)
+AS
+BEGIN
+	INSERT INTO Subscribes (EmployeeEmail,EmployerEmail,ProjectName,SubscriptionName,Cost,StartDate)
+	VALUES (@EmployeeEmail, @EmployerEmail, @ProjectName, @SubscriptionName, @Cost, @StartDate)
 END
 
 GO

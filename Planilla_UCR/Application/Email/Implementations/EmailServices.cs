@@ -1,5 +1,6 @@
 ﻿using Domain.Subscriptions.Entities;
 using Domain.LegalDeductions.Entities;
+using Domain.People.Entities;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -140,6 +141,36 @@ namespace Application.Email.Implementations
             htmlContent = htmlContent.Replace("[deductions]", deductions);
 
             _emailSender.SendMail(emailData.Destiny, "Reporte planilla", htmlContent);
+        }
+
+        public void SendEmployeeBenefitNotification(EmailObject emailData, string benefitName) 
+        {
+            string htmlContent = File.ReadAllText("../Server_Planilla/wwwroot/emails/EmployeeBenefitNotification.html");
+            htmlContent = htmlContent.Replace("[employeeName]", emailData.EmployeeName);
+            htmlContent = htmlContent.Replace("[employerName]", emailData.EmployerName);
+            htmlContent = htmlContent.Replace("[projectName]", emailData.ProjectName);
+            htmlContent = htmlContent.Replace("[benefitName]", benefitName);
+            _emailSender.SendMail(emailData.Destiny, "Gestión de beneficios", htmlContent);
+        }
+
+        public void SendEmployerBenefitNotification(EmailObject emailData, IList<Person> employeesEmail, string benefitName)
+        {
+            string affectedEmployees = string.Empty;
+
+            string htmlContent = File.ReadAllText("../Server_Planilla/wwwroot/emails/EmployerBenefitNotification.html");
+            htmlContent = htmlContent.Replace("[employerName]", emailData.EmployerName);
+            htmlContent = htmlContent.Replace("[projectName]", emailData.ProjectName);
+            htmlContent = htmlContent.Replace("[benefitName]", benefitName);
+            foreach (Person employee in employeesEmail)
+            {
+                string fullName = employee.Name + " " + employee.LastName1 + " " + employee.LastName2;
+                affectedEmployees += "<tr>";
+                affectedEmployees += "<td>" + fullName + "</td>";
+                affectedEmployees += "<td>" + employee.Email + " </td>";
+                affectedEmployees += "</tr>";
+            }
+            htmlContent = htmlContent.Replace("[employees]", affectedEmployees);
+            _emailSender.SendMail(emailData.Destiny, "Gestión de beneficios", htmlContent);
         }
     }
 }
