@@ -1,4 +1,5 @@
-﻿@using Domain.Projects.Entities
+﻿@using Application.Email
+@using Domain.Projects.Entities
 @using Domain.Agreements.Entities
 @using Domain.People.Entities
 @using Domain.AgreementTypes.Entities
@@ -19,7 +20,7 @@
 @inject IAgreementService AgreementService
 @inject IAgreementTypeService AgreementTypeService
 @inject IContextMenuService ContextMenuService
-
+@inject IEmailServices EmailService
 
 @{
 	List<BreadcrumbItem> _items = new List<BreadcrumbItem>
@@ -93,24 +94,18 @@ else
 }
 
 @code {
-
-	private bool _emptyAgreement = true;
-	private bool _loading = true;
-	private string _searchString = "";
-
+	[Parameter] public string personEmail { get; set; }
+	[Parameter] public string projectName { get; set; }
 	private IEnumerable<Person> _people;
 	private IEnumerable<Project> _projectElements;
 	private IEnumerable<EmployeeList> _joinTable = new List<EmployeeList>();
 	private IEnumerable<AgreementType> _agreementType = new List<AgreementType>();
 	private IEnumerable<Agreement> _agreements = new List<Agreement>();
-
-
-	[Parameter] public string personEmail { get; set; }
-	[Parameter] public string projectName { get; set; }
-
-
 	private MudTable<EmployeeList> _table;
 	private HashSet<EmployeeList> _selectedItems = new HashSet<EmployeeList>();
+	private bool _emptyAgreement = true;
+	private bool _loading = true;
+	private string _searchString = "";
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -173,12 +168,10 @@ else
 
 	private async Task CheckSelectedItems()
 	{
-		foreach (var element in _selectedItems) // Delete this, just to try out concept
-		{
-			Snackbar.Add("Greetings from: " + element.ProjectName, Severity.Success);
-		}
 		if (_selectedItems.Length() > 0)
 		{
+			Snackbar.Add("Su solicitud está siendo procesada, por favor espere un momento", Severity.Success);
+			await Task.Delay(500);
 			await QuitProjects();
 		}
 		else
@@ -189,9 +182,12 @@ else
 
 	private  async Task QuitProjects()
 	{
+		DateTime endDate;
 		foreach (var element in _selectedItems)
 		{
-			await UpdateEmployeeAgreement(element.EmployerEmail, element.ProjectName);
+			endDate = await UpdateEmployeeAgreement(element.EmployerEmail, element.ProjectName);
+			SendEmailToEmployee(element, endDate);
+			SendEmailToEmployer(element, endDate);
 		}
 		Snackbar.Add("Su solicitud de renuncia ha terminado exitosamente", Severity.Success);
 		await Task.Delay(3500);
@@ -217,7 +213,7 @@ else
 		int daysDifference = (currentLocalTime - employeeStartDate).Days;
 		return daysDifference;
 	}
-	
+
 	private int CalculateDaysLeft(int dayslapsed)
 	{
 		int daysLeft = 0;
@@ -247,7 +243,7 @@ else
 		contractEndDate = contractEndDate.AddDays(myDiff);
 		return contractEndDate;
 	}
-	
+
 	private IEnumerable<Agreement> RetrieveEmployeeContract(string employerEmail, string projectName)
 	{
 		IEnumerable<Agreement> myAgreement = new List<Agreement>();
@@ -274,12 +270,13 @@ else
 		return employeeAgreement;
 	}
 
-	private async Task UpdateEmployeeAgreement(string employerEmail, string projectName)
+	private async Task<DateTime> UpdateEmployeeAgreement(string employerEmail, string projectName)
 	{
 		IEnumerable<Agreement> myAgreement = RetrieveEmployeeContract(employerEmail, projectName);
 		DateTime endDate = SetContractLastDay(employerEmail, projectName);
 		Agreement employeeAgreement = SetAgreementInfo(myAgreement, endDate);
 		await AgreementService.UpdateAgreementStatus(employeeAgreement);
+		return endDate;
 	}
 
 	private async Task CheckToDesactivateAgreements()
@@ -295,13 +292,34 @@ else
 		}
 	}
 
-	private void SendEmailToEmployee()
+	private void SendEmailToEmployee(EmployeeList agreementInfo, DateTime endDate)
 	{
+		IList<string> employeeInfo = CreateEmailBody(agreementInfo, endDate);
+		//EmailObject emailObject = new EmailObject("","","","",agreementInfo.EmployerEmail);
+		EmailObject emailObject = new EmailObject("","","","","mauupvillegas2000@gmail.com");
+
+		EmailService.SendQuittingEmailToEmployee(emailObject, employeeInfo);
 
 	}
 
-	private void SendEmailToEmployer()
+	private void SendEmailToEmployer(EmployeeList agreementInfo, DateTime endDate)
 	{
+		IList<string> employeeInfo = CreateEmailBody(agreementInfo, endDate);
+		//EmailObject emailObject = new EmailObject("","","","",agreementInfo.EmployerEmail);
+		EmailObject emailObject = new EmailObject("","","","","mauupvillegas2000@gmail.com");
 
+		EmailService.SendQuittingEmailToEmployer(emailObject, employeeInfo);
+	}
+
+	private IList<string> CreateEmailBody(EmployeeList agreementInfo, DateTime endDate)
+	{
+		IList<string> employeeInfo = new List<string>();
+		string fullEmployerName = agreementInfo.EmployerName + " " + agreementInfo.EmployerLastName1 + " " + agreementInfo.EmployerLastName2;
+		employeeInfo.Add(personEmail);
+		employeeInfo.Add(agreementInfo.ProjectName);
+		employeeInfo.Add(DateTime.Now.ToShortDateString());
+		employeeInfo.Add(endDate.ToShortDateString());
+		employeeInfo.Add(fullEmployerName);
+		return employeeInfo;
 	}
 }
