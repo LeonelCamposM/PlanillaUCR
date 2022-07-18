@@ -141,5 +141,31 @@ namespace Application.Email.Implementations
 
             _emailSender.SendMail(emailData.Destiny, "Reporte planilla", htmlContent);
         }
+
+        public void SendIncreaseBenefitsEmail(string message, string destiny)
+        {
+
+        }
+
+        public void SendDecreaseBenefitsEmail(string message, string destiny)
+        {
+
+        }
+
+        public void SendOverbenefitsEmployeesEmail(IList<string> summaryEmployeesTable, string destiny)
+        {
+            string employees = string.Empty;
+            string htmlContent = "<section>" + "<div>" + "<header style = BACKGROUND-COLOR:#00695c>" + "<center>" + "<FONT SIZE=5 COLOR=#FFFFFF>" + "<strong>" + "PlanillaUCR" +
+                "</strong>" + "</FONT>" + "</center>" + "</div>" + "</header>" + "</section>" + "<br>" + "</br>";
+            htmlContent = htmlContent.Replace("[Heading]", "Lista de empleados que exeden los beneficios: ");
+            foreach (string benefit in summaryEmployeesTable)
+            {
+                employees += "<tr>";
+                employees += "<td>" + benefit + "</td>";
+                employees += "</tr>";
+            }
+            htmlContent = htmlContent.Replace("[benefits]", employees);
+
+        }
     }
 }
