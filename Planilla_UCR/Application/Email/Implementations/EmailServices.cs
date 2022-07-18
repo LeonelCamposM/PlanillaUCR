@@ -188,31 +188,30 @@ namespace Application.Email.Implementations
         public void SendOverbenefitsEmployeesEmail(IList<string> _overbenefitEmployeesEmail, IList<string> _overbenefitEmployeesName, EmailObject emailData)
         {
             string employees = string.Empty;
+            string projectName = emailData.ProjectName;
             string employeeName = emailData.EmployeeName;
             string employerName = emailData.EmployerName;
-            string projectName = emailData.ProjectName;
             string message = emailData.Message;
             string destiny = emailData.Destiny;
             string htmlContent = "<section>" + "<div>" + "<header style = BACKGROUND-COLOR:#00695c>" + "<center>" + "<FONT SIZE=5 COLOR=#FFFFFF>" + "<strong>" + "PlanillaUCR" +
                 "</strong>" + "</FONT>" + "</center>" + "</div>" + "</header>" + "</section>" + "<br>" + "</br>" + "<section>" + "<div>" + "Señor(a): " + employerName + "<br>" +
                 "</br>" + "</div>" + "</section>" + "<section>" + "<div>" + "En este correo se incluye la lista de empleados que actualmente están excediendo el monto y/o " +
-                "la cantidad de beneficios de " + projectName +". "+ "<br>" + "</br>" + "</div>" + "</section>" + "<section>" + "<div>" + "<strong>" + "<br>" + "</br>" + "<br>" + "</br>" +
-                "Lista de empleados excedidos en beneficios:" + "</strong>" + "</FONT>"+ "<br>" + "</br>" + "</div>" + "</section>"+ 
-                "<section>" + "<div>" + "<table> <center>" + "[Employees]" + "</table>" + "</center>" + "<br>" + "</br>" + "<br>" + "</br>" + "</div>" + "</section>" + "<section>" + "<div>" +
-                "<br>" + "</br>" + "A cada uno de ellos se les envió un correo indicando que deben desuscribirse de alguno de sus beneficios." + 
-                "<section>" + "<div>" + "Favor monitorear que cumplan con la fecha límite." + "<br>" + "</br>" + "</div>" + "</section>";
+                "la cantidad de beneficios de " + projectName + ". " + "<br>" + "</br>" + "</div> " + "</section>";
+            htmlContent += File.ReadAllText("../Server_Planilla/wwwroot/emails/OverstaffedEmployees.html");
+            
+            htmlContent += "<section>" + "<div>" +"<br>" + "</br>" + "A cada uno de ellos se les envió un correo indicando que deben desuscribirse de alguno de sus beneficios." +
+                "</div> " + "</section>" + "<section>" + "<div>" + "Favor monitorear que cumplan con la fecha límite." + "<br>" + "</br>" + "</div>" + "</section>";
 
             string subject = "Empleados excedidos en beneficios";
 
             for (int i = 0; i < _overbenefitEmployeesEmail.Length(); i++)
             {
                 employees += "<tr>";
-                employees += "<td style= border:1px solid black  border-style:outset>" +"<strong>" + "Nombre: " + "</strong>" + _overbenefitEmployeesName.ElementAt(i) + 
-                    ". - " + "<strong>" + "Email: " + "</strong>"+ _overbenefitEmployeesEmail.ElementAt(i) + "</td>";
+                employees += "<td>" + _overbenefitEmployeesName.ElementAt(i) + "</td>";
+                employees += "<td>" + _overbenefitEmployeesEmail.ElementAt(i) + "</td>";
                 employees += "</tr>";
             }
-            htmlContent = htmlContent.Replace("[Employees]", employees);
-            System.Diagnostics.Debug.WriteLine($"replace: {employees}");
+            htmlContent = htmlContent.Replace("[employees]", employees);
             _emailSender.SendMail(destiny, subject, htmlContent);
         }
     }
