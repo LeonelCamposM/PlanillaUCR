@@ -28,27 +28,27 @@ namespace Tests.Application
             new Payment("leonel@ucr.ac.cr", "Proyecto 5", "mau@ucr.ac.cr", 86000, DateTime.Now.AddDays(1),DateTime.Now.AddDays(15)),
             new Payment("leonel@ucr.ac.cr", "Proyecto 6", "mau@ucr.ac.cr", 186000, DateTime.Now.AddDays(1), DateTime.Now.AddDays(28)),
         };
-
-        private string _employeeEmail = "mau@ucr.ac.cr";
+        
+        private String _employerEmail = "leonel@ucr.ac.cr";
 
         [Fact]
-        public async Task GetEmployeeLatestPayment()
+        public async Task GetEmployerPayments()
         {
 
             //arrange
             var mockPaymentRepository = new Mock<IPaymentRepository>();
             var paymentService = new PaymentService(mockPaymentRepository.Object);
-            mockPaymentRepository.Setup(repo => repo.GetEmployeeLatestPayments("mau@ucr.ac.cr")).ReturnsAsync(paymentsList.Where(
-                e => e.EmployerEmail == _employeeEmail));
+            mockPaymentRepository.Setup(repo => repo.GetEmployerPayments("leonel@ucr.ac.cr")).ReturnsAsync(paymentsList.Where(
+                e => e.EmployerEmail == _employerEmail));
 
             //act
-            var lastestPaymentTest = paymentService.GetEmployeeLatestPayments(_employeeEmail);
+            var employerPaymentTest = paymentService.GetEmployerPayments(_employerEmail);
 
             //assert
-            mockPaymentRepository.Verify(repo => repo.GetEmployeeLatestPayments(_employeeEmail), Times.Once);
-            lastestPaymentTest.Count().Should().Equals(5);
+            mockPaymentRepository.Verify(repo => repo.GetEmployerPayments(_employerEmail), Times.Once);
+            employerPaymentTest.Count().Should().Equals(5);
         }
-
+    
         [Fact]
         public async Task GetDaysIntervalTest()
         {
