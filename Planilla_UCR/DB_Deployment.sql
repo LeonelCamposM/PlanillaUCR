@@ -1433,6 +1433,7 @@ INSERT INTO AgreementType VALUES
 
 INSERT INTO Agreement VALUES
 ('naye@ucr.ac.cr', 'david@ucr.ac.cr', 'Dulces david','2022-06-1','Medio tiempo', 1600, '2026-06-1', 1, ''),
+('fernando@ucr.ac.cr', 'david@ucr.ac.cr', 'Dulces david','2022-06-1','Medio tiempo', 1600, '2026-06-1', 1, ''),
 ('jefferson@ucr.ac.cr', 'david@ucr.ac.cr', 'Dulces david','2022-06-1','Tiempo completo', 1600, '2026-06-1', 1, ''),
 ('mary@ucr.ac.cr', 'david@ucr.ac.cr', 'Dulces david','2022-06-1','Tiempo completo', 1600, '2026-06-1', 1, ''),
 ('julio@ucr.ac.cr', 'david@ucr.ac.cr', 'Dulces david','2022-06-1','Tiempo completo', 1600, '2026-06-1', 1, ''),
@@ -1449,6 +1450,7 @@ INSERT INTO Agreement VALUES
 ('mary@ucr.ac.cr', 'david@ucr.ac.cr', 'Taller Hidalgo','2022-06-1','Servicios profesionales', 2000, '2026-06-1', 1, ''),
 ('alberto@ucr.ac.cr', 'david@ucr.ac.cr', 'Taller Hidalgo','2022-06-1','Medio tiempo', 2000, '2026-06-1', 1, ''),
 ('julio@ucr.ac.cr', 'david@ucr.ac.cr', 'Taller Hidalgo','2022-06-1','Tiempo completo', 2000, '2026-06-1', 1, ''),
+('fernando@ucr.ac.cr', 'david@ucr.ac.cr', 'Taller Hidalgo','2022-06-1','Medio tiempo', 2000, '2026-06-1', 1, ''),
 
 ('naye@ucr.ac.cr', 'david@ucr.ac.cr', 'El camino', '2022-06-1','Medio tiempo', 1600, '2026-06-1', 1, ''),
 ('naye@ucr.ac.cr', 'david@ucr.ac.cr', 'Cryptomonedas','2022-06-1','Tiempo completo', 16000, '2026-06-1', 1, '')
