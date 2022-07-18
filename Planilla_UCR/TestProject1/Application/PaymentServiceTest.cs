@@ -10,10 +10,14 @@ using Xunit;
 using Domain.Payments.Repositories;
 using Domain.Payments.Entities;
 using LanguageExt;
+using Tests.PaymentTest;
+using Presentation.Payments.Models;
+using Domain.Agreements.Entities;
+using static Tests.PaymentTest.EmployeeAgreement;
 
 namespace Tests.Application
 {
-    public class EmployeeLatestPaymentsServiceTest
+    public class PaymentServiceTest
     {
         List<Payment> paymentsList = new List<Payment>
         {
@@ -24,6 +28,7 @@ namespace Tests.Application
             new Payment("leonel@ucr.ac.cr", "Proyecto 5", "mau@ucr.ac.cr", 86000, DateTime.Now.AddDays(1),DateTime.Now.AddDays(15)),
             new Payment("leonel@ucr.ac.cr", "Proyecto 6", "mau@ucr.ac.cr", 186000, DateTime.Now.AddDays(1), DateTime.Now.AddDays(28)),
         };
+
         private string _employeeEmail = "mau@ucr.ac.cr";
 
         [Fact]
@@ -42,6 +47,20 @@ namespace Tests.Application
             //assert
             mockPaymentRepository.Verify(repo => repo.GetEmployeeLatestPayments(_employeeEmail), Times.Once);
             lastestPaymentTest.Count().Should().Equals(5);
+        }
+
+        [Fact]
+        public async Task GetDaysIntervalTest()
+        {
+
+            //arrange
+            ApprovePayment manager = new ApprovePayment(null, null, null);
+
+            //act
+            int days = manager.GetWorkedDays("", new DateTime(2007, 11, 05, 0, 0, 0), 31);
+
+            //assert
+            days.Should().Be(27);    
         }
     }
 }
