@@ -1,5 +1,5 @@
 ﻿--DB
---select * from Subscription Where IsEnabled = 0
+
 CREATE DATABASE DB_Planilla
 GO
 USE DB_Planilla
@@ -128,6 +128,21 @@ ON Agreement(EmployeeEmail,IsEnabled)
 	
 
 -- Suscription Stored Procedures
+GO
+CREATE OR ALTER PROCEDURE AddSuscription(
+	@EmployerEmail varchar(255),
+	@ProjectName varchar(255),
+	@SubscriptionName varchar(255),
+	@ProviderName varchar(255),
+	@SubscriptionDescription varchar(600),
+	@Cost float,
+	@TypeSubscription int
+) AS
+BEGIN
+	INSERT INTO Subscription
+	VALUES(@EmployerEmail,@ProjectName,@SubscriptionName,@ProviderName,@SubscriptionDescription,@Cost,@TypeSubscription,1)
+END
+
 GO
  CREATE OR ALTER PROCEDURE GetAllBenefits
 AS

@@ -123,7 +123,7 @@
             int error = await ValidName();
             if (error == 0)
             {
-                await SubscriptionService.CreateSubscriptionAsync(subscriptionToAdd);
+                SubscriptionService.CreateSubscriptionAsync(subscriptionToAdd);
                 snackHandler._saving = false;
                 ShowSnackNotification("Beneficio " + subscriptionToAdd.SubscriptionName + " creado", Severity.Success);
             }
@@ -143,14 +143,14 @@
         snackHandler._saving = false;
     }
 
-    private async Task ReactivateSubscription()
+    private void ReactivateSubscription()
     {
         Subscription subscriptionToAdd = subscriptionInfo;
         SubscriptionService.DisabledSubscription(subscriptionToAdd);
-        //Se cae
-        await SubscriptionService.CreateSubscriptionAsync(subscriptionToAdd);
+        SubscriptionService.CreateSubscriptionAsync(subscriptionToAdd);
         ShowSnackNotification("Beneficio " + subscriptionToAdd.SubscriptionName + " reactivado", Severity.Success);
         CloseDialog();
+        GoToMain();
     }
 
     private async Task<int> ValidName()
@@ -193,7 +193,7 @@
 
     private void GoToMain()
     {
-        nav.NavigateTo($"/Projects/{employerEmail}/{projectName}/Benefits");
+        nav.NavigateTo($"/Projects/{employerEmail}/{projectName}/Benefits", true);
     }
 
     private void CleanForm()
