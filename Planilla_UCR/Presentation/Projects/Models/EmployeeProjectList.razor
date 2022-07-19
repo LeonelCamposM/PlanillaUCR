@@ -295,9 +295,7 @@ else
 	private void SendEmailToEmployee(EmployeeList agreementInfo, DateTime endDate)
 	{
 		IList<string> employeeInfo = CreateEmailBody(agreementInfo, endDate);
-		//EmailObject emailObject = new EmailObject("","","","",agreementInfo.EmployerEmail);
-		EmailObject emailObject = new EmailObject("","","","","mauupvillegas2000@gmail.com");
-
+		EmailObject emailObject = new EmailObject("","","","",personEmail);
 		EmailService.SendQuittingEmailToEmployee(emailObject, employeeInfo);
 
 	}
@@ -305,9 +303,7 @@ else
 	private void SendEmailToEmployer(EmployeeList agreementInfo, DateTime endDate)
 	{
 		IList<string> employeeInfo = CreateEmailBody(agreementInfo, endDate);
-		//EmailObject emailObject = new EmailObject("","","","",agreementInfo.EmployerEmail);
-		EmailObject emailObject = new EmailObject("","","","","mauupvillegas2000@gmail.com");
-
+		EmailObject emailObject = new EmailObject("","","","",agreementInfo.EmployerEmail);
 		EmailService.SendQuittingEmailToEmployer(emailObject, employeeInfo);
 	}
 
