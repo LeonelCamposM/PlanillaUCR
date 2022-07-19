@@ -39,8 +39,6 @@ namespace Infrastructure.Subscriptions.Repositories
                 @SubscriptionDescription = {subscription.SubscriptionDescription}, @Cost = {subscription.Cost},
                 @TypeSubscription = {subscription.TypeSubscription}");
             _dbContext.Database.ExecuteSqlInterpolated(query);
-            //_dbContext.Subscriptions.Add(subscription);
-            //await _dbContext.SaveEntitiesAsync();
         }
 
         public async Task<Subscription>? GetSubscription(string employerEmail, string projectName, string subscriptionName)
