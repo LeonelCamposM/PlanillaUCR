@@ -119,13 +119,10 @@
         <MudDialog @bind-IsVisible="_visible" Options="dialogOptions">
             <TitleContent>
                 <MudText Typo="Typo.h6">
-                    <MudIcon Icon="@Icons.Material.Filled.Email" Color="@Color.Primary" Class="mr-2"/> Si desea reactivar su cuenta por favor ingrese el código de confirmación enviado a su email: 
+                    <MudIcon Icon="@Icons.Material.Filled.Email" Color="@Color.Primary" Class="mr-2"/> Se han encontrado datos relacionados a este correo electrónico. ¿Desea utilizarlos? 
                 </MudText>
             </TitleContent>
             <DialogContent>
-                <MudItem xs="12" Class="d-flex justify-center align-center">
-                    <MudText>Se han encontrado datos relacionados a este correo electrónico. ¿Desea utilizarlos?</MudText>
-                </MudItem>
                 </DialogContent>
             <DialogActions>
                 <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ConfirmOldData" Class="px-10">Aceptar</MudButton>
