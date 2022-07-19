@@ -19,8 +19,9 @@ CREATE TABLE Person(
 
 CREATE TABLE Employee(
 	Email varchar(255) NOT NULL PRIMARY KEY,
-	FOREIGN KEY(Email) REFERENCES Person(Email) 
+	FOREIGN KEY(Email) REFERENCES Person(Email) ON UPDATE CASCADE
 );
+
 
 CREATE TABLE Employer(
 	Email varchar(255) NOT NULL PRIMARY KEY,
@@ -55,7 +56,7 @@ CREATE TABLE Agreement(
 	MountPerHour int NOT NULL,
 	ContractFinishDate date NOT NULL,
 	PRIMARY KEY(EmployeeEmail,EmployerEmail,ProjectName,ContractStartDate),
-	FOREIGN KEY(EmployeeEmail) REFERENCES Employee(Email),
+	FOREIGN KEY(EmployeeEmail) REFERENCES Employee(Email) ON DELETE NO ACTION,
 	FOREIGN KEY(EmployerEmail, ProjectName) REFERENCES Project(EmployerEmail, ProjectName) ON UPDATE CASCADE,
 	FOREIGN KEY(ContractType, MountPerHour) REFERENCES AgreementType(TypeAgreement, MountPerHour),
 	IsEnabled int NOT NULL,
@@ -85,7 +86,7 @@ CREATE TABLE ReportOfHours(
 	Approved int NOT NULL,
 	PRIMARY KEY(EmployerEmail, ProjectName, EmployeeEmail, ReportDate),
 	FOREIGN KEY(EmployerEmail, ProjectName) REFERENCES Project(EmployerEmail, ProjectName) ON UPDATE CASCADE,
-	FOREIGN KEY(EmployeeEmail) REFERENCES Employee(Email)
+	FOREIGN KEY(EmployeeEmail) REFERENCES Employee(Email) ON DELETE NO ACTION
 );
 
 CREATE TABLE Subscribes(
