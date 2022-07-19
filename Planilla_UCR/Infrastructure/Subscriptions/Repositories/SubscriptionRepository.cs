@@ -108,5 +108,13 @@ namespace Infrastructure.Subscriptions.Repositories
             }
             return deductions;
         }
+
+        public void DisabledSubscription(Subscription subscription) 
+        {
+            System.FormattableString query = ($@"EXECUTE DisabledSubscription 
+                @EmployerEmail = {subscription.EmployerEmail}, @ProjectName = {subscription.ProjectName},
+                @SubscriptionName = {subscription.SubscriptionName}");
+            _dbContext.Database.ExecuteSqlInterpolated(query);
+        }
     }
 }

@@ -15,5 +15,6 @@ namespace Application.Subscriptions
         void DeleteSubscription(Subscription subscription);
         Task<IEnumerable<Subscription>> GetBenefitsByEmployee(string employeeEmail, string projectName);
         Task<IList<Subscription>> GetDeductionsByEmployee(string employeeEmail, string projectName);
+        void DisabledSubscription(Subscription subscription);
     }
 }

@@ -60,5 +60,10 @@ namespace Application.Subscriptions.Implementations
         {
             return await _subscriptionRepository.GetDeductionsByEmployee(employeeEmail, projectName);
         }
+
+        public void DisabledSubscription(Subscription subscription) 
+        { 
+            _subscriptionRepository.DisabledSubscription(subscription);
+        }
     }
 }
