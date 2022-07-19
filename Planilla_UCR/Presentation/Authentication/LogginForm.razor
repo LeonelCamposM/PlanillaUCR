@@ -95,7 +95,7 @@
     MudForm form;
     AccountDTO accountData = new AccountDTO("","");
     SnackHandler snackHandler = new SnackHandler();
-    Person personInfo = new Person("", "", "", "", Int32.Parse("0"), "", "", "",1);
+    Person personInfo;
     private bool visible;
     private bool open;
     private void OpenDialog() => visible = true;
@@ -110,6 +110,7 @@
         snackHandler._saving = true;
         await form.Validate();
         if (form.IsValid){
+            personInfo = new Person("", "", "", "", Int32.Parse("0"), "", "", "",1);
             personInfo.Email = accountData.Email;
             personInfo = await PersonService.GetInfoPerson(personInfo);
             bool emailExist = await AuthenticationService.EmailIsAlreadyRegistered(accountData.Email);
