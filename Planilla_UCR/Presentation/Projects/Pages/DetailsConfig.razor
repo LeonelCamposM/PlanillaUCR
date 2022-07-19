@@ -266,7 +266,7 @@ else
         _maxBenefits = benefitsList.Length();
         foreach(Subscription actualBenefit in benefitsList)
             _maxBenefitsAmount += actualBenefit.Cost;
-        
+
         if (_maxBenefitsAmount < _maximumAmountForBenefits || _maxBenefits < _projectInfo.MaximumBenefitAmount)
         {
             valid = false;
@@ -320,6 +320,7 @@ else
             emailData.Destiny = _employeesEmail.ElementAt(i);
             EmailService.SendIncreaseBenefitsEmail(emailData);
         }
+        _employeesEmail.Clear();
     }
 
     private async Task NotifyMyEmployeesDecrease()
