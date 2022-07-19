@@ -467,7 +467,6 @@ BEGIN
 	WHERE Email = @EmployerEmail
 END
 
-
 -- Employee Stored Procedures
 GO
 CREATE OR ALTER PROCEDURE [dbo].[GetAllEmployees]
@@ -507,7 +506,6 @@ BEGIN
 	SET Email = 'BORRADO*'+ CAST(GETDATE() AS varchar(20)) +'*'+ @EmployeeEmail
 	WHERE Email = @EmployeeEmail
 END
-
 
 -- AgreementType Stored procedures
 

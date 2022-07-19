@@ -124,13 +124,12 @@
             </TitleContent>
             <DialogContent>
                 <MudItem xs="12" Class="d-flex justify-center align-center">
-                    <MudTextField T="string" Label="Código de confirmación" Variant="Variant.Outlined" Required="true" RequiredError="Campo requerido" ></MudTextField>
+                    <MudText>Se han encontrado datos relacionados a este correo electrónico. ¿Desea utilizarlos?</MudText>
                 </MudItem>
                 </DialogContent>
             <DialogActions>
-                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Prueba" Class="px-10">Aceptar</MudButton>
-                <MudButton Variant="Variant.Filled" Color="Color.Transparent" OnClick="Prueba" Class="px-10">Reenviar</MudButton>
-                <MudButton Variant="Variant.Filled" Color="Color.Transparent" OnClick="Prueba" Class="px-10">No reactivar</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ConfirmOldData" Class="px-10">Aceptar</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Transparent" OnClick="CloseDialog" Class="px-10">Cancelar</MudButton>
             </DialogActions>
         </MudDialog>
 </MudGrid>
@@ -167,6 +166,7 @@
             EmailService.SendConfirmationEmail(message, accountData.Email);
             ShowSnackNotification("Cuenta para empleado "+personInfo.Name+" creada", Severity.Success);
             ShowSnackNotification("Se utilizó la contraseña por defecto: Nombre_Cedula!A", Severity.Info);
+
         }
         snackHandler._saving = false;
     }
@@ -247,16 +247,27 @@
         {
             _accountData.Email = element;
             bool emailExist = await AuthenticationService.EmailIsAlreadyRegistered(_accountData.Email);
-            OpenDialog();
-            ShowSnackNotification("Probando cuando cambio correo", Severity.Success);
+            if (emailExist && myPreviousPersonInfo.IsEnabled == 0)
+            {
+                OpenDialog();
+            }
+
         }
     }
 
-    private void Prueba()
-    {
-
-        ShowSnackNotification("Probando cuando click algo en dialog", Severity.Success);
+    private async Task ConfirmOldData(){
+        OpenDialog();
+        myPreviousPersonInfo.Email = _accountData.Email;
+        EmployeeService.DisabledAccountEmployee(myPreviousPersonInfo.Email);
+        myPreviousPersonInfo.IsEnabled = 1;
+        SetOldData();
+        await SavePersonInfo();
+        CloseDialog();
     }
 
+    private void SetOldData()
+    {
+        personInfo = myPreviousPersonInfo;
+    }
 
 }
