@@ -127,7 +127,7 @@
                 {
                     confirmationCodeEmail = CreateConfirmationCode();
                     OpenDialog();
-                    EmailService.ReactivateAccountEmail("El siguiente código es el que tienes que ingresar para verificar tu email para la reactivación de tu cuenta:  " + confirmationCodeEmail, accountData.Email);
+                    //EmailService.ReactivateAccountEmail("El siguiente código es el que tienes que ingresar para verificar tu email para la reactivación de tu cuenta:  " + confirmationCodeEmail, accountData.Email);
                 } 
             }
             else if (!emailExist && personInfo == null)
@@ -152,7 +152,7 @@
         if (open)
         {
             confirmationCodeEmail = CreateConfirmationCode();
-            EmailService.ReactivateAccountEmail("El siguiente código es el que tienes que ingresar para verificar tu email para la reactivación de tu cuenta:  " + confirmationCodeEmail, accountData.Email);
+            //EmailService.ReactivateAccountEmail("El siguiente código es el que tienes que ingresar para verificar tu email para la reactivación de tu cuenta:  " + confirmationCodeEmail, accountData.Email);
             ShowSnackNotification("Se ha enviado el nuevo correo", Severity.Success);
             if (confirmationCodeEmployer!=null)
             {

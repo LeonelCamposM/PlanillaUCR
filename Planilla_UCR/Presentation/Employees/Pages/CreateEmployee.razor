@@ -16,8 +16,9 @@
 @inject IPersonService PersonService
 @inject IEmployeeService EmployeeService
 @inject IAuthorizationServices AuthorizationService
-@inject IAuthenticationService authService;
+@inject IAuthenticationService AuthenticationService
 @inject IEmailServices EmailService
+@inject IDialogService DialogService
 @inject NavigationManager nav
 
 @*Navigation footprint *@
@@ -46,7 +47,7 @@
                     </MudItem>
 
                     <MudItem xs="4">
-                        <MudTextField @bind-Value="personInfo.Email" Label="Email" Variant="Variant.Outlined" Required="true" RequiredError="Campo requerido"  Validation="@(new EmailAddressAttribute() {ErrorMessage = "Por favor, digite un correo válido"})"></MudTextField>
+                        <MudTextField @bind-Value="personInfo.Email" Label="Email" Variant="Variant.Outlined" TextChanged = "CheckForAnExistingAccount" Required="true" RequiredError="Campo requerido"  Validation="@(new EmailAddressAttribute() {ErrorMessage = "Por favor, digite un correo válido"})"></MudTextField>
                     </MudItem>
                     <MudItem xs="2"></MudItem>
 
@@ -115,17 +116,39 @@
             </MudForm>
         </MudPaper>
     </MudItem>
+        <MudDialog @bind-IsVisible="_visible" Options="dialogOptions">
+            <TitleContent>
+                <MudText Typo="Typo.h6">
+                    <MudIcon Icon="@Icons.Material.Filled.Email" Color="@Color.Primary" Class="mr-2"/> Si desea reactivar su cuenta por favor ingrese el código de confirmación enviado a su email: 
+                </MudText>
+            </TitleContent>
+            <DialogContent>
+                <MudItem xs="12" Class="d-flex justify-center align-center">
+                    <MudTextField T="string" Label="Código de confirmación" Variant="Variant.Outlined" Required="true" RequiredError="Campo requerido" ></MudTextField>
+                </MudItem>
+                </DialogContent>
+            <DialogActions>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Prueba" Class="px-10">Aceptar</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Transparent" OnClick="Prueba" Class="px-10">Reenviar</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Transparent" OnClick="Prueba" Class="px-10">No reactivar</MudButton>
+            </DialogActions>
+        </MudDialog>
 </MudGrid>
 
 @code {
     Person personInfo = new Person("", "", "", "", Int32.Parse("0"), "", "", "",1);
+    Person myPreviousPersonInfo = new Person("", "", "", "", Int32.Parse("0"), "", "", "",1);
     SnackHandler snackHandler = new SnackHandler();
     MudForm form;
-
     [Parameter]
     public string email { set; get; }
     [Parameter]
     public string projectName { set; get; }
+    private bool _visible;
+    private void OpenDialog() => _visible = true;
+    private void CloseDialog() => _visible = false;
+    private DialogOptions dialogOptions = new() { FullWidth = true };
+    private AccountDTO _accountData = new AccountDTO("","");
 
     async Task SavePersonInfo()
     {
@@ -138,7 +161,7 @@
             await EmployeeService.CreateEmployeeAsync(personInfo.Email);
             AccountDTO accountData = new AccountDTO(personInfo.Email,personInfo.Name+"_"+personInfo.Ssn+"!A");
             string message = "Sus credenciales son: Usuario = "+accountData.Email+ " Clave =  "+accountData.Password;
-            await authService.RegisterRequestAsync(accountData);
+            await AuthenticationService.RegisterRequestAsync(accountData);
             await AuthorizationService.AssignRole(accountData.Email, "Employee");
             snackHandler._saving = false;
             EmailService.SendConfirmationEmail(message, accountData.Email);
@@ -212,8 +235,28 @@
         personInfo.Ssn = 0;
     }
 
-     private void GoToProjectEmployees()
+    private void GoToProjectEmployees()
     {
         nav.NavigateTo($"View_Project_Employees/{email}/{projectName}");
     }
+
+    private async Task CheckForAnExistingAccount(string element)
+    {
+        myPreviousPersonInfo = await PersonService.GetPerson(element);
+        if (myPreviousPersonInfo != null && myPreviousPersonInfo.IsEnabled == 0)
+        {
+            _accountData.Email = element;
+            bool emailExist = await AuthenticationService.EmailIsAlreadyRegistered(_accountData.Email);
+            OpenDialog();
+            ShowSnackNotification("Probando cuando cambio correo", Severity.Success);
+        }
+    }
+
+    private void Prueba()
+    {
+
+        ShowSnackNotification("Probando cuando click algo en dialog", Severity.Success);
+    }
+
+
 }

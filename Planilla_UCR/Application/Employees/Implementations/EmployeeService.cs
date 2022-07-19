@@ -33,5 +33,10 @@ namespace Application.Employees.Implementations
         {
             return await _employeeRepository.GetProjectEmployees(projectName, employerEmail);
         }
+
+        public void DisabledAccountEmployee(string employeeEmail)
+        {
+            _employeeRepository.DisabledAccountEmployee(employeeEmail);
+        }
     }
 }

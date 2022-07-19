@@ -12,5 +12,7 @@ namespace Application.Employees
         Task<IEnumerable<Employee>> GetEmployeeByEmail(string email);
         Task<IEnumerable<Person>> GetAllEmployees(string projectName);
         Task<IEnumerable<Person>> GetProjectEmployees(string projectName, string employerEmail);
+        void DisabledAccountEmployee(string employeeEmail);
+
     }
 }

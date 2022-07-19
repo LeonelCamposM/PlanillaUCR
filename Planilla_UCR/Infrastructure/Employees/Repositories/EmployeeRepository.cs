@@ -50,5 +50,10 @@ namespace Infrastructure.Employees.Repositories
             return employeeList;
         }
 
+        public void DisabledAccountEmployee(string email)
+        {
+            System.FormattableString query = ($@"EXECUTE DisabledAccountEmployee @EmployeeEmail = {email}");
+            _dbContext.Database.ExecuteSqlInterpolated(query);
+        }
     }
 }

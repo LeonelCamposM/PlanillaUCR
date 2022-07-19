@@ -498,6 +498,17 @@ BEGIN
     SELECT * FROM Employee AS E WHERE E.Email = @email 
 END
 
+GO
+CREATE OR ALTER PROCEDURE DisabledAccountEmployee(
+	@EmployeeEmail varchar(255)
+) AS
+BEGIN
+	UPDATE Person
+	SET Email = 'BORRADO*'+ CAST(GETDATE() AS varchar(20)) +'*'+ @EmployeeEmail
+	WHERE Email = @EmployeeEmail
+END
+
+
 -- AgreementType Stored procedures
 
 GO
