@@ -26,11 +26,11 @@ namespace Tests.Application
             new Payment("leonel@ucr.ac.cr", "Proyecto 5", "mau@ucr.ac.cr", 86000, DateTime.Now.AddDays(1),DateTime.Now.AddDays(15)),
             new Payment("leonel@ucr.ac.cr", "Proyecto 6", "mau@ucr.ac.cr", 186000, DateTime.Now.AddDays(1), DateTime.Now.AddDays(28)),
         };
-
+        
         private String _employerEmail = "leonel@ucr.ac.cr";
 
         [Fact]
-        public void GetEmployerPayments()
+        public async Task GetEmployerPayments()
         {
 
             //arrange
@@ -46,7 +46,7 @@ namespace Tests.Application
             mockPaymentRepository.Verify(repo => repo.GetEmployerPayments(_employerEmail), Times.Once);
             employerPaymentTest.Count().Should().Equals(5);
         }
-
+    
         [Fact]
         public void GetProjectsToPayTest()
         {
