@@ -12,6 +12,7 @@ namespace Application.Email
         public EmailSender() { }
         private string user = "i/MVRXAfhPPNVbUc0F0ILYn2xj4vSGjeCu1sXhBD7I0fFZBI5H7wD/8GHhHlMzPo";
         private string key = "Ac51HUFbRy1gf1G3b+pcTX3V37A4fYm9cjtx0+LX5ZsDBylU5L2dyoflorbIFyxv";
+        
         public void SendMail(string email, string subject, string htmlContent)
         {
             try
