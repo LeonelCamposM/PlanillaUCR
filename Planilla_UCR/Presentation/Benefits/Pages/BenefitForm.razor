@@ -139,15 +139,6 @@
                     ShowSnackNotification("Ya existe un beneficio con el nombre "+subscriptionToAdd.SubscriptionName, Severity.Error);
                 }
             }
-            //try
-            //{
-
-            //}
-            //catch (Exception)
-            //{
-            //    snackHandler._saving = false;
-            //    ShowSnackNotification("Ya existe un beneficio con el nombre "+subscriptionToAdd.SubscriptionName, Severity.Error);
-            //}
         }
         snackHandler._saving = false;
     }
@@ -156,9 +147,10 @@
     {
         Subscription subscriptionToAdd = subscriptionInfo;
         SubscriptionService.DisabledSubscription(subscriptionToAdd);
+        //Se cae
         await SubscriptionService.CreateSubscriptionAsync(subscriptionToAdd);
-        snackHandler._saving = false;
         ShowSnackNotification("Beneficio " + subscriptionToAdd.SubscriptionName + " reactivado", Severity.Success);
+        CloseDialog();
     }
 
     private async Task<int> ValidName()
