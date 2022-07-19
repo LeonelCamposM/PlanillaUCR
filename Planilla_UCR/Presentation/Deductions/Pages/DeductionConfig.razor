@@ -185,7 +185,8 @@ else
     {
         foreach (Subscription toDelete in _selectedItems1)
         {
-            IEnumerable<Subscribe> tempList = await SubscribeService.GetEmployeesBySubscription(employerEmail, projectName, toDelete.SubscriptionName);
+            IList<Subscribe> tempList = (await SubscribeService.GetEmployeesBySubscription(employerEmail, projectName, toDelete.SubscriptionName)).ToList();
+            tempList = tempList.Where(e => e.EndDate == null).ToList();
             if (tempList.Length() > 0)
             {
                 foreach (Subscribe toAppend in tempList)
