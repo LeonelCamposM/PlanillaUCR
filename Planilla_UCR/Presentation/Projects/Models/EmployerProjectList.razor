@@ -14,6 +14,7 @@
 
 @inject NavigationManager nav
 @inject ISnackbar Snackbar
+
 @inject IPersonService PersonService
 @inject IEmailServices EmailService
 @inject IProjectService ProjectService
@@ -103,9 +104,9 @@ else
         <MudButton Variant="Variant.Filled" OnClick="GoToCreate" Color="Color.Primary">Crear proyecto</MudButton>
 
                 
-        <MudDialog @bind-IsVisible="_visible" Options="dialogOptions">
+        <MudDialog @bind-IsVisible="_visible" Options="dialogOptions Style="text-align:justify-all">
             <TitleContent>
-                <MudText Typo="Typo.h6">
+                <MudText Typo="Typo.h6" Style="text-align:justify-all" >
                     <MudIcon Icon="@Icons.Material.Filled.Warning" Color="@Color.Primary" Class="mr-2"/> 
                         Este proyecto tiene empleados contratados, si confirma esta acción se procederá a terminar de forma 
                         temprana el contrato con todos sus empleados y la fecha de fin será el día de hoy. 
@@ -118,11 +119,14 @@ else
                     </MudTextField>
                 </MudItem>
 
-                <div class="d-flex align-end justify-space-between mud-width-full">
+                <div class="d-flex mud-width-full text-align:justify-all">
                      <div class="d-flex flex-column">
-                        <MudItem xs="12" Class="d-flex justify-center align-center">
-                                <MudText><b>*Nota: Si confirma la desactivación de este proyecto se le enviará un correo a cada uno de los empleados 
-                                    que tiene actualmente contratados, indicando la desactivación de este proyecto. </b></MudText>
+                        <MudItem xs="12" Class=" d-flex text-align:justify-all">
+                                <MudText Class=" d-flex text-align:justify-all"><b Class=" d-flex text-align:justify-all">
+                                    *Nota: Si confirma la desactivación de este proyecto se le enviará un correo a cada uno de los empleados 
+                                    que tiene actualmente contratados, indicando el motivo de la desactivación de este proyecto. 
+                                </b>
+                                </MudText>
                         </MudItem>
                     </div>
                 </div>
@@ -252,6 +256,7 @@ else
     private async Task ConfirmDisableProject()
     {
         EmailObject emailData = new EmailObject("", "", "", "", "");
+        Person employerInfo = await PersonService.GetPerson(personEmail);
         if (_justification != "")
         {
             foreach (Person activePerson in _activeEmployees)
@@ -262,7 +267,7 @@ else
                     {
                         await AgreementService.DesactivateAgreement(activePerson.Email, personEmail, this.projectName, _justification);
                         emailData.EmployeeName = activePerson.Name + " " + activePerson.LastName1 + " " + activePerson.LastName2;
-                        emailData.EmployerName = actualAgreement.EmployerEmail;
+                        emailData.EmployerName = employerInfo.Name + " " + employerInfo.LastName1 + " " + employerInfo.LastName2;
                         emailData.ProjectName = actualAgreement.ProjectName;
                         emailData.Message = _justification;
                         emailData.Destiny = actualAgreement.EmployeeEmail;
