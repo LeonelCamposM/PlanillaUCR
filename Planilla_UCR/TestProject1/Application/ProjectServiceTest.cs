@@ -78,16 +78,12 @@ namespace Tests.Application
         public async Task GetDisabledProjectTest()
         {
             // arrange
-            IEnumerable<Project> projectList = new List<Project>()
-            {
-                new Project(EmployerEmail, ProjectName, ProjectDescription, MaximumAmountForBenefits, MaximumBenefitAmount, PaymentInterval, IsEnabled, LastPaymentDate)
-            };
+            Project project = new Project(EmployerEmail, ProjectName, ProjectDescription, MaximumAmountForBenefits, MaximumBenefitAmount, PaymentInterval, IsEnabled, LastPaymentDate);
 
-            var project = new Project(EmployerEmail, ProjectName, ProjectDescription, MaximumAmountForBenefits, MaximumBenefitAmount, PaymentInterval, IsEnabled, LastPaymentDate);
             var mockProjectsRepository = new Mock<IProjectRepository>();
             var projectsService = new ProjectService(mockProjectsRepository.Object);
-            mockProjectsRepository.Setup(repo => repo.GetDisabledProject(EmployerEmail,ProjectName));
-            await projectsService.CreateProjectAsync(project);
+            mockProjectsRepository.Setup(repo => repo.GetDisabledProject(EmployerEmail,ProjectName)).ReturnsAsync(project);
+            await projectsService.GetDisabledProject(EmployerEmail, ProjectName);
 
             //act
             Project ProjectTest = await projectsService.GetDisabledProject(EmployerEmail, ProjectName);
