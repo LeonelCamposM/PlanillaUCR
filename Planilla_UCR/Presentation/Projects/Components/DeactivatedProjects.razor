@@ -183,7 +183,7 @@ else
         ProjectService.UpdateProject(_actualProject, this.personEmail);
         projectData.IsEnabled = 1;
         await ProjectService.CreateProjectAsync(projectData);
-        ShowSnackNotification(projectData.ProjectName + " ACTIVADO exitosamente", Severity.Success);
+        ShowSnackNotification(projectData.ProjectName + " activado exitosamente", Severity.Success);
         await Task.Delay(4000);
         nav.NavigateTo($"/Projects/{personEmail}/", true);
     }
