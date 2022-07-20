@@ -262,7 +262,7 @@ else
     {
         bool valid = true;
         _maxBenefitsAmount = 0.0;
-        IEnumerable <Subscription> benefitsList = await SuscriptionService.GetBenefitsByProject(personEmail, projectName);
+        IEnumerable < Subscription > benefitsList = await SuscriptionService.GetBenefitsByProject(personEmail, projectName);
         _maxBenefits = benefitsList.Length();
         foreach(Subscription actualBenefit in benefitsList)
             _maxBenefitsAmount += actualBenefit.Cost;

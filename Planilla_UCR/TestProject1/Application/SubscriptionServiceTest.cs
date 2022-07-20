@@ -12,11 +12,7 @@ using LanguageExt;
 
 namespace Tests.Application
 {
-<<<<<<< HEAD
-    public class GetBenefitsByProjectTest
-=======
     public class SubscriptionServiceTest
->>>>>>> main
     {
         List<Subscription> benefitsList = new List<Subscription>
         {
@@ -43,8 +39,6 @@ namespace Tests.Application
             mockSubscriptionRepository.Verify(repo => repo.GetBenefitsByProject(_employerEmail, _projectName));
             benefitsByEmployee.Count().Should().Equals(3);
         }
-<<<<<<< HEAD
-=======
 
         [Fact]
         public void GetSubscription()
@@ -72,6 +66,5 @@ namespace Tests.Application
             mockSubscriptionRepository.Verify(repo => repo.GetSubscription(_employerSubscriptionEmail, _projectSubscriptionName, _subscriptionName));
             subscription.Should().NotBe(null);
         }
->>>>>>> main
     }
 }
