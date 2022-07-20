@@ -73,5 +73,29 @@ namespace Tests.Application
             mockProjectsRepository.Verify(repo => repo.GetAllProjectsAsync(), Times.AtLeastOnce);
 
         }
+
+        [Fact]
+        public async Task GetDisabledProjectTest()
+        {
+            // arrange
+            IEnumerable<Project> projectList = new List<Project>()
+            {
+                new Project(EmployerEmail, ProjectName, ProjectDescription, MaximumAmountForBenefits, MaximumBenefitAmount, PaymentInterval, IsEnabled, LastPaymentDate)
+            };
+
+            var project = new Project(EmployerEmail, ProjectName, ProjectDescription, MaximumAmountForBenefits, MaximumBenefitAmount, PaymentInterval, IsEnabled, LastPaymentDate);
+            var mockProjectsRepository = new Mock<IProjectRepository>();
+            var projectsService = new ProjectService(mockProjectsRepository.Object);
+            mockProjectsRepository.Setup(repo => repo.GetDisabledProject(EmployerEmail,ProjectName));
+            await projectsService.CreateProjectAsync(project);
+
+            //act
+            Project ProjectTest = await projectsService.GetDisabledProject(EmployerEmail, ProjectName);
+
+            //assert
+            ProjectTest.EmployerEmail.Should().Be(EmployerEmail);
+            mockProjectsRepository.Verify(repo => repo.GetDisabledProject(EmployerEmail, ProjectName), Times.AtLeastOnce);
+
+        }
     }
 }
