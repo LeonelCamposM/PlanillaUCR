@@ -56,7 +56,7 @@
                 <MudTh>Fecha de pago</MudTh>
                 <MudTh>Salario neto</MudTh>
                 <MudTh><MudButton Size="Size.Small" OnClick="GoToHistoryPayments" Variant="Variant.Filled" 
-                    Color="Color.Primary"> Detalles</MudButton> </MudTh>
+                    Color="Color.Primary"> Histórico</MudButton> </MudTh>
             </HeaderContent>
             <RowTemplate Context="row">
                 <MudTd DataLabel="Proyecto">@row.ProjectName</MudTd> 
@@ -64,7 +64,7 @@
                 <MudTd DataLabel="Salario neto">@row.NetSalary</MudTd>
                      
                 <MudTd DataLabel="Ver más" >
-                    <MudButton Size="Size.Small" OnClick="GoToPaymentDetails" Variant="Variant.Filled" Color="Color.Primary"> Detalles</MudButton>
+                    <MudButton Size="Size.Small" @onclick="@(e => GoToPaymentDetails(row.ProjectName+": "+row.PaymentDate))" Variant="Variant.Filled" Color="Color.Transparent"> Detalles</MudButton>
                 </MudTd>
             </RowTemplate>
             <PagerContent>
@@ -93,7 +93,7 @@
 }
 
 @code {
-  
+
     [Parameter]
     public string email { get; set; }
     private bool _loading = true;
@@ -251,8 +251,9 @@
         nav.NavigateTo($"/{email}/Payment_History");
     }
 
-    private void GoToPaymentDetails()
+    private void GoToPaymentDetails(string selectedPayment)
     {
-        nav.NavigateTo($"/Last_Pay/{email}/");
+        selectedPayment = selectedPayment.Replace("/", "-");
+        nav.NavigateTo($"/Last_Pay/{email}/{selectedPayment}/");
     }
 }
