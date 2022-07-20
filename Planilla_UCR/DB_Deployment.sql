@@ -129,6 +129,21 @@ ON Agreement(EmployeeEmail,IsEnabled)
 
 -- Suscription Stored Procedures
 GO
+CREATE OR ALTER PROCEDURE AddSuscription(
+	@EmployerEmail varchar(255),
+	@ProjectName varchar(255),
+	@SubscriptionName varchar(255),
+	@ProviderName varchar(255),
+	@SubscriptionDescription varchar(600),
+	@Cost float,
+	@TypeSubscription int
+) AS
+BEGIN
+	INSERT INTO Subscription
+	VALUES(@EmployerEmail,@ProjectName,@SubscriptionName,@ProviderName,@SubscriptionDescription,@Cost,@TypeSubscription,1)
+END
+
+GO
  CREATE OR ALTER PROCEDURE GetAllBenefits
 AS
 BEGIN
@@ -167,23 +182,35 @@ CREATE OR ALTER PROCEDURE DeleteSubscription(
 	@SubscriptionName varchar(255)
 ) AS
 BEGIN
-	UPDATE Subscription
-	SET IsEnabled = 0
-	WHERE EmployerEmail= @EmployerEmail AND ProjectName = @ProjectName AND SubscriptionName = @SubscriptionName;
+	set implicit_transactions off;
 
-	DECLARE @EmployeeEmail varchar(255)
-	DECLARE @StartDate datetime
-	DECLARE cursor_Subscribes CURSOR FOR
-	SELECT EmployeeEmail, StartDate
-	FROM Subscribes WHERE EmployerEmail = @EmployerEmail AND ProjectName = @ProjectName AND SubscriptionName = @SubscriptionName
-	OPEN cursor_Subscribes
-		FETCH NEXT FROM cursor_Subscribes INTO @EmployeeEmail, @StartDate
-		WHILE @@FETCH_STATUS = 0 BEGIN
-			DELETE FROM Subscribes WHERE  EmployeeEmail = @EmployeeEmail AND EmployerEmail = @EmployerEmail AND ProjectName = @ProjectName AND SubscriptionName = @SubscriptionName AND StartDate = @StartDate
-			FETCH NEXT FROM cursor_Subscribes INTO @EmployeeEmail, @StartDate
-		END
-	CLOSE cursor_Subscribes
-	DEALLOCATE cursor_Subscribes
+	set transaction isolation level
+	serializable;
+
+	BEGIN TRANSACTION DeleteTransaction
+		BEGIN TRY
+			UPDATE Subscription
+			SET IsEnabled = 0
+			WHERE EmployerEmail= @EmployerEmail AND ProjectName = @ProjectName AND SubscriptionName = @SubscriptionName;
+
+			DECLARE @EmployeeEmail varchar(255)
+			DECLARE @StartDate datetime
+			DECLARE cursor_Subscribes CURSOR FOR
+			SELECT EmployeeEmail, StartDate
+			FROM Subscribes WHERE EmployerEmail = @EmployerEmail AND ProjectName = @ProjectName AND SubscriptionName = @SubscriptionName
+			OPEN cursor_Subscribes
+				FETCH NEXT FROM cursor_Subscribes INTO @EmployeeEmail, @StartDate
+				WHILE @@FETCH_STATUS = 0 BEGIN
+					DELETE FROM Subscribes WHERE  EmployeeEmail = @EmployeeEmail AND EmployerEmail = @EmployerEmail AND ProjectName = @ProjectName AND SubscriptionName = @SubscriptionName AND StartDate = @StartDate
+					FETCH NEXT FROM cursor_Subscribes INTO @EmployeeEmail, @StartDate
+				END
+			CLOSE cursor_Subscribes
+			DEALLOCATE cursor_Subscribes
+			COMMIT TRANSACTION DeleteTransaction;
+		END TRY
+       BEGIN CATCH
+			ROLLBACK TRANSACTION DeleteTransaction;
+       END CATCH
 END
 
 GO
@@ -209,6 +236,18 @@ BEGIN
 	WHERE S.TypeSubscription = 1 AND S.IsEnabled = 1 AND A.EmployeeEmail = @EmployeeEmail AND A.ProjectName = @ProjectName AND S.SubscriptionName NOT IN(SELECT SubscriptionName FROM Subscribes WHERE EmployeeEmail = @EmployeeEmail AND EndDate IS NULL)
 END
 
+GO
+CREATE OR ALTER PROCEDURE DisabledSubscription(
+	@EmployerEmail varchar(255),
+	@ProjectName varchar(255),
+	@SubscriptionName varchar(255)
+) AS
+BEGIN
+	UPDATE Subscription
+	SET SubscriptionName = 'BORRADO*'+ CAST(GETDATE() AS varchar(20)) +'*'+ @SubscriptionName
+	WHERE EmployerEmail = @EmployerEmail AND SubscriptionName = @SubscriptionName
+END
+
 -- Subscribe Stored Procedures
 GO
 CREATE OR ALTER PROCEDURE GetEmployeesBySubscription(
@@ -219,7 +258,7 @@ AS
 BEGIN
 	SELECT * 
 	FROM Subscribes 
-	WHERE EmployerEmail = @EmployerEmail AND ProjectName = @ProjectName AND SubscriptionName = @SubscriptionName
+	WHERE EmployerEmail = @EmployerEmail AND ProjectName = @ProjectName AND SubscriptionName = @SubscriptionName AND EndDate IS NULL
 END
 
 GO
@@ -244,6 +283,21 @@ BEGIN
 		S.ProjectName = C.ProjectName AND
 		S.SubscriptionName = C.SubscriptionName
 	WHERE S.EmployeeEmail = @EmployeeEmail AND C.IsEnabled = 1 AND C.TypeSubscription = 0 AND  S.ProjectName =  @ProjectName AND S.EndDate IS NULL
+END
+
+GO
+CREATE OR ALTER PROCEDURE AddSubscribes(
+	@EmployeeEmail varchar(255),
+	@EmployerEmail varchar(255),
+	@ProjectName varchar(255),
+	@SubscriptionName varchar(255),
+	@Cost float,
+	@StartDate datetime
+)
+AS
+BEGIN
+	INSERT INTO Subscribes (EmployeeEmail,EmployerEmail,ProjectName,SubscriptionName,Cost,StartDate)
+	VALUES (@EmployeeEmail, @EmployerEmail, @ProjectName, @SubscriptionName, @Cost, @StartDate)
 END
 
 GO
@@ -1271,7 +1325,7 @@ VALUES('leonel@ucr.ac.cr',
 'Dulces artesanales',
 'Gym',
 'jeremy@ucr.ac.cr',
-12000,
+25000,
 '2022-05-2'
 )
 
