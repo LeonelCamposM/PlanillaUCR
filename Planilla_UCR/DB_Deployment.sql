@@ -129,6 +129,21 @@ ON Agreement(EmployeeEmail,IsEnabled)
 
 -- Suscription Stored Procedures
 GO
+CREATE OR ALTER PROCEDURE AddSuscription(
+	@EmployerEmail varchar(255),
+	@ProjectName varchar(255),
+	@SubscriptionName varchar(255),
+	@ProviderName varchar(255),
+	@SubscriptionDescription varchar(600),
+	@Cost float,
+	@TypeSubscription int
+) AS
+BEGIN
+	INSERT INTO Subscription
+	VALUES(@EmployerEmail,@ProjectName,@SubscriptionName,@ProviderName,@SubscriptionDescription,@Cost,@TypeSubscription,1)
+END
+
+GO
  CREATE OR ALTER PROCEDURE GetAllBenefits
 AS
 BEGIN
@@ -219,6 +234,18 @@ BEGIN
 	SELECT S.EmployerEmail, S.ProjectName, S.SubscriptionName, S.ProviderName, S.SubscriptionDescription, S.Cost, S.TypeSubscription, S.IsEnabled
 	FROM Agreement A RIGHT JOIN Subscription S ON A.EmployerEmail = S.EmployerEmail AND A.ProjectName = S.ProjectName
 	WHERE S.TypeSubscription = 1 AND S.IsEnabled = 1 AND A.EmployeeEmail = @EmployeeEmail AND A.ProjectName = @ProjectName AND S.SubscriptionName NOT IN(SELECT SubscriptionName FROM Subscribes WHERE EmployeeEmail = @EmployeeEmail AND EndDate IS NULL)
+END
+
+GO
+CREATE OR ALTER PROCEDURE DisabledSubscription(
+	@EmployerEmail varchar(255),
+	@ProjectName varchar(255),
+	@SubscriptionName varchar(255)
+) AS
+BEGIN
+	UPDATE Subscription
+	SET SubscriptionName = 'BORRADO*'+ CAST(GETDATE() AS varchar(20)) +'*'+ @SubscriptionName
+	WHERE EmployerEmail = @EmployerEmail AND SubscriptionName = @SubscriptionName
 END
 
 -- Subscribe Stored Procedures
@@ -616,8 +643,18 @@ BEGIN
 	SET Agreement.ContractStartDate = @ContractStartDate, Agreement.ContractType = @ContractType, 
 	Agreement.MountPerHour = @MountPerHour, Agreement.ContractFinishDate = @ContractFinishDate,
 	Agreement.IsEnabled = 1, Agreement.Justification = ''
-	WHERE Agreement.EmployeeEmail = @EmployeeEmail AND Agreement.EmployerEmail = @EmployerEmail AND Agreement.ProjectName = @ProjectName and Agreement.IsEnabled <= 0;
+	WHERE Agreement.EmployeeEmail = @EmployeeEmail AND Agreement.EmployerEmail = @EmployerEmail AND Agreement.ProjectName = @ProjectName and Agreement.IsEnabled <= 1;
 END
+
+GO
+CREATE OR ALTER PROCEDURE GetErasableAgreeements(@EmployeeEmail varchar(255))
+AS
+BEGIN
+	SELECT *
+	FROM Agreement AS A
+	WHERE A.IsEnabled >= 0 AND A.ContractFinishDate <= GETDATE() AND A.EmployeeEmail = @EmployeeEmail
+END
+
 -- Payment stored procedures
 
 GO
@@ -1288,7 +1325,7 @@ VALUES('leonel@ucr.ac.cr',
 'Dulces artesanales',
 'Gym',
 'jeremy@ucr.ac.cr',
-12000,
+25000,
 '2022-05-2'
 )
 
