@@ -1405,7 +1405,6 @@ VALUES('leonel@ucr.ac.cr',
 '2022-06-1'
 )
 
-------------------------------------
 
 INSERT INTO LegalDeduction (DeductionName, Cost)
 VALUES('CCSS',
@@ -1416,93 +1415,6 @@ INSERT INTO LegalDeduction (DeductionName, Cost)
 VALUES('Hacienda',
 48000.3
 )
-
-/*
-INSERT INTO Payment
-VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Armario Vintage',153600, '2022-06-01', '2022-06-14')
-
-INSERT INTO Payment
-VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Armario Vintage',153600, '2022/06/15', '2022/06/28')
-
-INSERT INTO Payment
-VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Asian Bay',153600, '2022/06/1', '2022/06/14')
-
-INSERT INTO Payment
-VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Asian Bay',153600, '2022/06/15', '2022/06/28')
-
-INSERT INTO Payment
-VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','CarmelArt',153600, '2022/06/01', '2022/06/14')
-
-INSERT INTO Payment
-VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','CarmelArt',153600, '2022/06/15', '2022/06/28')
-
-INSERT INTO Payment
-VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Dulces artesanales',153600, '2022/06/01', '2022/06/14')
-
-INSERT INTO Payment
-VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Dulces artesanales',153600, '2022/06/15', '2022/06/28')
-
-INSERT INTO Payment
-VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','El pueblo',153600, '2022/06/01', '2022/06/14')
-
-INSERT INTO Payment
-VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','El pueblo',153600, '2022/06/15', '2022/06/28')
-
-INSERT INTO Payment
-VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Terra Dulce',153600, '2022/06/01', '2022/06/14')
-
-INSERT INTO Payment
-VALUES('mau@ucr.ac.cr','leonel@ucr.ac.cr','Terra Dulce',100000, '2022/06/01', '2022/06/14')
-
-INSERT INTO Payment
-VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Fragancias Doradas',153600, '2022/06/01', '2022/06/14')
-
-INSERT INTO Payment
-VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Fragancias Doradas',153600, '2022/06/15', '2022/06/28')
-
-INSERT INTO Payment
-VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Kaites',153600, '2022/06/01', '2022/06/14')
-
-INSERT INTO Payment
-VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Kaites',153600, '2022/06/15', '2022/06/28')
-
-INSERT INTO Payment
-VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','La Hilita',153600, '2022/06/01', '2022/06/14')
-
-INSERT INTO Payment
-VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','La Hilita',153600, '2022/06/15', '2022/06/28')
-
-INSERT INTO Payment
-VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Peluches felices',153600, '2022/06/01', '2022/06/14')
-
-INSERT INTO Payment
-VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Peluches felices',153600, '2022/06/15', '2022/06/28')
-
-INSERT INTO Payment
-VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Super Praga',153600, '2022/06/01', '2022/06/14')
-
-INSERT INTO Payment
-VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Super Praga',153600, '2022/06/15', '2022/06/28')
-
-INSERT INTO Payment
-VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Tech Solutions',153600, '2022/06/01', '2022/06/14')
-
-INSERT INTO Payment
-VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Tech Solutions',153600, '2022/06/15', '2022/06/28')
-
-INSERT INTO Payment
-VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Trendy Purse',153600, '2022/06/01', '2022/06/14')
-
-INSERT INTO Payment
-VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Trendy Purse',153600, '2022/06/15', '2022/06/28')
-
-INSERT INTO Payment
-VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Vanidosa',153600, '2022/06/01', '2022/06/14')
-
-INSERT INTO Payment
-VALUES('jeremy@ucr.ac.cr','leonel@ucr.ac.cr','Vanidosa',153600, '2022/06/15', '2022/06/28')
-*/
-
 
 -- Leonel Demo Insert
 INSERT INTO Person VALUES
@@ -1593,3 +1505,16 @@ INSERT INTO Subscribes (EmployerEmail, ProjectName, SubscriptionName, EmployeeEm
 ('david@ucr.ac.cr','La zapatera','Fondo de pensiones','naye@ucr.ac.cr',10000,'2022-06-1')
 
 
+
+--Drop DB
+--Drop table Payment
+--Drop table ReportOfHours
+--Drop table Subscribes
+--Drop table LegalDeduction
+--Drop table Agreement
+--Drop table AgreementType
+--Drop table Subscription
+--Drop table Employer
+--Drop table Employee
+--Drop table Project
+--Drop table Person
