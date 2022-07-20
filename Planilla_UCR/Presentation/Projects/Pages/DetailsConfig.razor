@@ -187,9 +187,9 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        ContextMenuService.SetProjectsContext(true,true,projectName, personEmail,true, false);
+        ContextMenuService.SetProjectsContext(true,true,projectName, personEmail,true, ContextMenuService.GetReportsContext());
         _projectInfo = await ProjectService.GetProject(personEmail,projectName);
-        _agreementElements = await AgreementService.GetEmployerAgreements(personEmail);
+        _agreementElements = await AgreementService.GetAllAgreementsByProjectAndEmployer(projectName, personEmail);
         await ValidateAmountOfBenefits();
         if (_projectInfo != null)
         {
@@ -210,8 +210,8 @@ else
         bool _valid = true;
         _newName = _newName.Trim();
 
-        if (_projectInfo.ProjectName != _newName) 
-        { 
+        if (_projectInfo.ProjectName != _newName)
+        {
             _valid = await ValidName(); 
         }
 
@@ -224,7 +224,6 @@ else
 
     private async Task SaveProject()
     {
-
         snackHandler._saving = false;
         _projectInfo.MaximumAmountForBenefits = (double)_maximumAmountForBenefits;
         ProjectService.ModifyProject(_projectInfo, _newName);
@@ -262,13 +261,13 @@ else
     private async Task<bool> ValidateAmountOfBenefits()
     {
         bool valid = true;
-        IEnumerable < Subscription > benefitsList = await SuscriptionService.GetBenefitsByProject(personEmail, projectName);
+        _maxBenefitsAmount = 0.0;
+        IEnumerable <Subscription> benefitsList = await SuscriptionService.GetBenefitsByProject(personEmail, projectName);
         _maxBenefits = benefitsList.Length();
         foreach(Subscription actualBenefit in benefitsList)
-        {
             _maxBenefitsAmount += actualBenefit.Cost;
-        }
-        if (_maxBenefitsAmount < _projectInfo.MaximumAmountForBenefits || _maxBenefits < _projectInfo.MaximumBenefitAmount)
+
+        if (_maxBenefitsAmount < _maximumAmountForBenefits || _maxBenefits < _projectInfo.MaximumBenefitAmount)
         {
             valid = false;
             ShowSnackNotification("Beneficios insuficientes, no puede asignar más beneficios de los existentes", Severity.Warning);
@@ -295,9 +294,8 @@ else
             _employeebenefits = await SubscribeService.GetBenefitsByEmployee(_employeesEmail.ElementAt(i), projectName);
             amountOfBenefits = _employeebenefits.Length();
             foreach (Subscribe actualSubscribe in _employeebenefits)
-            {
                 totalCost += actualSubscribe.Cost;
-            }
+
             if (totalCost > _projectInfo.MaximumAmountForBenefits ||
                 amountOfBenefits > _projectInfo.MaximumBenefitAmount)
             {
@@ -322,6 +320,7 @@ else
             emailData.Destiny = _employeesEmail.ElementAt(i);
             EmailService.SendIncreaseBenefitsEmail(emailData);
         }
+        _employeesEmail.Clear();
     }
 
     private async Task NotifyMyEmployeesDecrease()
@@ -329,6 +328,7 @@ else
         Person employer = await PersonService.GetPerson(personEmail);
         await FindEmployeesOfProject();
         await GetOverbenefitEmployees();
+
         for (int i = 0; i < _overbenefitEmployeesEmail.Length(); i++) 
         {
             EmailObject emailData = new EmailObject("", "", "", "", "");
