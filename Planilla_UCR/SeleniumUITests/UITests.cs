@@ -44,7 +44,7 @@ namespace SeleniumUITests
             string expectedURL = "https://localhost:44304/DashboardEmployer/david@ucr.ac.cr/";
             Assert.IsTrue(currentURL.Equals(expectedURL));
         }
-        
+
         [Test]
         public void IncompleteRegisterEmployerTest()
         {
@@ -59,7 +59,7 @@ namespace SeleniumUITests
             IWebElement passwordTextBox;
             IWebElement confirmPasswordTextBox;
             IWebElement registerButton;
-            IWebElement errorMessage =null;
+            IWebElement errorMessage = null;
 
             // Arrange
             string URL = "https://localhost:44304/";
@@ -108,7 +108,90 @@ namespace SeleniumUITests
 
             //Assert
             Thread.Sleep(2000);
-            Assert.IsTrue(errorMessage!=null);
+            Assert.IsTrue(errorMessage != null);
+        }
+
+        [Test]
+        public void ClearBenefitForm()
+        {
+            IWebElement textBox;
+            IWebElement passBox;
+            IWebElement loginButton;
+            IWebElement projectsMenu;
+            IWebElement project;
+            IWebElement projectBenefits;
+            IWebElement createBenefitsButtom;
+            IWebElement benefitName;
+            IWebElement benefitCost;
+            IWebElement benefitProvider;
+            IWebElement benefitDescription;
+            IWebElement clearFormButtom;
+
+            // Arrange
+            string URL = "https://localhost:44304/";
+            driver.Manage().Window.Maximize();
+            driver.Url = URL;
+
+            //Act
+            Thread.Sleep(2000);
+            textBox = driver.FindElement(By.CssSelector("#banner > div > div > div > div.mud-grid-item.mud-grid-item-xs-10.mud-grid-item-sm-12 > div > form > div > div:nth-child(2) > div > div.mud-input-control-input-container > div > input"));
+            textBox.SendKeys("david@ucr.ac.cr");
+            passBox = driver.FindElement(By.CssSelector("#banner > div > div > div > div.mud-grid-item.mud-grid-item-xs-10.mud-grid-item-sm-12 > div > form > div > div:nth-child(5) > div > div > div > input"));
+            passBox.SendKeys("Prueba01!");
+            loginButton = driver.FindElement(By.CssSelector("#banner > div > div > div > div.mud-grid-item.mud-grid-item-xs-10.mud-grid-item-sm-12 > div > form > div > div:nth-child(8) > button.mud-button-root.mud-button.mud-button-filled.mud-button-filled-primary.mud-button-filled-size-medium.mud-ripple > span > p"));
+            Thread.Sleep(2000);
+            loginButton.Click();
+            Thread.Sleep(2000);
+
+            projectsMenu = driver.FindElement(By.CssSelector("#banner > aside > div > div > ul > li > li:nth-child(2) > a > button"));
+            projectsMenu.Click();
+            Thread.Sleep(2000);
+
+            project = driver.FindElement(By.CssSelector("#banner > div > div > div > div.mud-table-container > table > tbody > tr:nth-child(1) > td:nth-child(1) > a"));
+            project.Click();
+            Thread.Sleep(2000);
+
+            projectBenefits = driver.FindElement(By.CssSelector("#banner > aside > div > div > ul > li > li:nth-child(12) > a > button.mud-button-root.mud-icon-button.mud-icon-button-color-secondary.mud-ripple.mud-ripple-icon.mr-2"));
+            projectBenefits.Click();
+            Thread.Sleep(2000);
+
+            try 
+            {
+                createBenefitsButtom = driver.FindElement(By.CssSelector("#banner > div > div > div > button.mud-button-root.mud-button.mud-button-filled.mud-button-filled-primary.mud-button-filled-size-medium.mud-ripple"));
+                createBenefitsButtom.Click();
+            }
+            catch 
+            {
+                createBenefitsButtom = driver.FindElement(By.CssSelector("#banner > div > div > button"));
+                createBenefitsButtom.Click();
+            }
+            Thread.Sleep(2000);
+
+            benefitName = driver.FindElement(By.CssSelector("#banner > div > div > div > div > div > form > div > div:nth-child(2) > div > div.mud-input-control-input-container > div > input"));
+            benefitName.SendKeys("Tarjeta de regalo");
+            Thread.Sleep(1000);
+
+            benefitCost = driver.FindElement(By.CssSelector("#banner > div > div > div > div > div > form > div > div:nth-child(5) > div > div.mud-input-control-input-container > div > input"));
+            benefitCost.SendKeys("10000");
+            Thread.Sleep(1000);
+
+            benefitProvider = driver.FindElement(By.CssSelector("#banner > div > div > div > div > div > form > div > div:nth-child(6) > div > div.mud-input-control-input-container > div > input"));
+            benefitProvider.SendKeys("Zara");
+            Thread.Sleep(1000);
+
+            benefitDescription = driver.FindElement(By.CssSelector("#banner > div > div > div > div > div > form > div > div:nth-child(9) > div > div.mud-input-control-input-container > div > input"));
+            benefitDescription.SendKeys("Tarjeta de regalo de 10000");
+            Thread.Sleep(1000);
+
+            clearFormButtom = driver.FindElement(By.CssSelector("#banner > div > div > div > div > div > form > div > div:nth-child(12) > button.mud-button-root.mud-button.mud-button-filled.mud-button-filled-transparent.mud-button-filled-size-medium.mud-ripple"));
+            clearFormButtom.Click();
+
+            //Assert
+            Thread.Sleep(1000);
+            Assert.IsTrue(benefitName.Text.Equals(string.Empty));
+            Assert.IsTrue(benefitCost.Text.Equals(string.Empty));
+            Assert.IsTrue(benefitProvider.Text.Equals(string.Empty));
+            Assert.IsTrue(benefitDescription.Text.Equals(string.Empty));
         }
 
         [Test]
@@ -166,5 +249,70 @@ namespace SeleniumUITests
             Assert.IsTrue(successMessage != null);
         }
 
+
+        [Test]
+        public void IncompleteAgreementCreationTest()
+        {
+            IWebElement logginBox;
+            IWebElement logginPassWordBox;
+            IWebElement button;
+
+            // Arrange
+            string URL = "https://localhost:44304/";
+            driver.Manage().Window.Maximize();
+            driver.Url = URL;
+            Thread.Sleep(2000);
+            logginBox = driver.FindElement(By.CssSelector("#banner > div > div > div > div.mud-grid-item.mud-grid-item-xs-10.mud-grid-item-sm-12 > div > form > div > div:nth-child(2) > div > div.mud-input-control-input-container > div > input"));
+            //textBox.SendKeys("david@ucr.ac.cr"); 
+            logginBox.SendKeys("leonel@ucr.ac.cr");
+            logginPassWordBox = driver.FindElement(By.CssSelector("#banner > div > div > div > div.mud-grid-item.mud-grid-item-xs-10.mud-grid-item-sm-12 > div > form > div > div:nth-child(5) > div > div > div > input"));
+            logginPassWordBox.SendKeys("Prueba01!");
+            button = driver.FindElement(By.CssSelector("#banner > div > div > div > div.mud-grid-item.mud-grid-item-xs-10.mud-grid-item-sm-12 > div > form > div > div:nth-child(8) > button.mud-button-root.mud-button.mud-button-filled.mud-button-filled-primary.mud-button-filled-size-medium.mud-ripple > span > p"));
+            Thread.Sleep(2000);
+            button.Click();
+            //driver.Url = "https://localhost:44304/DashboardEmployer/david@ucr.ac.cr/";
+            driver.Url = "https://localhost:44304/DashboardEmployer/leonel@ucr.ac.cr/";
+            Thread.Sleep(2000);
+            button = driver.FindElement(By.CssSelector("#banner > aside > div > div > ul > li > li:nth-child(2) > a > p"));
+            Thread.Sleep(2000);
+            button.Click();
+            //driver.Url = "https://localhost:44304/Projects/david@ucr.ac.cr/";
+            driver.Url = "https://localhost:44304/Projects/leonel@ucr.ac.cr/";
+            Thread.Sleep(2000);
+            button = driver.FindElement(By.CssSelector("#banner > div > div > div > div.mud-table-container > table > tbody > tr:nth-child(1) > td:nth-child(1) > a"));
+            Thread.Sleep(2000);
+            button.Click();
+            //driver.Url = "https://localhost:44304/Projects/david@ucr.ac.cr/Armario%20Vintage";
+            driver.Url = "https://localhost:44304/Projects/leonel@ucr.ac.cr/Armario%20Vintage";
+            Thread.Sleep(2000);
+            button = driver.FindElement(By.CssSelector("#banner > aside > div > div > ul > li > li:nth-child(11) > a > p"));
+            Thread.Sleep(2000);
+            button.Click();
+            //driver.Url = "https://localhost:44304/Agreements/david@ucr.ac.cr/Armario%20Vintage/";
+            driver.Url = "https://localhost:44304/Agreements/leonel@ucr.ac.cr/Armario%20Vintage/";
+            Thread.Sleep(2000);
+            button = driver.FindElement(By.CssSelector("#banner > div > div > div.mud-table.mud-sm-table.mud-table-hover.mud-elevation-1 > div.mud-table-container > table > tbody > tr:nth-child(1) > td:nth-child(4) > button > span > p"));
+            Thread.Sleep(2000);
+            button.Click();
+            //driver.Url = "https://localhost:44304/Agreements/david@ucr.ac.cr/Armario%20Vintage/alberto@ucr.ac.cr/Alberto%20%20%20%20/New";
+            driver.Url = "https://localhost:44304/Agreements/leonel@ucr.ac.cr/Armario%20Vintage/alberto@ucr.ac.cr/Alberto%20%20%20%20/New";
+
+            // Act 
+
+            Thread.Sleep(2000);
+            //SelectElement oSelect = new SelectElement(driver.FindElement(By.CssSelector("#banner > div > div > div > div > div > form > div > div:nth-child(10) > div > div > div > div.mud-input.mud-input-outlined.mud-input-adorned-end.mud-select-input > input")));
+            //oSelect.SelectByIndex(4);
+            button = driver.FindElement(By.CssSelector("#banner > div > div > div > div > div > form > div > button.mud-button-root.mud-button.mud-button-filled.mud-button-filled-primary.mud-button-filled-size-medium.mud-ripple.mud-button-disable-elevation > span > p"));
+            Thread.Sleep(2000);
+            button.Click();
+
+            // Assert
+
+            Thread.Sleep(2000);
+            string currentURL = driver.Url;
+            // string expectedURL = "https://localhost:44304/Agreements/david@ucr.ac.cr/Armario%20Vintage/alberto@ucr.ac.cr/Alberto%20%20%20%20/New";
+            string expectedURL = "https://localhost:44304/Agreements/leonel@ucr.ac.cr/Armario%20Vintage/alberto@ucr.ac.cr/Alberto%20%20%20%20/New";
+            Assert.IsTrue(currentURL.Equals(expectedURL));
+        }
     }
 }
