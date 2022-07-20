@@ -35,7 +35,8 @@
     <MudItem xs="10" sm="12">
     <MudPaper Elevation="0" Class="mx-auto pa-3 rounded" Height="380px" Width="50%" Outlined="false">
         <MudSpacer></MudSpacer>
-        <MudText Align="Align.Center" Typo="Typo.h6">Ingresar</MudText>
+        <MudText Align="Align.Center" Typo="Typo.h6">Ingresar a PlanillaUCR</MudText>
+        <br />
         <MudForm @ref="form">
         <MudGrid>
             <MudItem xs="2"></MudItem>
@@ -52,7 +53,7 @@
             @*Create buton *@
                 <MudItem xs="8">
                 <MudButton Disabled="@snackHandler._saving" OnClick="ValidateRegisterAccount" Variant="Variant.Filled" Color="Color.Primary">
-                        <MudText> &emsp;&emsp;&emsp;&emsp;&emsp; Iniciar sesión &emsp;&emsp;&emsp;&emsp;&emsp;</MudText>
+                        <MudText> &emsp;&emsp;&emsp;&emsp;&emsp; Iniciar sesión &emsp;&emsp;&emsp;&emsp;&emsp;&nbsp;&nbsp;&nbsp;&nbsp;</MudText>
                 </MudButton> 
 
             <MudItem xs="2"></MudItem>
@@ -60,7 +61,7 @@
             <MudItem xs="8"></MudItem>
                <br />
                 <MudButton OnClick="GoToCreateAccount" Variant="Variant.Filled" Color="Color.Transparent">
-                <MudText>&emsp;&emsp;&emsp; Registrar empleador &emsp;&emsp;&emsp; </MudText>
+                <MudText>&emsp;&emsp;&emsp; Registrar empleador &emsp;&emsp;&emsp;&nbsp;&nbsp;&nbsp; </MudText>
                 </MudButton>
             </MudItem>
            <MudItem xs="2"></MudItem>
