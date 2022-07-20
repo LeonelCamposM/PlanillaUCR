@@ -192,7 +192,7 @@ namespace SeleniumUITests
             Assert.IsTrue(benefitProvider.Text.Equals(string.Empty));
             Assert.IsTrue(benefitDescription.Text.Equals(string.Empty));
         }
-    }
+
         [Test]
         public void IncompleteAgreementCreationTest()
         {
@@ -241,7 +241,7 @@ namespace SeleniumUITests
             driver.Url = "https://localhost:44304/Agreements/leonel@ucr.ac.cr/Armario%20Vintage/alberto@ucr.ac.cr/Alberto%20%20%20%20/New";
 
             // Act 
-            
+
             Thread.Sleep(2000);
             //SelectElement oSelect = new SelectElement(driver.FindElement(By.CssSelector("#banner > div > div > div > div > div > form > div > div:nth-child(10) > div > div > div > div.mud-input.mud-input-outlined.mud-input-adorned-end.mud-select-input > input")));
             //oSelect.SelectByIndex(4);
@@ -257,5 +257,5 @@ namespace SeleniumUITests
             string expectedURL = "https://localhost:44304/Agreements/leonel@ucr.ac.cr/Armario%20Vintage/alberto@ucr.ac.cr/Alberto%20%20%20%20/New";
             Assert.IsTrue(currentURL.Equals(expectedURL));
         }
-    } 
+    }
 }
