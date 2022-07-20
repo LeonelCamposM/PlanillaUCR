@@ -785,10 +785,10 @@ VALUES('nyazofeifa3003@gmail.com',
 
 INSERT INTO Person
 VALUES('nayeri.azofeifa@ucr.ac.cr',
-'NayNay',
+'Mariela',
 'Azofeifa',
 'Porras',
-118070615,
+118070614,
 'CR4024',
 'Alajuela, Costa Rica',
 '89433965',
