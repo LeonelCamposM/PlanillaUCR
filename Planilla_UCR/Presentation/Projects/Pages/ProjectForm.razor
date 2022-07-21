@@ -63,7 +63,7 @@
                 <MudItem xs="4">
              
                     <MudNumericField Immediate="true" Label="Monto máximo para beneficios" Format="N2" Min="0" Culture="@cultureCR" Variant="Variant.Outlined" @bind-Value="_maximumAmountForBenefits" 
-                    Adornment="Adornment.Start" AdornmentText="@cultureCR.NumberFormat.CurrencySymbol" Required="false" RequiredError="Campo no requerido"/>
+                    Step="1000" Adornment="Adornment.Start" AdornmentText="@cultureCR.NumberFormat.CurrencySymbol" Required="false" RequiredError="Campo no requerido"/>
                 </MudItem>
 
                 <MudItem xs="4">
