@@ -449,6 +449,19 @@ BEGIN
 	SET IsEnabled = 0
 	WHERE EmployerEmail= @EmployerEmail AND ProjectName = @ProjectName;
 END
+
+GO
+CREATE OR ALTER PROCEDURE UpdateProject
+(
+	@ProjectName varchar(255),
+	@EmployerEmail varchar(255)
+) AS
+BEGIN
+	UPDATE Project
+	SET ProjectName='BORRADO*'+ CAST(GETDATE() AS varchar(20))+ '*'+@ProjectName
+	WHERE EmployerEmail= @EmployerEmail AND ProjectName = @ProjectName;
+END
+
 GO
 CREATE OR ALTER PROCEDURE UpdatePaymentDate(
 	@ProjectName varchar(255),
@@ -763,6 +776,9 @@ VALUES('leonel@ucr.ac.cr', 'Terra Dulce', 'Deducción Ejemplo', 'Ejemplo', 'Ejem
 ('leonel@ucr.ac.cr', 'Dulces artesanales', 'Apple del futuro', 'Apple', 'Subscripción futura', 55000, 0, 1),
 ('leonel@ucr.ac.cr', 'Dulces artesanales', 'Matricula', 'U Latina', 'Descuento en la matrícula de la U Latina', 100000, 0, 1),
 ('leonel@ucr.ac.cr', 'Dulces artesanales','Gym','Golden Gym','Gimnasio equipado con todo lo necesario.',25000,1, 1),
+('leonel@ucr.ac.cr', 'Dulces artesanales', 'Optometria', 'ASEMBIS', 'Beneficio descuento para el examen de la vista y aros.', 25000, 1, 1),
+('leonel@ucr.ac.cr', 'Dulces artesanales', 'Cine', 'Cinemark', 'Descuentos en palomitas.', 8000, 1, 1),
+('leonel@ucr.ac.cr', 'Dulces artesanales', 'Ortodoncia', 'Sonrisitas', 'Descuentos del 20% en consulta general.', 27000, 1, 1),
 ('leonel@ucr.ac.cr', 'Dulces artesanales', 'Piscina', 'Aquanautas', 'Piscinas temperadas, ubicadas en San Pedro.', 12000, 1, 1),
 ('leonel@ucr.ac.cr', 'Dulces artesanales', 'Starbucks descuento', 'Starbucks', 'Descuento en un starbucks', 12000, 0, 1),
 ('leonel@ucr.ac.cr', 'Dulces artesanales', 'Ayudemos a los niños', 'Hospital de los niños', 'Cuota voluntaria para ayudar a los más necesitados.', 14000, 0, 1),
@@ -840,6 +856,8 @@ INSERT INTO Subscribes (EmployerEmail, ProjectName, SubscriptionName, EmployeeEm
 VALUES('leonel@ucr.ac.cr', 'Terra Dulce', 'Ayudemos a los niños', 'jeremy@ucr.ac.cr', 25000, '2022-06-1'),
 ('leonel@ucr.ac.cr', 'Terra Dulce', 'Gym', 'jeremy@ucr.ac.cr', 12000, '2022-06-2'),
 ('leonel@ucr.ac.cr', 'Dulces artesanales', 'Gym', 'jeremy@ucr.ac.cr', 25000, '2022-05-2'),
+('leonel@ucr.ac.cr', 'Dulces artesanales', 'Gym', 'mau@ucr.ac.cr', 25000, '2022-05-2'),
+('leonel@ucr.ac.cr', 'Dulces artesanales', 'Gym', 'nayeri.azofeifa@ucr.ac.cr', 25000, '2022-05-2'),
 ('leonel@ucr.ac.cr', 'Dulces artesanales', 'Matricula', 'jeremy@ucr.ac.cr', 100000, '2022-05-2'),
 ('leonel@ucr.ac.cr', 'Dulces artesanales', 'Ayudemos a los niños', 'jeremy@ucr.ac.cr', 14000, '2022-06-1'),
 ('leonel@ucr.ac.cr', 'Asian Bay', 'Ayudemos a los niños', 'jeremy@ucr.ac.cr', 7000, '2022-06-1'),
