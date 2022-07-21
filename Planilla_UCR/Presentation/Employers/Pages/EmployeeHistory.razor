@@ -351,8 +351,7 @@ else
     {
         foreach (EmployeeHistoryList person in _paymentsHistory)
         {
-            person.EmployeeCost = person.GrossSalary + person.TotalBenefits + person.EmployerSocialCharges + 
-                                  person.MandatoryEmployeeDeductions + person.VoluntaryDeductions;
+            person.EmployeeCost = person.GrossSalary + person.TotalBenefits + person.EmployerSocialCharges;
         }
     }
 
