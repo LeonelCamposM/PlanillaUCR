@@ -858,11 +858,11 @@ VALUES('CCSS', 25000.3),
 INSERT INTO Person VALUES
 ('naye@ucr.ac.cr', 'Nayeri', 'Azofeifa','Porras', 483155349,'CR4024756765','Alajuela, Costa Rica','89433965',1),
 ('david@ucr.ac.cr','David','Hidalgo','Castro',833542346,'CR4024242342','Alajuela, Costa Rica','89433965',1),
-('jefferson@ucr.ac.cr','Jefferson',' ',' ',133552246,'CR434242342','Alajuela, Costa Rica','85633965',1),
-('mary@ucr.ac.cr','Mary',' ',' ',383355246,'CR434242342','Alajuela, Costa Rica','85633965',1),
-('julio@ucr.ac.cr','Julio',' ',' ',783355246,'CR434242342','Alajuela, Costa Rica','85633965',1),
-('alberto@ucr.ac.cr','Alberto',' ',' ',583355246,'CR434242342','Alajuela, Costa Rica','85633965',1),
-('fernando@ucr.ac.cr','Fernando',' ',' ',283355246,'CR434242342','Alajuela, Costa Rica','85633965',1)
+('jefferson@ucr.ac.cr','Jefferson','Artavia','Solis',133552246,'CR434242342','Alajuela, Costa Rica','85633965',1),
+('mary@ucr.ac.cr','Mary','Hincapie','Baltodano',383355246,'CR434242342','Alajuela, Costa Rica','85633965',1),
+('julio@ucr.ac.cr','Julio','Venegas','Castro',783355246,'CR434242342','Alajuela, Costa Rica','85633965',1),
+('alberto@ucr.ac.cr','Alberto','Rojas','Silva',583355246,'CR434242342','Alajuela, Costa Rica','85633965',1),
+('fernando@ucr.ac.cr','Fernando','Rodriguez','Villanueva',283355246,'CR434242342','Alajuela, Costa Rica','85633965',1)
 
 INSERT INTO Employee VALUES
 ('naye@ucr.ac.cr'),
@@ -917,7 +917,13 @@ INSERT INTO Agreement VALUES
 ('fernando@ucr.ac.cr', 'david@ucr.ac.cr', 'Taller Hidalgo','2022-06-1','Medio tiempo', 2000, '2026-06-1', 1, ''),
 
 ('naye@ucr.ac.cr', 'david@ucr.ac.cr', 'El camino', '2022-06-1','Medio tiempo', 1600, '2026-06-1', 1, ''),
-('naye@ucr.ac.cr', 'david@ucr.ac.cr', 'Cryptomonedas','2022-06-1','Tiempo completo', 16000, '2026-06-1', 1, '')
+
+('naye@ucr.ac.cr', 'david@ucr.ac.cr', 'Cryptomonedas','2022-06-1','Tiempo completo', 16000, '2026-06-1', 1, ''),
+('jeremy@ucr.ac.cr', 'david@ucr.ac.cr', 'Cryptomonedas','2022-06-1','Medio tiempo', 4000, '2026-06-1', 1, ''),
+('julio@ucr.ac.cr', 'david@ucr.ac.cr', 'Cryptomonedas','2022-06-1','Servicios profesionales', 1600, '2026-06-1', 1, ''),
+('mary@ucr.ac.cr', 'david@ucr.ac.cr', 'Cryptomonedas','2022-06-1','Tiempo completo', 8000, '2026-06-1', 1, ''),
+('jefferson@ucr.ac.cr', 'david@ucr.ac.cr', 'Cryptomonedas','2022-06-1','Tiempo completo', 16000, '2026-06-1', 1, '')
+
 
 INSERT INTO ReportOfHours VALUES
 ('david@ucr.ac.cr', 'Taller Hidalgo','naye@ucr.ac.cr', '2022-06-2',4.0 ,0),
