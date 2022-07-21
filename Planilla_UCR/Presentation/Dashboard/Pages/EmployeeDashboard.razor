@@ -12,6 +12,7 @@
 @using Application.PaymentCalculator;
 @using Presentation.Dashboard.Components
 @using Presentation.Employees.Models
+@using Presentation.Core.Components
 @using System.Text
 @using ChartJs.Blazor.BarChart
 @using ChartJs.Blazor.PieChart
@@ -40,8 +41,27 @@
         <MudGrid>
             <MudItem xs="6">
             <MudPaper Class="pa-3" Height="380px" Elevation="3">
-                <MudText Align="Align.Left" Typo="Typo.h6">Salario neto </MudText>
+
+                <MudText Align="Align.Left" Typo="Typo.h6">Salario neto    &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&nbsp;&nbsp;<MudToggleIconButton @bind-Toggled="@barChart1" Icon="@Icons.Filled.Fullscreen" Color="@Color.Primary" ToggledIcon="@Icons.Filled.FullscreenExit" Size="Size.Small" ToggledColor="@Color.Secondary" /> </MudText>
+
+
+            @if (barChart1)
+            {
+                <Overlay IsOpen="barChart1">
+                        <MudPaper Class="d-flex flex-column align-left border-none"  Elevation="0" Outlined="false" Style="max-width: 60vw; width: 60vw; height: 43vw; overflow: auto; max-height: 95vh; ">
+                            <MudText Align="Align.Left" Typo="Typo.h6">Salario neto</MudText>
+                            <MudItem xs="10">
+                           <BarChart colorList="colorslist" title="" data="@_dataNetSalary"></BarChart>
+                            </MudItem>
+                        </MudPaper>
+                        <MudItem xs="12" md="12" Style="width: 100%;" Class="d-flex justify-start">
+                            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ToggleBarChart1" Size="Size.Medium">Cerrar</MudButton>
+                        </MudItem>
+                </Overlay>  
+            }else{ 
                 <BarChart colorList="colorslist" title="" data="@_dataNetSalary"></BarChart>
+            }
+
             </MudPaper>
             </MudItem>
           
@@ -77,17 +97,49 @@
         <MudGrid>
             <MudItem xs="6">
             <MudPaper Class="pa-3" Height="380px" Elevation="3">
-                    <MudText Align="Align.Left" Typo="Typo.h6">Deducciones voluntarias </MudText>
+                   <MudText Align="Align.Left" Typo="Typo.h6">Deducciones voluntarias   &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&nbsp;&nbsp;<MudToggleIconButton @bind-Toggled="@barChart2" Icon="@Icons.Filled.Fullscreen" Color="@Color.Primary" ToggledIcon="@Icons.Filled.FullscreenExit" Size="Size.Small" ToggledColor="@Color.Secondary" /> </MudText>
+
+
+            @if (barChart2)
+            {
+                <Overlay IsOpen="barChart2">
+                        <MudPaper Class="d-flex flex-column align-left border-none"  Elevation="0" Outlined="false" Style="max-width: 60vw; width: 60vw; height: 43vw; overflow: auto; max-height: 95vh; ">
+                            <MudText Align="Align.Left" Typo="Typo.h6">Deducciones voluntarias</MudText>
+                            <MudItem xs="10">
+                           <BarChart colorList="colorslist" title="" data="@_dataVoluntaryDeductions"></BarChart>
+                            </MudItem>
+                        </MudPaper>
+                        <MudItem xs="12" md="12" Style="width: 100%;" Class="d-flex justify-start">
+                            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ToggleBarChart2" Size="Size.Medium">Cerrar</MudButton>
+                        </MudItem>
+                </Overlay>  
+            }else{ 
                 <BarChart colorList="colorslist" title="" data="@_dataVoluntaryDeductions"></BarChart>
+            }
             </MudPaper>
             </MudItem>
             
         <MudItem xs="6">
             <MudPaper Class="pa-3" Height="380px" Elevation="3">
-                    <MudText Align="Align.Left" Typo="Typo.h6">Deducciones legales </MudText>
-                    <BarChart  colorList="colorslist" title="" data="@_dataLegalDeductions"></BarChart>
+                   <MudText Align="Align.Left" Typo="Typo.h6">Deducciones legales   &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&nbsp;&nbsp;<MudToggleIconButton @bind-Toggled="@barChart3" Icon="@Icons.Filled.Fullscreen" Color="@Color.Primary" ToggledIcon="@Icons.Filled.FullscreenExit" Size="Size.Small" ToggledColor="@Color.Secondary" /> </MudText>
+            @if (barChart3)
+            {
+                <Overlay IsOpen="barChart3">
+                        <MudPaper Class="d-flex flex-column align-left border-none"  Elevation="0" Outlined="false" Style="max-width: 60vw; width: 60vw; height: 43vw; overflow: auto; max-height: 95vh; ">
+                            <MudText Align="Align.Left" Typo="Typo.h6">Deducciones legales</MudText>
+                            <MudItem xs="10">
+                           <BarChart  colorList="colorslist" title="" data="@_dataLegalDeductions"></BarChart>
+                            </MudItem>
+                        </MudPaper>
+                        <MudItem xs="12" md="12" Style="width: 100%;" Class="d-flex justify-start">
+                            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ToggleBarChart3" Size="Size.Medium">Cerrar</MudButton>
+                        </MudItem>
+                </Overlay>  
+            }else{ 
+                <BarChart  colorList="colorslist" title="" data="@_dataLegalDeductions"></BarChart>
+            }
             </MudPaper>
-        </MudItem>
+            </MudItem>
         </MudGrid>
     
 }
@@ -99,6 +151,9 @@
     private bool _loading = true;
     private bool _empty = true;
     private bool _payTaxes = false;
+    private bool barChart1 = false;
+    private bool barChart2 = false;
+    private bool barChart3 = false;
     private MudTable<PaymentHistoryModel>  _tablePaymentHistory;
     private IList<PaymentHistoryModel> _payments = new List<PaymentHistoryModel>();
     private IList<Payment> _paymentsList = new List<Payment>();
@@ -255,5 +310,20 @@
     {
         selectedPayment = selectedPayment.Replace("/", "-");
         nav.NavigateTo($"/Last_Pay/{email}/{selectedPayment}/");
+    }
+
+    private void ToggleBarChart1()
+    {
+        barChart1 = !barChart1;
+    }
+
+    private void ToggleBarChart2()
+    {
+        barChart2 = !barChart2;
+    }
+
+    private void ToggleBarChart3()
+    {
+        barChart3 = !barChart3;
     }
 }
