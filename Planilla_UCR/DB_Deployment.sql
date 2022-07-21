@@ -716,7 +716,7 @@ VALUES('jeremy@ucr.ac.cr',
 'Jeremy',
 'Vargas',
 'Artavia',
-5454454,
+125400897,
 '40234020012',
 'Alajuela, Costa Rica',
 '62571204',
@@ -728,7 +728,7 @@ VALUES('leonel@ucr.ac.cr',
 'Leonel',
 'Campos',
 'Murillo',
-242342,
+242342895,
 'CR40324350012',
 'Alajuela, Costa Rica',
 '83355316',
@@ -740,7 +740,7 @@ VALUES('mau@ucr.ac.cr',
 'Mauricio',
 'Palma',
 'Vitra',
-8857655,
+885765587,
 'CR4024220012',
 'Alajuela, Costa Rica',
 '677774',
@@ -751,8 +751,8 @@ INSERT INTO Person
 VALUES('wendy@ucr.ac.cr',
 'Wendy',
 'Ortiz',
-'',
-242342,
+'Alfaro',
+302150648,
 'CR40324350012',
 'Alajuela, Costa Rica',
 '83355226',
@@ -773,12 +773,12 @@ VALUES('nayeriazofeifa3003@gmail.com',
 
 INSERT INTO Person
 VALUES('nyazofeifa3003@gmail.com',
-'Nayeri',
-'Azofeifa',
-'Porras',
-118070615,
+'Nazareth',
+'Avarado',
+'Zamora',
+178951368,
 'CR4024',
-'Alajuela, Costa Rica',
+'San José, Costa Rica',
 '89433965',
 1
 )
@@ -1592,4 +1592,44 @@ INSERT INTO Subscribes (EmployerEmail, ProjectName, SubscriptionName, EmployeeEm
 ('david@ucr.ac.cr','Cryptomonedas','Ahorro pago luz','naye@ucr.ac.cr',25000,'2022-06-1'),
 ('david@ucr.ac.cr','La zapatera','Fondo de pensiones','naye@ucr.ac.cr',10000,'2022-06-1')
 
+---Wendy Demo insert - missing payment
+INSERT INTO Person
+VALUES('luis@ucr.ac.cr',
+'Luis',
+'Torres',
+'Abarca',
+187974121,
+'CR5451524964',
+'Cartago, Costa Rica',
+'87964423',
+1
+)
+INSERT INTO Person
+VALUES('michael@ucr.ac.cr',
+'Michael',
+'Cordero',
+'Rojas',
+302540336,
+'CR441215874610',
+'Heredia, Costa Rica',
+'87112654',
+1
+)
 
+INSERT INTO Employee
+VALUES('michael@ucr.ac.cr')
+
+INSERT INTO Employee
+VALUES('luis@ucr.ac.cr')
+
+INSERT INTO Agreement
+VALUES('michael@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Terra Dulce','2022-04-9','Medio tiempo', 2000, '2023-04-9', 1, '')
+
+INSERT INTO Agreement
+VALUES('luis@ucr.ac.cr', 'leonel@ucr.ac.cr', 'Terra Dulce','2022-01-1','Servicios profesionales', 2000, '2023-01-1', 1, '')
+
+INSERT INTO Payment
+VALUES('michael@ucr.ac.cr','leonel@ucr.ac.cr','Terra Dulce',100000, '2022/06/01', '2022/07/01')
+
+INSERT INTO ReportOfHours
+VALUES('leonel@ucr.ac.cr', 'Terra Dulce','luis@ucr.ac.cr', '2022-04-19',170,0)
