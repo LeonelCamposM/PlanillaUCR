@@ -29,7 +29,7 @@
 @inject IPaymentCalculatorService PaymentCalculatorService
 @inject IEmailServices EmailService
 @inject ISnackbar Snackbar
-@page "/Last_Pay/{email}"
+@page "/Last_Pay/{email}/{selectedPay}/"
 
 @if(_loading) 
 {
@@ -165,8 +165,10 @@
 
 
 @code {
-    [Parameter]
-    public string email { get; set; }
+        [Parameter]
+        public string email { get; set; }
+        [Parameter]
+        public string selectedPay { get; set; }
     public string projectName { get; set; }
 
     // Tables
@@ -200,8 +202,16 @@
             _paymentIDS.Add(payment.ProjectName +": "+ payment.EndDate.ToShortDateString());
         }
 
-        _lastPay = _lastEmployeePayments.FirstOrDefault();
-        await LoadPage();
+        if (selectedPay.Equals("default"))
+        {
+            _lastPay = _lastEmployeePayments.FirstOrDefault();
+            await LoadPage();
+        }
+        else
+        {
+            selectedPay = selectedPay.Replace("-", "/");
+            await OnPaymentSelect(selectedPay);
+        }
     }
 
     private async Task  LoadPage()

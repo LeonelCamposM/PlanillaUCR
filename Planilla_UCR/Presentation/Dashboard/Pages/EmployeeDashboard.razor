@@ -36,70 +36,64 @@
     </MudPaper>
 } else 
 {
-    if (!_empty)
-    {
-         <MudGrid>
-             <MudItem xs="6">
-                <MudPaper Class="pa-3" Height="380px" Elevation="3">
-                    <MudText Align="Align.Left" Typo="Typo.h6">Salario neto </MudText>
-                    <BarChart colorList="colorslist" title="" data="@_dataNetSalary"></BarChart>
-                </MudPaper>
-             </MudItem>
+    
+        <MudGrid>
+            <MudItem xs="6">
+            <MudPaper Class="pa-3" Height="380px" Elevation="3">
+                <MudText Align="Align.Left" Typo="Typo.h6">Salario neto </MudText>
+                <BarChart colorList="colorslist" title="" data="@_dataNetSalary"></BarChart>
+            </MudPaper>
+            </MudItem>
           
-            <MudItem xs="6">
-            <MudTable @ref="@_tablePaymentHistory" Items="@_payments" Height="255px" Hover="true" RowsPerPage="3" Breakpoint="Breakpoint.Sm" Loading="@_loading">
-                 <ToolBarContent>
-                        <MudText Align="Align.Left" Typo="Typo.h6">Últimos pagos </MudText>
-                        <MudSpacer />
-                </ToolBarContent> 
-                <HeaderContent>
-                    <MudTh>Proyecto</MudTh>
-                    <MudTh>Fecha de pago</MudTh>
-                    <MudTh>Salario neto</MudTh>
-                    <MudTh><MudButton Size="Size.Small" OnClick="GoToHistoryPayments" Variant="Variant.Filled" 
-                        Color="Color.Primary"> Detalles</MudButton> </MudTh>
-                </HeaderContent>
-                <RowTemplate Context="row">
-                    <MudTd DataLabel="Proyecto">@row.ProjectName</MudTd> 
-                    <MudTd DataLabel="Fecha pago">@row.PaymentDate</MudTd>
-                    <MudTd DataLabel="Salario neto">@row.NetSalary</MudTd>
+        <MudItem xs="6">
+        <MudTable @ref="@_tablePaymentHistory" Items="@_payments" Height="255px" Hover="true" RowsPerPage="3" Breakpoint="Breakpoint.Sm" Loading="@_loading">
+                <ToolBarContent>
+                    <MudText Align="Align.Left" Typo="Typo.h6">Últimos pagos </MudText>
+                    <MudSpacer />
+            </ToolBarContent> 
+            <HeaderContent>
+                <MudTh>Proyecto</MudTh>
+                <MudTh>Fecha de pago</MudTh>
+                <MudTh>Salario neto</MudTh>
+                <MudTh><MudButton Size="Size.Small" OnClick="GoToHistoryPayments" Variant="Variant.Filled" 
+                    Color="Color.Primary"> Histórico</MudButton> </MudTh>
+            </HeaderContent>
+            <RowTemplate Context="row">
+                <MudTd DataLabel="Proyecto">@row.ProjectName</MudTd> 
+                <MudTd DataLabel="Fecha pago">@row.PaymentDate</MudTd>
+                <MudTd DataLabel="Salario neto">@row.NetSalary</MudTd>
                      
-                    <MudTd DataLabel="Ver más" >
-                       <MudButton Size="Size.Small" OnClick="GoToPaymentDetails" Variant="Variant.Filled" Color="Color.Primary"> Detalles</MudButton>
-                    </MudTd>
-                </RowTemplate>
-                <PagerContent>
-                        <MudPagination SelectedChanged="PageChanged" Count="@((_tablePaymentHistory.GetFilteredItemsCount() + _tablePaymentHistory.RowsPerPage - 1) / _tablePaymentHistory.RowsPerPage)" Color="Color.Primary" Class="pa-4"/>
-                </PagerContent>
-            </MudTable>
-            </MudItem>
-         </MudGrid>
-          <br>
-         <MudGrid>
-             <MudItem xs="6">
-                <MudPaper Class="pa-3" Height="380px" Elevation="3">
-                     <MudText Align="Align.Left" Typo="Typo.h6">Deducciones voluntarias </MudText>
-                    <BarChart colorList="colorslist" title="" data="@_dataVoluntaryDeductions"></BarChart>
-                </MudPaper>
-             </MudItem>
-            
+                <MudTd DataLabel="Ver más" >
+                    <MudButton Size="Size.Small" @onclick="@(e => GoToPaymentDetails(row.ProjectName+": "+row.PaymentDate))" Variant="Variant.Filled" Color="Color.Transparent"> Detalles</MudButton>
+                </MudTd>
+            </RowTemplate>
+            <PagerContent>
+                    <MudPagination SelectedChanged="PageChanged" Count="@((_tablePaymentHistory.GetFilteredItemsCount() + _tablePaymentHistory.RowsPerPage - 1) / _tablePaymentHistory.RowsPerPage)" Color="Color.Primary" Class="pa-4"/>
+            </PagerContent>
+        </MudTable>
+        </MudItem>
+        </MudGrid>
+        <br>
+        <MudGrid>
             <MudItem xs="6">
-                <MudPaper Class="pa-3" Height="380px" Elevation="3">
-                        <MudText Align="Align.Left" Typo="Typo.h6">Deducciones legales </MudText>
-                        <BarChart  colorList="colorslist" title="" data="@_dataLegalDeductions"></BarChart>
-                </MudPaper>
+            <MudPaper Class="pa-3" Height="380px" Elevation="3">
+                    <MudText Align="Align.Left" Typo="Typo.h6">Deducciones voluntarias </MudText>
+                <BarChart colorList="colorslist" title="" data="@_dataVoluntaryDeductions"></BarChart>
+            </MudPaper>
             </MudItem>
-         </MudGrid>
-    }else
-    {
-        <MudText Align="Align.Center" Typo="Typo.h6">
-            No existen pagos
-        </MudText>
-    }
+            
+        <MudItem xs="6">
+            <MudPaper Class="pa-3" Height="380px" Elevation="3">
+                    <MudText Align="Align.Left" Typo="Typo.h6">Deducciones legales </MudText>
+                    <BarChart  colorList="colorslist" title="" data="@_dataLegalDeductions"></BarChart>
+            </MudPaper>
+        </MudItem>
+        </MudGrid>
+    
 }
 
 @code {
-  
+
     [Parameter]
     public string email { get; set; }
     private bool _loading = true;
@@ -163,9 +157,11 @@
                _cultureCR.NumberFormat.CurrencySymbol+CostFormat(_costNetSalary));
             _payments.Add(_paymentHistoryModel);
         }
+        /*
         if (_payments.Length() > 0){
             _empty = false;
         }
+        */
         return _payments;
     }
 
@@ -255,8 +251,9 @@
         nav.NavigateTo($"/{email}/Payment_History");
     }
 
-    private void GoToPaymentDetails()
+    private void GoToPaymentDetails(string selectedPayment)
     {
-        nav.NavigateTo($"/Last_Pay/{email}/");
+        selectedPayment = selectedPayment.Replace("/", "-");
+        nav.NavigateTo($"/Last_Pay/{email}/{selectedPayment}/");
     }
 }
