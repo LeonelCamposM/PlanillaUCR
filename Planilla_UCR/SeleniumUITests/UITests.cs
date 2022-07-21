@@ -202,7 +202,6 @@ namespace SeleniumUITests
             IWebElement failMessage;
             IWebElement projectNameTextBox;
             IWebElement projectDescriptionTextBox;
-            WebElement paymentIntervalDropDown;
             IWebElement MaximumAmountForBenefitsNumericField;
             IWebElement MaximumBenefitAmountNumericField;
   
@@ -210,11 +209,6 @@ namespace SeleniumUITests
             string URL = "https://localhost:44304/";
             driver.Manage().Window.Maximize();
             driver.Url = URL;
-
-        //    // Arrange
-        //    string URL = "https://localhost:44304/";
-        //    driver.Manage().Window.Maximize();
-        //    driver.Url = URL;
 
             //Act
             DavidEmployerLogginTest();
@@ -228,23 +222,23 @@ namespace SeleniumUITests
 
             Thread.Sleep(2000);
             projectNameTextBox = driver.FindElement(By.CssSelector("#banner > div > div > div > div > div > form > div > div:nth-child(2) > div > div > div > input"));
-            projectNameTextBox.SendKeys("Cryptomonedas");
+            projectNameTextBox.SendKeys("Panadería la aurora");
 
             projectDescriptionTextBox = driver.FindElement(By.CssSelector("#banner > div > div > div > div > div > form > div > div:nth-child(5) > div > div > div > input"));
-            projectDescriptionTextBox.SendKeys("Emprendimiento de cryptomonedas");
+            projectDescriptionTextBox.SendKeys("Emprendimiento de repostería, queques y más");
 
-        //    MaximumAmountForBenefitsNumericField = driver.FindElement(By.CssSelector("#banner > div > div > div > div > div > form > div > div:nth-child(11) > div > div > div > input"));
-        //    MaximumAmountForBenefitsNumericField.SendKeys("15000");
+            MaximumAmountForBenefitsNumericField = driver.FindElement(By.CssSelector("#banner > div > div > div > div > div > form > div > div:nth-child(11) > div > div > div > input"));
+            MaximumAmountForBenefitsNumericField.SendKeys("15000");
 
             MaximumBenefitAmountNumericField = driver.FindElement(By.CssSelector("#banner > div > div > div > div > div > form > div > div:nth-child(12) > div > div > div > input"));
-            MaximumBenefitAmountNumericField.SendKeys("10");
+            MaximumBenefitAmountNumericField.SendKeys("1");
 
-        //    submitProject = driver.FindElement(By.CssSelector("#banner > div > div > div > div > div > form > div > div:nth-child(18) > button.mud-button-root.mud-button.mud-button-filled.mud-button-filled-primary.mud-button-filled-size-medium.mud-ripple > span > p"));
-        //    Thread.Sleep(2000);
-        //    submitProject.Click();
+            submitProject = driver.FindElement(By.CssSelector("#banner > div > div > div > div > div > form > div > div:nth-child(18) > button.mud-button-root.mud-button.mud-button-filled.mud-button-filled-primary.mud-button-filled-size-medium.mud-ripple > span > p"));
+            Thread.Sleep(2000);
+            submitProject.Click();
 
             Thread.Sleep(2000);
-            failMessage = driver.FindElement(By.CssSelector("#mud-snackbar-container > div"));
+            failMessage = driver.FindElement(By.CssSelector("#banner > div > div > div > div > div > form > div > div:nth-child(8) > div > div > div.mud-input-control-helper-container.px-2 > p > div > div"));
 
             //Assert
             Thread.Sleep(2000);

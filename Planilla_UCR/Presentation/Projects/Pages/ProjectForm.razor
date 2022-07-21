@@ -62,7 +62,7 @@
                 <MudItem xs="2"> </MudItem>
                 <MudItem xs="4">
              
-                    <MudNumericField Immediate="true" Label="Monto máximo para beneficios" Min="0" Format="N2" Culture="@cultureCR" Variant="Variant.Outlined" @bind-Value="_maximumAmountForBenefits" 
+                    <MudNumericField Immediate="true" Label="Monto máximo para beneficios" Format="N2" Min="0" Culture="@cultureCR" Variant="Variant.Outlined" @bind-Value="_maximumAmountForBenefits" 
                     Adornment="Adornment.Start" AdornmentText="@cultureCR.NumberFormat.CurrencySymbol" Required="false" RequiredError="Campo no requerido"/>
                 </MudItem>
 
@@ -109,7 +109,7 @@
 
 @code{
     SnackHandler snackHandler = new SnackHandler();
-    private double? _maximumAmountForBenefits;
+    private double? _maximumAmountForBenefits = 0;
     private Project projectInfo = new Project("","","",0.0,0,"",1);
     private LimitsValidationForm limits = new LimitsValidationForm();
     private  CultureInfo cultureCR = CultureInfo.GetCultureInfo("es-CR");
