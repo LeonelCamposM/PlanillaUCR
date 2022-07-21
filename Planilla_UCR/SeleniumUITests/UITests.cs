@@ -150,7 +150,7 @@ namespace SeleniumUITests
             project.Click();
             Thread.Sleep(2000);
 
-            projectBenefits = driver.FindElement(By.CssSelector("#banner > aside > div > div > ul > li > li:nth-child(12) > a > button.mud-button-root.mud-icon-button.mud-icon-button-color-secondary.mud-ripple.mud-ripple-icon.mr-2"));
+            projectBenefits = driver.FindElement(By.CssSelector("#banner > aside > div > div > ul > li > li:nth-child(13) > a > button.mud-button-root.mud-icon-button.mud-icon-button-color-secondary.mud-ripple.mud-ripple-icon.mr-2"));
             projectBenefits.Click();
             Thread.Sleep(2000);
 
