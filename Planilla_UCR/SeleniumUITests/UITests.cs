@@ -195,15 +195,15 @@ namespace SeleniumUITests
         }
 
         [Test]
-        public void CreateNewProject()
+        public void createRepeatProject()
         {
             IWebElement projectListButton;
             IWebElement createButton;
             IWebElement submitProject;
-            IWebElement successMessage;
+            IWebElement failMessage;
             IWebElement projectNameTextBox;
             IWebElement projectDescriptionTextBox;
-            IWebElement paymentIntervalDropDown;
+            WebElement paymentIntervalDropDown;
             IWebElement MaximumAmountForBenefitsNumericField;
             IWebElement MaximumBenefitAmountNumericField;
   
@@ -214,39 +214,38 @@ namespace SeleniumUITests
 
 
             //Act
+            DavidEmployerLogginTest();
             Thread.Sleep(2000);
             projectListButton = driver.FindElement(By.CssSelector("#banner > aside > div > div > ul > li > li:nth-child(2) > a"));
             projectListButton.Click();
+
+            Thread.Sleep(2000);
             createButton = driver.FindElement(By.CssSelector("#banner > div > div > button > span"));
             createButton.Click();
 
             Thread.Sleep(2000);
             projectNameTextBox = driver.FindElement(By.CssSelector("#banner > div > div > div > div > div > form > div > div:nth-child(2) > div > div > div > input"));
-            projectNameTextBox.SendKeys("Panadería La aurora");
+            projectNameTextBox.SendKeys("Cryptomonedas");
 
             projectDescriptionTextBox = driver.FindElement(By.CssSelector("#banner > div > div > div > div > div > form > div > div:nth-child(5) > div > div > div > input"));
-            projectDescriptionTextBox.SendKeys("Emprendimiento de repostería, queques y más");
-
-            paymentIntervalDropDown = driver.FindElement(By.CssSelector("#banner > div > div > div > div > div > form > div > div:nth-child(8) > div > div > div > div.mud-input.mud-input-outlined.mud-input-adorned-end.mud-select-input > input"));
-            var selectElement = new SelectElement(paymentIntervalDropDown);
-            selectElement.SelectByText("Pago mensual");
+            projectDescriptionTextBox.SendKeys("Emprendimiento de cryptomonedas");
 
             MaximumAmountForBenefitsNumericField = driver.FindElement(By.CssSelector("#banner > div > div > div > div > div > form > div > div:nth-child(11) > div > div > div > input"));
             MaximumAmountForBenefitsNumericField.SendKeys("15000");
 
             MaximumBenefitAmountNumericField = driver.FindElement(By.CssSelector("#banner > div > div > div > div > div > form > div > div:nth-child(12) > div > div > div > input"));
-            MaximumBenefitAmountNumericField.SendKeys("1");
+            MaximumBenefitAmountNumericField.SendKeys("10");
 
             submitProject = driver.FindElement(By.CssSelector("#banner > div > div > div > div > div > form > div > div:nth-child(18) > button.mud-button-root.mud-button.mud-button-filled.mud-button-filled-primary.mud-button-filled-size-medium.mud-ripple > span > p"));
             Thread.Sleep(2000);
             submitProject.Click();
 
             Thread.Sleep(2000);
-            successMessage= driver.FindElement(By.CssSelector(""));
+            failMessage = driver.FindElement(By.CssSelector("#mud-snackbar-container > div"));
 
             //Assert
             Thread.Sleep(2000);
-            Assert.IsTrue(successMessage != null);
+            Assert.IsTrue(failMessage != null);
         }
 
 
