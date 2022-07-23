@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Domain.Authentication.Repositories;
 using Domain.Authentication.DTOs;
+using Domain.ValueObjects;
 
 namespace Application.Authentication.Implementations
 {
@@ -34,7 +35,17 @@ namespace Application.Authentication.Implementations
 
         public async Task<bool> SignInRequestAsync(AccountDTO accountData, bool isPersistent)
         {
-            return await _authenticationRepository.SignInRequestAsync(accountData, isPersistent);
+            InputValidator inputValidator = new InputValidator();
+            bool stringData = true;
+            stringData = inputValidator.ValidateStringSafety(accountData.Password);
+            if (stringData == true)
+            {
+                return await _authenticationRepository.SignInRequestAsync(accountData, isPersistent);
+            }
+            else 
+            {
+                return false;
+            }
         }
 
         public async Task SignOut()

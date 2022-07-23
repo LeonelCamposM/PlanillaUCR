@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Domain.Authentication.Repositories;
 using Domain.Authentication.DTOs;
+using Domain.ValueObjects;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.DataProtection;
 
@@ -81,28 +82,38 @@ namespace Infrastructure.Authentication.Repositories
 
         public async Task<bool> SignInRequestAsync(AccountDTO r, bool isPersistent)
         {
-            bool result = false;
-            var user = await _userManager.FindByNameAsync(r.Email);
-            if (user != null)
+            InputValidator inputValidator = new InputValidator();
+            bool stringData = true;
+            stringData = inputValidator.ValidateStringSafety(r.Password);
+            if (stringData == true)
             {
-                if (await _userManager.CheckPasswordAsync(user, r.Password) == true)
+                bool result = false;
+                var user = await _userManager.FindByNameAsync(r.Email);
+                if (user != null)
                 {
-                    if (await _userManager.IsEmailConfirmedAsync(user))
+                    if (await _userManager.CheckPasswordAsync(user, r.Password) == true)
                     {
-                        var token = await _userManager.GenerateUserTokenAsync(user, TokenOptions.DefaultProvider, "Login");
-                        string data = user.Id + "|" + token;
-                        var protector = _dataProtecter.CreateProtector("Login");
-                        var protectedData = protector.Protect(data);
-                        navigationManager.NavigateTo("/login?key=" + protectedData, true);
-                        result = true;
-                    }
-                    else
-                    {
-                        navigationManager.NavigateTo("/confirmAccount/" + EncryptString(r.Email, "confirm"), true);
+                        if (await _userManager.IsEmailConfirmedAsync(user))
+                        {
+                            var token = await _userManager.GenerateUserTokenAsync(user, TokenOptions.DefaultProvider, "Login");
+                            string data = user.Id + "|" + token;
+                            var protector = _dataProtecter.CreateProtector("Login");
+                            var protectedData = protector.Protect(data);
+                            navigationManager.NavigateTo("/login?key=" + protectedData, true);
+                            result = true;
+                        }
+                        else
+                        {
+                            navigationManager.NavigateTo("/confirmAccount/" + EncryptString(r.Email, "confirm"), true);
+                        }
                     }
                 }
+                return result;
             }
-            return result;
+            else
+            {
+                return false;
+            }
         }
 
         public async Task SignOut()
