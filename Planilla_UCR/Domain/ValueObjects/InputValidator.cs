@@ -17,7 +17,7 @@ namespace Domain.ValueObjects
             Regex injectionPattern = new Regex(@"((WHERE | OR)[ ] +[\(] *[ ] * ([\(] *[0 - 9] +[\)]*)[ ]*=[ ] *[\)]*[ ] *\3)| AND[ ] +[\(] *[ ] * ([\(] * 1[0 - 9] +|[2 - 9][0 - 9] *[\)]*)[ ] *[\(] *[ ] *=[ ] *[\)]*[ ] *\4");
             Match injectionValidaton = queryPattern.Match(data);
 
-            if (!queytValidaton.Success || data.Length() > 255 || !injectionPattern.Success)
+            if (!queytValidaton.Success || data.Length() > 255 || !injectionValidaton.Success)
             {
                 error = false;
             }
