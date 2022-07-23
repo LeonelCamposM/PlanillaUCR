@@ -1,7 +1,6 @@
 using Xunit;
 using Domain.Subscriptions.Entities;
 using FluentAssertions;
-
 namespace Tests.Domain
 {
     public class SubscriptionTests
