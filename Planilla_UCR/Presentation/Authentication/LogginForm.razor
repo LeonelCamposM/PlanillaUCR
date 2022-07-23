@@ -12,6 +12,7 @@
 @using Application.Employers
 @using Application.Authorization;
 @using Application.Authorization.Implementations;
+@using Domain.ValueObjects
 
 @inject NavigationManager nav
 @inject ISnackbar Snackbar
@@ -115,7 +116,8 @@
             personInfo.Email = accountData.Email;
             personInfo = await PersonService.GetInfoPerson(personInfo);
             bool emailExist = await AuthenticationService.EmailIsAlreadyRegistered(accountData.Email);
-            if (personInfo != null)
+            InputValidator validator = new InputValidator();
+            if (personInfo != null && validator.ValidateStringSafety(accountData.Password))
             {
                 if (emailExist && personInfo.IsEnabled==1)
                 {
@@ -139,6 +141,8 @@
         }
         snackHandler._saving = false;
     }
+
+
 
     private string CreateConfirmationCode()
     {
