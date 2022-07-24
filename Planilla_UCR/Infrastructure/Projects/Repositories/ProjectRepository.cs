@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Domain.ValueObjects;
 
 namespace Infrastructure.Projects.Repositories
 {
@@ -21,10 +22,24 @@ namespace Infrastructure.Projects.Repositories
             _dbContext = unitOfWork;
         }
 
-        public async Task CreateProjectAsync(Project projectInfo)
+        public async Task<bool> CreateProjectAsync(Project projectInfo)
         {
-            _dbContext.Projects.Add(projectInfo);
-            await _dbContext.SaveEntitiesAsync();
+            InputValidator inputValidator = new InputValidator();
+            bool checkEmployerEmail = inputValidator.ValidateStringSafety(projectInfo.EmployerEmail);
+            bool checkProjectName = inputValidator.ValidateStringSafety(projectInfo.ProjectName);
+            bool checkProjectDescription = inputValidator.ValidateStringSafety(projectInfo.ProjectDescription);
+            bool checkPaymentInterval = inputValidator.ValidateStringSafety(projectInfo.PaymentInterval);
+            bool result = true;
+            if (checkEmployerEmail && checkProjectName && checkProjectDescription && checkPaymentInterval)
+            {
+                _dbContext.Projects.Add(projectInfo);
+                await _dbContext.SaveEntitiesAsync();
+            }
+            else 
+            {
+                result = false;
+            }
+            return result;
         }
 
         public async Task<IEnumerable<Project>> GetAllProjectsAsync()
