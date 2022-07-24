@@ -3,6 +3,7 @@
 @using Domain.Employers.Entities
 @using Application.Projects
 @using Application.Employers
+@using Domain.ValueObjects
 @using Presentation.Projects.Models
 @using Presentation.Core.Components
 @using System.ComponentModel.DataAnnotations
@@ -133,14 +134,14 @@
     async Task ValidProject(Project projectToAdd)
     {
         await form.Validate();
-        if (form.IsValid && await (ValidateInfo(projectInfo)))
+        if (form.IsValid && ValidateInput() && await (ValidateInfo(projectInfo)))
         {
             await ProjectService.CreateProjectAsync(projectToAdd);
             snackHandler._saving = false;
             ShowSnackNotification(projectInfo.ProjectName + " creado exitosamente", Severity.Success);
             await GoToMain();
         }
-        
+
     }
 
     async Task<bool> ValidateInfo(Project projectInfo)
@@ -225,6 +226,16 @@
     {
         await Task.Delay(2000);
         nav.NavigateTo($"/Projects/{employerEmail}");
+    }
+
+    private bool ValidateInput()
+    {
+        InputValidator inputValidator = new InputValidator();
+        bool checkEmployerEmail = inputValidator.ValidateStringSafety(projectInfo.EmployerEmail);
+        bool checkProjectName = inputValidator.ValidateStringSafety(projectInfo.ProjectName);
+        bool checkProjectDescription = inputValidator.ValidateStringSafety(projectInfo.ProjectDescription);
+        bool checkPaymentInterval = inputValidator.ValidateStringSafety(projectInfo.PaymentInterval);
+        return checkEmployerEmail && checkProjectName && checkProjectDescription && checkPaymentInterval;
     }
 }
     

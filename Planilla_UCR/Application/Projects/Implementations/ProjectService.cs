@@ -15,7 +15,7 @@ namespace Application.Projects.Implementations
             _projectRepository = projectRepository;
         }
 
-        public async Task<bool> CreateProjectAsync(Project project)
+        public async Task CreateProjectAsync(Project project)
         {
             InputValidator inputValidator = new InputValidator();
             bool checkEmployerEmail = inputValidator.ValidateStringSafety(project.EmployerEmail);
@@ -27,11 +27,6 @@ namespace Application.Projects.Implementations
             {
                 await _projectRepository.CreateProjectAsync(project);
             }
-            else
-            {
-                result = false;
-            }
-            return result;
         }
 
         public async Task<IEnumerable<Project>> GetAllProjectsAsync()

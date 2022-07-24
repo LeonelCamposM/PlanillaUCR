@@ -22,7 +22,7 @@ namespace Infrastructure.Projects.Repositories
             _dbContext = unitOfWork;
         }
 
-        public async Task<bool> CreateProjectAsync(Project projectInfo)
+        public async Task CreateProjectAsync(Project projectInfo)
         {
             InputValidator inputValidator = new InputValidator();
             bool checkEmployerEmail = inputValidator.ValidateStringSafety(projectInfo.EmployerEmail);
@@ -35,11 +35,6 @@ namespace Infrastructure.Projects.Repositories
                 _dbContext.Projects.Add(projectInfo);
                 await _dbContext.SaveEntitiesAsync();
             }
-            else 
-            {
-                result = false;
-            }
-            return result;
         }
 
         public async Task<IEnumerable<Project>> GetAllProjectsAsync()
