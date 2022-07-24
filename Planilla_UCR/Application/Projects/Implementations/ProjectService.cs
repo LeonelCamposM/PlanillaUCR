@@ -1,5 +1,6 @@
 ﻿using Domain.Projects.Entities;
 using Domain.Projects.Repositories;
+using Domain.ValueObjects;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -14,9 +15,23 @@ namespace Application.Projects.Implementations
             _projectRepository = projectRepository;
         }
 
-        public async Task CreateProjectAsync(Project project)
+        public async Task<bool> CreateProjectAsync(Project project)
         {
-            await _projectRepository.CreateProjectAsync(project);
+            InputValidator inputValidator = new InputValidator();
+            bool checkEmployerEmail = inputValidator.ValidateStringSafety(project.EmployerEmail);
+            bool checkProjectName = inputValidator.ValidateStringSafety(project.ProjectName);
+            bool checkProjectDescription = inputValidator.ValidateStringSafety(project.ProjectDescription);
+            bool checkPaymentInterval = inputValidator.ValidateStringSafety(project.PaymentInterval);
+            bool result = true;
+            if (checkEmployerEmail && checkProjectName && checkProjectDescription && checkPaymentInterval)
+            {
+                await _projectRepository.CreateProjectAsync(project);
+            }
+            else
+            {
+                result = false;
+            }
+            return result;
         }
 
         public async Task<IEnumerable<Project>> GetAllProjectsAsync()
