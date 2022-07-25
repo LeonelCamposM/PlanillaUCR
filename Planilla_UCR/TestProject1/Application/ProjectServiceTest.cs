@@ -20,7 +20,7 @@ namespace Tests.Application
         
         public String ProjectName = "Accesorios artesanales";
         
-        public String ProjectDescription = "Accesorios artesanales hecos de coco y material recliclado";
+        public String ProjectDescription = "Accesorios artesanales hechos de coco y material recliclado";
         
         public double MaximumAmountForBenefits = 20000.0;
        
@@ -93,5 +93,39 @@ namespace Tests.Application
             mockProjectsRepository.Verify(repo => repo.GetDisabledProject(EmployerEmail, ProjectName), Times.AtLeastOnce);
 
         }
+
+        [Fact]
+        public async Task CreateProjectAsyncSuccessTest()
+        {
+            // arrange
+            Project project = new Project(EmployerEmail, ProjectName, ProjectDescription, MaximumAmountForBenefits, MaximumBenefitAmount, PaymentInterval, IsEnabled, LastPaymentDate);
+            var mockProjectsRepository = new Mock<IProjectRepository>();
+            var projectsService = new ProjectService(mockProjectsRepository.Object);
+            mockProjectsRepository.Setup(repo => repo.CreateProjectAsync(project));
+
+            //act
+            await projectsService.CreateProjectAsync(project);
+
+            //assert
+            mockProjectsRepository.Verify(repo => repo.CreateProjectAsync(project), Times.Once);
+        }
+
+        [Fact]
+        public async Task CreateProjectAsyncFailureTest()
+        {
+            // arrange
+            Project project = new Project(EmployerEmail, ProjectName, ProjectDescription, MaximumAmountForBenefits, MaximumBenefitAmount, PaymentInterval, IsEnabled, LastPaymentDate);
+            project.EmployerEmail = "Hola '1=1";
+            var mockProjectsRepository = new Mock<IProjectRepository>();
+            var projectsService = new ProjectService(mockProjectsRepository.Object);
+            mockProjectsRepository.Setup(repo => repo.CreateProjectAsync(project));
+
+            //act
+            await projectsService.CreateProjectAsync(project);
+
+            //assert
+            mockProjectsRepository.Verify(repo => repo.CreateProjectAsync(project), Times.Never);
+        }
+
     }
 }

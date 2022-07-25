@@ -141,6 +141,10 @@
             ShowSnackNotification(projectInfo.ProjectName + " creado exitosamente", Severity.Success);
             await GoToMain();
         }
+        else
+        {
+            ShowSnackNotification(projectInfo.ProjectName + " posee caracteres inválidos", Severity.Error);
+        }
 
     }
 
