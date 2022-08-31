@@ -8,7 +8,7 @@ Transversely,we show practical use of clean code design rules, the use of a clea
 2) Make sure you have .net 5.0 installed and ASP.net web development
 ![depImg](Images/dependencies.png)
 
-3) Right click on the Vending_Machine project and select it as the start project
+3) Right click on the Server_Planilla project and select it as the start project
 ![startImg](Images/startProject.png)
 
 4) With the web server as the default project. and the selected infrastructure layer.
