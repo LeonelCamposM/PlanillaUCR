@@ -8,17 +8,24 @@ using System.Collections.Generic;
 using static System.Linq.Queryable;
 using static System.Linq.Enumerable;
 using System.Threading.Tasks;
+using Google.Cloud.Firestore;
+using System.Collections;
 
 namespace Infrastructure.Payments.Repositories
 {
     internal class PaymentRepository : IPaymentRepository
     {
         private readonly PaymentDbContext _dbContext;
+        private readonly FirestoreDb _firestoreDbContext;
+
         public IUnitOfWork UnitOfWork => _dbContext;
 
         public PaymentRepository(PaymentDbContext unitOfWork)
         {
             _dbContext = unitOfWork;
+            string filePath = "../Server_Planilla/wwwroot/firebase_key.json";
+            Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", filePath);
+            _firestoreDbContext = FirestoreDb.Create("planillaucr-e92dc");
         }
 
         public async Task<Payment?> GetEmployeeLastPayment(string employeeEmail, string employerEmail, string projectName)
@@ -31,8 +38,32 @@ namespace Infrastructure.Payments.Repositories
 
         public async Task AddPayment(Payment newPayment)
         {
-            _dbContext.Payments.Add(newPayment);
-            await _dbContext.SaveEntitiesAsync();
+           // CollectionReference paymentsReference = _firestoreDbContext.Collection("Payment");
+            //await paymentsReference.AddAsync(new PaymentHistory("nuevo", "nuevo2"));
+
+            DocumentReference docRef = _firestoreDbContext.Collection("data").Document("one");
+            Dictionary<string, object> docData = new Dictionary<string, object>
+            {
+                { "stringExample", "Hello World" },
+                { "booleanExample", false },
+                { "numberExample", 3.14159265 },
+                { "nullExample", null },
+            };
+
+            ArrayList arrayExample = new ArrayList();
+            arrayExample.Add(5);
+            arrayExample.Add(true);
+            arrayExample.Add("Hello");
+            docData.Add("arrayExample", arrayExample);
+
+            Dictionary<string, object> objectExample = new Dictionary<string, object>
+            {
+                { "a", 5 },
+                { "b", true },
+            };
+            docData.Add("objectExample", objectExample);
+
+            await docRef.SetAsync(docData);
         }
 
         public async Task<IList<Payment>> GetProjectPayments(Payment payment)
