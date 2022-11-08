@@ -6,9 +6,8 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Data.SqlClient;
 using System.Threading.Tasks;
-
-
-using System.Linq;
+using static System.Linq.Queryable;
+using static System.Linq.Enumerable;
 
 namespace Infrastructure.Agreements.Repositories
 {

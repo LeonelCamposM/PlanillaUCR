@@ -3,7 +3,8 @@ using Domain.ReportOfHours.Repositories;
 using System.Threading.Tasks;
 using Domain.ReportOfHours.Entities;
 using System.Collections.Generic;
-using System.Linq;
+using static System.Linq.Queryable;
+using static System.Linq.Enumerable;
 using Microsoft.EntityFrameworkCore;
 using System;
 
