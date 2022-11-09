@@ -40,8 +40,8 @@ namespace Infrastructure.Payments.Repositories
         {
             _dbContext.Add(newPayment);
             await _dbContext.SaveEntitiesAsync();
-            DocumentReference paymentsReference = _firestoreDbContext.Collection("Payment").Document();
-            PaymentHistory paymentsHistory = new PaymentHistory(newPayment.EmployeeEmail,newPayment.EmployerEmail, newPayment.ProjectName, newPayment.GrossSalary, newPayment.StartDate.ToShortDateString(), newPayment.EndDate.ToShortDateString());
+            DocumentReference paymentsReference = _firestoreDbContext.Collection("PaymentHistory").Document();
+            PaymentHistory paymentsHistory = new(newPayment.EmployerEmail, newPayment.EmployeeEmail,"Payment Interval", newPayment.ProjectName, newPayment.GrossSalary, newPayment.StartDate.ToShortDateString(), newPayment.EndDate.ToShortDateString(), 100.0, "Contract Type", "Subscriptions", 99.0,99.0);
             await paymentsReference.CreateAsync(paymentsHistory);
         }
 
