@@ -38,32 +38,11 @@ namespace Infrastructure.Payments.Repositories
 
         public async Task AddPayment(Payment newPayment)
         {
-           // CollectionReference paymentsReference = _firestoreDbContext.Collection("Payment");
-            //await paymentsReference.AddAsync(new PaymentHistory("nuevo", "nuevo2"));
-
-            DocumentReference docRef = _firestoreDbContext.Collection("data").Document("one");
-            Dictionary<string, object> docData = new Dictionary<string, object>
-            {
-                { "stringExample", "Hello World" },
-                { "booleanExample", false },
-                { "numberExample", 3.14159265 },
-                { "nullExample", null },
-            };
-
-            ArrayList arrayExample = new ArrayList();
-            arrayExample.Add(5);
-            arrayExample.Add(true);
-            arrayExample.Add("Hello");
-            docData.Add("arrayExample", arrayExample);
-
-            Dictionary<string, object> objectExample = new Dictionary<string, object>
-            {
-                { "a", 5 },
-                { "b", true },
-            };
-            docData.Add("objectExample", objectExample);
-
-            await docRef.SetAsync(docData);
+            _dbContext.Add(newPayment);
+            await _dbContext.SaveEntitiesAsync();
+            DocumentReference paymentsReference = _firestoreDbContext.Collection("Payment").Document();
+            PaymentHistory paymentsHistory = new PaymentHistory(newPayment.EmployeeEmail,newPayment.EmployerEmail, newPayment.ProjectName, newPayment.GrossSalary, newPayment.StartDate.ToShortDateString(), newPayment.EndDate.ToShortDateString());
+            await paymentsReference.CreateAsync(paymentsHistory);
         }
 
         public async Task<IList<Payment>> GetProjectPayments(Payment payment)

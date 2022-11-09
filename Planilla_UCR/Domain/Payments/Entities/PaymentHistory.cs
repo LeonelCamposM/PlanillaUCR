@@ -1,21 +1,36 @@
 ﻿using Google.Cloud.Firestore;
+using System;
+
 namespace Domain.Payments.Entities
 {
-
     [FirestoreData]
     public class PaymentHistory
     {
         [FirestoreProperty]
-        public string Name { get; set; }
-
+        public string EmployeeEmail { get; set; }
         [FirestoreProperty]
-        public string State { get; set; }
+        public string EmployerEmail { get; set; }
+        [FirestoreProperty]
+        public string ProjectName { get; set; }
+        [FirestoreProperty]
+        public double GrossSalary { get; set; }
+        [FirestoreProperty]
+        public string StartDate { get; set; }
+        [FirestoreProperty]
+        public string EndDate { get; set; }
 
-        public PaymentHistory(string name, string state)
+        public PaymentHistory(string employeeEmail, string employerEmail,
+            string projectName, double grossSalary, string startDate, string endDate)
         {
-            this.Name = name;
-            this.State = state;
+            EmployeeEmail = employeeEmail;
+            EmployerEmail = employerEmail;
+            ProjectName = projectName;
+            StartDate = startDate;
+            EndDate = endDate;
+            GrossSalary = grossSalary;
         }
+
+        public PaymentHistory() { }
 
     }
 }
