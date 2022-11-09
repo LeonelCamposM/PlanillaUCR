@@ -38,11 +38,10 @@ namespace Infrastructure.Payments.Repositories
 
         public async Task AddPayment(Payment newPayment)
         {
-            _dbContext.Add(newPayment);
-            await _dbContext.SaveEntitiesAsync();
-            DocumentReference paymentsReference = _firestoreDbContext.Collection("PaymentHistory").Document();
+            string paymentDate = newPayment.StartDate.ToShortDateString().Replace("/", "-");
+            DocumentReference paymentsReference = _firestoreDbContext.Collection("PaymentHistory").Document(newPayment.ProjectName+"_"+newPayment.EmployerEmail).Collection(paymentDate).Document(newPayment.EmployeeEmail);
             PaymentHistory paymentsHistory = new(newPayment.EmployerEmail, newPayment.EmployeeEmail,"Payment Interval", newPayment.ProjectName, newPayment.GrossSalary, newPayment.StartDate.ToShortDateString(), newPayment.EndDate.ToShortDateString(), 100.0, "Contract Type", "Subscriptions", 99.0,99.0);
-            await paymentsReference.CreateAsync(paymentsHistory);
+            await paymentsReference.SetAsync(paymentsHistory);
         }
 
         public async Task<IList<Payment>> GetProjectPayments(Payment payment)

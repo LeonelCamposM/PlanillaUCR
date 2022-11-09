@@ -9,47 +9,47 @@ namespace Domain.Payments.Entities
 
         // Id
         [FirestoreProperty]
-        public string employerEmail { get; set; }
+        public string EmployerEmail { get; set; }
         [FirestoreProperty]
-        public string employeeEmail { get; set; }
+        public string EmployeeEmail { get; set; }
         [FirestoreProperty]
-        public string paymentInterval { get; set; }
+        public string PaymentInterval { get; set; }
         [FirestoreProperty]
-        public string projectName { get; set; }
+        public string ProjectName { get; set; }
 
         // data
         [FirestoreProperty]
-        public double grossSalary { get; set; }
+        public double GrossSalary { get; set; }
         [FirestoreProperty]
-        public string startDate { get; set; }
+        public string StartDate { get; set; }
         [FirestoreProperty]
-        public string endDate { get; set; }
+        public string EndDate { get; set; }
         [FirestoreProperty]
-        public double netSalary { get; set; }
+        public double NetSalary { get; set; }
         [FirestoreProperty]
-        public string contractType { get; set; }
+        public string ContractType { get; set; }
         [FirestoreProperty]
-        public string subscriptions { get; set; }
+        public string Subscriptions { get; set; }
         [FirestoreProperty]
-        public double employerTaxes { get; set; }
+        public double EmployerTaxes { get; set; }
         [FirestoreProperty]
-        public double employeeTaxes { get; set; }
+        public double EmployeeTaxes { get; set; }
 
         public PaymentHistory(string employerEmail, string employeeEmail, string paymentInterval
 ,            string projectName, double grossSalary, string startDate, string endDate, double netSalary, string contractType, string subscriptions, double employerTaxes, double employeeTaxes)
         {
-            this.employerEmail = employerEmail;
-            this.employeeEmail = employeeEmail;
-            this.paymentInterval = paymentInterval;
-            this.projectName = projectName;
-            this.grossSalary = grossSalary;
-            this.startDate = startDate;
-            this.endDate = endDate;
-            this.netSalary = netSalary;
-            this.contractType = contractType;
-            this.subscriptions = subscriptions;
-            this.employerTaxes = employerTaxes;
-            this.employeeTaxes = employeeTaxes;
+            this.EmployerEmail = employerEmail;
+            this.EmployeeEmail = employeeEmail;
+            this.PaymentInterval = paymentInterval;
+            this.ProjectName = projectName;
+            this.GrossSalary = grossSalary;
+            this.StartDate = startDate;
+            this.EndDate = endDate;
+            this.NetSalary = netSalary;
+            this.ContractType = contractType;
+            this.Subscriptions = subscriptions;
+            this.EmployerTaxes = employerTaxes;
+            this.EmployeeTaxes = employeeTaxes;
         }
 
         public PaymentHistory() { }
