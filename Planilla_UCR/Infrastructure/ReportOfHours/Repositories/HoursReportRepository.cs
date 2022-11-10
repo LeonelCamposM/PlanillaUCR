@@ -5,6 +5,7 @@ using Domain.ReportOfHours.Entities;
 using System.Collections.Generic;
 using static System.Linq.Queryable;
 using static System.Linq.Enumerable;
+using Google.Cloud.Firestore;
 using Microsoft.EntityFrameworkCore;
 using System;
 
@@ -14,14 +15,23 @@ namespace Infrastructure.ReportOfHours.Repositories
     {
         private readonly HoursReportDbContext _dbContext;
         public IUnitOfWork UnitOfWork => _dbContext;
+        private readonly FirestoreDb _firestoreDbContext;
 
         public HoursReportRepository(HoursReportDbContext unitOfWork)
         {
             _dbContext = unitOfWork;
+            string filePath = "../Server_Planilla/wwwroot/firebase_key.json";
+            Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", filePath);
+            _firestoreDbContext = FirestoreDb.Create("planillaucr-e92dc");
         }
 
         public async Task CreateReportAsync(HoursReport report)
         {
+            String reportDate = report.ReportDate.Value.ToShortDateString().Replace("/", "-");
+            DocumentReference reportsReference = _firestoreDbContext.Collection("ReportHoursHistory").Document(report.ProjectName + report.EmployerEmail).
+                Collection(report.EmployeeEmail).Document(reportDate);
+            await reportsReference.CreateAsync(new HoursReportHistory(report.EmployerEmail, report.ProjectName, 
+                report.EmployeeEmail, reportDate, report.ReportHours, report.Approved));
             _dbContext.HoursReport.Add(report);
             await _dbContext.SaveEntitiesAsync();
         }
@@ -57,10 +67,25 @@ namespace Infrastructure.ReportOfHours.Repositories
 
         public async Task UpdateReport(HoursReport updateReport)
         {
-            System.FormattableString query = ($@"EXECUTE ApproveHoursReport 
+            String reportDate = updateReport.ReportDate.Value.ToShortDateString().Replace("/", "-");
+            DocumentReference reportHoursReference = _firestoreDbContext.Collection("ReportHoursHistory").Document(updateReport.ProjectName + updateReport.EmployerEmail).
+                Collection(updateReport.EmployeeEmail).Document(reportDate);
+            DocumentSnapshot snapshot = await reportHoursReference.GetSnapshotAsync();
+            if (snapshot.Exists)
+            {
+                HoursReportHistory hoursReportHistory = snapshot.ConvertTo<HoursReportHistory>();
+                hoursReportHistory.Approved = updateReport.Approved;
+                await reportHoursReference.SetAsync(hoursReportHistory);
+            }
+            else
+            {
+                Console.WriteLine("Document does not exist!", snapshot.Id);
+            }
+
+          /*  System.FormattableString query = ($@"EXECUTE ApproveHoursReport 
             @EmployerEmail = {updateReport.EmployerEmail}, @ProjectName = {updateReport.ProjectName},
             @ReportDate = {updateReport.ReportDate}, @EmployeeEmail = {updateReport.EmployeeEmail}");
-            _dbContext.Database.ExecuteSqlInterpolated(query);
+            _dbContext.Database.ExecuteSqlInterpolated(query);*/
         }
 
         public async Task<IEnumerable<HoursReport>> GetProjectHoursReport(string projectName, string employeeEmail, string employerEmail)
