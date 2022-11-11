@@ -17,14 +17,14 @@ namespace Tests.Application
     {
         List<HoursReport> reportsList = new List<HoursReport>
         {
-            new HoursReport("leonel@ucr.ac.cr", "Proyecto 1", "mau@ucr.ac.cr", DateTime.Now, 5, 0),
-            new HoursReport("leonel@ucr.ac.cr", "Proyecto 1", "mau@ucr.ac.cr", DateTime.Now.AddDays(1), 5, 0),
-            new HoursReport("leonel@ucr.ac.cr", "Proyecto 1", "mau@ucr.ac.cr", DateTime.Now.AddDays(2), 5, 0),
-            new HoursReport("leonel@ucr.ac.cr", "Proyecto 1", "mau@ucr.ac.cr", DateTime.Now.AddDays(5), 5, 0),
-            new HoursReport("leonel@ucr.ac.cr", "Proyecto 1", "mau@ucr.ac.cr", DateTime.Now.AddDays(8), 5, 0),
-            new HoursReport("leonel@ucr.ac.cr", "Proyecto 2", "mau@ucr.ac.cr", DateTime.Now.AddDays(8), 5, 0),
-            new HoursReport("leonel@ucr.ac.cr", "Proyecto 2", "mau@ucr.ac.cr", DateTime.Now.AddDays(8), 5, 0),
-            new HoursReport("leonel@ucr.ac.cr", "Proyecto 3", "mau@ucr.ac.cr", DateTime.Now.AddDays(8), 5, 0)
+            new HoursReport("leonel@ucr.ac.cr", "Proyecto 1", "mau@ucr.ac.cr", DateTime.Now.ToShortDateString().Replace("/", "-"), 5, 0),
+            new HoursReport("leonel@ucr.ac.cr", "Proyecto 1", "mau@ucr.ac.cr", DateTime.Now.AddDays(1).ToShortDateString().Replace("/", "-"), 5, 0),
+            new HoursReport("leonel@ucr.ac.cr", "Proyecto 1", "mau@ucr.ac.cr", DateTime.Now.AddDays(2).ToShortDateString().Replace("/", "-"), 5, 0),
+            new HoursReport("leonel@ucr.ac.cr", "Proyecto 1", "mau@ucr.ac.cr", DateTime.Now.AddDays(5).ToShortDateString().Replace("/", "-"), 5, 0),
+            new HoursReport("leonel@ucr.ac.cr", "Proyecto 1", "mau@ucr.ac.cr", DateTime.Now.AddDays(8).ToShortDateString().Replace("/", "-"), 5, 0),
+            new HoursReport("leonel@ucr.ac.cr", "Proyecto 2", "mau@ucr.ac.cr", DateTime.Now.AddDays(8).ToShortDateString().Replace("/", "-"), 5, 0),
+            new HoursReport("leonel@ucr.ac.cr", "Proyecto 2", "mau@ucr.ac.cr", DateTime.Now.AddDays(8).ToShortDateString().Replace("/", "-"), 5, 0),
+            new HoursReport("leonel@ucr.ac.cr", "Proyecto 3", "mau@ucr.ac.cr", DateTime.Now.AddDays(8).ToShortDateString().Replace("/", "-"), 5, 0)
         };
 
         private string _projectName = "Proyecto 1";
@@ -32,7 +32,7 @@ namespace Tests.Application
         private string _employerEmail = "leonel@ucr.ac.cr";
 
 
-        public HoursReport report = new HoursReport("leonel@ucr.ac.cr", "Proyecto 3", "mau@ucr.ac.cr", DateTime.Now.AddDays(8), 5, 0);
+        public HoursReport report = new HoursReport("leonel@ucr.ac.cr", "Proyecto 3", "mau@ucr.ac.cr", DateTime.Now.AddDays(8).ToShortDateString().Replace("/", "-"), 5, 0);
 
         [Fact]
         public async Task GetProjectHoursReport()

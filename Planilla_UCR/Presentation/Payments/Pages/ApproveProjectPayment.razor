@@ -237,7 +237,7 @@
     {
         double _workedHours = 0;
         _report.EmployeeEmail = agreement.EmployeeEmail;
-        _report.ReportDate = lastPaymentDate;
+        _report.ReportDate = lastPaymentDate.ToShortDateString().Replace("/", "-"); ;
         IList<HoursReport> reports = await ReportHoursService.GetEmployeeReports(_report, lastPaymentDate.AddDays(daysInterval));
         foreach (HoursReport hours in reports)
         {
@@ -264,7 +264,7 @@
                 {
                     _days = fortnightDays(lastPaymentDate);
                 }break;
-            case "Mensual": 
+            case "Mensual":
                 {
                     DateTime nextMonth = lastPaymentDate.AddMonths(1);
                     TimeSpan t = nextMonth - lastPaymentDate;
@@ -342,7 +342,7 @@
             await Task.Delay(2000);
         }
     }
-    
+
     private bool FilterFunc1(ProjectModel element) => FilterFunc(element, searchString1);
 
     private bool FilterFunc(ProjectModel element, string searchString)

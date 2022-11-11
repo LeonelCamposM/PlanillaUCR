@@ -57,7 +57,7 @@ if (!_empty)
         <RowTemplate>
             <MudTd DataLabel="Nombre proyecto">@context.ProjectName</MudTd>
             <MudTd DataLabel="Nombre empleado"> @context.EmployeeEmail.Split(",")[1] </MudTd>
-            <MudTd DataLabel="Fecha">@context.ReportDate.Value.ToShortDateString()</MudTd>
+            <MudTd DataLabel="Fecha">@context.ReportDate</MudTd>
             <MudTd DataLabel="Horas">@context.ReportHours</MudTd>
         </RowTemplate>
         <PagerContent>
@@ -133,7 +133,7 @@ else
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
 
-        string dateString = element.ReportDate.Value.ToShortDateString();
+        string dateString = element.ReportDate;
         if (dateString.Contains(searchString))
             return true;
         return false;

@@ -206,7 +206,7 @@ else
     {
 
         _lastEmployerPayments = (IList<Payment>) await PaymentService.GetEmployerPayments(email);
-        var employerProjects = 
+        var employerProjects =
                         from payment in _lastEmployerPayments
                         group payment by payment.ProjectName;
 
@@ -255,7 +255,7 @@ else
 
                     HoursReport _report = new HoursReport();
                     _report.EmployeeEmail = _employeeAgreement.EmployeeEmail;
-                    _report.ReportDate = _pModel.LastPaymentDate;
+                    _report.ReportDate = _pModel.LastPaymentDate.ToShortDateString().Replace("/", "-"); ;
                     IList<HoursReport> reports = await ReportHoursService.GetEmployeeReports(_report, _pModel.LastPaymentDate.AddDays(_pModel.DayInterval));
 
                     _mountToPay = PaymentService.GetSalary(_employeeAgreement, _pModel.DayInterval, subscriptions, reports);
@@ -310,7 +310,7 @@ else
 
     private void GetProjectEmployeesCount(IList<Agreement> agreements)
     {
-        var employerProjects = 
+        var employerProjects =
                     from project in agreements
                     group project by project.ProjectName;
 

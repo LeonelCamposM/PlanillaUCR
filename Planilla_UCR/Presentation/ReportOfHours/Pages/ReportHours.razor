@@ -53,7 +53,7 @@
                                 <MudGrid>
                                 <MudItem xs="2"></MudItem>
                                  <MudItem xs="8">
-                                    <MudDatePicker Label="Fecha del reporte" @bind-Date="hoursReport.ReportDate" DateFormat="yyyy.MM.dd" Variant="Variant.Outlined" Required="true" RequiredError="La fecha de reporte es necesaria"/>
+                                    <MudDatePicker Label="Fecha del reporte" @bind-Date="startDate" DateFormat="yyyy.MM.dd" Variant="Variant.Outlined" Required="true" RequiredError="La fecha de reporte es necesaria"/>
                                 </MudItem>
                                 <MudItem xs="2"></MudItem>
 
@@ -115,7 +115,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-         hoursReport.ProjectName = ContextMenuService.GetProjectsContext();
+        hoursReport.ProjectName = ContextMenuService.GetProjectsContext();
         _elements = await AgreementService.GetEmployeeAgreements(employeeEmail);
         if (_elements.Length() == 0)
         {
@@ -126,7 +126,8 @@
             _empty = false;
         }
         _loading = false;
-        hoursReport.ReportDate = DateTime.Now;
+        DateTime date = DateTime.Now;
+        hoursReport.ReportDate = date.ToShortDateString().Replace("/", "-");
         hoursReport.EmployerEmail = employerEmail;
         hoursReport.EmployeeEmail = employeeEmail;
         hoursReport.ProjectName = ContextMenuService.GetProjectsContext();
@@ -140,6 +141,7 @@
         bool validDate = await ValidateDate();
         if (form.IsValid && ValidateHours() && !hasKey && validDate)
         {
+            hoursReport.ReportDate = startDate.Value.ToShortDateString().Replace("/", "-");
             await HoursReportService.CreateReportAsync(hoursReport);
             ShowSnackNotification("Reporte de horas creado",Severity.Success);
         }
@@ -165,13 +167,14 @@
 
     void CleanForm()
     {
-        hoursReport.ReportDate = DateTime.Now;
+        DateTime date = DateTime.Now;
+        hoursReport.ReportDate = date.ToShortDateString().Replace("/", "-");
         hoursReport.ReportHours = 0;
     }
 
     bool ValidateHours()
     {
-        bool valid = true; 
+        bool valid = true;
         if (hoursReport.ReportHours == 0 || hoursReport.ReportHours < 0 || hoursReport.ReportHours > 12)
         {
             ShowSnackNotification("Número de horas incorrecto", Severity.Error);
@@ -193,27 +196,29 @@
     async Task<bool> ValidateDate()
     {
         Payment lastPay = await PaymentService.GetEmployeeLastPayment(employeeEmail, ContextMenuService.GetEmployerEmailContext(), ContextMenuService.GetProjectsContext());
-        bool valid = true; 
-        if (hoursReport.ReportDate > DateTime.Now)
+        bool valid = true;
+        string dateData = hoursReport.ReportDate.Replace("-", "/");
+        DateTime date = Convert.ToDateTime(dateData);
+        if (date> DateTime.Now)
         {
             ShowSnackNotification("No es posible reportar horas a futuro", Severity.Error);
             valid = false;
         }
         if(lastPay != null)
         {
-            if (hoursReport.ReportDate.Value.Date < lastPay.EndDate.Date)
+            if (date.Date < lastPay.EndDate.Date)
             {
                 ShowSnackNotification("No es posible reportar horas antes del último pago", Severity.Error);
                 valid = false;
             }
         }
-        
-        Agreement searchAgreement = new Agreement(employeeEmail, ContextMenuService.GetEmployerEmailContext(), ContextMenuService.GetProjectsContext(), null, "",1,null,1,""); 
+
+        Agreement searchAgreement = new Agreement(employeeEmail, ContextMenuService.GetEmployerEmailContext(), ContextMenuService.GetProjectsContext(), null, "",1,null,1,"");
         searchAgreement = await AgreementService.GetContractee(searchAgreement);
-        if (searchAgreement.ContractStartDate > hoursReport.ReportDate)
+        if (searchAgreement.ContractStartDate > date)
         {
-                ShowSnackNotification("No es posible reportar antes de la fecha de inicio de su contrato", Severity.Error);
-                valid = false;
+            ShowSnackNotification("No es posible reportar antes de la fecha de inicio de su contrato", Severity.Error);
+            valid = false;
         }
         return valid;
     }

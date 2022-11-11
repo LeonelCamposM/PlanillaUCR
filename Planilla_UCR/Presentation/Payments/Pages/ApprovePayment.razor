@@ -145,19 +145,19 @@
         _employeesPayment = from _agreement in _employees
                             join _person in _people on _agreement.EmployeeEmail equals _person.Email
                             select new EmployeeAgreement
-                  {
-                        ProjectName = _agreement.ProjectName,
-                        EmployeeEmail = _agreement.EmployeeEmail,
-                        EmployeeName = _person.Name,
-                        EmployeeLastName1 = _person.LastName1,
-                        EmployeeLastName2 =  _person.LastName2,
-                        FullName = _person.Name + " " + _person.LastName1 + " " + _person.LastName2,
-                        ContractType = _agreement.ContractType,
-                        ContractStartDate = (DateTime) _agreement.ContractStartDate,
-                        ContractFinishDate = (DateTime) _agreement.ContractFinishDate,
-                        MountPerHour = _agreement.MountPerHour,
-                        MountToPay = 0
-                    };
+                            {
+                                ProjectName = _agreement.ProjectName,
+                                EmployeeEmail = _agreement.EmployeeEmail,
+                                EmployeeName = _person.Name,
+                                EmployeeLastName1 = _person.LastName1,
+                                EmployeeLastName2 =  _person.LastName2,
+                                FullName = _person.Name + " " + _person.LastName1 + " " + _person.LastName2,
+                                ContractType = _agreement.ContractType,
+                                ContractStartDate = (DateTime) _agreement.ContractStartDate,
+                                ContractFinishDate = (DateTime) _agreement.ContractFinishDate,
+                                MountPerHour = _agreement.MountPerHour,
+                                MountToPay = 0
+                            };
         await GetAllEmployeesSalaries();
     }
 
@@ -251,7 +251,7 @@
     {
         double _workedHours = 0;
         _report.EmployeeEmail = employeeEmail;
-        _report.ReportDate = _projectInfo.LastPaymentDate;
+        _report.ReportDate = _projectInfo.LastPaymentDate.ToShortDateString().Replace("/", "-"); ;
         IList<HoursReport> reports = await ReportHoursService.GetEmployeeReports(_report, _nextPay);
         foreach (HoursReport hours in reports)
         {
@@ -263,7 +263,7 @@
     public void GetNextPay()
     {
         GetDaysInterval();
-        _nextPay = _nextPay.AddDays(_daysInterval); 
+        _nextPay = _nextPay.AddDays(_daysInterval);
     }
 
     public void GetDaysInterval()
@@ -284,7 +284,7 @@
                 {
                     fortnightDays(lastPaymentDate);
                 }break;
-            case "Mensual": 
+            case "Mensual":
                 {
                     DateTime nextMonth = lastPaymentDate.AddMonths(1);
                     TimeSpan t = nextMonth - lastPaymentDate;
