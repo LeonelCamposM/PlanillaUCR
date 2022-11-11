@@ -24,7 +24,7 @@ namespace Application.Payments.Implementations
             _paymentRepository = paymentRepository;
         }
 
-        public async Task AddPayment(Payment newPayment)
+        public async Task AddPayment(PaymentHistory newPayment)
         {
             await _paymentRepository.AddPayment(newPayment);
         }

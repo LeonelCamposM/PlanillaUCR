@@ -118,7 +118,7 @@ else
 
                 <RowTemplate>
                         <MudTd DataLabel="Proyecto">@context.ProjectName</MudTd>
-                        <MudTd DataLabel="Fecha">@context.EndDate.ToShortDateString()</MudTd>
+                        <MudTd DataLabel="Fecha">@context.StartDate.ToShortDateString()</MudTd>
                         <MudTd DataLabel="Monto"> @_cultureCR.NumberFormat.CurrencySymbol @CostFormat(@context.GrossSalary) </MudTd>
                 </RowTemplate>
                 <PagerContent>
@@ -346,7 +346,6 @@ else
     private async Task LoadPaymentTable()
     {
         IList<Agreement> agreements = (IList<Agreement>) await AgreementService.GetEmployerAgreements(email);
-
         _projects = (IList<Project>) await ProjectService.GetEmployerProyects(email);
         _projectsList = PaymentService.GetProjectsToPay(_projects);
         await GetProjectsMountToPay();

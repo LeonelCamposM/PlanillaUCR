@@ -11,7 +11,7 @@ namespace Application.Payments
 {
     public interface IPaymentService
     {
-        Task AddPayment(Payment newPayment);
+        Task AddPayment(PaymentHistory newPayment);
         Task<Payment?> GetEmployeeLastPayment(string employeeEmail, string employerEmail, string projectName);
         Task<IList<Payment>> GetProjectPayments(Payment payment);
         Task<IEnumerable<Payment>> GetEmployeePayments(string email);

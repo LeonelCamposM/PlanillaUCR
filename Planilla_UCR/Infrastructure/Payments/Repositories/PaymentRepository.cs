@@ -27,12 +27,10 @@ namespace Infrastructure.Payments.Repositories
             _firestoreDbContext = FirestoreDb.Create("planillaucr-e92dc");
         }
 
-        public async Task AddPayment(Payment newPayment)
+        public async Task AddPayment(PaymentHistory newPayment)
         {
-            DocumentReference paymentsReference = _firestoreDbContext.Collection("PaymentHistory").Document();
-            PaymentHistory paymentsHistory = new(newPayment.EmployerEmail, newPayment.EmployeeEmail,"Payment Interval", newPayment.ProjectName, newPayment.GrossSalary, newPayment.StartDate.ToShortDateString(), newPayment.EndDate.ToShortDateString(), 100.0, "Contract Type", "Subscriptions", 99.0,99.0);
-            await paymentsReference.SetAsync(paymentsHistory);
- 
+            DocumentReference paymentsReference = _firestoreDbContext.Collection("PaymentHistory").Document();     
+            await paymentsReference.SetAsync(newPayment);
         }
 
         public async Task<Payment?> GetEmployeeLastPayment(string employeeEmail, string employerEmail, string projectName)
@@ -45,8 +43,8 @@ namespace Infrastructure.Payments.Repositories
 
         public async Task<IList<Payment>> GetProjectPayments(Payment payment)
         {
-            Query query = _firestoreDbContext.Collection("PaymentHistory").WhereEqualTo("ProjectName", payment.ProjectName).
-                WhereEqualTo("EmployeeEmail", payment.EmployeeEmail).WhereEqualTo("EmployerEmail", payment.EmployerEmail);
+            Query query = _firestoreDbContext.Collection("PaymentHistory").WhereEqualTo("ProjectName", payment.ProjectName)
+              .WhereEqualTo("EmployerEmail", payment.EmployerEmail);
             QuerySnapshot snapshot = await query.GetSnapshotAsync();
             IList<Payment> payments = new List<Payment>();
             foreach (DocumentSnapshot documentSnapshot in snapshot.Documents)
