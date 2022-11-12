@@ -120,6 +120,7 @@
 
     protected override async Task OnParametersSetAsync()
     {
+        _employeeAgreements = new List<EmployeeAgreement>();
         ContextService.SetProjectsContext(true,true, projectName, email, ContextService.GetHoursEmployeeContext(), ContextService.GetReportsContext());
         _employees = await AgreementService.GetProjectAgreements(ContextService.GetProjectsContext(), email);
         await GetProjectInfo();
@@ -173,7 +174,7 @@
             {
                 _employeeAgreement.MountToPay = await GetSalary(_employeeAgreement.MountPerHour,
                     _employeeAgreement.ContractType, _employeeAgreement.EmployeeEmail,
-                    _employeeAgreement.ContractStartDate);
+                    _projectInfo.LastPaymentDate);
                 if (_employeeAgreement.MountToPay > 0)
                 {
                     _employeeAgreement.MountToPay += TaxCalculatorService.GetEmployerSocialCharges(_employeeAgreement.MountToPay);
@@ -182,7 +183,7 @@
 
                         // Gross salary
                     double grossSalary = await GetSalaryByType(_employeeAgreement.MountPerHour, _employeeAgreement.EmployeeEmail,
-                        _employeeAgreement.ContractType, _employeeAgreement.ContractStartDate);
+                        _employeeAgreement.ContractType, _projectInfo.LastPaymentDate);
                     grossSalary += await GetEmployeeBenefits(_employeeAgreement.EmployeeEmail);
 
                     // Employer taxes

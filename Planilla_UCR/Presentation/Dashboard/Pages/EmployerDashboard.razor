@@ -198,21 +198,21 @@ else
     };
 
     private CultureInfo _cultureCR = CultureInfo.GetCultureInfo("es-CR");
-    private IList<Payment> _lastEmployerPayments = new List<Payment>();
+    private IList<PaymentHistory> _lastEmployerPayments = new List<PaymentHistory>();
     private IList<ProjectModel> _projectsList = new List<ProjectModel>();
     private IList<Payment> _tablelastEmployerPayments = new List<Payment>();
 
     protected override async Task OnParametersSetAsync()
     {
 
-        _lastEmployerPayments = (IList<Payment>) await PaymentService.GetEmployerPayments(email);
+        _lastEmployerPayments = (IList<PaymentHistory>) await PaymentService.GetEmployerPayments(email);
         var employerProjects = 
                         from payment in _lastEmployerPayments
                         group payment by payment.ProjectName;
 
-        await LoadPieChart(employerProjects);
+        LoadPieChart(employerProjects);
         await LoadPaymentTable();
-        await GetEmployerCost();
+        GetEmployerCost();
         _tablelastEmployerPayments = _tablelastEmployerPayments.OrderByDescending(pay => pay.EndDate).ToList();
         GetTotalPaymentsAmount();
         _loading = false;
@@ -234,57 +234,13 @@ else
         return formatedCost;
     }
 
-    private async Task GetProjectsMountToPay()
+    private void GetEmployerCost()
     {
-        IList<ProjectModel> projectsToDelete = new List<ProjectModel>();
-        foreach (ProjectModel _pModel in _projectsList)
-        {
-            IList<Agreement> _employees = await AgreementService.GetProjectAgreements(_pModel.ProjectName, _pModel.EmployerEmail);
-
-            Payment _payment = new Payment("", _pModel.EmployerEmail, _pModel.ProjectName, 0,
-                _pModel.LastPaymentDate, _pModel.LastPaymentDate.AddDays(_pModel.DayInterval));
-            IList<Payment> _paidEmployees = await PaymentService.GetProjectPayments(_payment);
-
-            foreach (Agreement _employeeAgreement in _employees)
-            {
-                if (_paidEmployees.Where(e => e.EmployeeEmail == _employeeAgreement.EmployeeEmail).Length() == 0)
-                {
-                    double _mountToPay = 0;
-                    Subscribe searchSubscribe = new Subscribe(_employeeAgreement.EmployeeEmail, _employeeAgreement.EmployerEmail, _employeeAgreement.ProjectName, "", 0.0, _pModel.LastPaymentDate, _pModel.LastPaymentDate.AddDays(_pModel.DayInterval));
-                    IEnumerable<Subscription> subscriptions = await SubscribeService.GetSubscribes(searchSubscribe);
-
-                    HoursReport _report = new HoursReport();
-                    _report.EmployeeEmail = _employeeAgreement.EmployeeEmail;
-                    _report.ReportDate = _pModel.LastPaymentDate;
-                    IList<HoursReport> reports = await ReportHoursService.GetEmployeeReports(_report, _pModel.LastPaymentDate.AddDays(_pModel.DayInterval));
-
-                    _mountToPay = PaymentService.GetSalary(_employeeAgreement, _pModel.DayInterval, subscriptions, reports);
-                    _pModel.MountToPay += _mountToPay;
-                    EmployeeAgreement projectEmployee = new EmployeeAgreement();
-                    projectEmployee.EmployeeEmail = _employeeAgreement.EmployeeEmail;
-                    projectEmployee.MountToPay = _mountToPay;
-                    _pModel.EmployeeList.Add(projectEmployee);
-                }
-            }
-            if (_pModel.MountToPay == 0)
-            {
-                projectsToDelete.Add(_pModel);
-            }
-        }
-        foreach (ProjectModel toDelete in projectsToDelete)
-        {
-            _projectsList.Remove(toDelete);
-        }
-    }
-
-    private async Task GetEmployerCost()
-    {
-        foreach (Payment payment in _lastEmployerPayments)
+        foreach (PaymentHistory payment in _lastEmployerPayments)
         {
             double cost = payment.GrossSalary;
-            cost += GetEmployerSocialCharges(payment);
-            cost += Convert.ToDouble(await GetEmployeeBenefits(payment));
-            _tablelastEmployerPayments.Add(new Payment(payment.EmployeeEmail, payment.EmployerEmail, payment.ProjectName, cost, payment.StartDate, payment.EndDate));
+            cost += payment.EmployerTaxes;
+            _tablelastEmployerPayments.Add(new Payment(payment.EmployeeEmail, payment.EmployerEmail, payment.ProjectName, cost, Convert.ToDateTime(payment.StartDate), Convert.ToDateTime(payment.EndDate)));
         }
     }
 
@@ -293,12 +249,12 @@ else
         return TaxCalculatorService.GetEmployerSocialCharges(projectHistorical.GrossSalary);
     }
 
-    private async Task<double> GetEmployeeBenefits(Payment payment)
+    private async Task<double> GetEmployeeBenefits(PaymentHistory payment)
     {
         double benefitsCost = 0;
         Subscribe searchSubscribe= new Subscribe(payment.EmployeeEmail,
             payment.EmployerEmail, payment.ProjectName, "",
-            0.0, payment.StartDate,  payment.EndDate);
+            0.0, Convert.ToDateTime(payment.StartDate),Convert.ToDateTime(payment.EndDate));
         IList<Subscription> benefits = (await SubscribeService.GetSubscriptionCostsByDate(searchSubscribe)).ToList();
         benefits = benefits.Where(e => e.TypeSubscription == 1).ToList();
         foreach (Subscription benefit in benefits)
@@ -327,15 +283,14 @@ else
         }
     }
 
-    private async Task LoadPieChart(IEnumerable<IGrouping<string, Payment>>  employerProjects)
+    private void LoadPieChart(IEnumerable<IGrouping<string, PaymentHistory>>  employerProjects)
     {
         totalCost = 0;
         foreach (var group in employerProjects){
             double cost = 0;
             foreach (var payment in group){
                 cost += payment.GrossSalary;
-                cost += GetEmployerSocialCharges(payment);
-                cost += Convert.ToDouble(await GetEmployeeBenefits(payment));
+                cost += payment.EmployerTaxes;
             }
             totalCost += cost;
             _data.Add(group.FirstOrDefault().ProjectName, cost);
@@ -348,7 +303,6 @@ else
         IList<Agreement> agreements = (IList<Agreement>) await AgreementService.GetEmployerAgreements(email);
         _projects = (IList<Project>) await ProjectService.GetEmployerProyects(email);
         _projectsList = PaymentService.GetProjectsToPay(_projects);
-        await GetProjectsMountToPay();
         GetProjectEmployeesCount(agreements);
     }
 

@@ -84,17 +84,15 @@ namespace Infrastructure.Payments.Repositories
             return employeePaymentList.OrderByDescending(e=> e.EndDate).Take(10);
         }
 
-        public async Task<IEnumerable<Payment>> GetEmployerPayments(string email)
+        public async Task<IEnumerable<PaymentHistory>> GetEmployerPayments(string email)
         {
             Query query = _firestoreDbContext.Collection("PaymentHistory").WhereEqualTo("EmployerEmail", email);
             QuerySnapshot snapshot = await query.GetSnapshotAsync();
-            List<Payment> payments = new List<Payment>();
+            List<PaymentHistory> payments = new List<PaymentHistory>();
             foreach (DocumentSnapshot documentSnapshot in snapshot.Documents)
             {
                 PaymentHistory newPayment = documentSnapshot.ConvertTo<PaymentHistory>();
-                DateTime startDate = Convert.ToDateTime(newPayment.StartDate);
-                DateTime endDate = Convert.ToDateTime(newPayment.EndDate);
-                payments.Add(new Payment(newPayment.EmployeeEmail, newPayment.EmployerEmail, newPayment.ProjectName, newPayment.GrossSalary, startDate, endDate));
+                payments.Add(newPayment);
             }
             return payments;
         }

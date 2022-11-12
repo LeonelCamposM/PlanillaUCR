@@ -162,7 +162,7 @@
 
     private async Task GetProjectsPayments()
     {
-        IList<Payment> payments = (await PaymentService.GetEmployerPayments(email)).ToList();
+        IList<PaymentHistory> payments = (await PaymentService.GetEmployerPayments(email)).ToList();
         _projects = (await ProjectService.GetEmployerProyects(email)).ToList();
         _joinPayments = from _payment in payments
                         join _project in _projects on _payment.ProjectName equals _project.ProjectName
@@ -172,8 +172,8 @@
                             EmployerEmail = _payment.EmployerEmail,
                             ProjectName = _payment.ProjectName,
                             PaymentFrecuency = _project.PaymentInterval,
-                            StartDate = (DateTime) _payment.StartDate,
-                            EndDate = (DateTime) _payment.EndDate,
+                                StartDate = Convert.ToDateTime(_payment.StartDate),
+                                EndDate = Convert.ToDateTime(_payment.EndDate),
                             GrossSalary = _payment.GrossSalary,
                             Benefits = 0,
                             EmployerCharges = 0,

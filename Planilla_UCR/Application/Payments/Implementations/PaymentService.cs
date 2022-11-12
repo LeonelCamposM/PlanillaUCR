@@ -49,7 +49,7 @@ namespace Application.Payments.Implementations
             return await _paymentRepository.GetLastEmployeePayments(email);
         }
 
-        public async Task<IEnumerable<Payment>> GetEmployerPayments(string email)
+        public async Task<IEnumerable<PaymentHistory>> GetEmployerPayments(string email)
         {
             return await _paymentRepository.GetEmployerPayments(email);
         }
