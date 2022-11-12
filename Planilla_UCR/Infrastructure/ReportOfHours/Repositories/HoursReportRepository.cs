@@ -27,8 +27,7 @@ namespace Infrastructure.ReportOfHours.Repositories
 
         public async Task CreateReportAsync(HoursReport report)
         {
-            DocumentReference reportsReference = _firestoreDbContext.Collection("ReportHoursHistory").Document(report.ProjectName + report.EmployerEmail).
-                Collection(report.EmployeeEmail).Document(report.ReportDate);
+            DocumentReference reportsReference = _firestoreDbContext.Collection("ReportHoursHistory").Document();
             await reportsReference.CreateAsync(report);
             _dbContext.HoursReport.Add(report);
             await _dbContext.SaveEntitiesAsync();
@@ -37,56 +36,91 @@ namespace Infrastructure.ReportOfHours.Repositories
         public async Task<bool> HasReportAsync(HoursReport report)
         {
             bool hasReport = true;
-           /* IEnumerable<HoursReport> reports = await _dbContext.HoursReport.Where
-               (e => e.EmployeeEmail == report.EmployeeEmail && e.EmployerEmail == 
-                     report.EmployerEmail && e.ReportDate.Value.Date == report.ReportDate.Value.Date && 
-                     e.ProjectName == report.ProjectName).ToListAsync();
-            if(reports.Length() == 0)
+            
+            Query reportHoursReference = _firestoreDbContext.Collection("ReportHoursHistory")
+                .WhereEqualTo("EmployeeEmail", report.EmployeeEmail)
+                .WhereEqualTo("EmployerEmail", report.EmployerEmail)
+                .WhereEqualTo("ProjectName", report.ProjectName)
+                .WhereEqualTo("ReportDate", report.ReportDate);
+            QuerySnapshot snapshot = await reportHoursReference.GetSnapshotAsync();
+
+            if (snapshot.Count() == 0)
             {
                 hasReport = false;
-            }*/
+            }
+
             return hasReport;
         }
 
         public async Task<IEnumerable<HoursReport>> GetAllReportsAsync(string email)
         {
-            IEnumerable<HoursReport> reports = await _dbContext.HoursReport.Where
-               (e => e.EmployeeEmail == email).ToListAsync();
-            return reports;
+            Query reportHoursReference = _firestoreDbContext.Collection("ReportHoursHistory")
+                .WhereEqualTo("EmployeeEmail", email);
+            QuerySnapshot snapshot = await reportHoursReference.GetSnapshotAsync();
+
+            IList<HoursReport> report = new List<HoursReport>();
+
+            foreach (DocumentSnapshot documentSnapshot in snapshot.Documents)
+            {
+                HoursReport hourReport = documentSnapshot.ConvertTo<HoursReport>();
+                report.Add(hourReport);
+            }
+            return report;
         }
 
         public async Task<IList<HoursReport>> GetEmployeeReports(HoursReport hoursReport, DateTime endDate)
         {
-            /*IList<HoursReport> reports = await _dbContext.HoursReport.Where
-                (e=> e.EmployeeEmail == hoursReport.EmployeeEmail &&
-                 (endDate >= e.ReportDate && e.ReportDate >= hoursReport.ReportDate) && e.Approved == 1).ToListAsync();
-            return reports;*/
-            return null;
+            Query reportHoursReference = _firestoreDbContext.Collection("ReportHoursHistory")
+                .WhereEqualTo("EmployeeEmail", hoursReport.EmployeeEmail)
+                .WhereEqualTo("Approved", 1);
+            QuerySnapshot snapshot = await reportHoursReference.GetSnapshotAsync();
+
+            IList<HoursReport> report = new List<HoursReport>();
+
+            foreach (DocumentSnapshot documentSnapshot in snapshot.Documents)
+            {
+                HoursReport hourReport = documentSnapshot.ConvertTo<HoursReport>();
+                DateTime hourReportDate = Convert.ToDateTime(hourReport.ReportDate);
+                DateTime hoursReportDate = Convert.ToDateTime(hoursReport.ReportDate);
+                if (hourReportDate <= endDate && hourReportDate >= hoursReportDate)
+                {
+                    report.Add(hourReport);
+                }
+            }
+            return report;
         }
 
         public async Task UpdateReport(HoursReport updateReport)
         {
-          //  String reportDate = updateReport.ReportDate.Value.ToShortDateString().Replace("/", "-");
-            DocumentReference reportHoursReference = _firestoreDbContext.Collection("ReportHoursHistory").Document(updateReport.ProjectName + updateReport.EmployerEmail).
-                Collection(updateReport.EmployeeEmail).Document(updateReport.ReportDate);
-            DocumentSnapshot snapshot = await reportHoursReference.GetSnapshotAsync();
-            if (snapshot.Exists)
-            {
-                await reportHoursReference.SetAsync(updateReport);
-            }
-            else
-            {
-                Console.WriteLine("Document does not exist!", snapshot.Id);
-            }
+            CollectionReference reportHoursReference = _firestoreDbContext.Collection("ReportHoursHistory");
+            Query query = reportHoursReference
+                 .WhereEqualTo("EmployeeEmail", updateReport.EmployeeEmail)
+                 .WhereEqualTo("EmployerEmail", updateReport.EmployerEmail)
+                 .WhereEqualTo("ProjectName", updateReport.ProjectName)
+                 .WhereEqualTo("ReportDate", updateReport.ReportDate);
+          
+            QuerySnapshot snapshot = await query.GetSnapshotAsync();
+
+            //await reportHoursReference.Document(snapshot.Documents.First().Id).SetAsync(updateReport);
         }
 
         public async Task<IEnumerable<HoursReport>> GetProjectHoursReport(string projectName, string employeeEmail, string employerEmail)
         {
-            /*IEnumerable<HoursReport> reports = await _dbContext.HoursReport.Where(e => e.EmployeeEmail == employeeEmail).ToListAsync();
-            reports = reports.Where(e => e.Approved == 0 && e.ProjectName == projectName && e.EmployerEmail == employerEmail);
-            reports = reports.OrderByDescending(report => report.ReportDate);
-            return reports;*/
-            return null;
+            Query reportHoursReference = _firestoreDbContext.Collection("ReportHoursHistory")
+                .WhereEqualTo("EmployeeEmail", employeeEmail)
+                .WhereEqualTo("EmployerEmail", employerEmail)
+                .WhereEqualTo("ProjectName", projectName)
+                .WhereEqualTo("Approved", 0);
+            QuerySnapshot snapshot = await reportHoursReference.GetSnapshotAsync();
+
+            IList<HoursReport> report = new List<HoursReport>();
+
+            foreach (DocumentSnapshot documentSnapshot in snapshot.Documents)
+            {
+                HoursReport hourReport = documentSnapshot.ConvertTo<HoursReport>();
+                report.Add(hourReport);
+            }
+            return report;
         }
     }
 }

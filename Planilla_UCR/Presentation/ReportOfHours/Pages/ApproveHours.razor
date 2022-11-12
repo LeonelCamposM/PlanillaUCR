@@ -161,7 +161,6 @@ else
         {
             foreach (var element in _selectedItems)
             {
-
                 element.Approved = 1;
                 element.EmployeeEmail = element.EmployeeEmail.Split(",")[0];
                 await HoursReportService.UpdateReport(element);
