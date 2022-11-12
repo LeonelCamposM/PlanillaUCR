@@ -6,8 +6,6 @@ namespace Domain.Payments.Entities
     [FirestoreData]
     public class PaymentHistory
     {
-
-        // Id
         [FirestoreProperty]
         public string EmployerEmail { get; set; }
         [FirestoreProperty]
@@ -16,8 +14,6 @@ namespace Domain.Payments.Entities
         public string PaymentInterval { get; set; }
         [FirestoreProperty]
         public string ProjectName { get; set; }
-
-        // data
         [FirestoreProperty]
         public double GrossSalary { get; set; }
         [FirestoreProperty]
