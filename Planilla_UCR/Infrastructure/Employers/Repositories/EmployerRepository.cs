@@ -6,7 +6,8 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Linq;
+using static System.Linq.Queryable;
+using static System.Linq.Enumerable;
 using Microsoft.Data.SqlClient;
 
 namespace Infrastructure.Employers.Repositories

@@ -7,7 +7,8 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
+using static System.Linq.Queryable;
+using static System.Linq.Enumerable;
 using System.Threading.Tasks;
 
 namespace Infrastructure.Subscribes.Repositories
@@ -24,10 +25,12 @@ namespace Infrastructure.Subscribes.Repositories
 
         public int CreateSubscribe(Subscribe subscription, int typeSubscription)
         {
-            SqlParameter errorCode = new SqlParameter();
-            errorCode.SqlDbType = SqlDbType.Int;
-            errorCode.ParameterName = "@ErrorCode";
-            errorCode.Direction = ParameterDirection.Output;
+            SqlParameter errorCode = new()
+            {
+                SqlDbType = SqlDbType.Int,
+                ParameterName = "@ErrorCode",
+                Direction = ParameterDirection.Output
+            };
             System.FormattableString query = ($@"EXECUTE AddNewSubscribes
                 @EmployeeEmail = {subscription.EmployeeEmail}, @EmployerEmail = {subscription.EmployerEmail},
                 @ProjectName = {subscription.ProjectName}, @SubscriptionName = {subscription.SubscriptionName},
