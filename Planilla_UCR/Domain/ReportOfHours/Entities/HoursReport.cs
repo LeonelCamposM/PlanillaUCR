@@ -11,6 +11,9 @@ namespace Domain.ReportOfHours.Entities
         public String EmployerEmail { get; set; }
 
         [FirestoreProperty]
+        public String EmployeeName { get; set; }
+
+        [FirestoreProperty]
         public String ProjectName { get; set; }
 
         [FirestoreProperty]
@@ -25,10 +28,11 @@ namespace Domain.ReportOfHours.Entities
         [FirestoreProperty]
         public int Approved { get; set; }
 
-        public HoursReport(String employerEmail, String projectName, String employeeEmail,
+        public HoursReport(String employerEmail, String employeeName, String projectName, String employeeEmail,
             String reportDate, double reportedHours, int approved)
         {
             EmployerEmail = employerEmail;
+            EmployeeName = employeeName;
             ProjectName = projectName;
             EmployeeEmail = employeeEmail;
             ReportDate = reportDate;

@@ -29,8 +29,6 @@ namespace Infrastructure.ReportOfHours.Repositories
         {
             DocumentReference reportsReference = _firestoreDbContext.Collection("ReportHoursHistory").Document();
             await reportsReference.CreateAsync(report);
-            _dbContext.HoursReport.Add(report);
-            await _dbContext.SaveEntitiesAsync();
         }
 
         public async Task<bool> HasReportAsync(HoursReport report)
@@ -101,7 +99,7 @@ namespace Infrastructure.ReportOfHours.Repositories
           
             QuerySnapshot snapshot = await query.GetSnapshotAsync();
 
-            //await reportHoursReference.Document(snapshot.Documents.First().Id).SetAsync(updateReport);
+            await reportHoursReference.Document(snapshot.Documents.First().Id).SetAsync(updateReport);
         }
 
         public async Task<IEnumerable<HoursReport>> GetProjectHoursReport(string projectName, string employeeEmail, string employerEmail)
