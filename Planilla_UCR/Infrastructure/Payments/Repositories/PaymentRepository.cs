@@ -35,10 +35,19 @@ namespace Infrastructure.Payments.Repositories
 
         public async Task<Payment?> GetEmployeeLastPayment(string employeeEmail, string employerEmail, string projectName)
         {
-            IEnumerable<Payment> payments = await _dbContext.Payments.Where(e => e.EmployeeEmail == employeeEmail &&
-             e.EmployerEmail == employerEmail && e.ProjectName == projectName).OrderByDescending(pay => pay.EndDate).ToListAsync();
-            Payment lastPay = payments.FirstOrDefault();
-            return lastPay;
+            Query query = _firestoreDbContext.Collection("PaymentHistory").WhereEqualTo("ProjectName", projectName)
+              .WhereEqualTo("EmployerEmail", employerEmail)
+              .WhereEqualTo("EmployeeEmail",employeeEmail);
+            QuerySnapshot snapshot = await query.GetSnapshotAsync();
+            IEnumerable<Payment> payments = new List<Payment>();
+            foreach (DocumentSnapshot documentSnapshot in snapshot.Documents)
+            {
+                Payment newPayment = documentSnapshot.ConvertTo<Payment>();
+                DateTime startDate = Convert.ToDateTime(newPayment.StartDate);
+                DateTime endDate = Convert.ToDateTime(newPayment.EndDate);
+          
+            }
+            return payments.FirstOrDefault();
         }
 
         public async Task<IList<Payment>> GetProjectPayments(Payment payment)
@@ -120,12 +129,19 @@ namespace Infrastructure.Payments.Repositories
         }
 
         public async Task<IList<Payment>> GetAllPaymentsStartAndEndDates(string employerEmail, string projectName) {
-            SqlParameter myEmployerEmail = new SqlParameter("@employerEmail", employerEmail);
-            SqlParameter myProjectName = new SqlParameter("@projectName", projectName);
 
-            var paymentList = await _dbContext.Payments.FromSqlRaw("EXEC GetAllPaymentsStartAndEndDates {0},{1}",
-               myEmployerEmail, myProjectName).ToListAsync();
-            return paymentList;
+            Query query = _firestoreDbContext.Collection("PaymentHistory").WhereEqualTo("EmployerEmail", employerEmail)
+                .WhereEqualTo("ProjectName", projectName);
+            QuerySnapshot snapshot = await query.GetSnapshotAsync();
+            List<Payment> payments = new List<Payment>();
+            foreach (DocumentSnapshot documentSnapshot in snapshot.Documents)
+            {
+                PaymentHistory newPayment = documentSnapshot.ConvertTo<PaymentHistory>();
+                DateTime startDate = Convert.ToDateTime(newPayment.StartDate);
+                DateTime endDate = Convert.ToDateTime(newPayment.EndDate);
+                payments.Add(new Payment(newPayment.EmployeeEmail, newPayment.EmployerEmail, newPayment.ProjectName, newPayment.GrossSalary, startDate, endDate));
+            }
+            return payments;
         }
 
     }

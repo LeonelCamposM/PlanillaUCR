@@ -374,25 +374,29 @@ else
 											A.ContractType
 										}
 											into grp
-										select new ReportePlanillasTemplateTable
-								   {
-									   Name = grp.Key.ContractType,
-									   Amount = grp.Sum(e => e.GrossSalary)
-								   };
+										select new ReportePlanillasTemplateTable  
+											{	
+												Name = grp.Key.ContractType,
+												Amount = grp.Sum(e => e.GrossSalary)
+											};
 		return _tempJoinedTable;
 	}
 
 	private void FillOutSalariesTable()
 	{
-		var myTempTable = JoinAgreementAndPayment();
-		double salarieCost;
-		string salarieName;
-		foreach (var salarie in myTempTable)
+		if (_paidEmployees.Count != 0)
 		{
-			salarieCost = salarie.Amount;
-			salarieName = salarie.Name;
-			_templateTempSalariesTable.Add(salarie);
-			_totalSalaries += salarieCost;
+			var myTempTable = JoinAgreementAndPayment();
+			double salarieCost;
+			string salarieName;
+			foreach (var salarie in myTempTable)
+			{
+				salarieCost = salarie.Amount;
+				salarieName = salarie.Name;
+				_templateTempSalariesTable.Add(salarie);
+				_totalSalaries += salarieCost;
+			
+			}
 		}
 	}
 
