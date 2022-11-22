@@ -285,7 +285,7 @@
     {
         double _workedHours = 0;
         _report.EmployeeEmail = employeeEmail;
-        _report.ReportDate = _projectInfo.LastPaymentDate;
+        _report.ReportDate = _projectInfo.LastPaymentDate.ToShortDateString().Replace("/", "-"); ;
         IList<HoursReport> reports = await ReportHoursService.GetEmployeeReports(_report, _nextPay);
         foreach (HoursReport hours in reports)
         {
@@ -297,7 +297,7 @@
     public void GetNextPay()
     {
         GetDaysInterval();
-        _nextPay = _nextPay.AddDays(_daysInterval); 
+        _nextPay = _nextPay.AddDays(_daysInterval);
     }
 
     public void GetDaysInterval()
@@ -318,7 +318,7 @@
                 {
                     fortnightDays(lastPaymentDate);
                 }break;
-            case "Mensual": 
+            case "Mensual":
                 {
                     DateTime nextMonth = lastPaymentDate.AddMonths(1);
                     TimeSpan t = nextMonth - lastPaymentDate;

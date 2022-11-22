@@ -36,8 +36,8 @@ namespace Tests.Application
             //arrange
             var mockPaymentRepository = new Mock<IPaymentRepository>();
             var paymentService = new PaymentService(mockPaymentRepository.Object);
-            mockPaymentRepository.Setup(repo => repo.GetEmployerPayments("leonel@ucr.ac.cr")).ReturnsAsync(paymentsList.Where(
-                e => e.EmployerEmail == _employerEmail));
+           /* mockPaymentRepository.Setup(repo => repo.GetEmployerPayments("leonel@ucr.ac.cr")).ReturnsAsync(paymentsList.Where(
+                e => e.EmployerEmail == _employerEmail));*/
 
             //act
             var employerPaymentTest = paymentService.GetEmployerPayments(_employerEmail);

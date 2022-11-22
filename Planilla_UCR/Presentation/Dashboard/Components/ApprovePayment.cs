@@ -123,7 +123,7 @@ namespace Presentation.Dashboard.Components
             HoursReport _report = new HoursReport();
             double _workedHours = 0;
             _report.EmployeeEmail = agreement.EmployeeEmail;
-            _report.ReportDate = lastPaymentDate;
+            _report.ReportDate = lastPaymentDate.ToShortDateString().Replace("/", "-");
             foreach (HoursReport hours in reports)
             {
                 _workedHours += hours.ReportHours;

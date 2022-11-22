@@ -3,6 +3,7 @@ using System;
 
 namespace Domain.Payments.Entities
 {
+
     [FirestoreData]
     public class PaymentHistory
     {
@@ -31,8 +32,7 @@ namespace Domain.Payments.Entities
         [FirestoreProperty]
         public double EmployeeTaxes { get; set; }
 
-        public PaymentHistory(string employerEmail, string employeeEmail, string paymentInterval
-,            string projectName, double grossSalary, string startDate, string endDate, double netSalary, string contractType, string subscriptions, double employerTaxes, double employeeTaxes)
+        public PaymentHistory(string employerEmail, string employeeEmail, string paymentInterval, string projectName, double grossSalary, string startDate, string endDate, double netSalary, string contractType, string subscriptions, double employerTaxes, double employeeTaxes)
         {
             this.EmployerEmail = employerEmail;
             this.EmployeeEmail = employeeEmail;

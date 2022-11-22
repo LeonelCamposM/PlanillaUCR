@@ -266,7 +266,7 @@ else
 
     private void GetProjectEmployeesCount(IList<Agreement> agreements)
     {
-        var employerProjects = 
+        var employerProjects =
                     from project in agreements
                     group project by project.ProjectName;
 
