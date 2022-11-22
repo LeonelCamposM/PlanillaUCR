@@ -196,7 +196,7 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        _lastEmployeePayments = (IList<Payment>) await PaymentService.GetLastEmployeePayments(email);
+        var _lastEmployeePayments = await PaymentService.GetLastEmployeePayments(email);
         foreach (var payment in _lastEmployeePayments)
         {
             _paymentIDS.Add(payment.ProjectName +": "+ payment.EndDate.ToShortDateString());
