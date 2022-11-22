@@ -165,10 +165,10 @@
 
 
 @code {
-        [Parameter]
-        public string email { get; set; }
-        [Parameter]
-        public string selectedPay { get; set; }
+    [Parameter]
+    public string email { get; set; }
+    [Parameter]
+    public string selectedPay { get; set; }
     public string projectName { get; set; }
 
     // Tables
@@ -196,7 +196,8 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        _lastEmployeePayments = (IList<Payment>) await PaymentService.GetLastEmployeePayments(email);
+        var lastEmployeePayments = await PaymentService.GetLastEmployeePayments(email);
+        _lastEmployeePayments = lastEmployeePayments.ToList();
         foreach (var payment in _lastEmployeePayments)
         {
             _paymentIDS.Add(payment.ProjectName +": "+ payment.EndDate.ToShortDateString());
