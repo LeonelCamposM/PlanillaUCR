@@ -18,8 +18,9 @@
 @using Application.Subscribes
 @using Presentation.Payments.Models
 @using System.Globalization
-@using Application.PaymentCalculator;
-@using Application.TaxCalculator;
+@using Application.PaymentCalculator
+@using Application.TaxCalculator
+@using Application.LegalDeductions
 
 @inject IAgreementService AgreementService
 @inject IProjectService ProjectService
@@ -29,6 +30,7 @@
 @inject ISubscribeService SubscribeService
 @inject IPaymentCalculatorService PaymentCalculatorService
 @inject ITaxCalculatorService TaxCalculatorService
+@inject ILegalDeductionService LegalDeductionService
 @inject ISnackbar Snackbar
 @inject NavigationManager nav
 
@@ -114,6 +116,8 @@
     private HoursReport _report = new HoursReport();
     public string searchString1 = "";
     public CultureInfo cultureCR = CultureInfo.GetCultureInfo("es-CR");
+    private IList<PaymentHistory> _pendingPayment = new List<PaymentHistory>();
+
 
     protected override async Task OnParametersSetAsync()
     {
@@ -162,6 +166,34 @@
                     projectEmployee.EmployeeEmail = _employeeAgreement.EmployeeEmail;
                     projectEmployee.MountToPay = _mountToPay;
                     _pModel.EmployeeList.Add(projectEmployee);
+
+
+                    // Gross salary
+                    double grossSalary = await GetSalaryByType(_employeeAgreement, _pModel.DayInterval, _pModel.LastPaymentDate);
+                    grossSalary += await GetEmployeeBenefits(_employeeAgreement, _pModel.DayInterval, _pModel.LastPaymentDate);
+
+                    // Employer taxes
+                    double employerTaxes = TaxCalculatorService.GetEmployerSocialCharges(grossSalary);
+
+                    // Employee taxes
+                    double employeeTaxes = 0;
+                    if (!_employeeAgreement.ContractType.Equals("Servicios profesionales"))
+                    {
+                        var _legalDeductions = await LegalDeductionService.GetAllAsync();
+                        _legalDeductions = _legalDeductions.ToList();
+                        foreach (var item in _legalDeductions)
+                        {
+                            employeeTaxes += TaxCalculatorService.GetTaxAmount(item.DeductionName, grossSalary);
+                        }
+                    }
+
+                    // Employee net salary
+                    double netSalary = grossSalary - employeeTaxes;
+
+                    _pendingPayment.Add(new PaymentHistory(email, _employeeAgreement.EmployeeEmail,
+                        _pModel.PaymentInterval, _pModel.ProjectName, grossSalary,
+                        _pModel.LastPaymentDate.ToShortDateString(), _pModel.LastPaymentDate.AddDays(_pModel.DayInterval).ToShortDateString(), netSalary,
+                        _employeeAgreement.ContractType, "Subscriptions", employerTaxes, employeeTaxes));
                 }
             }
             if (_pModel.MountToPay == 0)
@@ -322,7 +354,9 @@
                         mountToPay, _pModel.LastPaymentDate, _pModel.LastPaymentDate.AddDays(_pModel.DayInterval));
                     if(mountToPay > 0)
                     {
-                        await PaymentService.AddPayment(_payment);
+                        Payment newPayment = new Payment(_employee.EmployeeEmail, _pModel.EmployerEmail, _pModel.ProjectName, mountToPay, _pModel.LastPaymentDate, _nextPay);
+                        await PaymentService.AddPayment(_pendingPayment.Where(e => e.ProjectName == newPayment.ProjectName &&
+                          e.EmployerEmail == newPayment.EmployerEmail && e.EmployeeEmail == newPayment.EmployeeEmail && Convert.ToDateTime(e.StartDate) == newPayment.StartDate).FirstOrDefault());
                     }
                 }
                 Project _projectInfo = new Project(_pModel.EmployerEmail, _pModel.ProjectName, "", 0, 0, "", 1, _pModel.LastPaymentDate.AddDays(_pModel.DayInterval));
