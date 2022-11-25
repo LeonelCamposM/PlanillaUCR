@@ -134,8 +134,8 @@
 }
 
 @code {
-        [Parameter]
-        public string email { get; set; }
+    [Parameter]
+    public string email { get; set; }
     private bool _loading = true;
     private bool _empty = true;
     private IList<ProjectHistorical> _projectsPaymentsList = new List<ProjectHistorical>();
@@ -356,12 +356,9 @@
         bool projectNameBool = (payment.ProjectName.Equals(projectName));
         bool paymentDateBool = (payment.EndDate.ToShortDateString().Contains(projectDate, StringComparison.OrdinalIgnoreCase));
 
-        if ((projectNameBool && string.IsNullOrWhiteSpace(projectDate)))
-
+        if ((projectNameBool && paymentDateBool) || (projectNameBool && string.IsNullOrWhiteSpace(projectDate)))
             return true;
-        if ((projectNameBool && string.IsNullOrWhiteSpace(projectDate)))
-            return true;
-        if((paymentDateBool && string.IsNullOrWhiteSpace(projectName)))
+        if ((projectNameBool && paymentDateBool) || (paymentDateBool && string.IsNullOrWhiteSpace(projectName)))
             return true;
         if (string.IsNullOrWhiteSpace(projectName) && string.IsNullOrWhiteSpace(projectDate))
             return true;
