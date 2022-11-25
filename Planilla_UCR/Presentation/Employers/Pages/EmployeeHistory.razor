@@ -1,4 +1,4 @@
-﻿@*@page "/Employee_History/{employerEmail}"
+﻿@page "/Employee_History/{employerEmail}"
 @using Application.PaymentCalculator
 @using Domain.Agreements.Entities
 @using Domain.People.Entities
@@ -172,8 +172,8 @@ else
 }
 
 @code {
-    private bool _emptyHistory = true; 
-    private bool _loading = true; 
+    private bool _emptyHistory = true;
+    private bool _loading = true;
     private string _projectNameFilter = "";
     private string _contracTypeFilter = "";
     private string _paymentDateFilter = "";
@@ -181,7 +181,7 @@ else
 
     private IEnumerable<Person> _people;
     private IEnumerable<Agreement> _agreements;
-    private IEnumerable<Payment> _payment;
+    private IEnumerable<PaymentHistory> _payment;
     private IEnumerable<Project> _projects;
     private IEnumerable<EmployeeHistoryList> _paymentsHistory = new List<EmployeeHistoryList>();
     private IEnumerable<LegalDeduction> _legalDeductions = new List<LegalDeduction>();
@@ -197,7 +197,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         _agreements = await AgreementService.GetEmployerAgreements(employerEmail);
-        if (_agreements.Length() > 0) 
+        if (_agreements.Length() > 0)
         {
             _emptyHistory = false;
             _payment = await PaymentService.GetEmployerPayments(employerEmail);
@@ -209,23 +209,24 @@ else
         }
         _loading = false;
         await InvokeAsync(StateHasChanged);
-    }  
+    }
 
     private void CreateEmployeeHistory()
     {
+        
         _paymentsHistory = from Pe in _people
-                           join A in _agreements on Pe.Email equals A.EmployeeEmail 
-                           join P in _projects on A.ProjectName equals P.ProjectName 
-                           where A.IsEnabled == 1 
+                           join A in _agreements on Pe.Email equals A.EmployeeEmail
+                           join P in _projects on A.ProjectName equals P.ProjectName
+                           where A.IsEnabled == 1
                            select new EmployeeHistoryList
                            {
-                                ProjectName = A.ProjectName,
-                                EmployeeName = Pe.Name,
-                                EmployeeLastName1 = Pe.LastName1,
-                                EmployeeLastName2 = Pe.LastName2,
-                                EmployeeEmail = A.EmployeeEmail,
-                                Ssn = Pe.Ssn,
-                                ContractType = A.ContractType,
+                               ProjectName = A.ProjectName,
+                               EmployeeName = Pe.Name,
+                               EmployeeLastName1 = Pe.LastName1,
+                               EmployeeLastName2 = Pe.LastName2,
+                               EmployeeEmail = A.EmployeeEmail,
+                               Ssn = Pe.Ssn,
+                               ContractType = A.ContractType,
                            };
     }
 
@@ -249,12 +250,12 @@ else
         foreach (EmployeeHistoryList person in temporalList)
         {
             double totalGrossSalary = 0.0;
-            foreach (Payment pay in _payment) 
+            foreach (PaymentHistory pay in _payment)
             {
                 if (pay.EmployeeEmail == person.EmployeeEmail && pay.ProjectName == person.ProjectName)
                 {
                     totalGrossSalary += pay.GrossSalary;
-                    person.PaymentDate = pay.EndDate.ToShortDateString();
+                    person.PaymentDate = DateTime.Parse(pay.EndDate).ToShortDateString();
                 }
             }
             person.GrossSalary = totalGrossSalary;
@@ -271,7 +272,7 @@ else
         foreach (EmployeeHistoryList person in temporalList)
         {
             double costLegalDeductions = 0.0;
-            foreach (Payment pay in _payment) 
+            foreach (PaymentHistory pay in _payment)
             {
                 if (!person.ContractType.Equals("Servicios profesionales") && pay.EmployeeEmail == person.EmployeeEmail
                 && pay.ProjectName == person.ProjectName)
@@ -293,11 +294,11 @@ else
         foreach (EmployeeHistoryList person in temporalList)
         {
             double costVoluntaryDeductions = 0.0;
-            foreach (Payment pay in _payment) 
+            foreach (PaymentHistory pay in _payment)
             {
                 if (pay.EmployeeEmail == person.EmployeeEmail && pay.ProjectName == person.ProjectName)
                 {
-                    Subscribe searchSubscribe= new Subscribe(pay.EmployeeEmail,pay.EmployerEmail, pay.ProjectName, "", 0.0, pay.StartDate, pay.EndDate);
+                    Subscribe searchSubscribe= new Subscribe(pay.EmployeeEmail,pay.EmployerEmail, pay.ProjectName, "", 0.0, DateTime.Parse(pay.StartDate), DateTime.Parse(pay.EndDate));
                     IList<Subscription> subscriptions = (await SubscribeService.GetSubscriptionCostsByDate(searchSubscribe)).ToList();
                     costVoluntaryDeductions += PaymentCalculatorService.DeductionsCost(subscriptions);
                 }
@@ -314,7 +315,7 @@ else
         foreach (EmployeeHistoryList person in temporalList)
         {
             double costBenefits = 0.0;
-            foreach (Payment pay in _payment) 
+            foreach (PaymentHistory pay in _payment)
             {
                 if (pay.EmployeeEmail == person.EmployeeEmail && pay.ProjectName == person.ProjectName)
                 {
@@ -333,14 +334,14 @@ else
         foreach (EmployeeHistoryList person in temporalList)
         {
             double totalSocialCharges = 0.0;
-            string deductionName = "CCSS (14.50%)";         
-            double deductionCost = Math.Round(TaxCalculatorService.GetCSSSEmployerTaxes(person.GrossSalary),2);         
-            totalSocialCharges += deductionCost;         
-            deductionName = "Otras instituciones (7.25%)";         
-            deductionCost = Math.Round(TaxCalculatorService.GetOtherInstitutionsEmployerTaxes(person.GrossSalary),2);         
-            totalSocialCharges += deductionCost;         
-            deductionName = "Ley de protección al trabajador (4.75%)";         
-            deductionCost = Math.Round(TaxCalculatorService.GetWorkerWarrantiesEmployerTaxes(person.GrossSalary),2);         
+            string deductionName = "CCSS (14.50%)";
+            double deductionCost = Math.Round(TaxCalculatorService.GetCSSSEmployerTaxes(person.GrossSalary),2);
+            totalSocialCharges += deductionCost;
+            deductionName = "Otras instituciones (7.25%)";
+            deductionCost = Math.Round(TaxCalculatorService.GetOtherInstitutionsEmployerTaxes(person.GrossSalary),2);
+            totalSocialCharges += deductionCost;
+            deductionName = "Ley de protección al trabajador (4.75%)";
+            deductionCost = Math.Round(TaxCalculatorService.GetWorkerWarrantiesEmployerTaxes(person.GrossSalary),2);
             totalSocialCharges += deductionCost;
             person.EmployerSocialCharges = totalSocialCharges;
             _paymentsHistory = temporalList.AsEnumerable();
@@ -375,6 +376,23 @@ else
         _paymentsSsn = await GetEmployeeSsn();
     }
 
+    private async Task<IList<String>> GetPaymentDateByName(string name)
+    {
+        _paymentsDates.Clear();
+        foreach (EmployeeHistoryList history in _paymentsHistory)
+        {
+            if (!_paymentsDates.Contains(history.PaymentDate))
+            {
+                if (history.ProjectName.Equals(name))
+                {
+                    _paymentsDates.Add(history.PaymentDate);
+                }
+            }
+        }
+        _paymentsDates = _paymentsDates.Reverse().Take(10).ToList();
+        return _paymentsDates;
+    }
+
     private async Task<IList<String>> GetPaymentDate()
     {
         foreach (EmployeeHistoryList history in _paymentsHistory)
@@ -391,7 +409,7 @@ else
     private async Task<IList<String>> GetProyectName()
     {
         foreach (Agreement history in _agreements)
-        { 
+        {
             if (!_paymentsProjectNames.Contains(history.ProjectName))
             {
                 _paymentsProjectNames.Add(history.ProjectName);
@@ -404,7 +422,7 @@ else
     private async Task<IList<String>> GetEmployeeSsn()
     {
         foreach (EmployeeHistoryList person in _paymentsHistory)
-        { 
+        {
             if (!_paymentsSsn.Contains(person.Ssn.ToString()))
             {
                 _paymentsSsn.Add(person.Ssn.ToString());
@@ -414,26 +432,46 @@ else
         return _paymentsSsn;
     }
 
-    private void OnProjectNameSelect(string selected) 
+    private async Task<IList<String>> GetEmployeeSsnByName(String name)
     {
+        _paymentsSsn.Clear();
+        foreach (EmployeeHistoryList person in _paymentsHistory)
+        {
+            if (!_paymentsSsn.Contains(person.Ssn.ToString()))
+            {
+                    if (person.ProjectName.Equals(name))
+                    {
+                        _paymentsSsn.Add(person.Ssn.ToString());
+                    }                
+            }
+        }
+        _paymentsSsn = _paymentsSsn.Reverse().Take(10).ToList();
+        return _paymentsSsn;
+    }
+
+    private void OnProjectNameSelect(string selected)
+    {
+        GetEmployeeSsnByName(selected);
+        GetPaymentDateByName(selected);
         _projectNameFilter = selected;
     }
 
-    private void OnContractTypeSelect(string selected) 
+    private void OnContractTypeSelect(string selected)
     {
         _contracTypeFilter = selected;
     }
 
-    private void OnPaymentDateSelect(string selected) 
+    private void OnPaymentDateSelect(string selected)
     {
-        _paymentDateFilter = selected; 
+
+        _paymentDateFilter = selected;
     }
 
     private void OnSsnSelect(string selected) {
-        _ssnFilter = selected; 
+        _ssnFilter = selected;
     }
 
-    private bool FiltersFunction(EmployeeHistoryList element) => 
+    private bool FiltersFunction(EmployeeHistoryList element) =>
         FilterFunction(element, _projectNameFilter,_contracTypeFilter, _paymentDateFilter, _ssnFilter);
 
     private bool FilterFunction(EmployeeHistoryList element, string stringProjectName, string stringContract, string stringPayment, string stringSsn)
@@ -446,7 +484,7 @@ else
         bool ssnBool = (temp.Equals(stringSsn));
 
 
-        results = FindFilters(projectNameBool, contractTypeBool, paymentDateBool, ssnBool, 
+        results = FindFilters(projectNameBool, contractTypeBool, paymentDateBool, ssnBool,
            stringProjectName, stringContract, stringPayment, stringSsn);
 
         return results;
@@ -456,19 +494,19 @@ else
     bool ssnBool,string stringProjectName,string stringContract,string stringPayment, string stringSsn)
     {
         bool results = false;
-        results = GetFirstConditional(projectNameBool, contractTypeBool, paymentDateBool, ssnBool, 
+        results = GetFirstConditional(projectNameBool, contractTypeBool, paymentDateBool, ssnBool,
            stringProjectName, stringContract, stringPayment, stringSsn);
         if (!results)
-            results = GetSecondConditional(projectNameBool, contractTypeBool, paymentDateBool, ssnBool, 
+            results = GetSecondConditional(projectNameBool, contractTypeBool, paymentDateBool, ssnBool,
                 stringProjectName, stringContract, stringPayment, stringSsn);
         if (!results)
-            results = GetThirdConditional(projectNameBool, contractTypeBool, paymentDateBool, ssnBool, 
+            results = GetThirdConditional(projectNameBool, contractTypeBool, paymentDateBool, ssnBool,
                 stringProjectName, stringContract, stringPayment, stringSsn);
         if (!results)
-            results = GetFourthConditional(projectNameBool, contractTypeBool, paymentDateBool, ssnBool, 
+            results = GetFourthConditional(projectNameBool, contractTypeBool, paymentDateBool, ssnBool,
                 stringProjectName, stringContract, stringPayment, stringSsn);
         if (!results)
-            results = GetFifthConditional(projectNameBool, contractTypeBool, paymentDateBool, ssnBool, 
+            results = GetFifthConditional(projectNameBool, contractTypeBool, paymentDateBool, ssnBool,
                 stringProjectName, stringContract, stringPayment, stringSsn);
         return results;
     }
@@ -515,14 +553,14 @@ else
     bool ssnBool,string stringProjectName,string stringContract,string stringPayment, string stringSsn)
     {
         bool results = false;
-        if ((projectNameBool && contractTypeBool && paymentDateBool && ssnBool) || 
-        ((paymentDateBool && ssnBool) &&  string.IsNullOrWhiteSpace(stringProjectName) 
+        if ((projectNameBool && contractTypeBool && paymentDateBool && ssnBool) ||
+        ((paymentDateBool && ssnBool) &&  string.IsNullOrWhiteSpace(stringProjectName)
         && string.IsNullOrWhiteSpace(stringContract)))
         {
             results = true;
         }
-        else if ((projectNameBool && contractTypeBool && paymentDateBool && ssnBool) || 
-        ((contractTypeBool && ssnBool) &&  string.IsNullOrWhiteSpace(stringProjectName) 
+        else if ((projectNameBool && contractTypeBool && paymentDateBool && ssnBool) ||
+        ((contractTypeBool && ssnBool) &&  string.IsNullOrWhiteSpace(stringProjectName)
         && string.IsNullOrWhiteSpace(stringPayment)))
         {
             results = true;
@@ -534,12 +572,12 @@ else
     bool ssnBool,string stringProjectName,string stringContract,string stringPayment, string stringSsn)
     {
         bool results = false;
-        if ((projectNameBool && contractTypeBool && paymentDateBool && ssnBool) || 
+        if ((projectNameBool && contractTypeBool && paymentDateBool && ssnBool) ||
         ((paymentDateBool && contractTypeBool && ssnBool) &&  string.IsNullOrWhiteSpace(stringProjectName)))
         {
             results = true;
         }
-        else if ((projectNameBool && contractTypeBool && paymentDateBool && ssnBool) || 
+        else if ((projectNameBool && contractTypeBool && paymentDateBool && ssnBool) ||
         ((projectNameBool && paymentDateBool && ssnBool) &&  string.IsNullOrWhiteSpace(stringContract)))
         {
             results = true;
@@ -551,19 +589,20 @@ else
     bool ssnBool,string stringProjectName,string stringContract,string stringPayment, string stringSsn)
     {
         bool results = false;
-        if ((projectNameBool && contractTypeBool && paymentDateBool && ssnBool) || 
+        if ((projectNameBool && contractTypeBool && paymentDateBool && ssnBool) ||
         ((projectNameBool && contractTypeBool && ssnBool) && string.IsNullOrWhiteSpace(stringPayment)))
         {
             results = true;
         }
-        else if  ((projectNameBool && contractTypeBool && paymentDateBool && ssnBool) || 
+        else if  ((projectNameBool && contractTypeBool && paymentDateBool && ssnBool) ||
         ((projectNameBool && contractTypeBool  && paymentDateBool) && string.IsNullOrWhiteSpace(stringSsn)))
         {
             results = true;
-        } 
-        else if ((string.IsNullOrWhiteSpace(stringProjectName) && string.IsNullOrWhiteSpace(stringContract) 
+        }
+        else if ((string.IsNullOrWhiteSpace(stringProjectName) && string.IsNullOrWhiteSpace(stringContract)
         && string.IsNullOrWhiteSpace(stringPayment) && string.IsNullOrWhiteSpace(stringSsn)))
         {
+            CreateEmployeeHistory();
             results = true;
         }
         return results;
@@ -581,9 +620,9 @@ else
     {
         _paymentsHistoryExcel = _paymentsHistory.ToArray();
     }
-    
+
     private void PageChanged(int i)
     {
         _table.NavigateTo(i - 1);
     }
-}*@
+}
