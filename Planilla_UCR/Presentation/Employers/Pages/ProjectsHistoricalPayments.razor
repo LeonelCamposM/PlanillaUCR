@@ -134,8 +134,8 @@
 }
 
 @code {
-    [Parameter]
-    public string email { get; set; }
+        [Parameter]
+        public string email { get; set; }
     private bool _loading = true;
     private bool _empty = true;
     private IList<ProjectHistorical> _projectsPaymentsList = new List<ProjectHistorical>();
@@ -172,8 +172,8 @@
                             EmployerEmail = _payment.EmployerEmail,
                             ProjectName = _payment.ProjectName,
                             PaymentFrecuency = _project.PaymentInterval,
-                                StartDate = Convert.ToDateTime(_payment.StartDate),
-                                EndDate = Convert.ToDateTime(_payment.EndDate),
+                            StartDate = Convert.ToDateTime(_payment.StartDate),
+                            EndDate = Convert.ToDateTime(_payment.EndDate),
                             GrossSalary = _payment.GrossSalary,
                             Benefits = 0,
                             EmployerCharges = 0,
@@ -223,19 +223,19 @@
         var finalList = (from P in _projectsPayment orderby P.ProjectName
                          group P by new { P.EmployerEmail, P.ProjectName, P.StartDate, P.EndDate, P.PaymentFrecuency } into grp
                          select new ProjectHistorical
-                              {
-                                  EmployerEmail = grp.Key.EmployerEmail,
-                                  ProjectName = grp.Key.ProjectName,
-                                  StartDate = grp.Key.StartDate,
-                                  PaymentFrecuency = grp.Key.PaymentFrecuency,
-                                  EndDate = grp.Key.EndDate,
-                                  GrossSalary = grp.Sum(e => e.GrossSalary),
-                                  Benefits = grp.Sum(e=> e.Benefits),
-                                  ObligatoryDeductions =  grp.Sum(e=> e.ObligatoryDeductions),
-                                  VoluntaryDeductions = grp.Sum(e=> e.VoluntaryDeductions),
-                                  EmployerCharges = grp.Sum(e=> e.EmployerCharges),
-                                  EmployerCost = grp.Sum(e=> e.EmployerCost)
-                              });
+                         {
+                             EmployerEmail = grp.Key.EmployerEmail,
+                             ProjectName = grp.Key.ProjectName,
+                             StartDate = grp.Key.StartDate,
+                             PaymentFrecuency = grp.Key.PaymentFrecuency,
+                             EndDate = grp.Key.EndDate,
+                             GrossSalary = grp.Sum(e => e.GrossSalary),
+                             Benefits = grp.Sum(e=> e.Benefits),
+                             ObligatoryDeductions =  grp.Sum(e=> e.ObligatoryDeductions),
+                             VoluntaryDeductions = grp.Sum(e=> e.VoluntaryDeductions),
+                             EmployerCharges = grp.Sum(e=> e.EmployerCharges),
+                             EmployerCost = grp.Sum(e=> e.EmployerCost)
+                         });
         _projectsPaymentsList = finalList.ToList();
     }
 
@@ -296,7 +296,7 @@
     private IList<String> GetProyectName()
     {
         foreach (ProjectHistorical payment in _projectsPaymentsList)
-        { 
+        {
             if (!_paymentsProjectNames.Contains(payment.ProjectName))
             {
                 _paymentsProjectNames.Add(payment.ProjectName);
@@ -320,28 +320,51 @@
         return _paymentsDates;
     }
 
-    private void OnProjectNameSelect(string selected) 
+    private void OnProjectNameSelect(string selected)
     {
+        GetPaymentDateByName(selected);
         projectNameFilter = selected;
     }
 
-    private void OnPaymentDateSelect(string selected) 
+    private void OnPaymentDateSelect(string selected)
     {
-        paymentDateFilter = selected; 
+        paymentDateFilter = selected;
     }
 
-    private bool FiltersFunc(ProjectHistorical element) => FilterFunc(element, projectNameFilter, paymentDateFilter);
-
-    private bool FilterFunc(ProjectHistorical element, string searchString1, string searchString2)
+    private IList<String> GetPaymentDateByName(string name)
     {
-        bool projectNameBool = (element.ProjectName.Equals(searchString1));
-        bool paymentDateBool = (element.EndDate.ToShortDateString().Contains(searchString2, StringComparison.OrdinalIgnoreCase));
-        if((projectNameBool && paymentDateBool) || (projectNameBool && string.IsNullOrWhiteSpace(searchString2)))
+        _projectsPaymentsList = _projectsPaymentsList.OrderBy(e => e.EndDate).ToList();
+        _paymentsDates.Clear();
+        foreach (ProjectHistorical payment in _projectsPaymentsList)
+        {
+            if (!_paymentsDates.Contains(payment.EndDate.ToShortDateString()))
+            {
+                if (payment.ProjectName.Equals(name))
+                {
+                    _paymentsDates.Add(payment.EndDate.ToShortDateString());
+                }
+            }
+        }
+        _paymentsDates = _paymentsDates.Reverse().ToList();
+        return _paymentsDates;
+    }
+
+    private bool FiltersFunc(ProjectHistorical payment) => FilterFunc(payment, projectNameFilter, paymentDateFilter);
+
+    private bool FilterFunc(ProjectHistorical payment, string projectName, string projectDate)
+    {
+        bool projectNameBool = (payment.ProjectName.Equals(projectName));
+        bool paymentDateBool = (payment.EndDate.ToShortDateString().Contains(projectDate, StringComparison.OrdinalIgnoreCase));
+
+        if ((projectNameBool && string.IsNullOrWhiteSpace(projectDate)))
+
             return true;
-        if((projectNameBool && paymentDateBool) || (paymentDateBool && string.IsNullOrWhiteSpace(searchString1)))
+        if ((projectNameBool && string.IsNullOrWhiteSpace(projectDate)))
             return true;
-        if(string.IsNullOrWhiteSpace(searchString1) && string.IsNullOrWhiteSpace(searchString2))
-            return true;  
+        if((paymentDateBool && string.IsNullOrWhiteSpace(projectName)))
+            return true;
+        if (string.IsNullOrWhiteSpace(projectName) && string.IsNullOrWhiteSpace(projectDate))
+            return true;
         return false;
     }
 
