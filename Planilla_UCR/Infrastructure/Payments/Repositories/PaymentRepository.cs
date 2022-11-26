@@ -120,12 +120,25 @@ namespace Infrastructure.Payments.Repositories
         }
 
         public async Task<IList<Payment>> GetAllPaymentsStartAndEndDates(string employerEmail, string projectName) {
-            SqlParameter myEmployerEmail = new SqlParameter("@employerEmail", employerEmail);
+            /*SqlParameter myEmployerEmail = new SqlParameter("@employerEmail", employerEmail);
             SqlParameter myProjectName = new SqlParameter("@projectName", projectName);
 
             var paymentList = await _dbContext.Payments.FromSqlRaw("EXEC GetAllPaymentsStartAndEndDates {0},{1}",
                myEmployerEmail, myProjectName).ToListAsync();
-            return paymentList;
+            return paymentList;*/
+            Query query = _firestoreDbContext.Collection("PaymentHistory").WhereEqualTo("EmployerEmail", employerEmail)
+                .WhereEqualTo("ProjectName",projectName);
+            QuerySnapshot snapshot = await query.GetSnapshotAsync();
+            List<Payment> payments = new List<Payment>();
+            foreach (DocumentSnapshot documentSnapshot in snapshot.Documents)
+            {
+                PaymentHistory newPayment = documentSnapshot.ConvertTo<PaymentHistory>();
+                DateTime startDate = Convert.ToDateTime(newPayment.StartDate);
+                DateTime endDate = Convert.ToDateTime(newPayment.EndDate);
+                payments.Add(new Payment(newPayment.EmployeeEmail, newPayment.EmployerEmail, newPayment.ProjectName, newPayment.GrossSalary, startDate, endDate));
+            }
+            return payments.OrderByDescending(e => e.StartDate).ToList();
+
         }
 
     }
