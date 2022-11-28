@@ -72,7 +72,7 @@ namespace Infrastructure.Payments.Repositories
                 PaymentHistory newPayment = documentSnapshot.ConvertTo<PaymentHistory>();
                 DateTime startDate = Convert.ToDateTime(newPayment.StartDate);
                 DateTime endDate = Convert.ToDateTime(newPayment.EndDate);
-                payments.Add(new Payment(newPayment.EmployeeEmail, newPayment.EmployerEmail, newPayment.ProjectName, newPayment.GrossSalary, startDate, endDate));
+                payments.Add(new Payment(newPayment.EmployeeEmail, newPayment.EmployerEmail, newPayment.ProjectName, newPayment.GrossSalary, startDate, endDate));            
             }
             return payments;
         }
@@ -92,7 +92,10 @@ namespace Infrastructure.Payments.Repositories
             foreach (DocumentSnapshot documentSnapshot in snapshot.Documents)
             {
                 PaymentHistory newPayment = documentSnapshot.ConvertTo<PaymentHistory>();
-                payments.Add(newPayment);
+                if (newPayment.GrossSalary != 0)
+                {
+                    payments.Add(newPayment);
+                }                   
             }
             return payments;
         }
