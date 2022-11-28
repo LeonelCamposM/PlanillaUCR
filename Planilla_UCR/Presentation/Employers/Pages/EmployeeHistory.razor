@@ -213,7 +213,7 @@ else
 
     private void CreateEmployeeHistory()
     {
-        
+
         _paymentsHistory = from Pe in _people
                            join A in _agreements on Pe.Email equals A.EmployeeEmail
                            join P in _projects on A.ProjectName equals P.ProjectName
@@ -232,6 +232,7 @@ else
 
     private async Task FillColumns()
     {
+       
         GetAllGrossySalaries();
         await GetAllLegalDeductions();
         await GetAllVoluntaryDeductions();
@@ -244,24 +245,27 @@ else
         GetTotalCostForEmployee();
     }
 
+
     private void GetAllGrossySalaries()
     {
         IList<EmployeeHistoryList> temporalList = _paymentsHistory.ToList();
+        IList<EmployeeHistoryList> temp = new List<EmployeeHistoryList>();
         foreach (EmployeeHistoryList person in temporalList)
         {
             double totalGrossSalary = 0.0;
             foreach (PaymentHistory pay in _payment)
             {
-                if (pay.EmployeeEmail == person.EmployeeEmail && pay.ProjectName == person.ProjectName)
+                if (pay.EmployeeEmail == person.EmployeeEmail && pay.ProjectName == person.ProjectName && pay.GrossSalary > 0)
                 {
                     totalGrossSalary += pay.GrossSalary;
                     person.PaymentDate = DateTime.Parse(pay.EndDate).ToShortDateString();
+                    temp.Add(person);
                 }
             }
             person.GrossSalary = totalGrossSalary;
             totalGrossSalary = 0.0;
         }
-        _paymentsHistory = temporalList.AsEnumerable();
+        _paymentsHistory = temp.AsEnumerable();
     }
 
     private async Task GetAllLegalDeductions()
@@ -439,10 +443,10 @@ else
         {
             if (!_paymentsSsn.Contains(person.Ssn.ToString()))
             {
-                    if (person.ProjectName.Equals(name))
-                    {
-                        _paymentsSsn.Add(person.Ssn.ToString());
-                    }                
+                if (person.ProjectName.Equals(name))
+                {
+                    _paymentsSsn.Add(person.Ssn.ToString());
+                }
             }
         }
         _paymentsSsn = _paymentsSsn.Reverse().Take(10).ToList();
