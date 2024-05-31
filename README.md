@@ -3,7 +3,7 @@
 The goal of this application is to allow users to pay bills easily, efficiently, and safely. In addition to providing a practical solution for bill payment, the project showcases the application of clean code design principles and a clean architecture based on Domain-Driven Design (DDD) to generate maintainable code, along with thorough unit tests and UI tests.
 
 ### Backend
-The backend is built with .NET 5.0, handling various operations related to bill payment. It integrates with a SQL Server Database for storing transactional data and utilizes ASP.NET Identity for comprehensive user and role management. This ensures secure authentication and authorization for both clients and store owners.
+The backend is built with .NET 5.0, handling various operations related to bill payment. It integrates with a SQL Server Database for storing transactional data and utilizes ASP.NET Identity for comprehensive user and role management.
 
 ### Frontend
 The client side of our app, constructed with Blazor Server, not only delivers a seamless and interactive user experience but also prioritizes security. Harnessing Blazor's robust component-based architecture, our client-side interface ensures responsiveness and efficiency without compromising on safety.
