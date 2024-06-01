@@ -22,7 +22,7 @@ namespace Infrastructure.ReportOfHours.Repositories
             _dbContext = unitOfWork;
             string filePath = "../Server_Planilla/wwwroot/firebase_key.json";
             Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", filePath);
-            _firestoreDbContext = FirestoreDb.Create("planillaucr-e92dc");
+            _firestoreDbContext = FirestoreDb.Create("planillaucr-9c3c3");
         }
 
         public async Task CreateReportAsync(HoursReport report)

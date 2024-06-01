@@ -24,7 +24,7 @@ namespace Infrastructure.Payments.Repositories
             _dbContext = unitOfWork;
             string filePath = "../Server_Planilla/wwwroot/firebase_key.json";
             Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", filePath);
-            _firestoreDbContext = FirestoreDb.Create("planillaucr-e92dc");
+            _firestoreDbContext = FirestoreDb.Create("planillaucr-9c3c3");
         }
 
         public async Task AddPayment(PaymentHistory newPayment)
@@ -123,12 +123,6 @@ namespace Infrastructure.Payments.Repositories
         }
 
         public async Task<IList<Payment>> GetAllPaymentsStartAndEndDates(string employerEmail, string projectName) {
-            /*SqlParameter myEmployerEmail = new SqlParameter("@employerEmail", employerEmail);
-            SqlParameter myProjectName = new SqlParameter("@projectName", projectName);
-
-            var paymentList = await _dbContext.Payments.FromSqlRaw("EXEC GetAllPaymentsStartAndEndDates {0},{1}",
-               myEmployerEmail, myProjectName).ToListAsync();
-            return paymentList;*/
             Query query = _firestoreDbContext.Collection("PaymentHistory").WhereEqualTo("EmployerEmail", employerEmail)
                 .WhereEqualTo("ProjectName",projectName);
             QuerySnapshot snapshot = await query.GetSnapshotAsync();
