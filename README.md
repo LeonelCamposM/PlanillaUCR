@@ -36,8 +36,9 @@ In monolithic applications, the Application Core, Infrastructure, and UI project
 <img src="Images/authDB.png" alt="depImg" height="300">
 <img src="Images/IdentityDB.png" alt="depImg" >
 
-- **Scrum Iterations**: The project follows Agile methodologies, with detailed documentation of Scrum iterations, ensuring clear communication and progress tracking throughout the development lifecycle.
+- **Scrum Iterations**: The project follows Agile methodologies, with detailed documentation of Scrum iterations, ensuring clear communication and progress tracking throughout the development lifecycle.<br>
 <a href="https://github.com/LeonelCamposM/PlanillaUCR/tree/main/Scrum">Agile metogology documentation</a>
+<br>
 
 - **Unit-Integration Testing**: Comprehensive unit, integration, system tests are implemented to validate the functionality.
 <table>
@@ -49,26 +50,10 @@ In monolithic applications, the Application Core, Infrastructure, and UI project
   </tr>
 </table>
 
-## Execution instructions
-1) Clone the repository locally, using Visual Studio
 
-2) Make sure you have .net 5.0 installed and ASP.net web development
-![depImg](Images/dependencies.png)
-
-3) Right click on the Server_Planilla project and select it as the start project
-![startImg](Images/startProject.png)
-
-4) With the web server as the default project. and the selected infrastructure layer.
-From the Package manager console run:
-Update-Database -Context AccountsDbContext
-![AuthImg](Images/auth.png)
-
-5) Run Planilla data base using vs options
-![databaseImg](Images/databaseImg.png)
-
-6) Click on the button to run using ISSExpress
-![rundImg](Images/run.png)
-
+## Running the app
+<a href="/SETUP.md">Setup Instructions</a>
+<br>
 
 # Colaborators
 ● Leonel Campos Murillo. B91545.  
