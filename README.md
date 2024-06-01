@@ -34,7 +34,7 @@ In monolithic applications, the Application Core, Infrastructure, and UI project
 
 - **ASP .NET Identity**: Utilized for user and role management, facilitating secure authentication and authorization processes within the application.
 <img src="Images/authDB.png" alt="depImg" height="300">
-<img src="Images/identityDB.png" alt="depImg" >
+<img src="Images/IdentityDB.png" alt="depImg" >
 
 - **Scrum Iterations**: The project follows Agile methodologies, with detailed documentation of Scrum iterations, ensuring clear communication and progress tracking throughout the development lifecycle.
 <a href="https://github.com/LeonelCamposM/PlanillaUCR/tree/main/Scrum">Agile metogology documentation</a>
