@@ -54,10 +54,3 @@ In monolithic applications, the Application Core, Infrastructure, and UI project
 ## Running the app
 <a href="/SETUP.md">Setup Instructions</a>
 <br>
-
-# Colaborators
-● Leonel Campos Murillo. B91545.  
-● Nayeri Azofeifa Porras. B90841.  
-● Wendy Ortiz Alfaro. B75584.  
-● Ronald Mauricio Palma Villegas. B95811.  
-● Jeremy Vargas Artavia. B98157.  
